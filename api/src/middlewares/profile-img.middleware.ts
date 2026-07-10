@@ -23,4 +23,4 @@ function fileFilter(_: Request, file: Express.Multer.File, callback: multer.File
 
 export const upload = multer({ storage, fileFilter });
 
-export const uploadImage = upload.single("file");
+export const uploadImage = upload.single("image_file");

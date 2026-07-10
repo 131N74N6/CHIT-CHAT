@@ -5,7 +5,7 @@ import { v2 } from "cloudinary";
 import { User } from "../models/user.model";
 import { AuthRequest } from "../middlewares/auth.middleware";
 import { Rooms } from "../models/room.model";
-import mongoose, { Types } from "mongoose";
+import { Types } from "mongoose";
 
 export async function changeRoomName(req: Request, res: Response) {
     try {
@@ -83,6 +83,22 @@ export async function createRoom(req: AuthRequest, res: Response) {
         await newRoom.save();
 
         res.status(200).json({ message: "new room created" });
+    } catch (error) {
+        res.status(500).json({ message: "something went wrong" });
+    }
+}
+
+export async function deleteOldProfile(req: Request, res: Response) {
+    try {
+        const roomId = req.params.room_id;
+        const { old_image } = req.body;
+
+        await Promise.all([
+            v2.uploader.destroy(old_image.public_id, { resource_type: old_image.resource_type }),
+            Rooms.updateOne({ _id: roomId }, { $set: { profile_picture: null } })
+        ]);
+
+        res.status(200).json({ message: "old picture deleted" });
     } catch (error) {
         res.status(500).json({ message: "something went wrong" });
     }

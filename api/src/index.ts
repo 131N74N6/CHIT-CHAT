@@ -12,13 +12,12 @@ import { v2 } from "cloudinary";
 import express from "express";
 import cookieParser from "cookie-parser";
 import cors from "cors";
+import { app, server } from "./services/socket-io.service";
 import userRouters from "./routers/user.router";
 import authRouters from "./routers/auth.router";
 import chatsRouters from "./routers/chat.router";
 import chatBotRouters from "./routers/chatbot.router";
 import roomRouters from "./routers/room.router";
-
-const app = express();
 
 v2.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -43,7 +42,7 @@ app.use("/api/users", userRouters);
 
 if (process.env.NODE_ENV !== "production") {
     mongodb.then(() => {
-        app.listen(4000, () => console.log("api running on http://localhost:4000"));
+        server.listen(4000, () => console.log("api running on http://localhost:4000"));
     });
 }
 

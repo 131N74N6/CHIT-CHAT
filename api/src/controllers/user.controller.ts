@@ -46,6 +46,21 @@ export async function changeUser(req: AuthRequest, res: Response) {
     }
 }
 
+export async function deleteOldProfile(req: AuthRequest, res: Response) {
+    try {
+        const userId = req.user?.user_id;
+        const { old_image } = req.body;
+        await Promise.all([
+            v2.uploader.destroy(old_image.public_id, { resource_type: old_image.resource_type }),
+            User.updateOne({ _id: userId }, { $set: { profile_picture: null } })
+        ]);
+
+        res.status(200).json({ message: "old picture deleted" });
+    } catch (error) {
+        res.status(500).json({ message: "something went wrong" });
+    }
+}
+
 export async function deleteUser(req: AuthRequest, res: Response) {
     try {
         const currentUserId = req.user?.user_id;

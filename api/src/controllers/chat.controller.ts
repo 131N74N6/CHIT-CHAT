@@ -3,6 +3,7 @@ import { AuthRequest } from "../middlewares/auth.middleware";
 import { Chats } from "../models/chat.model";
 import { CloudinaryUploadResult, uploadTOCloudinary } from "../services/cloudinary.service";
 import { v2 } from "cloudinary";
+import { io } from "../services/socket-io.service";
 
 export async function sendToOtherUser(req: AuthRequest, res: Response) {
     try {
@@ -36,6 +37,15 @@ export async function sendToOtherUser(req: AuthRequest, res: Response) {
         });
 
         await newChat.save();
+
+        io.to(`receiver:${newChat.receiver_id}`).emit("chat:send-to-user", {
+            _id: newChat._id,
+            created_at: newChat.created_at,
+            media: newChat.media,
+            messages: newChat.messages,
+            receiver_id: newChat.receiver_id,
+            sender_id: newChat.sender_id
+        });
 
         res.status(200).json({ message: "new chat for other user added" });
     } catch (error) {
@@ -75,6 +85,15 @@ export async function sendToOtherRoom(req: AuthRequest, res: Response) {
         });
 
         await newChat.save();
+
+        io.to(`room:${newChat.room_id}`).emit("chat:send-to-room", {
+            _id: newChat._id,
+            created_at: newChat.created_at,
+            media: newChat.media,
+            messages: newChat.messages,
+            room_id: newChat.room_id,
+            sender_id: newChat.sender_id
+        });
 
         res.status(200).json({ message: "new chat for room only added" });
     } catch (error) {
@@ -118,9 +137,9 @@ export async function deleteAllChats(req: Request, res: Response) {
 
 export async function deleteAllChatsPermanently(req: Request, res: Response) {
     try {
-        const receiver_id = req.params.receiver_id;
+        const receiverId = req.params.receiver_id;
         const selectedMedia: CloudinaryUploadResult[] = [];
-        const chats = await Chats.find({ receiver_id });
+        const chats = await Chats.find({ receiver_id: receiverId });
 
         if (chats.length === 0) return res.status(404).json({ message: "chat not found" });
 
@@ -136,7 +155,7 @@ export async function deleteAllChatsPermanently(req: Request, res: Response) {
 
         await Promise.all([
             ...deleteFromCloudinary,
-            Chats.deleteMany({ receiver_id })
+            Chats.deleteMany({ receiver_id: receiverId })
         ]);
         res.status(200).json({ message: "all chats deleted" });
     } catch (error) {
