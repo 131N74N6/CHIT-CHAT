@@ -3,15 +3,15 @@ import { getAllChats, getAllChatsForRoom } from "../views/chat.view";
 import { verifyToken } from "../middlewares/auth.middleware";
 import { deleteAllChats, deleteAllChatsPermanently, deleteChat, deleteChatPermanently } from "../controllers/chat.controller";
 
-const docsRouters = Router();
+const chatsRouters = Router();
 
-docsRouters.delete("/user/rm-all/:receiver_id", verifyToken, deleteAllChats);
-docsRouters.delete("/user/rm-all-pr/:receiver_id", verifyToken, deleteAllChatsPermanently);
+chatsRouters.delete("/user/rm-all/:receiver_id", verifyToken, deleteAllChats);
+chatsRouters.delete("/user/rm-all-pr/:receiver_id", verifyToken, deleteAllChatsPermanently);
 
-docsRouters.delete("/rm/:_id", verifyToken, deleteChat);
-docsRouters.delete("/rm-p/:_id", verifyToken, deleteChatPermanently);
+chatsRouters.delete("/rm/:_id", verifyToken, deleteChat);
+chatsRouters.delete("/rm-p/:_id", verifyToken, deleteChatPermanently);
 
-docsRouters.get("/user/:receiver_id", verifyToken, getAllChats);
-docsRouters.get("/room/room_id", verifyToken, getAllChatsForRoom);
+chatsRouters.get("/user/:receiver_id", verifyToken, getAllChats);
+chatsRouters.get("/room/room_id", verifyToken, getAllChatsForRoom);
 
-export default docsRouters;
+export default chatsRouters;

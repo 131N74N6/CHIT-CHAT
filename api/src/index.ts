@@ -7,14 +7,16 @@ if (process.env.NODE_ENV !== "production") {
     console.log("dns server: 1.1.1.1 or 8.8.8.8");
 }
 
+import { mongodb } from "./services/mongodb.service";
+import { v2 } from "cloudinary";
 import express from "express";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import userRouters from "./routers/user.router";
 import authRouters from "./routers/auth.router";
-import docsRouters from "./routers/chat.router";
-import { mongodb } from "./services/mongodb.service";
-import { v2 } from "cloudinary";
+import chatsRouters from "./routers/chat.router";
+import chatBotRouters from "./routers/chatbot.router";
+import roomRouters from "./routers/room.router";
 
 const app = express();
 
@@ -34,7 +36,9 @@ app.use(cors({
     ]
 }));
 app.use("/api/auths", authRouters);
-app.use("/api/docs", docsRouters);
+app.use("/api/chats", chatsRouters);
+app.use("/api/chatbots", chatBotRouters);
+app.use("/api/rooms", roomRouters);
 app.use("/api/users", userRouters);
 
 if (process.env.NODE_ENV !== "production") {

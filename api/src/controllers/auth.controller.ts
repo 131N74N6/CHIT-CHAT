@@ -73,6 +73,7 @@ export async function signUp (req: Request, res: Response) {
             gender: null,
             password: hashedPassword,
             profile_picture: null,
+            room_id: [],
             username
         });
 

@@ -16,7 +16,12 @@ const roomSchema = new Schema<RoomIntrf>({
     created_at: { type: String, required: true },
     creator_id: { type: Schema.Types.ObjectId, required: true },
     description: { type: String },
-    name: { type: String, required: true }
+    name: { type: String, required: true },
+    profile_picture: {
+        public_id: { type: String },
+        resource_type: { type: String },
+        url: { type: String }
+    }
 });
 
 export const Rooms = mongoose.model("rooms", roomSchema, "rooms");

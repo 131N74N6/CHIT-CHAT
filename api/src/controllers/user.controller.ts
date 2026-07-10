@@ -4,6 +4,8 @@ import { Chats } from "../models/chat.model";
 import { User } from "../models/user.model";
 import { CloudinaryUploadResult, uploadTOCloudinary } from "../services/cloudinary.service";
 import { v2 } from "cloudinary";
+import { Types } from "mongoose";
+import { Rooms } from "../models/room.model";
 
 export async function changeUser(req: AuthRequest, res: Response) {
     try {
@@ -66,11 +68,30 @@ export async function deleteUser(req: AuthRequest, res: Response) {
         await Promise.all([
             ...deleteFromCloudinary,
             v2.uploader.destroy(user.profile_picture.public_id, { resource_type: user.profile_picture.resource_type }),
+            Rooms.deleteMany({ creator_id: currentUserId }),
             Chats.deleteMany({ sender_id: currentUserId }),
             User.deleteOne({ _id: currentUserId })
         ]);
 
         res.status(200).json({ message: "user deleted" });
+    } catch (error) {
+        res.status(500).json({ message: "something went wrong" });
+    }
+}
+
+export async function joinRoom(req: AuthRequest, res: Response) {
+    try {
+        const { room_code } = req.body;
+        const userId = req.user?.user_id;
+
+        const currentUser = await User.findOne({ _id: userId });
+        if (!currentUser) return res.status(404).json({ message: "user not found" });
+
+        await User.updateOne({ _id: userId }, {
+            $push: { room_id: new Types.ObjectId(room_code) },
+        });
+
+        res.status(200).json({ message: "you left the room" });
     } catch (error) {
         res.status(500).json({ message: "something went wrong" });
     }

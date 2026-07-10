@@ -5,6 +5,7 @@ import { v2 } from "cloudinary";
 import { User } from "../models/user.model";
 import { AuthRequest } from "../middlewares/auth.middleware";
 import { Rooms } from "../models/room.model";
+import mongoose, { Types } from "mongoose";
 
 export async function changeRoomName(req: Request, res: Response) {
     try {
@@ -89,8 +90,11 @@ export async function createRoom(req: AuthRequest, res: Response) {
 
 export async function deleteRoom(req: Request, res: Response) {
     try {
-        const roomId = req.params.room_id;
-        const chats = await Chats.find({ room_id: roomId });
+        const roomIdParam = req.params.room_id;
+        const roomIdStr = Array.isArray(roomIdParam) ? roomIdParam[0] : roomIdParam;
+        const roomId = new Types.ObjectId(roomIdStr);
+
+        const chats = await Chats.find({ room_id: roomIdStr });
         const selectedMedia: CloudinaryUploadResult[] = [];
 
         chats.forEach(chat => {
@@ -106,7 +110,7 @@ export async function deleteRoom(req: Request, res: Response) {
         await Promise.all([
             ...deleteFromCloudinary,
             Chats.deleteMany({ room_id: roomId }),
-            User.updateMany({ room_id: roomId }, { $set: { room_id: null } }),
+            User.updateMany({ room_id: roomId }, { $pull: { room_id: roomId } }),
             Rooms.deleteOne({ _id: roomId })
         ]);
     } catch (error) {

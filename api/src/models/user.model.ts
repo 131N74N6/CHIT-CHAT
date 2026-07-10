@@ -11,7 +11,7 @@ export interface UserIntrf {
         resource_type: string;
         url: string;
     };
-    room_id: Types.ObjectId;
+    room_id: Types.ObjectId[];
     username: string;
 }
 
@@ -26,7 +26,7 @@ const userSchema = new Schema<UserIntrf>({
         resource_type: { type: String, required: true },
         url: { type: String, required: true }
     },
-    room_id: { type: Schema.Types.ObjectId },
+    room_id: [{ type: Schema.Types.ObjectId }],
     username: { type: String, required: true },
 });
 

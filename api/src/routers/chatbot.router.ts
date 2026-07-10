@@ -1,0 +1,14 @@
+import { Router } from "express";
+import { verifyToken } from "../middlewares/auth.middleware";
+import { deleteAllChats, deleteChat } from "../controllers/chatbot.controller";
+import { getAllResults, getResult } from "../views/chatbot.view";
+
+const chatBotRouters = Router();
+
+chatBotRouters.delete("/rm-all", verifyToken, deleteAllChats);
+chatBotRouters.delete("/rm", verifyToken, deleteChat);
+
+chatBotRouters.get("/show-all", verifyToken, getAllResults);
+chatBotRouters.get("/show/:_id", verifyToken, getResult);
+
+export default chatBotRouters;
