@@ -7,10 +7,10 @@ export async function getCurrentUser(req: AuthRequest, res: Response) {
         const user = await User.findOne({ _id: req.user?.user_id });
         if (!user) return res.status(404).json({ message: "user not found" });
         res.status(200).json({
-            address: user.address ? user.address : "-",
+            address: user.address,
             email: user.email,
-            gender: user.gender ? user.gender : "-",
-            profile_pic: user.profile_picture ? user.profile_picture : null,
+            gender: user.gender,
+            profile_pic: user.profile_picture,
             user_id: user._id,
             username: user.username
         });

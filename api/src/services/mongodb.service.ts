@@ -7,5 +7,5 @@ export const mongodb = mongoose.connect(`${process.env.MONGODB_URL}`)
     if (res) console.log("Database connected ✔️");
 })
 .catch(err => {
-    console.log(`Connection failed ❌: ${err}`);
+    console.log(`❌ Connection failed : ${err}`);
 });

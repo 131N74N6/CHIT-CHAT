@@ -1,4 +1,4 @@
-import mongoose, { Schema } from "mongoose";
+import mongoose, { Schema, Types } from "mongoose";
 
 export interface UserIntrf {
     address: string;
@@ -11,20 +11,22 @@ export interface UserIntrf {
         resource_type: string;
         url: string;
     };
+    room_id: Types.ObjectId;
     username: string;
 }
 
 const userSchema = new Schema<UserIntrf>({
-    address: { type: String, default: "-" },
+    address: { type: String },
     created_at: { type: String, required: true },
     email: { type: String, required: true },
-    gender: { type: String, default: "-" },
+    gender: { type: String },
     password: { type: String, required: true },
     profile_picture: {
         public_id: { type: String, required: true },
         resource_type: { type: String, required: true },
         url: { type: String, required: true }
     },
+    room_id: { type: Schema.Types.ObjectId },
     username: { type: String, required: true },
 });
 

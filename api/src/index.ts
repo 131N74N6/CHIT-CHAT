@@ -12,7 +12,7 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import userRouters from "./routers/user.router";
 import authRouters from "./routers/auth.router";
-import docsRouters from "./routers/doc.router";
+import docsRouters from "./routers/chat.router";
 import { mongodb } from "./services/mongodb.service";
 import { v2 } from "cloudinary";
 
