@@ -2,6 +2,7 @@ import { Router } from "express";
 import { getAllChats, getAllChatsForRoom } from "../views/chat.view";
 import { verifyToken } from "../middlewares/auth.middleware";
 import { deleteAllChats, deleteAllChatsPermanently, deleteChat, deleteChatPermanently, deleteAllChatsInRoom, deleteAllChatsPermanentlyInRoom, deleteChatInRoom, deleteChatPermanentlyInRoom, sendToOtherUser, sendToOtherRoom } from "../controllers/chat.controller";
+import { uploadMedia } from "../middlewares/upload.middleware";
 
 const chatsRouters = Router();
 
@@ -18,7 +19,7 @@ chatsRouters.delete("/room/rm/:_id/:room_id", verifyToken, deleteChatInRoom);
 chatsRouters.get("/user/:receiver_id", verifyToken, getAllChats);
 chatsRouters.get("/room/room_id", verifyToken, getAllChatsForRoom);
 
-chatsRouters.post("/to-user", verifyToken, sendToOtherUser);
-chatsRouters.post("/to-room", verifyToken, sendToOtherRoom);
+chatsRouters.post("/to-user", verifyToken, uploadMedia, sendToOtherUser);
+chatsRouters.post("/to-room", verifyToken, uploadMedia, sendToOtherRoom);
 
 export default chatsRouters;

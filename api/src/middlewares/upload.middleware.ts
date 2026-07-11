@@ -3,7 +3,7 @@ import { Request } from "express";
 
 const storage = multer.memoryStorage();
 
-function fileFilter(_: Request, file: Express.Multer.File, callback: multer.FileFilterCallback) {
+function imageFilter(_: Request, file: Express.Multer.File, callback: multer.FileFilterCallback) {
     const allowedFileTypes = [
         'image/jpg', 
         'image/webp', 
@@ -21,6 +21,8 @@ function fileFilter(_: Request, file: Express.Multer.File, callback: multer.File
     }
 }
 
-export const upload = multer({ storage, fileFilter });
+export const uploadImageConfig = multer({ storage, fileFilter: imageFilter });
+export const uploadImage = uploadImageConfig.single("image");
 
-export const uploadImage = upload.single("image_file");
+export const uploadMediaConfig = multer({ storage });
+export const uploadMedia = uploadMediaConfig.array("media");

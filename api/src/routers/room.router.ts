@@ -2,7 +2,7 @@ import { Router } from "express";
 import { verifyToken } from "../middlewares/auth.middleware";
 import { showAvailableRoom, showRoomMember } from "../views/room.view";
 import { changeRoomName, createRoom, deleteOldProfile, deleteRoom, kickMember } from "../controllers/room.controller";
-import { uploadImage } from "../middlewares/profile-img.middleware";
+import { uploadImage } from "../middlewares/upload.middleware";
 
 const roomRouters = Router();
 

@@ -2,7 +2,7 @@ import { Router } from "express";
 import { verifyToken } from "../middlewares/auth.middleware";
 import { getCurrentUser } from "../views/user.view";
 import { changeUser, deleteOldProfile, leftRoom } from "../controllers/user.controller";
-import { uploadImage } from "../middlewares/profile-img.middleware";
+import { uploadImage } from "../middlewares/upload.middleware";
 
 const userRouters = Router();
 
