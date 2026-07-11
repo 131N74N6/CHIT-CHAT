@@ -6,6 +6,7 @@ import { CloudinaryUploadResult, uploadTOCloudinary } from "../services/cloudina
 import { v2 } from "cloudinary";
 import { Types } from "mongoose";
 import { Rooms } from "../models/room.model";
+import { io } from "../services/socket-io.service";
 
 export async function changeUser(req: AuthRequest, res: Response) {
     try {
@@ -31,13 +32,29 @@ export async function changeUser(req: AuthRequest, res: Response) {
             }
         }
         
-        await User.updateOne({ _id: currentUserId }, {
+        const updated = await User.findOneAndUpdate({ _id: currentUserId }, {
             $set: {
                 address: address || null,
                 gender: gender || null,
                 profile_picture: newProfilePicture || null,
                 username: username || `user-${Date.now()}`
             }
+        });
+
+        user.room_id.forEach(roomId => {
+            io.to(`room:${roomId}`)
+            .emit("user:changed", {
+                _id: updated?._id,
+                profile_picture: updated?.profile_picture,
+                username: updated?.username
+            });
+        });
+
+        io.to(`receiver:${updated?._id}`)
+        .emit("user:changed", {
+            _id: updated?._id,
+            profile_picture: updated?.profile_picture,
+            username: updated?.username
         });
 
         res.status(200).json({ message: "user profile updated" });
@@ -50,6 +67,7 @@ export async function deleteOldProfile(req: AuthRequest, res: Response) {
     try {
         const userId = req.user?.user_id;
         const { old_image } = req.body;
+
         await Promise.all([
             v2.uploader.destroy(old_image.public_id, { resource_type: old_image.resource_type }),
             User.updateOne({ _id: userId }, { $set: { profile_picture: null } })
@@ -88,6 +106,22 @@ export async function deleteUser(req: AuthRequest, res: Response) {
             User.deleteOne({ _id: currentUserId })
         ]);
 
+        user.room_id.forEach(roomId => {
+            io.to(`room-member:${roomId}`)
+            .emit("user:changed", {
+                _id: user._id,
+                profile_picture: user.profile_picture,
+                username: user.username
+            });
+        });
+
+        io.to(`receiver:${user._id}`)
+        .emit("user:changed", {
+            _id: user._id,
+            profile_picture: user.profile_picture,
+            username: user.username
+        });
+
         res.status(200).json({ message: "user deleted" });
     } catch (error) {
         res.status(500).json({ message: "something went wrong" });
@@ -99,11 +133,15 @@ export async function joinRoom(req: AuthRequest, res: Response) {
         const { room_code } = req.body;
         const userId = req.user?.user_id;
 
-        const currentUser = await User.findOne({ _id: userId });
-        if (!currentUser) return res.status(404).json({ message: "user not found" });
+        const updated = await User.findOneAndUpdate({ _id: userId }, {
+            $addToSet: { room_id: new Types.ObjectId(room_code) },
+        });
 
-        await User.updateOne({ _id: userId }, {
-            $push: { room_id: new Types.ObjectId(room_code) },
+        io.to(`room-member:${room_code}`)
+        .emit("user:joined", {
+            _id: updated?._id,
+            profile_picture: updated?.profile_picture,
+            username: updated?.username
         });
 
         res.status(200).json({ message: "you left the room" });
@@ -114,9 +152,18 @@ export async function joinRoom(req: AuthRequest, res: Response) {
 
 export async function leftRoom(req: AuthRequest, res: Response) {
     try {
-        const currentUserId = req.user?.user_id;
-        await User.updateOne({ _id: currentUserId }, {
-            $set: { room_id: null }
+        const userId = req.user?.user_id;
+        const roomId = req.params.room_id;
+
+        const updated = await User.findOneAndUpdate({ _id: userId }, {
+            $pull: { room_id: roomId }
+        });
+
+        io.to(`room-member:${roomId}`)
+        .emit("user:left", {
+            _id: updated?._id,
+            profile_picture: updated?.profile_picture,
+            username: updated?.username
         });
 
         res.status(200).json({ message: "you left the room" });

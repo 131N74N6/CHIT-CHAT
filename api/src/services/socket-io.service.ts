@@ -11,8 +11,16 @@ const io = new Server(server, {
 io.on("connection", (socket) => {
     console.log("user connected");
 
-    socket.on("join:room", (roomId: string) => {
-        socket.join(`room:${roomId}`);
+    socket.on("join:room-chat", (roomId: string) => {
+        socket.join(`room-chat:${roomId}`);
+    });
+
+    socket.on("join:room-profile", (roomId: string) => {
+        socket.join(`room-profile:${roomId}`);
+    });
+
+    socket.on("join:available-room", (userId: string) => {
+        socket.join(`available-room:${userId}`);
     });
 
     socket.on("join:receiver", (userId: string) => {

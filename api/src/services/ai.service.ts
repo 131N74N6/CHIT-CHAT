@@ -1,27 +1,17 @@
 import { OpenRouter } from "@openrouter/sdk";
 import { ChatResult } from "@openrouter/sdk/models";
 
-export interface CreateDocsI {
-    codes: string;
-    language: string;
-}
-
 const ai = new OpenRouter({ apiKey: process.env.OPEN_ROUTER_API_KEY });
 const model = process.env.OPEN_ROUTER_AI_MODEL;
 
-export async function createDocumentation(props: CreateDocsI) {
+export async function chatWithAi(commands: string) {
     try {
         const response: ChatResult = await ai.chat.send({
             chatRequest: {
                 model: model,
                 messages: [{
                     "role": "user",
-                    "content": `
-                        ${props.codes}\n
-                        Tolong buatkan dokumentasi pada kode program ini dengan rapi dan terstruktur 
-                        menggunakan bahasa ${props.language} sehingga orang lain dapat memahami cara kerjanya. 
-                        Tolak dengan sopan jika yang dimasukkan bukan kode program.
-                    `
+                    "content": commands
                 }]
             }
         });
