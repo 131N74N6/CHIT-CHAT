@@ -11,7 +11,7 @@ userRouters.delete("/rm-pict", verifyToken, deleteOldProfile);
 
 userRouters.get("/show", verifyToken, getCurrentUser);
 
-userRouters.put("/left-room", verifyToken, leftRoom);
+userRouters.put("/left-room/:room_id", verifyToken, leftRoom);
 userRouters.put("/remake", verifyToken, uploadImage, changeUser);
 
 export default userRouters;
