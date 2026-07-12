@@ -1,0 +1,244 @@
+import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import type { IRoomService } from "../models/room.model";
+import { useChatStore } from "../stores/chat.store";
+import { useRef } from "react";
+
+export default function RooServices(props?: IRoomService) {
+    const queryClient = useQueryClient();
+    const inputMediaRef = useRef<HTMLInputElement>(null);
+    const baseUrl = `${import.meta.env.VITE_BASE_API_URL}/rooms`;
+
+    const resetChats = useChatStore((state) => state.resetChats);
+
+    const media = useChatStore((state) => state.media);
+    const setMedia = useChatStore((state) => state.setMedia);
+
+    const mediaUrl = useChatStore((state) => state.mediaUrl);
+    const setMediaUrl = useChatStore((state) => state.setMediaUrl);
+
+    const messages = useChatStore((state) => state.messages);
+    const setMessages = useChatStore((state) => state.setMessages);
+
+    const clearChatInRoomForMeMt = useMutation({
+        mutationFn: async (_id: string) => {
+            try {
+                const request = await fetch(`${baseUrl}/clear/${_id}/${props?.roomId}`, {
+                    credentials: "include",
+                    method: "PUT"
+                });
+
+                const response = await request.json();
+                if (!request.ok) throw new Error(response.message)
+                return response;
+            } catch (error) {
+                throw error;
+            }
+        },
+        onError: (error) => {
+            props?.setMessage!(error.message);
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: [`room-chat-${props?.roomId}`] });
+            resetChats();
+        }
+    });
+
+    const clearChatsInRoomForMeMt = useMutation({
+        mutationFn: async (_id: string) => {
+            try {
+                const request = await fetch(`${baseUrl}/clears/${props?.roomId}`, {
+                    credentials: "include",
+                    method: "PUT"
+                });
+
+                const response = await request.json();
+                if (!request.ok) throw new Error(response.message)
+                return response;
+            } catch (error) {
+                throw error;
+            }
+        },
+        onError: (error) => {
+            props?.setMessage!(error.message);
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: [`room-chat-${props?.roomId}`] });
+            resetChats();
+        }
+    });
+
+    const deleteAllChatsPermanentlyForRoomMt = useMutation({
+        mutationFn: async () => {
+            try {
+                const request = await fetch(`${baseUrl}/rm-all/permanently/${props?.roomId}`, {
+                    credentials: "include",
+                    method: "DELETE"
+                });
+
+                const response = await request.json();
+                if (!request.ok) throw new Error(response.message);
+                return response;
+            } catch (error) {
+                throw error;
+            }
+        },
+        onError: (error) => {
+            props?.setMessage!(error.message);
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: [`room-chat-${props?.roomId}`] });
+        }
+    });
+
+    const deleteAllChatsForRoomMt = useMutation({
+        mutationFn: async () => {
+            try {
+                const request = await fetch(`${baseUrl}/rooms/rm-all/${props?.roomId}`, {
+                    credentials: "include",
+                    method: "DELETE"
+                });
+
+                const response = await request.json();
+                if (!request.ok) throw new Error(response.message);
+                return response;
+            } catch (error) {
+                throw error;
+            }
+        },
+        onError: (error) => {
+            props?.setMessage!(error.message);
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: [`room-chat-${props?.roomId}`] });
+        }
+    });
+
+    const deleteChatPermanentlyForRoomMt = useMutation({
+        mutationFn: async (_id: string) => {
+            try {
+                const request = await fetch(`${baseUrl}/rooms/rm/permanently/${_id}/${props?.roomId}`, {
+                    credentials: "include",
+                    method: "DELETE"
+                });
+
+                const response = await request.json();
+                if (!request.ok) throw new Error(response.message);
+                return response;
+            } catch (error) {
+                throw error;
+            }
+        },
+        onError: (error) => {
+            props?.setMessage!(error.message);
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: [`room-chat-${props?.roomId}`] });
+        }
+    });
+
+    const deleteChaForRoomMt = useMutation({
+        mutationFn: async (_id: string) => {
+            try {
+                const request = await fetch(`${baseUrl}/rooms/rm/${_id}/${props?.roomId}`, {
+                    credentials: "include",
+                    method: "DELETE"
+                });
+
+                const response = await request.json();
+                if (!request.ok) throw new Error(response.message);
+                return response;
+            } catch (error) {
+                throw error;
+            }
+        },
+        onError: (error) => {
+            props?.setMessage!(error.message);
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: [`room-chat-${props?.roomId}`] });
+            resetChats();
+        }
+    });
+
+    const { data, error, fetchNextPage, isFetchingNextPage, isLoading, hasNextPage } = useInfiniteQuery({
+        enabled: !!props?.roomId,
+        getNextPageParam: (lastPage, allPages) => {
+            if (lastPage.length <= 14) return;
+            return allPages.length + 1;
+        },
+        queryFn: async ({pageParam = 1}: { pageParam?: number }) => {
+            try {const request = await fetch(`${baseUrl}/chat/${props?.roomId}?page=${pageParam}&limit=${14}`, {
+                    credentials: "include",
+                    method: "GET"
+                });
+                
+                const response = await request.json();
+                if (!request.ok) throw new Error(response.message);
+                return response;
+            } catch (error) {
+                throw error;
+            }
+        },
+        initialPageParam: 1,
+        queryKey: [`room-chat-${props?.roomId}`],
+        refetchOnMount: true,
+        refetchOnReconnect: true,
+        refetchOnWindowFocus: false,
+        staleTime: Infinity
+    });
+    
+    const sendChatToRoomMt = useMutation({
+        mutationFn: async () => {
+            try {
+                const formData = new FormData();
+                formData.append("messages", messages.trim());
+                formData.append("room_id", props?.roomId!);
+
+                if (media && media.length > 0) {
+                    media.forEach(media => formData.append("media", media));
+                }
+
+                const request = await fetch(`${baseUrl}/rooms/to-room`, {
+                    body: formData,
+                    credentials: "include",
+                    method: "POST"
+                });
+
+                const response = await request.json();
+                if (!request.ok) throw new Error(response.message);
+                return response;
+            } catch (error) {
+                throw error;
+            }
+        },
+        onError: (error) => {
+            props?.setMessage!(error.message);
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: [`room-chat-${props?.roomId}`] });
+            resetChats();
+        }
+    });
+
+    const isRoomProcessing = clearChatInRoomForMeMt.isPending || clearChatsInRoomForMeMt.isPending ||
+    deleteAllChatsPermanentlyForRoomMt.isPending || deleteAllChatsForRoomMt.isPending || 
+    deleteChatPermanentlyForRoomMt.isPending || deleteChaForRoomMt.isPending
+
+    return { 
+        clearChatInRoomForMeMt,
+        clearChatsInRoomForMeMt,
+        deleteAllChatsForRoomMt,
+        deleteAllChatsPermanentlyForRoomMt,
+        deleteChaForRoomMt,
+        deleteChatPermanentlyForRoomMt,
+        inputMediaRef, 
+        isRoomProcessing,
+        media,
+        mediaUrl,
+        messages,
+        sendChatToRoomMt, 
+        setMedia,
+        setMediaUrl,
+        setMessages
+    }
+}

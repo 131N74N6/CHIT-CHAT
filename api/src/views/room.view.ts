@@ -2,6 +2,27 @@ import { Request, Response } from "express";
 import { User } from "../models/user.model";
 import { AuthRequest } from "../middlewares/auth.middleware";
 import { Rooms } from "../models/room.model";
+import { Chats } from "../models/chat.model";
+
+export async function getAllChatsForRoom(req: AuthRequest, res: Response) {
+    try {
+        const roomId = req.params.room_id;
+        const userId = req.user?.user_id;
+
+        const limit = parseInt(req.query.limit as string) || 13;
+        const page = parseInt(req.query.page as string) || 1;
+        const skip = (page - 1) * limit;
+
+        const chats = await Chats
+        .find({ room_id: roomId, hidden_for: { $nin: [userId!] } })
+        .limit(limit)
+        .skip(skip);
+
+        res.status(200).json(chats);
+    } catch (error) {
+        res.status(500).json({ message: "something went wrong" });
+    }
+}
 
 export async function showAvailableRoom(req: AuthRequest, res: Response) {
     try {

@@ -1,25 +1,29 @@
 import { Router } from "express";
-import { getAllChats, getAllChatsForRoom } from "../views/chat.view";
+import { getAllChats } from "../views/chat.view";
 import { verifyToken } from "../middlewares/auth.middleware";
-import { deleteAllChats, deleteAllChatsPermanently, deleteChat, deleteChatPermanently, deleteAllChatsInRoom, deleteAllChatsPermanentlyInRoom, deleteChatInRoom, deleteChatPermanentlyInRoom, sendToOtherUser, sendToOtherRoom } from "../controllers/chat.controller";
+import { 
+    clearChatForMe, 
+    clearChatsForMe, 
+    deleteAllChats, 
+    deleteAllChatsPermanently, 
+    deleteChat, 
+    deleteChatPermanently, 
+    sendToOtherUser 
+} from "../controllers/chat.controller";
 import { uploadMedia } from "../middlewares/upload.middleware";
 
 const chatsRouters = Router();
 
-chatsRouters.delete("/user/rm-all/permanently", verifyToken, deleteAllChatsPermanently);
-chatsRouters.delete("/user/rm/permanently/:_id", verifyToken, deleteChatPermanently);
-chatsRouters.delete("/user/rm-all", verifyToken, deleteAllChats);
-chatsRouters.delete("/user/rm/:_id", verifyToken, deleteChat);
+chatsRouters.delete("/rm-all/permanently", verifyToken, deleteAllChatsPermanently);
+chatsRouters.delete("/rm/permanently/:_id", verifyToken, deleteChatPermanently);
+chatsRouters.delete("/rm-all", verifyToken, deleteAllChats);
+chatsRouters.delete("/rm/:_id", verifyToken, deleteChat);
 
-chatsRouters.delete("/room/rm-all/permanently/:room_id", verifyToken, deleteAllChatsPermanentlyInRoom);
-chatsRouters.delete("/room/rm/permanently/:_id/:room_id", verifyToken, deleteChatPermanentlyInRoom);
-chatsRouters.delete("/room/rm-all/:room_id", verifyToken, deleteAllChatsInRoom);
-chatsRouters.delete("/room/rm/:_id/:room_id", verifyToken, deleteChatInRoom);
-
-chatsRouters.get("/user/:receiver_id", verifyToken, getAllChats);
-chatsRouters.get("/room/room_id", verifyToken, getAllChatsForRoom);
+chatsRouters.get("/chat/:receiver_id", verifyToken, getAllChats);
 
 chatsRouters.post("/to-user", verifyToken, uploadMedia, sendToOtherUser);
-chatsRouters.post("/to-room", verifyToken, uploadMedia, sendToOtherRoom);
+
+chatsRouters.put("/clear/:_id", verifyToken, clearChatForMe);
+chatsRouters.put("/clears/:receiver_id", verifyToken, clearChatsForMe);
 
 export default chatsRouters;

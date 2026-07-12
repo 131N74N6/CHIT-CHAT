@@ -1,9 +1,10 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useChatStore } from "../stores/chat.store";
 import { useRef } from "react";
 import type { IChatService } from "../models/chat.model";
 
 export default function ChatServices(props?: IChatService) {
+    const baseUrl = `${import.meta.env.VITE_BASE_API_URL}/chats`;
     const queryClient = useQueryClient();
     const inputMediaRef = useRef<HTMLInputElement>(null);
 
@@ -18,6 +19,180 @@ export default function ChatServices(props?: IChatService) {
     const messages = useChatStore((state) => state.messages);
     const setMessages = useChatStore((state) => state.setMessages);
 
+    const clearChatForMeMt = useMutation({
+        mutationFn: async (_id: string) => {
+            try {
+                const request = await fetch(`${baseUrl}/clear/${_id}`, {
+                    credentials: "include",
+                    method: "PUT"
+                });
+
+                const response = await request.json();
+                if (!request.ok) throw new Error(response.message);
+                return response;
+            } catch (error) {
+                throw error;
+            }
+        },
+        onError: (error) => {
+            props?.setMessage!(error.message);
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: [`user-chat-${props?.receiverId}`] });
+            resetChats();
+        }
+    });
+
+    const clearChatsForMeMt = useMutation({
+        mutationFn: async () => {
+            try {
+                const request = await fetch(`${baseUrl}/clears/${props?.receiverId}`, {
+                    credentials: "include",
+                    method: "PUT"
+                });
+
+                const response = await request.json();
+                if (!request.ok) throw new Error(response.message);
+                return response;
+            } catch (error) {
+                throw error;
+            }
+        },
+        onError: (error) => {
+            props?.setMessage!(error.message);
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: [`user-chat-${props?.receiverId}`] });
+            resetChats();
+        }
+    });
+
+    const deleteAllChatsPermanentlyForReceiverMt = useMutation({
+        mutationFn: async () => {
+            try {
+                const request = await fetch(`${baseUrl}/rm-all/permanently`, {
+                    credentials: "include",
+                    method: "DELETE"
+                });
+
+                const response = await request.json();
+                if (!request.ok) throw new Error(response.message);
+                return response;
+            } catch (error) {
+                throw error;
+            }
+        },
+        onError: (error) => {
+            props?.setMessage!(error.message);
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: [`user-chat-${props?.receiverId}`] });
+            resetChats();
+        }
+    });
+
+    const deleteAllChatsForReceiverMt = useMutation({
+        mutationFn: async () => {
+            try {
+                const request = await fetch(`${baseUrl}/rm-all`, {
+                    credentials: "include",
+                    method: "DELETE"
+                });
+
+                const response = await request.json();
+                if (!request.ok) throw new Error(response.message);
+                return response;
+            } catch (error) {
+                throw error;
+            }
+        },
+        onError: (error) => {
+            props?.setMessage!(error.message);
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: [`user-chat-${props?.receiverId}`] });
+            resetChats();
+        }
+    });
+
+    const deleteChatPermanentlyForReceiverMt = useMutation({
+        mutationFn: async (_id: string) => {
+            try {
+                const request = await fetch(`${baseUrl}/rm/permanently/${_id}`, {
+                    credentials: "include",
+                    method: "DELETE"
+                });
+
+                const response = await request.json();
+                if (!request.ok) throw new Error(response.message);
+                return response;
+            } catch (error) {
+                throw error;
+            }
+        },
+        onError: (error) => {
+            props?.setMessage!(error.message);
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: [`user-chat-${props?.receiverId}`] });
+            resetChats();
+        }
+    });
+
+    const deleteChatForReceiverMt = useMutation({
+        mutationFn: async (_id: string) => {
+            try {
+                const request = await fetch(`${baseUrl}/rm/${_id}`, {
+                    credentials: "include",
+                    method: "DELETE"
+                });
+
+                const response = await request.json();
+                if (!request.ok) throw new Error(response.message);
+                return response;
+            } catch (error) {
+                throw error;
+            }
+        },
+        onError: (error) => {
+            props?.setMessage!(error.message);
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: [`user-chat-${props?.receiverId}`] });
+            resetChats();
+        }
+    });
+
+    const { data, error, fetchNextPage, isFetchingNextPage, isLoading, hasNextPage } = useInfiniteQuery({
+        enabled: !!props?.receiverId,
+        getNextPageParam: (lastPage, allPages) => {
+            if (lastPage.length <= 14) return;
+            return allPages.length + 1;
+        },
+        queryFn: async ({ pageParam = 1 }: { pageParam?: number }) => {
+            try {
+                const request = await fetch(`${baseUrl}/chat/${props?.receiverId}?page=${pageParam}&limit=${14}`, {
+                    credentials: "include",
+                    method: "GET"
+                });
+                
+                const response = await request.json();
+                if (!request.ok) throw new Error(response.message);
+                return response;
+            } catch (error) {
+                throw error;
+            }
+        },
+        initialPageParam: 1,
+        queryKey: [`user-chat-${props?.receiverId}`],
+        refetchOnMount: true,
+        refetchOnReconnect: true,
+        refetchOnWindowFocus: false,
+        staleTime: Infinity
+    });
+
+    const getUserChats = data ? data.pages.flat() : [];
+
     const sendChatToUserMt = useMutation({
         mutationFn: async () => {
             try {
@@ -29,7 +204,7 @@ export default function ChatServices(props?: IChatService) {
                     media.forEach(media => formData.append("media", media));
                 }
 
-                const request = await fetch(`${import.meta.env.VITE_BASE_API_URL}/chats/to-user`, {
+                const request = await fetch(`${baseUrl}/to-user`, {
                     body: formData,
                     credentials: "include",
                     method: "POST"
@@ -51,239 +226,28 @@ export default function ChatServices(props?: IChatService) {
         }
     });
 
-    const sendChatToRoomMt = useMutation({
-        mutationFn: async () => {
-            try {
-                const formData = new FormData();
-                formData.append("messages", messages.trim());
-                formData.append("room_id", props?.roomId!);
+    const isChatProcessing = sendChatToUserMt.isPending || isLoading || clearChatForMeMt.isPending || 
+    clearChatsForMeMt.isPending || deleteAllChatsForReceiverMt.isPending || 
+    deleteAllChatsPermanentlyForReceiverMt.isPending || deleteChatForReceiverMt.isPending || 
+    deleteChatPermanentlyForReceiverMt.isPending;
 
-                if (media && media.length > 0) {
-                    media.forEach(media => formData.append("media", media));
-                }
-
-                const request = await fetch(`${import.meta.env.VITE_BASE_API_URL}/chats/to-room`, {
-                    body: formData,
-                    credentials: "include",
-                    method: "POST"
-                });
-
-                const response = await request.json();
-                if (!request.ok) throw new Error(response.message);
-                return response;
-            } catch (error) {
-                throw error;
-            }
-        },
-        onError: (error) => {
-            props?.setMessage!(error.message);
-        },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: [`room-chat-${props?.roomId}`] });
-            resetChats();
-        }
-    });
-
-    const deleteAllChatsPermanentlyForReceiverMt = useMutation({
-        mutationFn: async () => {
-            try {
-                const request = await fetch(`${import.meta.env.VITE_BASE_API_URL}/chats/user/rm-all/permanently`, {
-                    credentials: "include",
-                    method: "DELETE"
-                });
-
-                const response = await request.json();
-                if (!request.ok) throw new Error(response.message);
-                return response;
-            } catch (error) {
-                throw error;
-            }
-        },
-        onError: (error) => {
-            props?.setMessage!(error.message);
-        },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: [`user-chat-${props?.receiverId}`] });
-        }
-    });
-
-    const deleteAllChatsForReceiverMt = useMutation({
-        mutationFn: async () => {
-            try {
-                const request = await fetch(`${import.meta.env.VITE_BASE_API_URL}/chats/user/rm-all`, {
-                    credentials: "include",
-                    method: "DELETE"
-                });
-
-                const response = await request.json();
-                if (!request.ok) throw new Error(response.message);
-                return response;
-            } catch (error) {
-                throw error;
-            }
-        },
-        onError: (error) => {
-            props?.setMessage!(error.message);
-        },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: [`user-chat-${props?.receiverId}`] });
-        }
-    });
-
-    const deleteChatPermanentlyForReceiverMt = useMutation({
-        mutationFn: async (_id: string) => {
-            try {
-                const request = await fetch(`${import.meta.env.VITE_BASE_API_URL}/chats/user/rm/permanently/${_id}`, {
-                    credentials: "include",
-                    method: "DELETE"
-                });
-
-                const response = await request.json();
-                if (!request.ok) throw new Error(response.message);
-                return response;
-            } catch (error) {
-                throw error;
-            }
-        },
-        onError: (error) => {
-            props?.setMessage!(error.message);
-        },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: [`user-chat-${props?.receiverId}`] });
-        }
-    });
-
-    const deleteChaForReceiverMt = useMutation({
-        mutationFn: async (_id: string) => {
-            try {
-                const request = await fetch(`${import.meta.env.VITE_BASE_API_URL}/chats/user/rm/${_id}`, {
-                    credentials: "include",
-                    method: "DELETE"
-                });
-
-                const response = await request.json();
-                if (!request.ok) throw new Error(response.message);
-                return response;
-            } catch (error) {
-                throw error;
-            }
-        },
-        onError: (error) => {
-            props?.setMessage!(error.message);
-        },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: [`user-chat-${props?.receiverId}`] });
-        }
-    });
-
-    const deleteAllChatsPermanentlyForRoomMt = useMutation({
-        mutationFn: async () => {
-            try {
-                const request = await fetch(`${import.meta.env.VITE_BASE_API_URL}/chats/room/rm-all/permanently/${props?.roomId}`, {
-                    credentials: "include",
-                    method: "DELETE"
-                });
-
-                const response = await request.json();
-                if (!request.ok) throw new Error(response.message);
-                return response;
-            } catch (error) {
-                throw error;
-            }
-        },
-        onError: (error) => {
-            props?.setMessage!(error.message);
-        },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: [`room-chat-${props?.roomId}`] });
-        }
-    });
-
-    const deleteAllChatsForRoomMt = useMutation({
-        mutationFn: async () => {
-            try {
-                const request = await fetch(`${import.meta.env.VITE_BASE_API_URL}/chats/room/rm-all/${props?.roomId}`, {
-                    credentials: "include",
-                    method: "DELETE"
-                });
-
-                const response = await request.json();
-                if (!request.ok) throw new Error(response.message);
-                return response;
-            } catch (error) {
-                throw error;
-            }
-        },
-        onError: (error) => {
-            props?.setMessage!(error.message);
-        },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: [`room-chat-${props?.roomId}`] });
-        }
-    });
-
-    const deleteChatPermanentlyForRoomMt = useMutation({
-        mutationFn: async (_id: string) => {
-            try {
-                const request = await fetch(`${import.meta.env.VITE_BASE_API_URL}/chats/room/rm/permanently/${_id}/${props?.roomId}`, {
-                    credentials: "include",
-                    method: "DELETE"
-                });
-
-                const response = await request.json();
-                if (!request.ok) throw new Error(response.message);
-                return response;
-            } catch (error) {
-                throw error;
-            }
-        },
-        onError: (error) => {
-            props?.setMessage!(error.message);
-        },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: [`room-chat-${props?.roomId}`] });
-        }
-    });
-
-    const deleteChaForRoomMt = useMutation({
-        mutationFn: async (_id: string) => {
-            try {
-                const request = await fetch(`${import.meta.env.VITE_BASE_API_URL}/chats/room/rm/${_id}/${props?.roomId}`, {
-                    credentials: "include",
-                    method: "DELETE"
-                });
-
-                const response = await request.json();
-                if (!request.ok) throw new Error(response.message);
-                return response;
-            } catch (error) {
-                throw error;
-            }
-        },
-        onError: (error) => {
-            props?.setMessage!(error.message);
-        },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: [`room-chat-${props?.roomId}`] });
-        }
-    });
+    const userChats = { error, fetchNextPage, getUserChats, isFetchingNextPage, isLoading, hasNextPage }
 
     return {
-        deleteChaForReceiverMt,
+        clearChatForMeMt,
+        clearChatsForMeMt,
+        deleteChatForReceiverMt,
         deleteChatPermanentlyForReceiverMt,
         deleteAllChatsForReceiverMt,
         deleteAllChatsPermanentlyForReceiverMt,
-        deleteAllChatsForRoomMt,
-        deleteAllChatsPermanentlyForRoomMt,
-        deleteChaForRoomMt,
-        deleteChatPermanentlyForRoomMt,
         inputMediaRef,
+        isChatProcessing,
         media,
         mediaUrl,
-        sendChatToRoomMt,
         sendChatToUserMt,
         setMedia,
         setMediaUrl,
-        setMessages
+        setMessages,
+        userChats
     }
 }

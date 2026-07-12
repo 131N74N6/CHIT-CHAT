@@ -2,140 +2,55 @@ import { Request, Response } from "express";
 import { Chats } from "../models/chat.model";
 import { CloudinaryUploadResult, uploadTOCloudinary } from "../services/cloudinary.service";
 import { v2 } from "cloudinary";
-import { User } from "../models/user.model";
 import { AuthRequest } from "../middlewares/auth.middleware";
-import { Rooms } from "../models/room.model";
-import { Types } from "mongoose";
 import { io } from "../services/socket-io.service";
 
-export async function changeRoomName(req: AuthRequest, res: Response) {
+export async function clearChatInRoomForMe(req: AuthRequest, res: Response) {
+    try {
+        const id = req.params._id;
+        const roomId = req.params.room_id;
+        const userId = req.user?.user_id;
+
+        const chat = await Chats.findOne({ _id: id, room_id: roomId });
+        if (!chat) return res.status(404).json({ message: "chat not found" });
+
+        await Chats.updateOne({ _id: id, room_id: roomId }, {
+            $set: { media: [] },
+            $addToSet: { hidden_for: userId }
+        });
+
+        res.status(200).json({ message: "chat in room cleared" });
+    } catch (error) {
+        res.status(500).json({ message: "something went wrong" });
+    }
+}
+
+export async function clearChatsInRoomForMe(req: AuthRequest, res: Response) {
     try {
         const roomId = req.params.room_id;
         const userId = req.user?.user_id;
-        
-        const { description, name } = req.body;
-        const selectedImage: Express.Multer.File | undefined = req.file;
-        let newProfilePicture;
 
-        if (!name) return res.status(400).json({ message: "room name is required" });
+        const chat = await Chats.find({ room_id: roomId });
+        if (chat.length === 0) return res.status(404).json({ message: "chat not found" });
 
-        const room = await Rooms.findOne({ _id: roomId });
-        if (!room) return res.status(404).json({ message: "room not found" });
-
-        const nameExist = await Rooms.findOne({ name: name, _id: { $ne: roomId } });
-        if (nameExist) return res.status(409).json({ message: `name: ${name} has been taken` });
-
-        if (selectedImage) {
-            if (room.profile_picture !== null) {
-                await v2.uploader.destroy(room.profile_picture.public_id, { resource_type: room.profile_picture.resource_type });
-
-                const cloudinary = await uploadTOCloudinary({
-                    file_buffer: selectedImage.buffer,
-                    folder_name: "room_profile",
-                    original_name: selectedImage.filename
-                });
-
-                newProfilePicture = cloudinary;
-            }
-        }
-
-        const updated = await Rooms.findOneAndUpdate({ _id: roomId }, {
-            $set: { 
-                description: description || null,
-                name: name, 
-                profile_picture: newProfilePicture || null
-            }
+        await Chats.updateMany({ room_id: roomId }, {
+            $set: { media: [] },
+            $addToSet: { hidden_for: userId }
         });
 
-        io.to(`room-profile:${updated?._id}`)
-        .to(`room-chat:${updated?._id}`)
-        .to(`available-room:${userId}`)
-        .emit("room-profile:changed", {
-            _id: updated?._id,
-            description: updated?.description,
-            name: updated?.name,
-            profile_picture: updated?.profile_picture
-        });
-
-        res.status(200).json({ message: "room name changed" });
+        res.status(200).json({ message: "chat in room cleared" });
     } catch (error) {
         res.status(500).json({ message: "something went wrong" });
     }
 }
 
-export async function createRoom(req: AuthRequest, res: Response) {
+export async function deleteAllChatsPermanentlyInRoom(req: AuthRequest, res: Response) {
     try {
-        const user_id = req.user?.user_id;
-        const created_at = new Date().toISOString();
-
-        const { description, name } = req.body;
-        const selectedImage: Express.Multer.File | undefined = req.file;
-        
-        let picture;
-
-        if (!name) return res.status(400).json({ message: "room name is required" });
-
-        if (selectedImage) {
-            const cloudinary = await uploadTOCloudinary({
-                file_buffer: selectedImage.buffer,
-                folder_name: "room_profile",
-                original_name: selectedImage.filename
-            });
-
-            picture = cloudinary;
-        }
-
-        const newRoom = new Rooms({
-            created_at: created_at,
-            creator_id: user_id,
-            name: name,
-            description: description || null,
-            profile_picture: picture || null
-        });
-
-        await newRoom.save();
-
-        res.status(200).json({ message: "new room created" });
-    } catch (error) {
-        res.status(500).json({ message: "something went wrong" });
-    }
-}
-
-export async function deleteOldProfile(req: Request, res: Response) {
-    try {
-        const roomId = req.params.room_id;
-        const { old_image } = req.body;
-
-        await Promise.all([
-            v2.uploader.destroy(old_image.public_id, { resource_type: old_image.resource_type }),
-            Rooms.updateOne({ _id: roomId }, { $set: { profile_picture: null } })
-        ]);
-
-        res.status(200).json({ message: "old picture deleted" });
-    } catch (error) {
-        res.status(500).json({ message: "something went wrong" });
-    }
-}
-
-export async function deleteRoom(req: AuthRequest, res: Response) {
-    try {
-        const roomIdParam = req.params.room_id;
         const userId = req.user?.user_id;
-
-        const roomIdStr = Array.isArray(roomIdParam) ? roomIdParam[0] : roomIdParam;
-        const roomId = new Types.ObjectId(roomIdStr);
-
-        const chats = await Chats.find({ room_id: roomIdStr });
-        const room = await Rooms.findOne({ _id: roomId });
-        const selectedMedia: CloudinaryUploadResult[] = [];
-
-        if (!room) return res.status(404).json({ message: "room not found" });
-
-        chats.forEach(chat => {
-            if (chat.media.length > 0) {
-                chat.media.map(media => selectedMedia.push(media));
-            }
-        });
+        const roomId = req.params.room_id;
+        
+        const chats = await Chats.find({ sender_id: userId, room_id: roomId });
+        const selectedMedia: CloudinaryUploadResult[] = chats.flatMap(chat => chat.media || []);
 
         const deleteFromCloudinary = selectedMedia.map(media => {
             return v2.uploader.destroy(media.public_id, { resource_type: media.resource_type });
@@ -143,46 +58,169 @@ export async function deleteRoom(req: AuthRequest, res: Response) {
 
         await Promise.all([
             ...deleteFromCloudinary,
-            Chats.deleteMany({ room_id: roomId }),
-            User.updateMany({ room_id: roomId }, { $pull: { room_id: roomId } }),
-            Rooms.deleteOne({ _id: roomId })
+            Chats.deleteMany({ sender_id: userId, room_id: roomId })
         ]);
 
-        io.to(`room-chat:${roomId}`)
-        .to(`room-profile:${roomId}`)
-        .to(`available-room:${userId}`)
-        .emit("room:deleted", {
-            _id: room._id,
-            name: room.name,
-            profile_picture: room.profile_picture
-        });
+        io.to(`room-chat:${roomId}`).emit("room:deleted-all-chats-permanently", chats);
 
-        io.to(`room-chat:${roomId}`).emit("room:deleted", chats);
-
-        res.status(200).json({ message: "room deleted" });
+        res.status(200).json({ message: "all your message in group deleted permanently" });
     } catch (error) {
         res.status(500).json({ message: "something went wrong" });
     }
 }
 
-export async function kickMember(req: Request, res: Response) {
+export async function deleteAllChatsInRoom(req: AuthRequest, res: Response) {
     try {
-        const userId = req.params.user_id;
+        const userId = req.user?.user_id;
         const roomId = req.params.room_id;
 
-        const updated = await User.findOneAndUpdate({ _id: userId }, {
-            $pull: { room_id: roomId }
+        const chats = await Chats.find({ sender_id: userId, room_id: roomId });
+        const selectedMedia: CloudinaryUploadResult[] = chats.flatMap(chat => chat.media || []);
+
+        const deleteFromCloudinary = selectedMedia.map(media => {
+            return v2.uploader.destroy(media.public_id, { resource_type: media.resource_type });
         });
 
-        io.to(`room-profile:${roomId}`)
-        .to(`available-room:${userId}`)
-        .emit("room:member-kicked", {
-            _id: updated?._id,
-            profile_picture: updated?.profile_picture,
-            username: updated?.username
+        await Promise.all([
+            ...deleteFromCloudinary,
+            Chats.updateMany({ sender_id: userId, room_id: roomId }, {
+                $set: {
+                    media: [],
+                    messages: "This message has been deleted"
+                }
+            })
+        ]);
+
+        io.to(`room-chat:${roomId}`).emit("room:deleted-all-chat", chats);
+
+        res.status(200).json({ message: "all your message in group deleted permanently" });
+    } catch (error) {
+        res.status(500).json({ message: "something went wrong" });
+    }
+}
+
+export async function deleteChatPermanentlyInRoom(req: Request, res: Response) {
+    try {
+        const id = req.params._id;
+        const roomId = req.params.room_id;
+
+        const chat = await Chats.findOne({ _id: id, room_id: roomId });
+        if (!chat) return res.status(404).json({ message: "chat not found" });
+
+        const selectedMedia: CloudinaryUploadResult[] = chat.media.map(media => media) || [];
+
+        if (chat.media.length > 0) {
+            chat.media.forEach(cmd => selectedMedia.push(cmd));
+        }
+
+        const deleteFromCloudinary = selectedMedia.map(media => {
+            return v2.uploader.destroy(media.public_id, { resource_type: media.resource_type });
         });
 
-        res.status(200).json({ message: "1 member kicked" });
+        await Promise.all([
+            ...deleteFromCloudinary,
+            Chats.updateOne({ _id: id }, {
+                $set: {
+                    media: [],
+                    messages: "This message has been deleted"
+                }
+            })
+        ]);
+
+        io.to(`room-chat:${chat.room_id}`)
+        .emit("room:chat-deleted-permanently", {
+            _id: chat._id,
+            created_at: chat.created_at,
+            media: chat.media,
+            messages: chat.messages
+        });
+
+        res.status(200).json({ message: "chat deleted permanently from room" });
+    } catch (error) {
+        res.status(500).json({ message: "something went wrong" });
+    }
+}
+
+export async function deleteChatInRoom(req: Request, res: Response) {
+    try {
+        const id = req.params._id;
+        const roomId = req.params.room_id;
+
+        const chat = await Chats.findOne({ _id: id, room_id: roomId });
+        if (!chat) return res.status(404).json({ message: "chat not found" });
+
+        const selectedMedia: CloudinaryUploadResult[] = chat.media.map(media => media) || [];
+
+        if (chat.media.length > 0) {
+            chat.media.forEach(cmd => selectedMedia.push(cmd));
+        }
+
+        const deleteFromCloudinary = selectedMedia.map(media => {
+            return v2.uploader.destroy(media.public_id, { resource_type: media.resource_type });
+        });
+
+        await Promise.all([
+            ...deleteFromCloudinary,
+            Chats.deleteOne({ _id: id, room_id: roomId })
+        ]);
+
+        io.to(`room-chat:${chat.room_id}`)
+        .emit("room:chat-deleted", {
+            _id: chat._id,
+            created_at: chat.created_at,
+            media: chat.media,
+            messages: chat.messages
+        });
+
+        res.status(200).json({ message: "chat deleted from room" });
+    } catch (error) {
+        res.status(500).json({ message: "something went wrong" });
+    }
+}
+
+export async function sendToOtherRoom(req: AuthRequest, res: Response) {
+    try {
+        const user_id = req.user?.user_id;
+        const created_at = new Date().toISOString();
+        const selectedMedia: CloudinaryUploadResult[] = [];
+
+        const media = req.files as Express.Multer.File[] | undefined;
+        const { messages, room_id } = req.body;
+
+        if (!messages || !media) return res.status(400).json({ message: "please provide messages" });
+
+        if (media && media.length > 0) {
+            for (let x = 0; x < media.length; x++) {
+                const cloudinary = await uploadTOCloudinary({ 
+                    file_buffer: media[x].buffer,
+                    folder_name: "chat_media",
+                    original_name: media[x].filename
+                });
+
+                selectedMedia.push(cloudinary);
+            }
+        }
+
+        const newChat = new Chats({
+            created_at: created_at,
+            messages: messages || null,
+            media: selectedMedia || [],
+            room_id: room_id,
+            sender_id: user_id
+        });
+
+        await newChat.save();
+
+        io.to(`room-chat:${newChat.room_id}`).emit("room-chat:send", {
+            _id: newChat._id,
+            created_at: newChat.created_at,
+            media: newChat.media,
+            messages: newChat.messages,
+            room_id: newChat.room_id,
+            sender_id: newChat.sender_id
+        });
+
+        res.status(200).json({ message: "new chat for room only added" });
     } catch (error) {
         res.status(500).json({ message: "something went wrong" });
     }

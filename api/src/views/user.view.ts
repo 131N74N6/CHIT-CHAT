@@ -1,6 +1,34 @@
-import { Response } from "express";
+import { Request, Response } from "express";
 import { AuthRequest } from "../middlewares/auth.middleware";
 import { User } from "../models/user.model";
+
+export async function getAllUsers(req: AuthRequest, res: Response) {
+    try {
+        const searched = req.query.searched as string | undefined;
+        const page = parseInt(req.query.page as string) || 1;
+        const limit = parseInt(req.query.limit as string) || 14;
+        const skip = (page - 1) * limit;
+
+        const userId = req.user?.user_id;
+        let users;
+
+        if (searched === undefined) {
+            users = User.find({ _id: { $ne: userId } }).limit(limit).skip(skip).sort({ username: 1 });
+            
+            res.status(200).json(users);
+        } else {
+            users = User
+            .find({ _id: { $ne: userId }, username: { $regex: new RegExp(searched, 'i') } })
+            .limit(limit)
+            .skip(skip)
+            .sort({ username: 1 });
+
+            res.status(200).json(users);
+        }
+    } catch (error) {
+        res.status(500).json({ message: "something went wrong" });
+    }
+}
 
 export async function getCurrentUser(req: AuthRequest, res: Response) {
     try {

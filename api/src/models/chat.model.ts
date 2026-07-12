@@ -2,6 +2,7 @@ import mongoose, { Schema, Types } from "mongoose";
 
 export interface ChatIntrf {
     created_at: string;
+    hidden_for: Types.ObjectId[];
     media: {
         public_id: string;
         resource_type: string;
@@ -15,6 +16,7 @@ export interface ChatIntrf {
 
 const chatSchema = new Schema<ChatIntrf>({
     created_at: { type: String, required: true },
+    hidden_for: [{ type: Schema.Types.ObjectId }],
     media: [{
         public_id: { type: String },
         resource_type: { type: String },
