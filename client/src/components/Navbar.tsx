@@ -1,5 +1,7 @@
 export default function Navbar() {
     return (
-        <div>Navbar</div>
+        <>
+            <nav className="bg-white md:flex hidden flex-col gap-2.5 p-2.5"></nav>
+        </>
     );
 }

@@ -205,7 +205,7 @@ export async function deleteRoom(req: AuthRequest, res: Response) {
 
         chats.forEach(chat => {
             if (chat.media.length > 0) {
-                chat.media.map(media => selectedMedia.push(media));
+                chat.media.forEach(media => selectedMedia.push(media));
             }
         });
 
@@ -265,7 +265,7 @@ export async function deleteUser(req: AuthRequest, res: Response) {
         ]);
 
         user.room_id.forEach(roomId => {
-            io.to(`room-member:${roomId}`)
+            io.to(`room-profile:${roomId}`)
             .emit("user:changed", {
                 _id: user._id,
                 profile_picture: user.profile_picture,
@@ -295,7 +295,7 @@ export async function joinRoom(req: AuthRequest, res: Response) {
             $addToSet: { room_id: new Types.ObjectId(room_code) },
         });
 
-        io.to(`room-member:${room_code}`)
+        io.to(`room-profile:${room_code}`)
         .emit("user:joined", {
             _id: updated?._id,
             profile_picture: updated?.profile_picture,
@@ -340,7 +340,7 @@ export async function leftRoom(req: AuthRequest, res: Response) {
             $pull: { room_id: roomId }
         });
 
-        io.to(`room-member:${roomId}`)
+        io.to(`room-profile:${roomId}`)
         .emit("user:left", {
             _id: updated?._id,
             profile_picture: updated?.profile_picture,

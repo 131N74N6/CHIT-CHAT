@@ -5,12 +5,15 @@ export interface UserState {
     email: string;
     gender: string;
     password: string;
-    profile_picture: {
+    profilePicture: File | null;
+    profilePictureUrl: string | null;
+    oldProfile: {
         public_id: string;
         resource_type: string;
         url: string;
     } | null;
     username: string;
+    visiblepassword: boolean;
 
     resetSignIn: () => void;
     resetSignUp: () => void;
@@ -18,13 +21,16 @@ export interface UserState {
     setAddress: (address: string) => void;
     setEmail: (email: string) => void;
     setGender: (gender: string) => void;
-    setPassword: (password: string) => void;
-    setProfilePicture: (profile_picture: {
+    setOldProfilePicture: (oldProfile: {
         public_id: string;
         resource_type: string;
         url: string;
     } | null) => void;
+    setPassword: (password: string) => void;
+    setProfilePicture: (profilePicture: File | null) => void;
+    setProfilePictureUrl: (profilePictureUrl: string | null) => void;
     setUserName: (username: string) => void;
+    setVisiblePassword: (visiblepassword: boolean) => void;
 }
 
 export const useUserStore = create<UserState>((set) => ({
@@ -32,8 +38,11 @@ export const useUserStore = create<UserState>((set) => ({
     email: "",
     gender: "",
     password: "",
-    profile_picture: null,
+    profilePicture: null,
+    profilePictureUrl: null,
+    oldProfile: null,
     username: "",
+    visiblepassword: false,
 
     resetSignIn: () => set({ username: "", password: "" }),
     resetSignUp: () => set({ email: "", username: "", password: "" }),
@@ -42,6 +51,9 @@ export const useUserStore = create<UserState>((set) => ({
     setEmail: (email) => set({ email }),
     setGender: (gender) => set({ gender }),
     setPassword: (password) => set({ password }),
-    setProfilePicture: (profile_picture) => set({ profile_picture }),
-    setUserName: (username) => set({ username })
+    setOldProfilePicture: (oldProfile) => set({ oldProfile }),
+    setProfilePicture: (profilePicture) => set({ profilePicture }),
+    setProfilePictureUrl: (profilePictureUrl) => set({ profilePictureUrl }),
+    setUserName: (username) => set({ username }),
+    setVisiblePassword: (visiblepassword) => set({ visiblepassword })
 }));

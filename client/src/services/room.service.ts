@@ -2,11 +2,13 @@ import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-q
 import type { IRoomService } from "../models/room.model";
 import { useChatStore } from "../stores/chat.store";
 import { useRef } from "react";
+import UserServices from "./user.service";
 
 export default function RooServices(props?: IRoomService) {
     const queryClient = useQueryClient();
     const inputMediaRef = useRef<HTMLInputElement>(null);
     const baseUrl = `${import.meta.env.VITE_BASE_API_URL}/rooms`;
+    const { currentUser } = UserServices();
 
     const resetChats = useChatStore((state) => state.resetChats);
 
@@ -18,6 +20,136 @@ export default function RooServices(props?: IRoomService) {
 
     const messages = useChatStore((state) => state.messages);
     const setMessages = useChatStore((state) => state.setMessages);
+
+    const { 
+        data: paginatedRoomChats, 
+        error: roomChatsError, 
+        fetchNextPage: fecthNextRoomChat, 
+        hasNextPage: roomChatHasNextPage, 
+        isFetchingNextPage: isRoomChatFetchNext, 
+        isLoading: isRoomChatLoading, 
+    } = useInfiniteQuery({
+        enabled: !!props?.roomId,
+        getNextPageParam: (lastPage, allPages) => {
+            if (lastPage.length <= 14) return;
+            return allPages.length + 1;
+        },
+        queryFn: async ({pageParam = 1}: { pageParam?: number }) => {
+            try {const request = await fetch(`${baseUrl}/chat/${props?.roomId}?page=${pageParam}&limit=${14}`, {
+                    credentials: "include",
+                    method: "GET"
+                });
+                
+                const response = await request.json();
+                if (!request.ok) throw new Error(response.message);
+                return response;
+            } catch (error) {
+                throw error;
+            }
+        },
+        initialPageParam: 1,
+        queryKey: [`room-chat-${props?.roomId}`],
+        refetchOnReconnect: true,
+        staleTime: Infinity
+    });
+    
+    const roomChats = paginatedRoomChats ? paginatedRoomChats.pages.flat() : [];
+    
+    const allChatsInRoom = {
+        roomChats,
+        roomChatsError,
+        fecthNextRoomChat,
+        roomChatHasNextPage,
+        isRoomChatFetchNext,
+        isRoomChatLoading
+    }
+
+    const { 
+        data: paginatedRoomMember, 
+        error: roomMemberError,
+        fetchNextPage: fetchNextRoomMember,
+        isFetchingNextPage: isRoomMemberFetchNextPage,
+        hasNextPage: roomMmeberHaveNextPage,
+        isLoading: isRoomMemberLoading 
+    } = useInfiniteQuery({
+        enabled: !!props?.roomId,
+        getNextPageParam: (lastPage, allPages) => {
+            if (lastPage.length <= 14 ) return;
+            allPages.length + 1;
+        },
+        queryFn: async ({ pageParam = 1 }: { pageParam?: number }) => {
+            try {
+                const request = await fetch(`${baseUrl}/member/${props?.roomId}?page=${pageParam}&limit=${14}`, {
+                    credentials: "include",
+                    method: "GET"
+                });
+
+                const response = await request.json();
+                if (!request.ok) throw new Error(response.message);
+                return response;
+            } catch (error) {
+                throw error;
+            }
+        },
+        queryKey: [`room-member-${props?.roomId}`],
+        initialPageParam: 1,
+        staleTime: Infinity
+    });
+
+    const roomMember = paginatedRoomMember ? paginatedRoomMember.pages.flat() : [];
+
+    const currentRoomMember = { 
+        roomMember, 
+        roomMemberError, 
+        fetchNextRoomMember, 
+        roomMmeberHaveNextPage, 
+        isRoomMemberFetchNextPage, 
+        isRoomMemberLoading 
+    }
+
+    const { 
+        data: paginatedAvailableRooms,
+        error: availableRoomsError,
+        fetchNextPage: fetchNextAvailableRoom,
+        isFetchingNextPage: isFetchNextAvailableRoom,
+        isLoading: isAvailableRoomLoading,
+        hasNextPage: availableRoomHasNextPage
+    } = useInfiniteQuery({
+        enabled: !!currentUser.user?.user_id,
+        getNextPageParam: (lastPage, allPages) => {
+            if (lastPage.length <= 14) return;
+            return allPages.length + 1;
+        },
+        queryFn: async ({ pageParam = 1 }: { pageParam?: number }) => {
+            try {
+                const request = await fetch(`${baseUrl}/show-all?page=${pageParam}&limit=${14}`, {
+                    credentials: "include",
+                    method: "GET"
+                });
+                
+                const response = await request.json();
+                if (!request.ok) throw new Error(response.message)
+                    return response;
+            } catch (error) {
+                throw error;
+            }
+        },
+        initialPageParam: 1,
+        queryKey: [`available-room-${currentUser.user?.user_id}`],
+        refetchOnReconnect: true,
+        staleTime: Infinity
+    });
+
+    const availableRooms = paginatedAvailableRooms ? paginatedAvailableRooms.pages.flat() : [];
+
+    const currentAvailableRooms = {
+        availableRooms,
+        availableRoomsError,
+        fetchNextAvailableRoom,
+        isFetchNextAvailableRoom,
+        isAvailableRoomLoading,
+        availableRoomHasNextPage
+    }
 
     const clearChatInRoomForMeMt = useMutation({
         mutationFn: async (_id: string) => {
@@ -159,33 +291,6 @@ export default function RooServices(props?: IRoomService) {
             resetChats();
         }
     });
-
-    const { data, error, fetchNextPage, isFetchingNextPage, isLoading, hasNextPage } = useInfiniteQuery({
-        enabled: !!props?.roomId,
-        getNextPageParam: (lastPage, allPages) => {
-            if (lastPage.length <= 14) return;
-            return allPages.length + 1;
-        },
-        queryFn: async ({pageParam = 1}: { pageParam?: number }) => {
-            try {const request = await fetch(`${baseUrl}/chat/${props?.roomId}?page=${pageParam}&limit=${14}`, {
-                    credentials: "include",
-                    method: "GET"
-                });
-                
-                const response = await request.json();
-                if (!request.ok) throw new Error(response.message);
-                return response;
-            } catch (error) {
-                throw error;
-            }
-        },
-        initialPageParam: 1,
-        queryKey: [`room-chat-${props?.roomId}`],
-        refetchOnMount: true,
-        refetchOnReconnect: true,
-        refetchOnWindowFocus: false,
-        staleTime: Infinity
-    });
     
     const sendChatToRoomMt = useMutation({
         mutationFn: async () => {
@@ -225,8 +330,11 @@ export default function RooServices(props?: IRoomService) {
     deleteChatPermanentlyForRoomMt.isPending || deleteChaForRoomMt.isPending
 
     return { 
+        allChatsInRoom,
         clearChatInRoomForMeMt,
         clearChatsInRoomForMeMt,
+        currentAvailableRooms,
+        currentRoomMember,
         deleteAllChatsForRoomMt,
         deleteAllChatsPermanentlyForRoomMt,
         deleteChaForRoomMt,

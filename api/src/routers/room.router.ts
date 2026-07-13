@@ -20,7 +20,7 @@ roomRouters.delete("/rm-all/:room_id", verifyToken, deleteAllChatsInRoom);
 roomRouters.delete("/rm/:_id/:room_id", verifyToken, deleteChatInRoom);
 
 roomRouters.get("/show-all", verifyToken, showAvailableRoom);
-roomRouters.get("/members/:room_id", verifyToken, showRoomMember);
+roomRouters.get("/member/:room_id", verifyToken, showRoomMember);
 roomRouters.get("/chat/:room_id", verifyToken, getAllChatsForRoom);
 
 roomRouters.post("/to-room", verifyToken, uploadMedia, sendToOtherRoom);

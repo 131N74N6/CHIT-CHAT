@@ -103,6 +103,6 @@ export default function AuthServices(props?: IAuthService) {
     });
 
     return {
-        setEmail, setPassword, setUserName, signInMt, signOutMt, signUpMt
+        email, password, setEmail, setPassword, setUserName, signInMt, signOutMt, signUpMt, username
     }
 }
