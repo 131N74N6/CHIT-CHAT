@@ -1,9 +1,9 @@
 import { AuthRequest } from "../middlewares/auth.middleware";
 import { Request, Response } from "express";
 import { ChatBot } from "../models/chatbot.model";
-import { chatWithAi } from "../services/ai.service";
+import { aiService } from "../services/ai.service";
 
-export async function createChatWithBot(req: AuthRequest, res: Response) {
+export async function askAi(req: AuthRequest, res: Response) {
     try {
         const createdAt = new Date().toISOString();
         const userId = req.user?.user_id;
@@ -11,7 +11,7 @@ export async function createChatWithBot(req: AuthRequest, res: Response) {
 
         if (!question) return res.status(400).json({ message: "please insert your question" });
 
-        const response = await chatWithAi(question);
+        const response = await aiService(question);
 
         const newResult = new ChatBot({
             created_at: createdAt,

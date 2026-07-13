@@ -1,20 +1,28 @@
 import { useEffect } from "react";
 import { useMessageStore } from "../stores/message.store";
 import AuthServices from "../services/auth.service";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import UserServices from "../services/user.service";
 
 export default function SignIn() {
+    const navigate = useNavigate();
     const message = useMessageStore((state) => state.message);
     const setMessage = useMessageStore((state) => state.setMessage);
 
+    const { password, setPassword, setUserName, signInMt, username } = AuthServices({ setMessage: setMessage });
+    const { currentUser } = UserServices({ setMessage: setMessage });
+
+    useEffect(() => {
+        if (currentUser && !currentUser.isUserLoading && currentUser.user) navigate("/home", { replace: true });
+    }, [currentUser.user, currentUser.isUserLoading, navigate]);
+    
     useEffect(() => {
         if (message) {
             const timeOut = setTimeout(() => setMessage(null), 3000);
             return () => clearTimeout(timeOut);
         }
     }, [message, setMessage]);
-
-    const { password, setPassword, setUserName, signInMt, username } = AuthServices({ setMessage: setMessage });
+    
 
     return (
         <section className="bg-blue-200 flex justify-center items-center h-screen">
@@ -28,7 +36,7 @@ export default function SignIn() {
                 <div className="flex flex-col gap-2">
                     <label htmlFor="username" className="font-medium text-gray-900">Username</label>
                     <input
-                        className="border border-b-gray-900 p-1.5 text-[0.85rem] font-medium w-full inline-0 text-gray-900"
+                        className="bg-blue-300 p-1.5 text-[0.85rem] font-medium w-full inline-0 text-gray-900"
                         id="username"
                         name="username"
                         onChange={(event) => setUserName(event.target.value)}
@@ -39,7 +47,7 @@ export default function SignIn() {
                 <div className="flex flex-col gap-2 relative">
                     <label htmlFor="password" className="font-medium text-gray-900">Password</label>
                     <input
-                        className="border border-b-gray-900 p-1.5 text-[0.85rem] font-medium w-full inline-0 text-gray-900"
+                        className="bg-blue-300 p-1.5 text-[0.85rem] font-medium w-full inline-0 text-gray-900"
                         id="password"
                         name="password"
                         onChange={(event) => setPassword(event.target.value)}

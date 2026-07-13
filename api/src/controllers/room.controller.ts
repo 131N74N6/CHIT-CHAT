@@ -118,13 +118,8 @@ export async function deleteChatPermanentlyInRoom(req: Request, res: Response) {
         });
 
         await Promise.all([
-            ...deleteFromCloudinary,
-            Chats.updateOne({ _id: id }, {
-                $set: {
-                    media: [],
-                    messages: "This message has been deleted"
-                }
-            })
+            ...deleteFromCloudinary,,
+            Chats.deleteOne({ _id: id, room_id: roomId })
         ]);
 
         io.to(`room-chat:${chat.room_id}`)
@@ -161,7 +156,12 @@ export async function deleteChatInRoom(req: Request, res: Response) {
 
         await Promise.all([
             ...deleteFromCloudinary,
-            Chats.deleteOne({ _id: id, room_id: roomId })
+            Chats.updateOne({ _id: id }, {
+                $set: {
+                    media: [],
+                    messages: "This message has been deleted"
+                }
+            })
         ]);
 
         io.to(`room-chat:${chat.room_id}`)

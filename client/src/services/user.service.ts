@@ -1,5 +1,5 @@
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import type { IUserService, UserIntrf } from "../models/user.model";
+import type { IUserService, UserProfileIntrf } from "../models/user.model";
 import { useNavigate } from "react-router-dom";
 import { useUserStore } from "../stores/user.store";
 import { useRef } from "react";
@@ -48,7 +48,7 @@ export default function UserServices(props?: IUserService) {
     const username = useUserStore((state) => state.username);
     const setUserName = useUserStore((state) => state.setUserName);
 
-    const { data: user, error: userError, isLoading: isUserLoading } = useQuery<UserIntrf>({
+    const { data: user, error: userError, isLoading: isUserLoading } = useQuery<UserProfileIntrf>({
         retry: false,
         queryFn: async () => {
             try {

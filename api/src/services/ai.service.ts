@@ -4,7 +4,7 @@ import { ChatResult } from "@openrouter/sdk/models";
 const ai = new OpenRouter({ apiKey: process.env.OPEN_ROUTER_API_KEY });
 const model = process.env.OPEN_ROUTER_AI_MODEL;
 
-export async function chatWithAi(commands: string) {
+export async function aiService(commands: string) {
     try {
         const response: ChatResult = await ai.chat.send({
             chatRequest: {
