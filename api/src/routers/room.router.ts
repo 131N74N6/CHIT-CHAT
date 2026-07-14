@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { verifyToken } from "../middlewares/auth.middleware";
-import { getAllChatsForRoom, showAvailableRoom, showRoomMember } from "../views/room.view";
+import { getAllChatsForRoom, showAvailableRoom, showRoomMember, showRoomProfile } from "../views/room.view";
 import { 
     clearChatInRoomForMe, 
     clearChatsInRoomForMe, 
@@ -22,6 +22,7 @@ roomRouters.delete("/rm/:_id/:room_id", verifyToken, deleteChatInRoom);
 roomRouters.get("/show-all", verifyToken, showAvailableRoom);
 roomRouters.get("/member/:room_id", verifyToken, showRoomMember);
 roomRouters.get("/chat/:room_id", verifyToken, getAllChatsForRoom);
+roomRouters.get("/profile/:room_id", verifyToken, showRoomProfile);
 
 roomRouters.post("/to-room", verifyToken, uploadMedia, sendToOtherRoom);
 

@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getAllChats } from "../views/chat.view";
+import { showAllChats, showReceiverProfile } from "../views/chat.view";
 import { verifyToken } from "../middlewares/auth.middleware";
 import { 
     clearChatForMe, 
@@ -19,7 +19,8 @@ chatsRouters.delete("/rm/permanently/:_id", verifyToken, deleteChatPermanently);
 chatsRouters.delete("/rm-all", verifyToken, deleteAllChats);
 chatsRouters.delete("/rm/:_id", verifyToken, deleteChat);
 
-chatsRouters.get("/show-all/:receiver_id", verifyToken, getAllChats);
+chatsRouters.get("/show-all/:receiver_id", verifyToken, showAllChats);
+chatsRouters.get("/profile/:receiver_id", verifyToken, showReceiverProfile);
 
 chatsRouters.post("/to-user", verifyToken, uploadMedia, sendToOtherUser);
 

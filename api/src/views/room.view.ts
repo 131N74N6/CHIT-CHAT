@@ -57,3 +57,17 @@ export async function showRoomMember(req: Request, res: Response) {
         res.status(500).json({ message: "something went wrong" });
     }
 }
+
+export async function showRoomProfile(req: Request, res: Response) {
+    try {
+        const roomIdParam = req.params.room_id;
+        const roomId = Array.isArray(roomIdParam) ? roomIdParam[0] : roomIdParam;
+
+        const room = await Rooms.findOne({ _id: roomId });
+        if (!room) return res.status(200).json({ message: "room not found" });
+        
+        res.status(200).json(room);
+    } catch (error) {
+        res.status(500).json({ message: "something went wrong" });
+    }
+}
