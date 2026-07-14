@@ -1,4 +1,5 @@
 import UserServices from "../services/user.service";
+import cn from "../utils/cn";
 
 export default function Join() {
     const { joinRoomMt, roomCode, setRoomCode } = UserServices();
@@ -27,10 +28,10 @@ export default function Join() {
                         value={roomCode}
                     />
                     <button
-                        className={`
-                            cursor-pointer disabled:cursor-not-allowed bg-gray-400 text-gray-950 font-medium 
-                            text-[0.85rem] hover:bg-gray-300 transition-colors
-                        `}
+                        className={cn(
+                            "cursor-pointer disabled:cursor-not-allowed bg-gray-400 text-gray-950",  
+                            "text-[0.85rem] hover:bg-gray-300 transition-colors font-medium"
+                        )}
                         disabled={joinRoomMt.isPending}
                         type="submit"
                     >

@@ -1,5 +1,103 @@
-export default function UserChatWindow() {
+import { File, SendIcon } from "lucide-react";
+import cn from "../utils/cn"
+import type { UserChatWindowIntrf } from "../models/chat.model";
+import ChatList from "./ChatList";
+import Loading from "./Loading";
+import { useNavigate } from "react-router-dom";
+
+export default function UserChatWindow(props: UserChatWindowIntrf) {
+    const navigate = useNavigate();
+
     return (
-        <div>UserChatWindow</div>
-    )
+        <div className="h-full flex-col gap-2.5 md:w-2/4 md:flex md:p-2.5 md:flex-col hidden">
+            <div className="bg-gray-500 p-2 flex gap-1.5">
+                <div className="w-20 h-20 rounded-full">
+                    {props.profilePicture !== null ? (
+                        <div className="w-full h-full">
+                            <img 
+                                className="w-full h-full object-cover" 
+                                src={props.profilePicture.url} 
+                                alt={props.profilePicture.public_id}
+                            />
+                        </div>
+                    ) : (
+                        <div className={cn(
+                            "w-full h-full rounded-full flex items-center", 
+                            "justify-center bg-blue-600 text-white font-extralight"
+                        )}>
+                            {props.username[0]}
+                        </div>
+                    )}
+                </div>
+                <div className="text-white text-[1.2rem] font-extralight">Username</div>
+            </div>
+            <div>
+                {props.receiverId ? (
+                    <ChatList 
+                        chats={props.chats} 
+                        currentUserId={props.currentUserId} 
+                        fetchNextPage={props.fetchNextPage}
+                        hasNextPage={props.hasNextPage}
+                        isFetchingNextPage={props.isFetchingNextPage}
+                        isProcessing={props.isProcessing}
+                        onClearOne={props.onClearOne}
+                        onDeleteOne={props.onDeleteOne}
+                        onDeleteOnePermanent={props.onDeleteOnePermanent}
+                    />
+                ) : props.isLoading ? (
+                    <div className="flex justify-center items-center bg-white h-full">
+                        <Loading/>
+                    </div>
+                ) : props.error ? (
+                    <div className="flex justify-center items-center h-full">
+                        <div className="text-gray-700 font-medium text-center">
+                            {props.error.message}
+                        </div>
+                    </div>
+                ) : (
+                    <div className="flex justify-center items-center h-full bg-white">
+                        <div className="text-gray-700 font-medium text-center">
+                            Welcome...
+                        </div>
+                    </div>
+                )}
+            </div>
+            <form>
+                <div className="bg-white inset-shadow-gray-200 p-1.5 flex flex-col gap-1.5 max-h-[30%] overflow-y-auto">
+                    <div className="flex justify-end gap-1.5">
+                        <input
+                            className="inline-0 text-gray-900 font-light w-[90%]"
+                            id="message"
+                            name="message"
+                            type="text"
+                        />
+                        <button
+                            className={cn(
+                                "cursor-pointer disabled:cursor-not-allowed", 
+                                "text-white rounded-full flex justify-center items-center p-1.5",
+                                "bg-blue-600 w-[10%] h-[10%] transition-colors hover:bg-blue-500" 
+                            )}
+                            disabled={props.isProcessing}
+                            type="submit"
+                        >
+                            <SendIcon size={22}/>
+                        </button>
+                    </div>
+                    <div>
+                        <button 
+                            className={cn(
+                                "cursor-pointer disabled:cursor-not-allowed", 
+                                "border border-gray-500 bg-white text-gray-500 w-[20%] p-1.5"
+                            )}
+                            disabled={props.isProcessing}
+                            onClick={() => navigate(`/media/preview`)}
+                            type="button"
+                        >
+                            <File size={22}/>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    );
 }

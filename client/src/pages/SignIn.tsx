@@ -3,6 +3,7 @@ import { useMessageStore } from "../stores/message.store";
 import AuthServices from "../services/auth.service";
 import { Link, useNavigate } from "react-router-dom";
 import UserServices from "../services/user.service";
+import cn from "../utils/cn";
 
 export default function SignIn() {
     const navigate = useNavigate();
@@ -56,10 +57,10 @@ export default function SignIn() {
                     />
                 </div>
                 <button
-                    className={`
-                        disabled:cursor-not-allowed transition-colors cursor-pointer bg-blue-700 hover:bg-blue-500 
-                        text-white font-medium text-[0.9rem]
-                    `}
+                    className={cn(
+                        "disabled:cursor-not-allowed transition-colors cursor-pointer bg-blue-700",
+                        "hover:bg-blue-500 text-white font-medium text-[0.9rem]"
+                    )}
                     disabled={signInMt.isPending}
                     type="submit"
                 >

@@ -37,10 +37,22 @@ export interface UserListIntrf {
     hasNextPage: boolean;
     isFetchingNextPage: boolean;
     isProcessing: boolean;
+    setProfilePicture: (profilePicture: {
+        public_id: string;
+        resource_type: string;
+        url: string;
+    } | null) => void;
     setReceiverId: (receiverId: string) => void;
+    setUserName: (username: string) => void;
 }
 
 export interface UserItemIntrf {
     user: UserIntrf;
+    setProfilePicture: (profilePicture: {
+        public_id: string;
+        resource_type: string;
+        url: string;
+    } | null) => void;
     setReceiverId: (receiverId: string) => void;
+    setUserName: (username: string) => void;
 }

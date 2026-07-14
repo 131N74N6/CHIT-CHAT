@@ -1,4 +1,5 @@
 import type { ChatListIntrf } from "../models/chat.model";
+import cn from "../utils/cn";
 import ChatBubble from "./ChatBubble";
 import Loading from "./Loading";
 
@@ -28,10 +29,10 @@ export default function ChatList(props: ChatListIntrf) {
                 ) : props.hasNextPage ? (
                     <button
                         disabled={props.isProcessing}
-                        className={`
-                            cursor-pointer disabled:cursor-not-allowed bg-gray-400 
-                            text-gray-950 font-medium p-1.5 text-[0.8rem] hover:bg-gray-300 transition-colors
-                        `}
+                        className={cn(
+                            "cursor-pointer disabled:cursor-not-allowed bg-gray-400 text-gray-950", 
+                            "font-medium p-1.5 text-[0.8rem] hover:bg-gray-300 transition-colors"
+                        )}
                         onClick={() => props.fetchNextPage()}
                         type="button"
                     >

@@ -1,4 +1,5 @@
 import type { UserListIntrf } from "../models/user.model";
+import cn from "../utils/cn";
 import Loading from "./Loading";
 import UserData from "./UserData";
 
@@ -8,7 +9,13 @@ export default function UserList(props: UserListIntrf) {
             <div className="flex flex-col gap-2">
                 {props.users.map((user) => {
                     return (
-                        <UserData setReceiverId={props.setReceiverId} user={user} key={user._id}/>
+                        <UserData 
+                            key={user._id}
+                            setProfilePicture={props.setProfilePicture}
+                            setReceiverId={props.setReceiverId} 
+                            setUserName={props.setUserName}
+                            user={user} 
+                        />
                     );
                 })}
             </div>
@@ -20,10 +27,10 @@ export default function UserList(props: UserListIntrf) {
                 ) : props.hasNextPage ? (
                     <button
                         disabled={props.isProcessing}
-                        className={`
-                            cursor-pointer disabled:cursor-not-allowed bg-gray-400 
-                            text-gray-950 font-medium p-1.5 text-[0.8rem] hover:bg-gray-300 transition-colors
-                        `}
+                        className={cn(
+                            "cursor-pointer disabled:cursor-not-allowed bg-gray-400 text-gray-950", 
+                            "font-medium p-1.5 text-[0.8rem] hover:bg-gray-300 transition-colors"
+                        )}
                         onClick={() => props.fetchNextUser()}
                         type="button"
                     >

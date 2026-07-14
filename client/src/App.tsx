@@ -13,6 +13,8 @@ import Chatbot from "./pages/Chatbot";
 import ChatbotResults from "./pages/ChatbotResults";
 import ChatbotDetail from "./pages/ChatbotDetail";
 import YourProfile from "./pages/YourProfile";
+import MediaPreview from "./pages/MediaPreview";
+import MediaDetail from "./pages/MediaDetail";
 
 const queryClient = new QueryClient();
 
@@ -36,6 +38,8 @@ export default function App() {
                     <Route element={<ProtectedRoute><Chatbot/></ProtectedRoute>} path="/chatbot"/>
                     <Route element={<ProtectedRoute><ChatbotResults/></ProtectedRoute>} path="/chatbot/histories"/>
                     <Route element={<ProtectedRoute><ChatbotDetail/></ProtectedRoute>} path="/chatbot/detail/:_id"/>
+                    <Route element={<ProtectedRoute><MediaPreview/></ProtectedRoute>} path="/media/preview"/>
+                    <Route element={<ProtectedRoute><MediaDetail/></ProtectedRoute>} path="/media/detail"/>
                 </Routes>
             </BrowserRouter>
         </QueryClientProvider>

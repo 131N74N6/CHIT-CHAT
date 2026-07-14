@@ -4,6 +4,7 @@ import { useQueryClient } from "@tanstack/react-query";
 
 interface ChatSocketIntrf {
     user_id: string;
+    marks: string[];
     identifier?: string;
 }
 

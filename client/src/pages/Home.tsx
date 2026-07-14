@@ -5,11 +5,21 @@ import ChatServices from "../services/chat.service";
 import UserServices from "../services/user.service";
 import { useMessageStore } from "../stores/message.store";
 import Navbar from "../components/Navbar";
-import ChatList from "../components/ChatList";
+import UserChatWindow from "../components/UserChatWindow";
+import { useWindowStore } from "../stores/window.store";
 
 export default function Home() {
     const message = useMessageStore((state) => state.message);
     const setMessage = useMessageStore((state) => state.setMessage);
+
+    const profilePicture = useWindowStore((state) => state.profilePicture);
+    const setProfilePicture = useWindowStore((state) => state.setProfilePicture);
+    
+    const receiverId = useWindowStore((state) => state.receiverId);
+    const setReceiverId = useWindowStore((state) => state.setReceiverId);
+
+    const username = useWindowStore((state) => state.username);
+    const setUserName = useWindowStore((state) => state.setUserName);
 
     const { 
         allUsers, 
@@ -22,8 +32,6 @@ export default function Home() {
         deleteChatForReceiverMt, 
         deleteChatPermanentlyForReceiverMt, 
         isChatProcessing, 
-        receiverId, 
-        setReceiverId, 
         userChats 
     } = ChatServices({ setMessage: setMessage });
 
@@ -53,42 +61,29 @@ export default function Home() {
                         hasNextPage={allUsers.usersHaveNextPage}
                         isProcessing={isChatProcessing || isUserProcessing}
                         isFetchingNextPage={allUsers.isFetchNextUser}
+                        setProfilePicture={setProfilePicture}
                         setReceiverId={setReceiverId}
+                        setUserName={setUserName}
                         users={allUsers.users}
                     />
                 )}
             </div>
-            <div className="md:w-2/4 md:flex hidden h-full md:p-2.5 md:flex-col bg-blue-300">
-                {receiverId ? (
-                    <ChatList 
-                        chats={userChats.getUserChats} 
-                        currentUserId={currentUser.user ? currentUser.user.user_id : ''} 
-                        fetchNextPage={userChats.fetchNextPage}
-                        hasNextPage={userChats.hasNextPage}
-                        isFetchingNextPage={userChats.isFetchingNextPage}
-                        isProcessing={isChatProcessing || isUserProcessing}
-                        onClearOne={clearChatForMeMt}
-                        onDeleteOne={deleteChatForReceiverMt}
-                        onDeleteOnePermanent={deleteChatPermanentlyForReceiverMt}
-                    />
-                ) : userChats.isLoading ? (
-                    <div className="flex justify-center items-center bg-white h-full">
-                        <Loading/>
-                    </div>
-                ) : userChats.error ? (
-                    <div className="flex justify-center items-center h-full">
-                        <div className="text-gray-700 font-medium text-center">
-                            {userChats.error.message}
-                        </div>
-                    </div>
-                ) : (
-                    <div className="flex justify-center items-center h-full bg-white">
-                        <div className="text-gray-700 font-medium text-center">
-                            Welcome...
-                        </div>
-                    </div>
-                )}
-            </div>
+            <UserChatWindow
+                chats={userChats.getUserChats}
+                currentUserId={currentUser.user ? currentUser.user.user_id : ''}
+                error={userChats.error}
+                fetchNextPage={userChats.fetchNextPage}
+                hasNextPage={userChats.hasNextPage}
+                isFetchingNextPage={userChats.isFetchingNextPage}
+                isLoading={userChats.isLoading}
+                isProcessing={isChatProcessing || isUserProcessing}
+                onClearOne={clearChatForMeMt}
+                onDeleteOne={deleteChatForReceiverMt}
+                onDeleteOnePermanent={deleteChatPermanentlyForReceiverMt}
+                profilePicture={profilePicture}
+                receiverId={receiverId}
+                username={username}
+            />
             <Navbar isProcessing={isChatProcessing || isUserProcessing}/>
         </section>
     );
