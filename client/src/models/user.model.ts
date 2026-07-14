@@ -12,7 +12,7 @@ export interface UserProfileIntrf {
     address: string;
     email: string;
     gender: string;
-    profile_pic: {
+    profile_picture: {
         public_id: string;
         resource_type: string;
         url: string;
@@ -23,7 +23,7 @@ export interface UserProfileIntrf {
 
 export interface UserIntrf {
     _id: string;
-    profile_pic: {
+    profile_picture: {
         public_id: string;
         resource_type: string;
         url: string;
@@ -36,8 +36,11 @@ export interface UserListIntrf {
     fetchNextUser: (options?: FetchNextPageOptions | undefined) => Promise<InfiniteQueryObserverResult<InfiniteData<any, unknown>, Error>>;
     hasNextPage: boolean;
     isFetchingNextPage: boolean;
+    isProcessing: boolean;
+    setReceiverId: (receiverId: string) => void;
 }
 
 export interface UserItemIntrf {
     user: UserIntrf;
+    setReceiverId: (receiverId: string) => void;
 }

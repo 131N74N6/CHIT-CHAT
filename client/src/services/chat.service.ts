@@ -19,6 +19,9 @@ export default function ChatServices(props?: IChatService) {
     const messages = useChatStore((state) => state.messages);
     const setMessages = useChatStore((state) => state.setMessages);
 
+    const receiverId = useChatStore((state) => state.receiverId);
+    const setReceiverId = useChatStore((state) => state.setReceiverId);
+
     const clearChatForMeMt = useMutation({
         mutationFn: async (_id: string) => {
             try {
@@ -164,14 +167,14 @@ export default function ChatServices(props?: IChatService) {
     });
 
     const { data, error, fetchNextPage, isFetchingNextPage, isLoading, hasNextPage } = useInfiniteQuery({
-        enabled: !!props?.receiverId,
+        enabled: !!props?.receiverId || !!receiverId,
         getNextPageParam: (lastPage, allPages) => {
             if (lastPage.length <= 14) return;
             return allPages.length + 1;
         },
         queryFn: async ({ pageParam = 1 }: { pageParam?: number }) => {
             try {
-                const request = await fetch(`${baseUrl}/chat/${props?.receiverId}?page=${pageParam}&limit=${14}`, {
+                const request = await fetch(`${baseUrl}/show-all/${props?.receiverId}?page=${pageParam}&limit=${14}`, {
                     credentials: "include",
                     method: "GET"
                 });
@@ -183,8 +186,8 @@ export default function ChatServices(props?: IChatService) {
                 throw error;
             }
         },
-        initialPageParam: 1,
         queryKey: [`user-chat-${props?.receiverId}`],
+        initialPageParam: 1,
         refetchOnMount: true,
         refetchOnReconnect: true,
         refetchOnWindowFocus: false,
@@ -244,10 +247,12 @@ export default function ChatServices(props?: IChatService) {
         isChatProcessing,
         media,
         mediaUrl,
+        receiverId,
         sendChatToUserMt,
         setMedia,
         setMediaUrl,
         setMessages,
+        setReceiverId,
         userChats
     }
 }

@@ -1,21 +1,18 @@
-import type { ChatListIntrf } from "../models/chat.model";
-import ChatBubble from "./ChatBubble";
+import type { RoomListIntrf } from "../models/room.model";
 import Loading from "./Loading";
+import RoomItem from "./RoomItem";
 
-export default function ChatList(props: ChatListIntrf) {
+export default function RoomList(props: RoomListIntrf) {
     return (
         <div className="flex flex-col gap-2.5 overflow-y-auto">
             <div className="flex flex-col gap-2">
-                {props.chats.map((chat) => {
+                {props.rooms.map((room) => {
                     return (
-                        <ChatBubble 
-                            chat={chat} 
-                            key={chat._id}
+                        <RoomItem 
                             isProcessing={props.isProcessing} 
-                            onClearOne={props.onClearOne} 
-                            onDeleteOne={props.onDeleteOne}
-                            onDeleteOnePermanent={props.onDeleteOnePermanent}
-                            own={props.currentUserId === chat.sender_id}
+                            key={room._id}
+                            room={room} 
+                            setRoomId={props.setRoomId}
                         />
                     );
                 })}
@@ -23,7 +20,7 @@ export default function ChatList(props: ChatListIntrf) {
             <div className="flex justify-center">
                 {props.isFetchingNextPage ? (
                     <Loading/>
-                ) : props.chats.length <= 14 ? (
+                ) : props.rooms.length <= 14 ? (
                     <></>
                 ) : props.hasNextPage ? (
                     <button
@@ -38,7 +35,7 @@ export default function ChatList(props: ChatListIntrf) {
                         Load more
                     </button>
                 ) : (
-                    <div className="text-center text-[0.8rem] text-gray-950 font-medium">No chat to show</div>
+                    <div className="text-center text-[0.8rem] text-gray-950 font-medium">No more room to show</div>
                 )}
             </div>
         </div>

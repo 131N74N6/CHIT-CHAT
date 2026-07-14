@@ -21,6 +21,9 @@ export default function RooServices(props?: IRoomService) {
     const messages = useChatStore((state) => state.messages);
     const setMessages = useChatStore((state) => state.setMessages);
 
+    const roomId = useChatStore((state) => state.roomId);
+    const setRoomId = useChatStore((state) => state.setRoomId);
+
     const { 
         data: paginatedRoomChats, 
         error: roomChatsError, 
@@ -29,7 +32,7 @@ export default function RooServices(props?: IRoomService) {
         isFetchingNextPage: isRoomChatFetchNext, 
         isLoading: isRoomChatLoading, 
     } = useInfiniteQuery({
-        enabled: !!props?.roomId,
+        enabled: !!props?.roomId || !!roomId,
         getNextPageParam: (lastPage, allPages) => {
             if (lastPage.length <= 14) return;
             return allPages.length + 1;
@@ -154,7 +157,7 @@ export default function RooServices(props?: IRoomService) {
     const clearChatInRoomForMeMt = useMutation({
         mutationFn: async (_id: string) => {
             try {
-                const request = await fetch(`${baseUrl}/clear/${_id}/${props?.roomId}`, {
+                const request = await fetch(`${baseUrl}/clear/${_id}/${props? props.roomId : roomId}`, {
                     credentials: "include",
                     method: "PUT"
                 });
@@ -178,7 +181,7 @@ export default function RooServices(props?: IRoomService) {
     const clearChatsInRoomForMeMt = useMutation({
         mutationFn: async (_id: string) => {
             try {
-                const request = await fetch(`${baseUrl}/clears/${props?.roomId}`, {
+                const request = await fetch(`${baseUrl}/clears/${props? props.roomId : roomId}`, {
                     credentials: "include",
                     method: "PUT"
                 });
@@ -202,7 +205,7 @@ export default function RooServices(props?: IRoomService) {
     const deleteAllChatsPermanentlyForRoomMt = useMutation({
         mutationFn: async () => {
             try {
-                const request = await fetch(`${baseUrl}/rm-all/permanently/${props?.roomId}`, {
+                const request = await fetch(`${baseUrl}/rm-all/permanently/${props? props.roomId : roomId}`, {
                     credentials: "include",
                     method: "DELETE"
                 });
@@ -225,7 +228,7 @@ export default function RooServices(props?: IRoomService) {
     const deleteAllChatsForRoomMt = useMutation({
         mutationFn: async () => {
             try {
-                const request = await fetch(`${baseUrl}/rooms/rm-all/${props?.roomId}`, {
+                const request = await fetch(`${baseUrl}/rooms/rm-all/${props? props.roomId : roomId}`, {
                     credentials: "include",
                     method: "DELETE"
                 });
@@ -248,7 +251,7 @@ export default function RooServices(props?: IRoomService) {
     const deleteChatPermanentlyForRoomMt = useMutation({
         mutationFn: async (_id: string) => {
             try {
-                const request = await fetch(`${baseUrl}/rooms/rm/permanently/${_id}/${props?.roomId}`, {
+                const request = await fetch(`${baseUrl}/rooms/rm/permanently/${_id}/${props? props.roomId : roomId}`, {
                     credentials: "include",
                     method: "DELETE"
                 });
@@ -271,7 +274,7 @@ export default function RooServices(props?: IRoomService) {
     const deleteChaForRoomMt = useMutation({
         mutationFn: async (_id: string) => {
             try {
-                const request = await fetch(`${baseUrl}/rooms/rm/${_id}/${props?.roomId}`, {
+                const request = await fetch(`${baseUrl}/rooms/rm/${_id}/${props? props.roomId : roomId}`, {
                     credentials: "include",
                     method: "DELETE"
                 });
@@ -344,9 +347,11 @@ export default function RooServices(props?: IRoomService) {
         media,
         mediaUrl,
         messages,
+        roomId,
         sendChatToRoomMt, 
         setMedia,
         setMediaUrl,
-        setMessages
+        setMessages,
+        setRoomId
     }
 }

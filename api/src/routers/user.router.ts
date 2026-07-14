@@ -9,6 +9,7 @@ import {
     deleteOldRoomProfile, 
     deleteRoom, 
     deleteUser, 
+    joinRoom, 
     kickMember, 
     leftRoom 
 } from "../controllers/user.controller";
@@ -26,6 +27,7 @@ userRouters.get("/show-all", verifyToken, getAllUsers);
 
 userRouters.post("/make-room", verifyToken, uploadImage, createRoom);
 
+userRouters.put("/join-room", verifyToken, joinRoom);
 userRouters.put("/kick/:user_id", verifyToken, kickMember);
 userRouters.put("/left-room/:room_id", verifyToken, leftRoom);
 userRouters.put("/remake", verifyToken, uploadImage, changeUser);

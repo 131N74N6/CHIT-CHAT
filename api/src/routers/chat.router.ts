@@ -19,7 +19,7 @@ chatsRouters.delete("/rm/permanently/:_id", verifyToken, deleteChatPermanently);
 chatsRouters.delete("/rm-all", verifyToken, deleteAllChats);
 chatsRouters.delete("/rm/:_id", verifyToken, deleteChat);
 
-chatsRouters.get("/chat/:receiver_id", verifyToken, getAllChats);
+chatsRouters.get("/show-all/:receiver_id", verifyToken, getAllChats);
 
 chatsRouters.post("/to-user", verifyToken, uploadMedia, sendToOtherUser);
 

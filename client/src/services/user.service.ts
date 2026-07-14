@@ -45,6 +45,9 @@ export default function UserServices(props?: IUserService) {
     const profilePictureUrl = useUserStore((state) => state.profilePictureUrl);
     const setProfilePictureUrl = useUserStore((state) => state.setProfilePictureUrl);
 
+    const roomCode = useUserStore((state) => state.roomCode);
+    const setRoomCode = useUserStore((state) => state.setRoomCode);
+
     const username = useUserStore((state) => state.username);
     const setUserName = useUserStore((state) => state.setUserName);
 
@@ -149,8 +152,16 @@ export default function UserServices(props?: IUserService) {
             props?.setMessage!(error.message);
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: [`room-profile-${props?.roomId}`] });
-            queryClient.invalidateQueries({ queryKey: [`available-room-${user?.user_id}`] });
+            queryClient.invalidateQueries({
+                predicate: (query) => {
+                    const queryKey = query.queryKey;
+                    if (Array.isArray(queryKey) && queryKey.length > 0 && typeof queryKey[0] === "string") {
+                        return queryKey[0].startsWith(`room-profile-${props?.roomId}`) ||
+                        queryKey[0].startsWith(`available-room-${user?.user_id}`);
+                    }
+                    return false;
+                }
+            });
             resetRoomState();
         }
     });
@@ -193,9 +204,17 @@ export default function UserServices(props?: IUserService) {
             props?.setMessage!(error.message);
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: [`all-users`] });
-            queryClient.invalidateQueries({ queryKey: [`current-profile`] });
-            queryClient.invalidateQueries({ queryKey: [`room-profile-${props?.roomId}`] });
+            queryClient.invalidateQueries({
+                predicate: (query) => {
+                    const queryKey = query.queryKey;
+                    if (Array.isArray(queryKey) && queryKey.length > 0 && typeof queryKey[0] === "string") {
+                        return queryKey[0].startsWith(`all-users`) ||
+                        queryKey[0].startsWith('current-user') ||
+                        queryKey[0].startsWith(`room-profile-${props?.roomId}`);
+                    }
+                    return false;
+                }
+            });
         }
     });
 
@@ -218,10 +237,17 @@ export default function UserServices(props?: IUserService) {
             props?.setMessage!(error.message);
         },
         onSuccess: () => {
-            queryClient.setQueryData(['current-user'], null);
-            queryClient.invalidateQueries({ queryKey: [`available-room-${user?.user_id}`] });
-            queryClient.invalidateQueries({ queryKey: [`room-member-${props?.roomId}`] });
-            queryClient.invalidateQueries({ queryKey: [`room-profile-${props?.roomId}`] });
+            queryClient.invalidateQueries({
+                predicate: (query) => {
+                    const queryKey = query.queryKey;
+                    if (Array.isArray(queryKey) && queryKey.length > 0 && typeof queryKey[0] === "string") {
+                        return queryKey[0].startsWith(`room-member-${props?.roomId}`) ||
+                        queryKey[0].startsWith(`available-room-${user?.user_id}`) ||
+                        queryKey[0].startsWith(`room-profile-${props?.roomId}`);
+                    }
+                    return false;
+                }
+            });
             resetRoomState();
         }
     });
@@ -246,8 +272,6 @@ export default function UserServices(props?: IUserService) {
         },
         onSuccess: () => {
             queryClient.setQueryData(['current-user'], null);
-            queryClient.invalidateQueries({ queryKey: [`all-users`] });
-            queryClient.invalidateQueries({ queryKey: [`room-profile-${props?.roomId}`] });
             queryClient.clear();
             navigate("/sign-in");
         }
@@ -269,6 +293,30 @@ export default function UserServices(props?: IUserService) {
         if (roomProfileRef.current) roomProfileRef.current.value = "";
     }
 
+    const joinRoomMt = useMutation({
+        mutationFn: async () => {
+            try {
+                const request = await fetch(`${baseUrl}/join-room`, {
+                    body: JSON.stringify({ room_code: roomCode.trim() }),
+                    credentials: "include",
+                    method: "PUT"
+                });
+
+                const response = await request.json();
+                if (!request.ok) throw new Error(response.message);
+                return response;
+            } catch (error) {
+                throw error;
+            }
+        },
+        onError: (error) => {
+            props?.setMessage!(error.message);
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['current-user'] });
+        }
+    });
+
     const kickMemberMt = useMutation({
         mutationFn: async (userId: string) => {
             try {
@@ -288,8 +336,16 @@ export default function UserServices(props?: IUserService) {
             props?.setMessage!(error.message);
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: [`current-user`] });
-            queryClient.invalidateQueries({ queryKey: [`room-member-${props?.roomId}`] });
+            queryClient.invalidateQueries({
+                predicate: (query) => {
+                    const queryKey = query.queryKey;
+                    if (Array.isArray(queryKey) && queryKey.length > 0 && typeof queryKey[0] === "string") {
+                        return queryKey[0].startsWith(`current-user`) ||
+                        queryKey[0].startsWith(`room-member-${props?.roomId}`);
+                    }
+                    return false;
+                }
+            });
         }
     });
 
@@ -312,8 +368,16 @@ export default function UserServices(props?: IUserService) {
             props?.setMessage!(error.message);
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: [`current-user`] });
-            queryClient.invalidateQueries({ queryKey: [`room-profile-${props?.roomId}`] });
+            queryClient.invalidateQueries({
+                predicate: (query) => {
+                    const queryKey = query.queryKey;
+                    if (Array.isArray(queryKey) && queryKey.length > 0 && typeof queryKey[0] === "string") {
+                        return queryKey[0].startsWith(`current-user`) ||
+                        queryKey[0].startsWith(`room-profile-${props?.roomId}`);
+                    }
+                    return false;
+                }
+            });
         }
     });
 
@@ -342,8 +406,16 @@ export default function UserServices(props?: IUserService) {
             props?.setMessage!(error.message);
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: [`available-room-${user?.user_id}`] });
-            queryClient.invalidateQueries({ queryKey: [`room-profile-${props?.roomId}`] });
+            queryClient.invalidateQueries({
+                predicate: (query) => {
+                    const queryKey = query.queryKey;
+                    if (Array.isArray(queryKey) && queryKey.length > 0 && typeof queryKey[0] === "string") {
+                        return queryKey[0].startsWith(`available-room-${user?.user_id}`) ||
+                        queryKey[0].startsWith(`room-profile-${props?.roomId}`);
+                    }
+                    return false;
+                }
+            });
             resetRoomState();
         }
     });
@@ -368,6 +440,7 @@ export default function UserServices(props?: IUserService) {
         handleImagePreview,
         handleImageRoomPreview,
         isUserProcessing,
+        joinRoomMt,
         kickMemberMt,
         leftRoomMt,
         makeRoomMt,
@@ -375,6 +448,7 @@ export default function UserServices(props?: IUserService) {
         profilePicture,
         profilePictureUrl,
         resetImagePreview,
+        roomCode,
         selectedProfileRoom,
         selectedProfileRoomUrl,
         setAddress,
@@ -384,6 +458,7 @@ export default function UserServices(props?: IUserService) {
         setOldRoomPicture,
         setProfilePictureUrl,
         setProfilePicture,
+        setRoomCode,
         setRoomName,
         setSelectedProfileRoom,
         setSelectedProfileRoomUrl,
