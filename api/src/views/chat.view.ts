@@ -33,9 +33,8 @@ export async function showReceiverProfile(req: Request, res: Response) {
 
         res.status(200).json({
             address: receiver.address,
-            email: receiver.email,
             gender: receiver.gender,
-            profile_pic: receiver.profile_picture,
+            profile_picture: receiver.profile_picture,
             user_id: receiver._id,
             username: receiver.username
         });

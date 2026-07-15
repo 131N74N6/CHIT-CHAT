@@ -1,7 +1,8 @@
-import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useChatStore } from "../stores/chat.store";
 import { useRef } from "react";
-import type { IChatService } from "../models/chat.model";
+import type { ChatIntrf, IChatService } from "../models/chat.model";
+import type { UserProfileIntrf } from "../models/user.model";
 
 export default function ChatServices(props?: IChatService) {
     const baseUrl = `${import.meta.env.VITE_BASE_API_URL}/chats`;
@@ -69,6 +70,25 @@ export default function ChatServices(props?: IChatService) {
             resetChats();
         }
     });
+
+    const { data: detail, error: detailError, isLoading: isDetailLoading } = useQuery<UserProfileIntrf>({
+        enabled: !!props?.receiverId,
+        queryFn: async () => {
+            try {
+                const request = await fetch(`${baseUrl}/profile/${props?.receiverId}`);
+
+                const response = await request.json();
+                if (!request.ok) throw new Error(response.message);
+                return response;
+            } catch (error) {
+                throw error;
+            }
+        },
+        queryKey: [`user-${props?.receiverId}`],
+        staleTime: Infinity
+    });
+
+    const currentUserProfile = { detail, detailError, isDetailLoading }
 
     const deleteAllChatsPermanentlyForReceiverMt = useMutation({
         mutationFn: async () => {
@@ -194,7 +214,7 @@ export default function ChatServices(props?: IChatService) {
         staleTime: Infinity
     });
 
-    const getUserChats = data ? data.pages.flat() : [];
+    const getUserChats: ChatIntrf[] = data ? data.pages.flat() : [];
 
     const sendChatToUserMt = useMutation({
         mutationFn: async () => {
@@ -239,6 +259,7 @@ export default function ChatServices(props?: IChatService) {
     return {
         clearChatForMeMt,
         clearChatsForMeMt,
+        currentUserProfile,
         deleteChatForReceiverMt,
         deleteChatPermanentlyForReceiverMt,
         deleteAllChatsForReceiverMt,

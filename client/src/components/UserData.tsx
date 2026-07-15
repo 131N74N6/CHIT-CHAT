@@ -5,7 +5,7 @@ import cn from "../utils/cn";
 export default function UserData(props: UserItemIntrf) {
     const navigate = useNavigate();
 
-    const windowChat = () => {
+    const showWindowChat = () => {
         props.setProfilePicture(props.user.profile_picture);
         props.setReceiverId(props.user._id);
         props.setUserName(props.user.username);
@@ -13,7 +13,7 @@ export default function UserData(props: UserItemIntrf) {
 
     return (
         <>
-            <div className={cn("border bg-white border-b-gray-600 md:flex gap-1.5 hidden")} onClick={windowChat}>
+            <div className={cn("border bg-white border-b-gray-600 md:flex gap-1.5 hidden")} onClick={showWindowChat}>
                 <div className={cn("w-20 h-20 rounded-full")}>
                     {props.user.profile_picture !== null ? (
                         <div className="w-full h-full">

@@ -13,6 +13,8 @@ export default function RoomList(props: RoomListIntrf) {
                             key={room._id}
                             room={room} 
                             setRoomId={props.setRoomId}
+                            setRoomName={props.setRoomName}
+                            setRoomProfilePicture={props.setRoomProfilePicture}
                         />
                     );
                 })}

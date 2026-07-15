@@ -1,6 +1,8 @@
-import type { FetchNextPageOptions, InfiniteData, InfiniteQueryObserverResult } from "@tanstack/react-query";
+import type { FetchNextPageOptions, InfiniteData, InfiniteQueryObserverResult, UseMutationResult } from "@tanstack/react-query";
+import type { ChatIntrf } from "./chat.model";
 
 export interface IRoomService {
+    currentUserId?: string;
     receiverId?: string;
     roomId?: string;
     setMessage?: (message:  string | null) => void;
@@ -23,6 +25,12 @@ export interface RoomItemIntrf {
     isProcessing: boolean;
     room: RoomIntrf;
     setRoomId: (roomId: string) => void;
+    setRoomName: (roomName: string) => void;
+    setRoomProfilePicture: (roomProfilePicture: {
+        public_id: string;
+        resource_type: string;
+        url: string;
+    } | null) => void;
 }
 
 export interface RoomListIntrf {
@@ -32,4 +40,32 @@ export interface RoomListIntrf {
     isProcessing: boolean;
     rooms: RoomIntrf[];
     setRoomId: (roomId: string) => void;
+    setRoomName: (roomName: string) => void;
+    setRoomProfilePicture: (roomProfilePicture: {
+        public_id: string;
+        resource_type: string;
+        url: string;
+    } | null) => void;
+}
+
+export interface RoomChatWindowIntrf {
+    currentUserId: string;
+    error: Error | null;
+    fetchNextPage: (options?: FetchNextPageOptions | undefined) => Promise<InfiniteQueryObserverResult<InfiniteData<any, unknown>, Error>>
+    hasNextPage: boolean;
+    isFetchingNextPage: boolean;
+    isLoading: boolean;
+    isProcessing: boolean;
+    onClearOne: UseMutationResult<any, Error, string, unknown>;
+    onDeleteOnePermanent: UseMutationResult<any, Error, string, unknown>;
+    onDeleteOne: UseMutationResult<any, Error, string, unknown>;
+    roomChats: ChatIntrf[];
+    roomId: string;
+    roomName: string;
+    roomProfilePicture: {
+        public_id: string;
+        resource_type: string;
+        url: string;
+    } | null;
+    sendChatToRoom: UseMutationResult<any, Error, void, unknown>;
 }

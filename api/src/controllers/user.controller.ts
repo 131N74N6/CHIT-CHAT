@@ -217,7 +217,7 @@ export async function deleteRoom(req: AuthRequest, res: Response) {
             ...deleteFromCloudinary,
             Chats.deleteMany({ room_id: roomId }),
             User.updateMany({ room_id: roomId }, { $pull: { room_id: roomId } }),
-            Rooms.deleteOne({ _id: roomId })
+            Rooms.deleteOne({ _id: roomId, creator_id: userId })
         ]);
 
         io.to(`room-chat:${roomId}`)

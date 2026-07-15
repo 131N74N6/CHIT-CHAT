@@ -32,6 +32,7 @@ export default function Home() {
         deleteChatForReceiverMt, 
         deleteChatPermanentlyForReceiverMt, 
         isChatProcessing, 
+        sendChatToUserMt,
         userChats 
     } = ChatServices({ setMessage: setMessage });
 
@@ -68,22 +69,31 @@ export default function Home() {
                     />
                 )}
             </div>
-            <UserChatWindow
-                chats={userChats.getUserChats}
-                currentUserId={currentUser.user ? currentUser.user.user_id : ''}
-                error={userChats.error}
-                fetchNextPage={userChats.fetchNextPage}
-                hasNextPage={userChats.hasNextPage}
-                isFetchingNextPage={userChats.isFetchingNextPage}
-                isLoading={userChats.isLoading}
-                isProcessing={isChatProcessing || isUserProcessing}
-                onClearOne={clearChatForMeMt}
-                onDeleteOne={deleteChatForReceiverMt}
-                onDeleteOnePermanent={deleteChatPermanentlyForReceiverMt}
-                profilePicture={profilePicture}
-                receiverId={receiverId}
-                username={username}
-            />
+            {receiverId ? (
+                <UserChatWindow
+                    chats={userChats.getUserChats}
+                    currentUserId={currentUser.user ? currentUser.user.user_id : ''}
+                    error={userChats.error}
+                    fetchNextPage={userChats.fetchNextPage}
+                    hasNextPage={userChats.hasNextPage}
+                    isFetchingNextPage={userChats.isFetchingNextPage}
+                    isLoading={userChats.isLoading}
+                    isProcessing={isChatProcessing || isUserProcessing}
+                    onClearOne={clearChatForMeMt}
+                    onDeleteOne={deleteChatForReceiverMt}
+                    onDeleteOnePermanent={deleteChatPermanentlyForReceiverMt}
+                    profilePicture={profilePicture}
+                    receiverId={receiverId}
+                    sendChatToUser={sendChatToUserMt}
+                    username={username}
+                />
+            ) : (
+                <div className="flex justify-center items-center h-full bg-white">
+                    <div className="text-gray-700 font-medium text-center">
+                        Welcome...
+                    </div>
+                </div>
+            )}
             <Navbar isProcessing={isChatProcessing || isUserProcessing}/>
         </section>
     );

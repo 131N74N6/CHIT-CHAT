@@ -10,7 +10,6 @@ export interface IUserService extends IAuthService {
 
 export interface UserProfileIntrf {
     address: string;
-    email: string;
     gender: string;
     profile_picture: {
         public_id: string;
@@ -37,22 +36,22 @@ export interface UserListIntrf {
     hasNextPage: boolean;
     isFetchingNextPage: boolean;
     isProcessing: boolean;
-    setProfilePicture: (profilePicture: {
+    setProfilePicture?: (profilePicture: {
         public_id: string;
         resource_type: string;
         url: string;
     } | null) => void;
-    setReceiverId: (receiverId: string) => void;
-    setUserName: (username: string) => void;
+    setReceiverId?: (receiverId: string) => void;
+    setUserName?: (username: string) => void;
 }
 
 export interface UserItemIntrf {
     user: UserIntrf;
-    setProfilePicture: (profilePicture: {
+    setProfilePicture?: (profilePicture: {
         public_id: string;
         resource_type: string;
         url: string;
     } | null) => void;
-    setReceiverId: (receiverId: string) => void;
-    setUserName: (username: string) => void;
+    setReceiverId?: (receiverId: string) => void;
+    setUserName?: (username: string) => void;
 }

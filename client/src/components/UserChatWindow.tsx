@@ -29,10 +29,20 @@ export default function UserChatWindow(props: UserChatWindowIntrf) {
                         </div>
                     )}
                 </div>
-                <div className="text-white text-[1.2rem] font-extralight">Username</div>
+                <div className="text-white text-[1.2rem] font-extralight">{props.username}</div>
             </div>
-            <div>
-                {props.receiverId ? (
+            <div className="flex flex-col gap-2.5 p-1">
+                {props.isLoading ? (
+                    <div className="flex justify-center items-center bg-white h-full">
+                        <Loading/>
+                    </div>
+                ) : props.error ? (
+                    <div className="flex justify-center items-center h-full">
+                        <div className="text-gray-700 font-medium text-center">
+                            {props.error.message}
+                        </div>
+                    </div>
+                ) : (
                     <ChatList 
                         chats={props.chats} 
                         currentUserId={props.currentUserId} 
@@ -44,27 +54,15 @@ export default function UserChatWindow(props: UserChatWindowIntrf) {
                         onDeleteOne={props.onDeleteOne}
                         onDeleteOnePermanent={props.onDeleteOnePermanent}
                     />
-                ) : props.isLoading ? (
-                    <div className="flex justify-center items-center bg-white h-full">
-                        <Loading/>
-                    </div>
-                ) : props.error ? (
-                    <div className="flex justify-center items-center h-full">
-                        <div className="text-gray-700 font-medium text-center">
-                            {props.error.message}
-                        </div>
-                    </div>
-                ) : (
-                    <div className="flex justify-center items-center h-full bg-white">
-                        <div className="text-gray-700 font-medium text-center">
-                            Welcome...
-                        </div>
-                    </div>
                 )}
-            </div>
-            <form>
-                <div className="bg-white inset-shadow-gray-200 p-1.5 flex flex-col gap-1.5 max-h-[30%] overflow-y-auto">
-                    <div className="flex justify-end gap-1.5">
+                <form 
+                    className="bg-white inset-shadow-gray-200 p-1.5 flex flex-col gap-1.5 max-h-[30%] overflow-y-auto"
+                    onSubmit={(event: React.SubmitEvent<HTMLFormElement>) => {
+                        event.preventDefault();
+                        props.sendChatToUser.mutate();
+                    }}
+                >
+                    <div className="flex justify-end">
                         <input
                             className="inline-0 text-gray-900 font-light w-[90%]"
                             id="message"
@@ -96,8 +94,8 @@ export default function UserChatWindow(props: UserChatWindowIntrf) {
                             <File size={22}/>
                         </button>
                     </div>
-                </div>
-            </form>
+                </form>
+            </div>
         </div>
     );
 }

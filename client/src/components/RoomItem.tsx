@@ -3,10 +3,16 @@ import type { RoomItemIntrf } from "../models/room.model";
 
 export default function RoomItem(props: RoomItemIntrf) {
     const navigate = useNavigate();
+
+    const showWindowChat = () => {
+        props.setRoomId(props.room._id);
+        props.setRoomName(props.room.name);
+        props.setRoomProfilePicture(props.room.profile_picture);
+    }
     
     return (
         <>
-            <div className="border bg-white border-b-gray-600 md:flex gap-1.5 hidden" onClick={() => props.setRoomId(props.room._id)}>
+            <div className="border bg-white border-b-gray-600 md:flex gap-1.5 hidden" onClick={showWindowChat}>
                 <div className="w-20 h-20 rounded-full">
                     {props.room.profile_picture !== null ? (
                         <div className="w-full h-full">

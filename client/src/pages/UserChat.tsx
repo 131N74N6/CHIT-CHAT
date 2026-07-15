@@ -1,13 +1,17 @@
-import { useParams } from "react-router-dom";
-import ChatServices from "../services/chat.service";
-import { useMessageStore } from "../stores/message.store";
-import UserServices from "../services/user.service";
-import { useEffect } from "react";
-import Loading from "../components/Loading";
 import ChatList from "../components/ChatList";
+import ChatServices from "../services/chat.service";
+import cn from "../utils/cn";
+import Loading from "../components/Loading";
+import UserServices from "../services/user.service";
+import { File, SendIcon } from "lucide-react";
+import { useMessageStore } from "../stores/message.store";
+import { useNavigate, useParams } from "react-router-dom";
+import { useEffect } from "react";
 
 export default function UserChat() {
     const { receiver_id } = useParams();
+    const navigate = useNavigate();
+    
     const message = useMessageStore((state) => state.message);
     const setMessage = useMessageStore((state) => state.setMessage);
 
@@ -15,9 +19,11 @@ export default function UserChat() {
 
     const { 
         clearChatForMeMt, 
+        currentUserProfile,
         deleteChatForReceiverMt, 
         deleteChatPermanentlyForReceiverMt, 
-        isChatProcessing,  
+        isChatProcessing, 
+        sendChatToUserMt,
         userChats 
     } = ChatServices({ receiverId: receiver_id, setMessage: setMessage });
     
@@ -31,6 +37,92 @@ export default function UserChat() {
     return (
         <section className="flex flex-col h-screen relative z-10">
             <div className="flex flex-col p-2.5 h-full">
+                <div className="bg-gray-500 p-2 flex gap-1.5 cursor-pointer" onClick={() => navigate(`/user/profile/${receiver_id}`)}>
+                    <div className="w-20 h-20 rounded-full">
+                        {currentUserProfile.detail && currentUserProfile.detail.profile_picture !== null ? (
+                            <div className="w-full h-full">
+                                <img 
+                                    className="w-full h-full object-cover" 
+                                    src={currentUserProfile.detail.profile_picture.url} 
+                                    alt={currentUserProfile.detail.profile_picture.public_id}
+                                />
+                            </div>
+                        ) : (
+                            <div className={cn(
+                                "w-full h-full rounded-full flex items-center", 
+                                "justify-center bg-blue-600 text-white font-extralight"
+                            )}>
+                                {currentUserProfile.detail?.username[0]}
+                            </div>
+                        )}
+                    </div>
+                <div className="text-white text-[1.2rem] font-extralight">Username</div>
+            </div>
+            <div className="flex flex-col gap-2.5 p-1">
+                {userChats.isLoading ? (
+                    <div className="flex justify-center items-center bg-white h-full">
+                        <Loading/>
+                    </div>
+                ) : userChats.error ? (
+                    <div className="flex justify-center items-center h-full">
+                        <div className="text-gray-700 font-medium text-center">
+                            {userChats.error.message}
+                        </div>
+                    </div>
+                ) : (
+                    <ChatList 
+                        chats={userChats.getUserChats} 
+                        currentUserId={currentUser.user ? currentUser.user.user_id : ''} 
+                        fetchNextPage={userChats.fetchNextPage}
+                        hasNextPage={userChats.hasNextPage}
+                        isFetchingNextPage={userChats.isFetchingNextPage}
+                        isProcessing={isChatProcessing || isUserProcessing}
+                        onClearOne={clearChatForMeMt}
+                        onDeleteOne={deleteChatForReceiverMt}
+                        onDeleteOnePermanent={deleteChatPermanentlyForReceiverMt}
+                    />
+                )}
+                <form 
+                    className="bg-white inset-shadow-gray-200 p-1.5 flex flex-col gap-1.5 max-h-[30%] overflow-y-auto"
+                    onSubmit={(event: React.SubmitEvent<HTMLFormElement>) => {
+                        event.preventDefault();
+                        sendChatToUserMt.mutate();
+                    }}
+                >
+                    <div className="flex justify-end">
+                        <input
+                            className="inline-0 text-gray-900 font-light w-[90%]"
+                            id="message"
+                            name="message"
+                            type="text"
+                        />
+                        <button
+                            className={cn(
+                                "cursor-pointer disabled:cursor-not-allowed", 
+                                "text-white rounded-full flex justify-center items-center p-1.5",
+                                "bg-blue-600 w-[10%] h-[10%] transition-colors hover:bg-blue-500" 
+                            )}
+                            disabled={isChatProcessing || isUserProcessing}
+                            type="submit"
+                        >
+                            <SendIcon size={22}/>
+                        </button>
+                    </div>
+                    <div>
+                        <button 
+                            className={cn(
+                                "cursor-pointer disabled:cursor-not-allowed", 
+                                "border border-gray-500 bg-white text-gray-500 w-[20%] p-1.5"
+                            )}
+                            disabled={isChatProcessing || isUserProcessing}
+                            onClick={() => navigate(`/media/preview`)}
+                            type="button"
+                        >
+                            <File size={22}/>
+                        </button>
+                    </div>
+                </form>
+            </div>
                 {userChats.isLoading ? (
                     <div className="flex justify-center items-center bg-white h-full">
                         <Loading/>

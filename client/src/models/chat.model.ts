@@ -9,15 +9,14 @@ export interface IChatService {
 export interface ChatIntrf {
     _id: string;
     created_at: string;
-    hidden_for: string[];
     media: {
         public_id: string;
         resource_type: string;
         url: string;
     }[];
     messages: string;
-    receiver_id: string;
-    room_id: string;
+    receiver_id?: string;
+    room_id?: string;
     sender_id: string;
 }
 
@@ -60,5 +59,6 @@ export interface UserChatWindowIntrf {
         url: string;
     } | null;
     receiverId: string;
+    sendChatToUser: UseMutationResult<any, Error, void, unknown>;
     username: string;
 }
