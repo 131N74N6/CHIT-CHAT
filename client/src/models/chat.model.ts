@@ -6,6 +6,11 @@ export interface IChatService {
     setMessage?: (message:  string | null) => void;
 }
 
+export interface IUserChatService {
+    receiverId?: string;
+    setMessage?: (message: string | null) => void;
+}
+
 export interface ChatIntrf {
     _id: string;
     created_at: string;

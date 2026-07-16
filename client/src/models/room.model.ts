@@ -1,6 +1,10 @@
 import type { FetchNextPageOptions, InfiniteData, InfiniteQueryObserverResult, UseMutationResult } from "@tanstack/react-query";
 import type { ChatIntrf } from "./chat.model";
 
+export interface IAvailableRoomService {
+    currentUserId?: string;
+}
+
 export interface IChangeRoom {
     currentUserId?: string;
     roomId?: string;
@@ -16,11 +20,19 @@ export interface IJoinRoom {
     setMessage?: (message: string | null) => void;
 }
 
-export interface IRoomService {
+export interface IRoomChatService {
     currentUserId?: string;
     receiverId?: string;
     roomId?: string;
     setMessage?: (message:  string | null) => void;
+}
+
+export interface IRoomMemberService {
+    roomId?: string;
+}
+
+export interface IRoomProfileService {
+    roomId?: string;
 }
 
 export interface RoomIntrf {

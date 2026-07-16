@@ -1,14 +1,14 @@
-import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import type { IRoomService, RoomIntrf } from "../models/room.model";
-import { useChatStore } from "../stores/chat.store";
-import { useRef } from "react";
-import type { ChatIntrf } from "../models/chat.model";
+import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useRef } from 'react'
+import type { IRoomChatService } from '../models/room.model';
+import { useChatStore } from '../stores/chat.store';
+import type { ChatIntrf } from '../models/chat.model';
 
-export default function RoomServices(props?: IRoomService) {
+export default function roomChatService(props: IRoomChatService) {
     const queryClient = useQueryClient();
-    const inputMediaRef = useRef<HTMLInputElement>(null);
     const baseUrl = `${import.meta.env.VITE_BASE_API_URL}/rooms`;
-
+    
+    const inputMediaRef = useRef<HTMLInputElement>(null);
     const resetChats = useChatStore((state) => state.resetChats);
 
     const media = useChatStore((state) => state.media);
@@ -17,8 +17,8 @@ export default function RoomServices(props?: IRoomService) {
     const mediaUrl = useChatStore((state) => state.mediaUrl);
     const setMediaUrl = useChatStore((state) => state.setMediaUrl);
 
-    const messages = useChatStore((state) => state.messages);
-    const setMessages = useChatStore((state) => state.setMessages);
+    const text = useChatStore((state) => state.text);
+    const setText = useChatStore((state) => state.setText);
 
     const { 
         data: paginatedRoomChats, 
@@ -61,93 +61,6 @@ export default function RoomServices(props?: IRoomService) {
         roomChatHasNextPage,
         isRoomChatFetchNext,
         isRoomChatLoading
-    }
-
-    const { 
-        data: paginatedRoomMember, 
-        error: roomMemberError,
-        fetchNextPage: fetchNextRoomMember,
-        isFetchingNextPage: isRoomMemberFetchNextPage,
-        hasNextPage: roomMmeberHaveNextPage,
-        isLoading: isRoomMemberLoading 
-    } = useInfiniteQuery({
-        enabled: !!props?.roomId,
-        getNextPageParam: (lastPage, allPages) => {
-            if (lastPage.length <= 14 ) return;
-            allPages.length + 1;
-        },
-        queryFn: async ({ pageParam = 1 }: { pageParam?: number }) => {
-            try {
-                const request = await fetch(`${baseUrl}/member/${props?.roomId}?page=${pageParam}&limit=${14}`, {
-                    credentials: "include",
-                    method: "GET"
-                });
-
-                const response = await request.json();
-                if (!request.ok) throw new Error(response.message);
-                return response;
-            } catch (error) {
-                throw error;
-            }
-        },
-        queryKey: [`room-member-${props?.roomId}`],
-        initialPageParam: 1,
-        staleTime: Infinity
-    });
-
-    const roomMember = paginatedRoomMember ? paginatedRoomMember.pages.flat() : [];
-
-    const currentRoomMember = { 
-        roomMember, 
-        roomMemberError, 
-        fetchNextRoomMember, 
-        roomMmeberHaveNextPage, 
-        isRoomMemberFetchNextPage, 
-        isRoomMemberLoading 
-    }
-
-    const { 
-        data: paginatedAvailableRooms,
-        error: availableRoomsError,
-        fetchNextPage: fetchNextAvailableRoom,
-        isFetchingNextPage: isFetchNextAvailableRoom,
-        isLoading: isAvailableRoomLoading,
-        hasNextPage: availableRoomHasNextPage
-    } = useInfiniteQuery({
-        enabled: !!props?.currentUserId,
-        getNextPageParam: (lastPage, allPages) => {
-            if (lastPage.length <= 14) return;
-            return allPages.length + 1;
-        },
-        queryFn: async ({ pageParam = 1 }: { pageParam?: number }) => {
-            try {
-                const request = await fetch(`${baseUrl}/show-all?page=${pageParam}&limit=${14}`, {
-                    credentials: "include",
-                    method: "GET"
-                });
-                
-                const response = await request.json();
-                if (!request.ok) throw new Error(response.message)
-                    return response;
-            } catch (error) {
-                throw error;
-            }
-        },
-        initialPageParam: 1,
-        queryKey: [`available-room-${props?.currentUserId}`],
-        refetchOnReconnect: true,
-        staleTime: Infinity
-    });
-
-    const availableRooms = paginatedAvailableRooms ? paginatedAvailableRooms.pages.flat() : [];
-
-    const currentAvailableRooms = {
-        availableRooms,
-        availableRoomsError,
-        fetchNextAvailableRoom,
-        isFetchNextAvailableRoom,
-        isAvailableRoomLoading,
-        availableRoomHasNextPage
     }
 
     const clearChatInRoomForMeMt = useMutation({
@@ -197,29 +110,7 @@ export default function RoomServices(props?: IRoomService) {
             resetChats();
         }
     });
-
-    const { data: detail, error: errorDetail, isLoading: isDetailLoading } = useQuery<RoomIntrf>({
-        enabled: !!props?.roomId,
-        queryFn: async () => {
-            try {
-                const request = await fetch(`${baseUrl}/profile/${props?.roomId}`, {
-                    credentials: "include",
-                    method: "GET"
-                });
-
-                const response = await request.json();
-                if (!request.ok) throw new Error(response.message);
-                return response;
-            } catch (error) {
-                throw error;
-            }
-        },
-        queryKey: [`room-profile-${props?.roomId}`],
-        staleTime: Infinity
-    });
-
-    const currentRoomProfile = { detail, errorDetail, isDetailLoading }
-
+    
     const deleteAllChatsPermanentlyForRoomMt = useMutation({
         mutationFn: async () => {
             try {
@@ -312,16 +203,35 @@ export default function RoomServices(props?: IRoomService) {
             resetChats();
         }
     });
+
+    const handleImagePreview = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files;
+        const urls: string[] = [];
+        
+        if (file && file.length > 0) setMedia(file);
+
+        if (media && media.length > 0) {
+            for (let a = 0; a < media.length; a++) {
+                const previewUrl = URL.createObjectURL(media[a] as Blob);
+                urls.push(previewUrl);
+            }
+        }
+        
+        setMediaUrl(urls);
+        if (inputMediaRef.current) inputMediaRef.current.value = "";
+    }
     
     const sendChatToRoomMt = useMutation({
         mutationFn: async () => {
             try {
                 const formData = new FormData();
-                formData.append("messages", messages.trim());
+                formData.append("messages", text.trim());
                 formData.append("room_id", props?.roomId!);
 
                 if (media && media.length > 0) {
-                    media.forEach(media => formData.append("media", media));
+                    for (let t = 0; t < media.length; t++) {
+                        formData.append("media", media[t]);
+                    }
                 }
 
                 const request = await fetch(`${baseUrl}/rooms/to-room`, {
@@ -346,29 +256,26 @@ export default function RoomServices(props?: IRoomService) {
         }
     });
 
-    const isRoomProcessing = clearChatInRoomForMeMt.isPending || clearChatsInRoomForMeMt.isPending ||
-    deleteAllChatsPermanentlyForRoomMt.isPending || deleteAllChatsForRoomMt.isPending || 
-    deleteChatPermanentlyForRoomMt.isPending || deleteChaForRoomMt.isPending
+    const isRoomChatProcessing = clearChatInRoomForMeMt.isPending || clearChatsInRoomForMeMt.isPending ||
+    deleteAllChatsForRoomMt.isPending || deleteAllChatsPermanentlyForRoomMt.isPending || deleteChaForRoomMt.isPending ||
+    deleteChatPermanentlyForRoomMt.isPending || allChatsInRoom.isRoomChatLoading || sendChatToRoomMt.isPending;
 
     return { 
-        allChatsInRoom,
-        clearChatInRoomForMeMt,
-        clearChatsInRoomForMeMt,
-        currentAvailableRooms,
-        currentRoomMember,
-        currentRoomProfile,
+        allChatsInRoom, 
+        clearChatInRoomForMeMt, 
+        clearChatsInRoomForMeMt, 
         deleteAllChatsForRoomMt,
         deleteAllChatsPermanentlyForRoomMt,
         deleteChaForRoomMt,
         deleteChatPermanentlyForRoomMt,
-        inputMediaRef, 
-        isRoomProcessing,
+        handleImagePreview,
+        inputMediaRef,
+        isRoomChatProcessing,
         media,
         mediaUrl,
-        messages,
-        sendChatToRoomMt, 
         setMedia,
         setMediaUrl,
-        setMessages
+        setText,
+        text 
     }
 }

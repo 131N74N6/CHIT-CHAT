@@ -6,6 +6,10 @@ export interface IAuthService {
 
 export interface IChangeUser extends IAuthService {}
 
+export interface IUserProfileService {
+    receiverId?: string;
+}
+
 export interface IUserService extends IAuthService {
     roomId?: string;
 }

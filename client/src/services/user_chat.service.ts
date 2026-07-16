@@ -1,14 +1,13 @@
-import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useChatStore } from "../stores/chat.store";
+import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import type { ChatIntrf, IUserChatService } from "../models/chat.model";
 import { useRef } from "react";
-import type { ChatIntrf, IChatService } from "../models/chat.model";
-import type { UserProfileIntrf } from "../models/user.model";
+import { useChatStore } from "../stores/chat.store";
 
-export default function ChatServices(props?: IChatService) {
+export default function userChatService(props: IUserChatService) {
     const baseUrl = `${import.meta.env.VITE_BASE_API_URL}/chats`;
     const queryClient = useQueryClient();
-    const inputMediaRef = useRef<HTMLInputElement>(null);
 
+    const inputMediaRef = useRef<HTMLInputElement>(null);
     const resetChats = useChatStore((state) => state.resetChats);
 
     const media = useChatStore((state) => state.media);
@@ -17,9 +16,9 @@ export default function ChatServices(props?: IChatService) {
     const mediaUrl = useChatStore((state) => state.mediaUrl);
     const setMediaUrl = useChatStore((state) => state.setMediaUrl);
 
-    const messages = useChatStore((state) => state.messages);
-    const setMessages = useChatStore((state) => state.setMessages);
-
+    const text = useChatStore((state) => state.text);
+    const setText = useChatStore((state) => state.setText);
+    
     const clearChatForMeMt = useMutation({
         mutationFn: async (_id: string) => {
             try {
@@ -67,27 +66,8 @@ export default function ChatServices(props?: IChatService) {
             resetChats();
         }
     });
-
-    const { data: detail, error: detailError, isLoading: isDetailLoading } = useQuery<UserProfileIntrf>({
-        enabled: !!props?.receiverId,
-        queryFn: async () => {
-            try {
-                const request = await fetch(`${baseUrl}/profile/${props?.receiverId}`);
-
-                const response = await request.json();
-                if (!request.ok) throw new Error(response.message);
-                return response;
-            } catch (error) {
-                throw error;
-            }
-        },
-        queryKey: [`user-${props?.receiverId}`],
-        staleTime: Infinity
-    });
-
-    const currentUserProfile = { detail, detailError, isDetailLoading }
-
-    const deleteAllChatsPermanentlyForReceiverMt = useMutation({
+    
+    const deleteAllChatsPermanentlyForUsererMt = useMutation({
         mutationFn: async () => {
             try {
                 const request = await fetch(`${baseUrl}/rm-all/permanently`, {
@@ -111,7 +91,7 @@ export default function ChatServices(props?: IChatService) {
         }
     });
 
-    const deleteAllChatsForReceiverMt = useMutation({
+    const deleteAllChatsForUsererMt = useMutation({
         mutationFn: async () => {
             try {
                 const request = await fetch(`${baseUrl}/rm-all`, {
@@ -135,7 +115,7 @@ export default function ChatServices(props?: IChatService) {
         }
     });
 
-    const deleteChatPermanentlyForReceiverMt = useMutation({
+    const deleteChatPermanentlyForUserMt = useMutation({
         mutationFn: async (_id: string) => {
             try {
                 const request = await fetch(`${baseUrl}/rm/permanently/${_id}`, {
@@ -159,7 +139,7 @@ export default function ChatServices(props?: IChatService) {
         }
     });
 
-    const deleteChatForReceiverMt = useMutation({
+    const deleteChatForUserMt = useMutation({
         mutationFn: async (_id: string) => {
             try {
                 const request = await fetch(`${baseUrl}/rm/${_id}`, {
@@ -211,17 +191,34 @@ export default function ChatServices(props?: IChatService) {
         staleTime: Infinity
     });
 
-    const getUserChats: ChatIntrf[] = data ? data.pages.flat() : [];
+    const handleImagePreview = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files;
+        const urls: string[] = [];
+        
+        if (file && file.length > 0) setMedia(file);
 
+        if (media && media.length > 0) {
+            for (let a = 0; a < media.length; a++) {
+                const previewUrl = URL.createObjectURL(media[a] as Blob);
+                urls.push(previewUrl);
+            }
+        }
+        
+        setMediaUrl(urls);
+        if (inputMediaRef.current) inputMediaRef.current.value = "";
+    }
+    
     const sendChatToUserMt = useMutation({
         mutationFn: async () => {
             try {
                 const formData = new FormData();
-                formData.append("messages", messages.trim());
+                formData.append("messages", text.trim());
                 formData.append("receiver_id", props?.receiverId!);
 
                 if (media && media.length > 0) {
-                    media.forEach(media => formData.append("media", media));
+                    for (let m = 0; m < media.length; m++) {
+                        formData.append("media", media[m]);
+                    }
                 }
 
                 const request = await fetch(`${baseUrl}/to-user`, {
@@ -246,29 +243,24 @@ export default function ChatServices(props?: IChatService) {
         }
     });
 
-    const isChatProcessing = sendChatToUserMt.isPending || isLoading || clearChatForMeMt.isPending || 
-    clearChatsForMeMt.isPending || deleteAllChatsForReceiverMt.isPending || 
-    deleteAllChatsPermanentlyForReceiverMt.isPending || deleteChatForReceiverMt.isPending || 
-    deleteChatPermanentlyForReceiverMt.isPending;
-
+    const getUserChats: ChatIntrf[] = data ? data.pages.flat() : [];
     const userChats = { error, fetchNextPage, getUserChats, isFetchingNextPage, isLoading, hasNextPage }
 
-    return {
-        clearChatForMeMt,
-        clearChatsForMeMt,
-        currentUserProfile,
-        deleteChatForReceiverMt,
-        deleteChatPermanentlyForReceiverMt,
-        deleteAllChatsForReceiverMt,
-        deleteAllChatsPermanentlyForReceiverMt,
-        inputMediaRef,
-        isChatProcessing,
-        media,
-        mediaUrl,
-        sendChatToUserMt,
-        setMedia,
-        setMediaUrl,
-        setMessages,
-        userChats
+    const isUserChatProcessing = clearChatForMeMt.isPending || clearChatsForMeMt.isPending || 
+    deleteAllChatsForUsererMt.isPending || deleteAllChatsPermanentlyForUsererMt.isPending || 
+    deleteChatForUserMt.isPending || deleteChatPermanentlyForUserMt.isPending ||
+    sendChatToUserMt.isPending;
+
+    return { 
+        handleImagePreview, 
+        inputMediaRef, 
+        isUserChatProcessing, 
+        media, 
+        mediaUrl, 
+        setMedia, 
+        setMediaUrl, 
+        setText, 
+        text, 
+        userChats 
     }
 }

@@ -1,14 +1,14 @@
 import { create } from "zustand";
 
 export interface ChatState {
-    media: File[] | null;
-    setMedia: (media: File[] | null) => void;
+    media: FileList | null;
+    setMedia: (media: FileList | null) => void;
 
     mediaUrl: string[];
     setMediaUrl: (mediaUrl: string[]) => void;
 
-    messages: string;
-    setMessages: (messages: string) => void;
+    text: string;
+    setText: (text: string) => void;
 
     resetChats: () => void;
 }
@@ -20,8 +20,8 @@ export const useChatStore = create<ChatState>((set) => ({
     mediaUrl: [],
     setMediaUrl: (mediaUrl) => set({ mediaUrl }),
 
-    messages: "",
-    setMessages: (messages) => set({ messages }),
+    text: "",
+    setText: (text) => set({ text }),
 
-    resetChats: () => set({ media: null, mediaUrl: [], messages: "" })
+    resetChats: () => set({ media: null, mediaUrl: [], text: "" })
 }));

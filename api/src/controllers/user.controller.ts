@@ -50,7 +50,7 @@ export async function changeRoom(req: AuthRequest, res: Response) {
         io.to(`room-profile:${updated?._id}`)
         .to(`room-chat:${updated?._id}`)
         .to(`available-room:${userId}`)
-        .emit("room-profile:changed", {
+        .emit("room:profile-changed", {
             _id: updated?._id,
             description: updated?.description,
             name: updated?.name,
@@ -267,7 +267,7 @@ export async function deleteUser(req: AuthRequest, res: Response) {
 
         user.room_id.forEach(roomId => {
             io.to(`room-profile:${roomId}`)
-            .emit("user:changed", {
+            .emit("user:deleted", {
                 _id: user._id,
                 profile_picture: user.profile_picture,
                 username: user.username
@@ -275,7 +275,7 @@ export async function deleteUser(req: AuthRequest, res: Response) {
         });
 
         io.to(`receiver:${user._id}`)
-        .emit("user:changed", {
+        .emit("user:deleted", {
             _id: user._id,
             profile_picture: user.profile_picture,
             username: user.username

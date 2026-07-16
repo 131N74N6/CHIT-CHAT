@@ -12,18 +12,34 @@ export default function useSocketIo(props: ChatSocketIntrf) {
     const queryClient = useQueryClient();
 
     const {
-        availableRoomJoin,
         connect,
-        receiverJoin,
-        receiverProfileJoin,
-        roomChatJoin,
-        roomProfileJoin
+        onAvailableRoomJoin,
+        onChangeRoom,
+        onChangeUser,
+        onDeleteAllChatsInRoom,
+        onDeleteAllChatsPermanentlyInRoom,
+        onDeleteChatInRoom,
+        onDeleteChatPermanentlyInRoom,
+        onDeleteAllChats,
+        onDeleteAllChatsPermanently,
+        onDeleteChat,
+        onDeleteChatPermanently,
+        onDeleteRoom,
+        onDeleteUser,
+        onKickMember,
+        onLeftTheRoom,
+        onReceiverJoin,
+        onReceiverProfileJoin,
+        onRoomChatJoin,
+        onRoomProfileJoin,
+        onSendToRoom,
+        onSendToUser
     } = socketIoServices();
 
-    const allUsersQueryNames = ['all-users'];
-    const currentUserQueryNames = ['current-user'];
-    const roomDetailQueryNames = ['room-profile', 'room-member', 'available-room', 'room-chat'];
-    const userChatQueryNames = ['user-chat'];
+    //  ['all-users'];
+    //  ['current-user'];
+    //  ['room-profile', 'room-member', 'available-room', 'room-chat'];
+    //  ['user-chat'];
 
     function invalidations(queryNames: string[]) {
         queryClient.invalidateQueries({
@@ -42,22 +58,58 @@ export default function useSocketIo(props: ChatSocketIntrf) {
         connect(props.currentUserId);
 
         if (props.identifier.includes("available-room")) {
-            availableRoomJoin(props.marks);
+            onAvailableRoomJoin(props.marks);
         } else if (props.identifier.includes("room-chat")) {
-            roomChatJoin(props.marks);
+            onRoomChatJoin(props.marks);
         } else if (props.identifier.includes("room-profile")) {
-            roomProfileJoin(props.marks);
+            onRoomProfileJoin(props.marks);
         } else if (props.identifier.includes("user-chat")) {
-            receiverJoin(props.marks);
+            onReceiverJoin(props.marks);
         } else {
-            receiverProfileJoin(props.marks);
+            onReceiverProfileJoin(props.marks);
         }
 
-        if (props.identifier.includes("available-room")) {
-            
+        if (props.identifier.includes("available-rooms")) {
+            onChangeRoom(() => invalidations(["room-profile", "available-room"]));
+            onDeleteRoom(() => invalidations(["available-room", "room-profile", "room-chat", "room-member"]));
+        }
+
+        if (props.identifier.includes("room-chat")) {
+            onChangeRoom(() => invalidations(["room-profile", "available-room"]));
+            onDeleteAllChatsInRoom(() => invalidations(["room-chat"]));
+            onDeleteAllChatsPermanentlyInRoom(() => invalidations(["room-chat"]));
+            onDeleteChatInRoom(() => invalidations(["room-chat"]));
+            onDeleteChatPermanentlyInRoom(() => invalidations(["room-chat"]));
+            onSendToRoom(() => invalidations(["room-chat"]));
+        }
+
+        if (props.identifier.includes("room-member")) {
+            onChangeUser(() => invalidations(["all-users", "current-user"]));
+            onDeleteRoom(() => invalidations(["available-room", "room-profile", "room-chat", "room-member"]));
+            onDeleteUser(() => invalidations(["current-user", "user-chat"]));
+            onKickMember(() => invalidations(["room-member"]));
+            onLeftTheRoom(() => invalidations(["current-user", "user", "room-member"]));
+        }
+
+        if (props.identifier.includes("room-profile")) {
+            onChangeRoom(() => invalidations(["room-profile", "available-room"]));
+            onDeleteRoom(() => invalidations(["available-room", "room-profile", "room-chat", "room-member"]));
+        }
+
+        if (props.identifier.includes("receiver")) {
+            onChangeUser(() => invalidations(["all-users", "current-user", "user"]));
+            onDeleteAllChats(() => invalidations(["user-chat"]));
+            onDeleteAllChatsPermanently(() => invalidations(["user-chat"]));
+            onDeleteChatPermanently(() => invalidations(["user-chat"]));
+            onDeleteChat(() => invalidations(["user-chat"]));
+            onDeleteUser(() => invalidations(["current-user", "user-chat", "user"]));
+            onSendToUser(() => invalidations(["user-chat"]));
+        }
+
+        if (props.identifier.includes("receiver-profile")) {
+            onChangeUser(() => invalidations(["all-users", "current-user", "user"]));
+            onDeleteUser(() => invalidations(["current-user", "user-chat", "user"]));
         }
         
-    }, [props.identifier, props.currentUserId, queryClient]);
-
-    return {}
+    }, [props.identifier, props.currentUserId, props.marks, queryClient]);
 }

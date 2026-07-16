@@ -29,8 +29,16 @@ export default function socketIoServices() {
         });
     }
 
-    function availableRoomJoin(userId: string) {
+    function onAvailableRoomJoin(userId: string) {
         socket?.emit("join:available-room", userId);
+    }
+
+    function onChangeRoom(callback: (data: any) => void) {
+        socket?.on("room:profile-changed", callback);
+    }
+
+    function onChangeUser(callback: (data: any) => void) {
+        socket?.on("user:changed", callback);
     }
 
     function onDeleteAllChatsPermanently(callback: (data: any) => void) {
@@ -65,6 +73,38 @@ export default function socketIoServices() {
         socket?.on("room:chat-deleted", callback);
     }
 
+    function onDeleteRoom(callback: (data: any) => void) {
+        socket?.on("room:deleted", callback);
+    }
+
+    function onDeleteUser(callback: (data: any) => void) {
+        socket?.on("user:deleted", callback);
+    }
+
+    function onKickMember(callback: (data: any) => void) {
+        socket?.on("room:member-kicked", callback);
+    }
+
+    function onLeftTheRoom(callback: (data: any) => void) {
+        socket?.on("user:left", callback);
+    }
+
+    function onReceiverJoin(receiverId: string) {
+        socket?.emit("join:receiver", receiverId);
+    }
+
+    function onReceiverProfileJoin(receiverId: string) {
+        socket?.emit("join:receiver-profile", receiverId);
+    }
+
+    function onRoomChatJoin(roomId: string) {
+        socket?.emit("join:room-chat", roomId);
+    }
+
+    function onRoomProfileJoin(roomId: string) {
+        socket?.emit("join:room-profile", roomId);
+    }
+
     function onSendToUser(callback: (data: any) => void) {
         socket?.on("chat:send", callback);
     }
@@ -72,26 +112,12 @@ export default function socketIoServices() {
     function onSendToRoom(callback: (data: any) => void) {
         socket?.on("room-chat:send", callback);
     }
-
-    function receiverJoin(receiverId: string) {
-        socket?.emit("join:receiver", receiverId);
-    }
-
-    function receiverProfileJoin(receiverId: string) {
-        socket?.emit("join:receiver-profile", receiverId);
-    }
-
-    function roomChatJoin(roomId: string) {
-        socket?.emit("join:room-chat", roomId);
-    }
-
-    function roomProfileJoin(roomId: string) {
-        socket?.emit("join:room-profile", roomId);
-    }
     
     return {
-        availableRoomJoin,
         connect,
+        onAvailableRoomJoin,
+        onChangeRoom,
+        onChangeUser,
         onDeleteAllChats,
         onDeleteChat,
         onDeleteAllChatsInRoom,
@@ -100,11 +126,15 @@ export default function socketIoServices() {
         onDeleteChatPermanently,
         onDeleteAllChatsPermanentlyInRoom,
         onDeleteChatPermanentlyInRoom,
+        onDeleteRoom,
+        onDeleteUser,
+        onKickMember,
+        onLeftTheRoom,
+        onReceiverJoin,
+        onReceiverProfileJoin,
+        onRoomChatJoin,
+        onRoomProfileJoin,
         onSendToRoom,
-        onSendToUser,
-        receiverJoin,
-        receiverProfileJoin,
-        roomChatJoin,
-        roomProfileJoin
+        onSendToUser
     }
 }
