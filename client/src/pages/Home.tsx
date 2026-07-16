@@ -45,6 +45,7 @@ export default function Home() {
 
     return (
         <section className="flex md:flex-row gap-2.5 flex-col h-screen relative z-10">
+            <Navbar isProcessing={isChatProcessing || isUserProcessing}/>
             <div className="md:w-2/4 w-full h-full p-2.5 flex flex-col">
                 {allUsers.usersError ? (
                     <div className="flex justify-center items-center h-full">
@@ -94,7 +95,6 @@ export default function Home() {
                     </div>
                 </div>
             )}
-            <Navbar isProcessing={isChatProcessing || isUserProcessing}/>
         </section>
     );
 }

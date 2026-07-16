@@ -6,7 +6,7 @@ import { CloudinaryUploadResult, uploadTOCloudinary } from "../services/cloudina
 import { v2 } from "cloudinary";
 import { Types } from "mongoose";
 import { Rooms } from "../models/room.model";
-import { io } from "../services/socket-io.service";
+import { io } from "../services/socket_io.service";
 
 export async function changeRoom(req: AuthRequest, res: Response) {
     try {
@@ -106,6 +106,7 @@ export async function changeUser(req: AuthRequest, res: Response) {
         });
 
         io.to(`receiver:${updated?._id}`)
+        .to(`receiver-profile:${updated?._id}`)
         .emit("user:changed", {
             _id: updated?._id,
             profile_picture: updated?.profile_picture,

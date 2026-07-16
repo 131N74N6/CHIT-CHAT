@@ -1,26 +1,63 @@
 import { useEffect } from "react";
-import socketIoServices from "../services/socket-io.service";
-import { useQueryClient } from "@tanstack/react-query";
+import socketIoServices from "../services/socket_io.service";
+import { Query, useQueryClient } from "@tanstack/react-query";
 
 interface ChatSocketIntrf {
-    user_id: string;
-    marks: string[];
-    identifier?: string;
+    currentUserId: string;
+    identifier: string[];
+    marks: string;
 }
 
 export default function useSocketIo(props: ChatSocketIntrf) {
     const queryClient = useQueryClient();
 
     const {
-        connect
+        availableRoomJoin,
+        connect,
+        receiverJoin,
+        receiverProfileJoin,
+        roomChatJoin,
+        roomProfileJoin
     } = socketIoServices();
 
-    useEffect(() => {
-        if (!props.user_id) return;
-        connect(props.user_id);
+    const allUsersQueryNames = ['all-users'];
+    const currentUserQueryNames = ['current-user'];
+    const roomDetailQueryNames = ['room-profile', 'room-member', 'available-room', 'room-chat'];
+    const userChatQueryNames = ['user-chat'];
 
-        if (props.identifier === "")
-    }, [props.identifier, props.user_id, queryClient]);
+    function invalidations(queryNames: string[]) {
+        queryClient.invalidateQueries({
+            predicate: (query: Query<unknown, Error, unknown, readonly unknown[]>) => {
+                const queryKey = query.queryKey;
+                if (Array.isArray(queryKey) && queryKey.length > 0 && typeof queryKey[0] === 'string') {
+                    return queryNames.some(queryName => queryKey[0].startsWith(queryName));
+                }
+                return false;
+            }
+        });
+    }
+
+    useEffect(() => {
+        if (!props.currentUserId) return;
+        connect(props.currentUserId);
+
+        if (props.identifier.includes("available-room")) {
+            availableRoomJoin(props.marks);
+        } else if (props.identifier.includes("room-chat")) {
+            roomChatJoin(props.marks);
+        } else if (props.identifier.includes("room-profile")) {
+            roomProfileJoin(props.marks);
+        } else if (props.identifier.includes("user-chat")) {
+            receiverJoin(props.marks);
+        } else {
+            receiverProfileJoin(props.marks);
+        }
+
+        if (props.identifier.includes("available-room")) {
+            
+        }
+        
+    }, [props.identifier, props.currentUserId, queryClient]);
 
     return {}
 }

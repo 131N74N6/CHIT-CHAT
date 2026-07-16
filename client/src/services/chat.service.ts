@@ -20,9 +20,6 @@ export default function ChatServices(props?: IChatService) {
     const messages = useChatStore((state) => state.messages);
     const setMessages = useChatStore((state) => state.setMessages);
 
-    const receiverId = useChatStore((state) => state.receiverId);
-    const setReceiverId = useChatStore((state) => state.setReceiverId);
-
     const clearChatForMeMt = useMutation({
         mutationFn: async (_id: string) => {
             try {
@@ -187,7 +184,7 @@ export default function ChatServices(props?: IChatService) {
     });
 
     const { data, error, fetchNextPage, isFetchingNextPage, isLoading, hasNextPage } = useInfiniteQuery({
-        enabled: !!props?.receiverId || !!receiverId,
+        enabled: !!props?.receiverId,
         getNextPageParam: (lastPage, allPages) => {
             if (lastPage.length <= 14) return;
             return allPages.length + 1;
@@ -268,12 +265,10 @@ export default function ChatServices(props?: IChatService) {
         isChatProcessing,
         media,
         mediaUrl,
-        receiverId,
         sendChatToUserMt,
         setMedia,
         setMediaUrl,
         setMessages,
-        setReceiverId,
         userChats
     }
 }

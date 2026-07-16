@@ -2,10 +2,10 @@ import { useNavigate } from "react-router-dom";
 import AuthServices from "../services/auth.service";
 
 interface INavbar {
-    isProcessing: boolean;
+    isProcessing?: boolean;
 }
 
-export default function Navbar(props: INavbar) {
+export default function Navbar(props?: INavbar) {
     const navigate = useNavigate();
     const { signOutMt } = AuthServices();
 
@@ -17,7 +17,7 @@ export default function Navbar(props: INavbar) {
                         cursor-pointer disabled:cursor-not-allowed text-gray-900 p-1.5
                         font-medium bg-white hover:bg-gray-400 transition-colors
                     `}
-                    disabled={props.isProcessing}
+                    disabled={props?.isProcessing}
                     onClick={() => navigate("/home")}
                     type="button"
                 >
@@ -28,7 +28,7 @@ export default function Navbar(props: INavbar) {
                         cursor-pointer disabled:cursor-not-allowed text-gray-900 p-1.5
                         font-medium bg-white hover:bg-gray-400 transition-colors
                     `}
-                    disabled={props.isProcessing}
+                    disabled={props?.isProcessing}
                     onClick={() => navigate("/rooms")}
                     type="button"
                 >
@@ -39,7 +39,7 @@ export default function Navbar(props: INavbar) {
                         cursor-pointer disabled:cursor-not-allowed text-gray-900 p-1.5
                         font-medium bg-white hover:bg-gray-400 transition-colors
                     `}
-                    disabled={props.isProcessing}
+                    disabled={props?.isProcessing}
                     onClick={() => navigate("/join-room")}
                     type="button"
                 >
@@ -50,7 +50,7 @@ export default function Navbar(props: INavbar) {
                         cursor-pointer disabled:cursor-not-allowed text-gray-900 p-1.5
                         font-medium bg-white hover:bg-gray-400 transition-colors
                     `}
-                    disabled={props.isProcessing}
+                    disabled={props?.isProcessing}
                     onClick={() => navigate("/chatbot")}
                     type="button"
                 >
@@ -62,7 +62,7 @@ export default function Navbar(props: INavbar) {
                         cursor-pointer disabled:cursor-not-allowed text-gray-900 p-1.5
                         font-medium bg-white hover:bg-gray-400 transition-colors
                     `}
-                    disabled={props.isProcessing}
+                    disabled={props?.isProcessing}
                     onClick={() => navigate("/profile")}
                     type="button"
                 >
@@ -73,7 +73,7 @@ export default function Navbar(props: INavbar) {
                         cursor-pointer disabled:cursor-not-allowed text-gray-900 p-1.5
                         font-medium bg-white hover:bg-gray-400 transition-colors
                     `}
-                    disabled={props.isProcessing}
+                    disabled={props?.isProcessing}
                     onClick={() => signOutMt.mutate()}
                     type="button"
                 >

@@ -2,30 +2,26 @@ import { create } from "zustand";
 
 export interface ChatState {
     media: File[] | null;
+    setMedia: (media: File[] | null) => void;
+
     mediaUrl: string[];
+    setMediaUrl: (mediaUrl: string[]) => void;
+
     messages: string;
-    receiverId: string;
-    roomId: string;
+    setMessages: (messages: string) => void;
 
     resetChats: () => void;
-    setMediaUrl: (mediaUrl: string[]) => void;
-    setMedia: (media: File[] | null) => void;
-    setMessages: (messages: string) => void;
-    setReceiverId: (receiverId: string) => void;
-    setRoomId: (roomId: string) => void;
 }
 
 export const useChatStore = create<ChatState>((set) => ({
     media: null,
-    mediaUrl: [],
-    messages: "",
-    receiverId: "",
-    roomId: "",
-
-    resetChats: () => set({ media: null, mediaUrl: [], messages: "" }),
     setMedia: (media) => set({ media }),
+
+    mediaUrl: [],
     setMediaUrl: (mediaUrl) => set({ mediaUrl }),
+
+    messages: "",
     setMessages: (messages) => set({ messages }),
-    setReceiverId: (receiverId) => set({ receiverId }),
-    setRoomId: (roomId) => set({ roomId })
+
+    resetChats: () => set({ media: null, mediaUrl: [], messages: "" })
 }));

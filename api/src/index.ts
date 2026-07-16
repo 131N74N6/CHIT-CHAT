@@ -12,7 +12,7 @@ import { v2 } from "cloudinary";
 import express from "express";
 import cookieParser from "cookie-parser";
 import cors from "cors";
-import { app, server } from "./services/socket-io.service";
+import { app, server } from "./services/socket_io.service";
 import userRouters from "./routers/user.router";
 import authRouters from "./routers/auth.router";
 import chatsRouters from "./routers/chat.router";

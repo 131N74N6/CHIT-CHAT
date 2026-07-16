@@ -77,6 +77,10 @@ export default function socketIoServices() {
         socket?.emit("join:receiver", receiverId);
     }
 
+    function receiverProfileJoin(receiverId: string) {
+        socket?.emit("join:receiver-profile", receiverId);
+    }
+
     function roomChatJoin(roomId: string) {
         socket?.emit("join:room-chat", roomId);
     }
@@ -99,6 +103,7 @@ export default function socketIoServices() {
         onSendToRoom,
         onSendToUser,
         receiverJoin,
+        receiverProfileJoin,
         roomChatJoin,
         roomProfileJoin
     }

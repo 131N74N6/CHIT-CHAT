@@ -4,6 +4,8 @@ export interface IAuthService {
     setMessage?: (message: string | null) => void;
 }
 
+export interface IChangeUser extends IAuthService {}
+
 export interface IUserService extends IAuthService {
     roomId?: string;
 }

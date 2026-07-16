@@ -27,6 +27,10 @@ io.on("connection", (socket) => {
         socket.join(`receiver:${userId}`);
     });
 
+    socket.on("join:receiver-profile", (userId: string) => {
+        socket.join(`receiver-profile:${userId}`);
+    });
+
     socket.on("disconnect", () => {
         console.log("user disconnected");
     });

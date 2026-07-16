@@ -3,7 +3,7 @@ import { AuthRequest } from "../middlewares/auth.middleware";
 import { Chats } from "../models/chat.model";
 import { CloudinaryUploadResult, uploadTOCloudinary } from "../services/cloudinary.service";
 import { v2 } from "cloudinary";
-import { io } from "../services/socket-io.service";
+import { io } from "../services/socket_io.service";
 
 export async function clearChatForMe(req: AuthRequest, res: Response) {
     try {

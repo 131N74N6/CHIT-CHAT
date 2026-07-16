@@ -2,60 +2,107 @@ import { create } from "zustand";
 
 export interface UserState {
     address: string;
+    setAddress: (address: string) => void;
+
+    deleteProfilePicture: {
+        public_id: string;
+        resource_type: string;
+        url: string;
+    } | null;
+    setDeleteProfilePicture: (deleteProfilePicture: {
+        public_id: string;
+        resource_type: string;
+        url: string;
+    } | null) => void;
+
     email: string;
+    setEmail: (email: string) => void;
+
     gender: string;
+    setGender: (gender: string) => void;
+
     password: string;
+    setPassword: (password: string) => void;
+
     profilePicture: File | null;
+    setProfilePicture: (profilePicture: File | null) => void;
+
     profilePictureUrl: string | null;
+    setProfilePictureUrl: (profilePictureUrl: string | null) => void;
+
     oldProfile: {
         public_id: string;
         resource_type: string;
         url: string;
     } | null;
-    roomCode: string;
-    username: string;
-    visiblepassword: boolean;
-
-    resetSignIn: () => void;
-    resetSignUp: () => void;
-    setAddress: (address: string) => void;
-    setEmail: (email: string) => void;
-    setGender: (gender: string) => void;
     setOldProfilePicture: (oldProfile: {
         public_id: string;
         resource_type: string;
         url: string;
     } | null) => void;
-    setPassword: (password: string) => void;
-    setProfilePicture: (profilePicture: File | null) => void;
-    setProfilePictureUrl: (profilePictureUrl: string | null) => void;
+
+    resetSignIn: () => void;
+    resetUserState: () => void;
+    resetSignUp: () => void;
+
+    roomCode: string;
     setRoomCode: (roomCode: string) => void;
+
+    username: string;
     setUserName: (username: string) => void;
+    
+    visiblepassword: boolean;
     setVisiblePassword: (visiblepassword: boolean) => void;
+    
 }
 
 export const useUserStore = create<UserState>((set) => ({
     address: "",
+    setAddress: (address) => set({ address }),
+
+    deleteProfilePicture: null,
+    setDeleteProfilePicture: (deleteProfilePicture) => set({ deleteProfilePicture }),
+    
     email: "",
+    setEmail: (email) => set({ email }),
+    
     gender: "",
-    password: "",
-    profilePicture: null,
-    profilePictureUrl: null,
+    setGender: (gender) => set({ gender }),
+
     oldProfile: null,
-    roomCode: "",
-    username: "",
-    visiblepassword: false,
+    setOldProfilePicture: (oldProfile) => set({ oldProfile }),
+
+    password: "",
+    setPassword: (password) => set({ password }),
+
+    profilePicture: null,
+    setProfilePicture: (profilePicture) => set({ profilePicture }),
+
+    profilePictureUrl: null,
+    setProfilePictureUrl: (profilePictureUrl) => set({ profilePictureUrl }),
+
+    resetUserState: () => set({
+        deleteProfilePicture: null,
+        email: "",
+        oldProfile: null,
+        password: "",
+        profilePicture: null,
+        profilePictureUrl: null,
+        roomCode: "",
+        visiblepassword: false,
+        username: "",
+    }),
 
     resetSignIn: () => set({ username: "", password: "" }),
+
     resetSignUp: () => set({ email: "", username: "", password: "" }),
-    setAddress: (address) => set({ address }),
-    setEmail: (email) => set({ email }),
-    setGender: (gender) => set({ gender }),
-    setPassword: (password) => set({ password }),
-    setOldProfilePicture: (oldProfile) => set({ oldProfile }),
-    setProfilePicture: (profilePicture) => set({ profilePicture }),
-    setProfilePictureUrl: (profilePictureUrl) => set({ profilePictureUrl }),
+    
+    roomCode: "",
     setRoomCode: (roomCode) => set({ roomCode }),
+
+    username: "",
     setUserName: (username) => set({ username }),
+
+    visiblepassword: false,
     setVisiblePassword: (visiblepassword) => set({ visiblepassword })
 }));

@@ -1,11 +1,29 @@
-import UserServices from "../services/user.service";
 import cn from "../utils/cn";
+import joinRoomService from "../services/join_room.service";
+import Navbar from "../components/Navbar";
+import { useMessageStore } from "../stores/message.store";
+import { useEffect } from "react";
+import Alert from "../components/Alert";
 
-export default function Join() {
-    const { joinRoomMt, roomCode, setRoomCode } = UserServices();
+export default function JoinRoom() {
+    const message = useMessageStore((state) => state.message);
+    const setMessage = useMessageStore((state) => state.setMessage);
+
+    useEffect(() => {
+        if (message) {
+            const timer = setTimeout(() => {
+                setMessage(null);
+            }, 1500);
+            return () => clearTimeout(timer);
+        }
+    }, [message, setMessage]);
+
+    const { isJoinRoomProcessing, joinRoomMt, roomCode, setRoomCode } = joinRoomService({ setMessage: setMessage });
 
     return (
         <section className="flex flex-col h-screen z-10 relative">
+            <Navbar isProcessing={isJoinRoomProcessing}/>
+            {message ? <Alert message={message}/> : null}
             <div className="justify-center flex items-center h-full">
                 <form 
                     className="bg-white flex flex-col gap-2.5"
