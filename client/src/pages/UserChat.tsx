@@ -1,5 +1,5 @@
 import ChatList from "../components/ChatList";
-import ChatServices from "../services/chat.service";
+import userChatService from "../services/user_chat.service";
 import cn from "../utils/cn";
 import Loading from "../components/Loading";
 import UserServices from "../services/user.service";
@@ -7,6 +7,7 @@ import { File, SendIcon } from "lucide-react";
 import { useMessageStore } from "../stores/message.store";
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect } from "react";
+import userProfileService from "../services/user_profile.service";
 
 export default function UserChat() {
     const { receiver_id } = useParams();
@@ -17,15 +18,16 @@ export default function UserChat() {
 
     const { currentUser, isUserProcessing } = UserServices({ setMessage: setMessage });
 
+    const { currentUserProfile } = userProfileService({ receiverId: receiver_id });
+
     const { 
         clearChatForMeMt, 
-        currentUserProfile,
-        deleteChatForReceiverMt, 
-        deleteChatPermanentlyForReceiverMt, 
-        isChatProcessing, 
+        deleteChatForUserMt, 
+        deleteChatPermanentlyForUserMt, 
+        isUserChatProcessing, 
         sendChatToUserMt,
         userChats 
-    } = ChatServices({ receiverId: receiver_id, setMessage: setMessage });
+    } = userChatService({ receiverId: receiver_id, setMessage: setMessage });
     
     useEffect(() => {
         if (message) {
@@ -56,96 +58,73 @@ export default function UserChat() {
                             </div>
                         )}
                     </div>
-                <div className="text-white text-[1.2rem] font-extralight">Username</div>
-            </div>
-            <div className="flex flex-col gap-2.5 p-1">
-                {userChats.isLoading ? (
-                    <div className="flex justify-center items-center bg-white h-full">
-                        <Loading/>
-                    </div>
-                ) : userChats.error ? (
-                    <div className="flex justify-center items-center h-full">
-                        <div className="text-gray-700 font-medium text-center">
-                            {userChats.error.message}
+                    <div className="text-white text-[1.2rem] font-extralight">Username</div>
+                </div>
+                <div className="flex flex-col gap-2.5 p-1">
+                    {userChats.isLoading ? (
+                        <div className="flex justify-center items-center bg-white h-full">
+                            <Loading/>
                         </div>
-                    </div>
-                ) : (
-                    <ChatList 
-                        chats={userChats.getUserChats} 
-                        currentUserId={currentUser.user ? currentUser.user.user_id : ''} 
-                        fetchNextPage={userChats.fetchNextPage}
-                        hasNextPage={userChats.hasNextPage}
-                        isFetchingNextPage={userChats.isFetchingNextPage}
-                        isProcessing={isChatProcessing || isUserProcessing}
-                        onClearOne={clearChatForMeMt}
-                        onDeleteOne={deleteChatForReceiverMt}
-                        onDeleteOnePermanent={deleteChatPermanentlyForReceiverMt}
-                    />
-                )}
-                <form 
-                    className="bg-white inset-shadow-gray-200 p-1.5 flex flex-col gap-1.5 max-h-[30%] overflow-y-auto"
-                    onSubmit={(event: React.SubmitEvent<HTMLFormElement>) => {
-                        event.preventDefault();
-                        sendChatToUserMt.mutate();
-                    }}
-                >
-                    <div className="flex justify-end">
-                        <input
-                            className="inline-0 text-gray-900 font-light w-[90%]"
-                            id="message"
-                            name="message"
-                            type="text"
+                    ) : userChats.error ? (
+                        <div className="flex justify-center items-center h-full">
+                            <div className="text-gray-700 font-medium text-center">
+                                {userChats.error.message}
+                            </div>
+                        </div>
+                    ) : (
+                        <ChatList 
+                            chats={userChats.getUserChats} 
+                            currentUserId={currentUser.user ? currentUser.user.user_id : ''} 
+                            fetchNextPage={userChats.fetchNextPage}
+                            hasNextPage={userChats.hasNextPage}
+                            isFetchingNextPage={userChats.isFetchingNextPage}
+                            isProcessing={isUserChatProcessing || isUserProcessing}
+                            onClearOne={clearChatForMeMt}
+                            onDeleteOne={deleteChatForUserMt}
+                            onDeleteOnePermanent={deleteChatPermanentlyForUserMt}
                         />
-                        <button
-                            className={cn(
-                                "cursor-pointer disabled:cursor-not-allowed", 
-                                "text-white rounded-full flex justify-center items-center p-1.5",
-                                "bg-blue-600 w-[10%] h-[10%] transition-colors hover:bg-blue-500" 
-                            )}
-                            disabled={isChatProcessing || isUserProcessing}
-                            type="submit"
-                        >
-                            <SendIcon size={22}/>
-                        </button>
-                    </div>
-                    <div>
-                        <button 
-                            className={cn(
-                                "cursor-pointer disabled:cursor-not-allowed", 
-                                "border border-gray-500 bg-white text-gray-500 w-[20%] p-1.5"
-                            )}
-                            disabled={isChatProcessing || isUserProcessing}
-                            onClick={() => navigate(`/media/preview`)}
-                            type="button"
-                        >
-                            <File size={22}/>
-                        </button>
-                    </div>
-                </form>
-            </div>
-                {userChats.isLoading ? (
-                    <div className="flex justify-center items-center bg-white h-full">
-                        <Loading/>
-                    </div>
-                ) : userChats.error ? (
-                    <div className="flex justify-center items-center h-full">
-                        <div className="text-gray-700 font-medium text-center">
-                            {userChats.error.message}
+                    )}
+                    <form 
+                        className="bg-white inset-shadow-gray-200 p-1.5 flex flex-col gap-1.5 max-h-[30%] overflow-y-auto"
+                        onSubmit={(event: React.SubmitEvent<HTMLFormElement>) => {
+                            event.preventDefault();
+                            sendChatToUserMt.mutate();
+                        }}
+                    >
+                        <div className="flex justify-end">
+                            <input
+                                className="inline-0 text-gray-900 font-light w-[90%]"
+                                id="message"
+                                name="message"
+                                type="text"
+                            />
+                            <button
+                                className={cn(
+                                    "cursor-pointer disabled:cursor-not-allowed", 
+                                    "text-white rounded-full flex justify-center items-center p-1.5",
+                                    "bg-blue-600 w-[10%] h-[10%] transition-colors hover:bg-blue-500" 
+                                )}
+                                disabled={isUserChatProcessing || isUserProcessing}
+                                type="submit"
+                            >
+                                <SendIcon size={22}/>
+                            </button>
                         </div>
-                    </div>
-                ) : (
-                    <ChatList 
-                        chats={userChats.getUserChats} 
-                        currentUserId={currentUser.user ? currentUser.user.user_id : ''} 
-                        fetchNextPage={userChats.fetchNextPage}
-                        hasNextPage={userChats.hasNextPage}
-                        isFetchingNextPage={userChats.isFetchingNextPage}
-                        isProcessing={isChatProcessing || isUserProcessing}
-                        onClearOne={clearChatForMeMt}
-                        onDeleteOne={deleteChatForReceiverMt}
-                        onDeleteOnePermanent={deleteChatPermanentlyForReceiverMt}
-                    />
-                )}
+                        <div>
+                            <button 
+                                className={cn(
+                                    "cursor-pointer disabled:cursor-not-allowed", 
+                                    "border border-gray-500 bg-white text-gray-500 w-[20%] p-1.5"
+                                )}
+                                disabled={isUserChatProcessing || isUserProcessing}
+                                onClick={() => navigate(`/user/chat/preview/${receiver_id}`)}
+                                type="button"
+                            >
+                                <File size={22}/>
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </section>
     );

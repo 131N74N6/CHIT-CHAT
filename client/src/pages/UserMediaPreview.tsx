@@ -1,4 +1,4 @@
-export default function MediaPreview() {
+export default function UserMediaPreview() {
     return (
         <div>MediaPreview</div>
     )

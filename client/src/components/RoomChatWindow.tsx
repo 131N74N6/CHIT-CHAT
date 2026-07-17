@@ -1,16 +1,13 @@
-import { File, SendIcon } from "lucide-react";
-import type { RoomChatWindowIntrf } from "../models/room.model";
 import cn from "../utils/cn";
 import ChatList from "./ChatList";
 import Loading from "./Loading";
-import { useNavigate } from "react-router-dom";
+import { File, SendIcon } from "lucide-react";
+import type { IRoomChatWindow } from "../models/room.model";
 
-export default function RoomChatWindow(props: RoomChatWindowIntrf) {
-    const navigate = useNavigate();
-
+export default function RoomChatWindow(props: IRoomChatWindow) {
     return (
-        <div className="h-full flex-col gap-2.5 md:w-2/4 md:flex md:p-2.5 md:flex-col hidden">
-            <div className="bg-gray-500 flex gap-1.5 p-2">
+        <div className="flex flex-col gap-2.5">
+            <div className="bg-gray-500 flex gap-1.5 p-2 cursor-pointer" onClick={props.seeProfile}>
                 <div className="w-20 h-20 rounded-full">
                     {props.roomProfilePicture !== null ? (
                         <div className="w-full h-full">
@@ -31,23 +28,23 @@ export default function RoomChatWindow(props: RoomChatWindowIntrf) {
                 </div>
             </div>
             <div className="flex flex-col gap-2.5 p-1">
-                {props.isLoading ? (
+                {props.isRoomChatLoading ? (
                     <div className="flex justify-center items-center h-full">
                         <Loading/>
                     </div>
-                ) : props.error ? (
+                ) : props.roomChatError ? (
                     <div className="flex justify-center items-center h-full">
                         <div className="text-gray-700 font-medium text-center">
-                            {props.error.message}
+                            {props.roomChatError.message}
                         </div>
                     </div>
                 ) : (
                     <ChatList
                         chats={props.roomChats}
                         currentUserId={props.currentUserId}
-                        fetchNextPage={props.fetchNextPage}
-                        hasNextPage={props.hasNextPage}
-                        isFetchingNextPage={props.isFetchingNextPage}
+                        fetchNextPage={props.fetchNextRoomChat}
+                        hasNextPage={props.hasNextRoomChat}
+                        isFetchingNextPage={props.isFetchingNextRoomChat}
                         isProcessing={props.isProcessing}
                         onClearOne={props.onClearOne}
                         onDeleteOne={props.onDeleteOne}
@@ -87,7 +84,7 @@ export default function RoomChatWindow(props: RoomChatWindowIntrf) {
                                 "border border-gray-500 bg-white text-gray-500 w-[20%] p-1.5"
                             )}
                             disabled={props.isProcessing}
-                            onClick={() => navigate(`/media/preview`)}
+                            onClick={() => props.navigate(`/media/preview`)}
                             type="button"
                         >
                             <File size={22}/>

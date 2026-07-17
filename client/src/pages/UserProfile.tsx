@@ -1,4 +1,4 @@
-import ChatServices from "../services/chat.service";
+import userProfileService from "../services/user_profile.service";
 import { useNavigate, useParams } from "react-router-dom";
 import { useMessageStore } from "../stores/message.store";
 import { useEffect } from "react";
@@ -24,17 +24,14 @@ export default function UserProfile() {
         }
     }, [message, setMessage]);
 
-    const {
-        currentUserProfile,
-        isChatProcessing
-    } = ChatServices({ receiverId: receiver_id, setMessage: setMessage });
+    const { currentUserProfile } = userProfileService({ receiverId: receiver_id });
 
     const { detail, detailError, isDetailLoading } = currentUserProfile;
 
     return (
         <section className="flex flex-col relative h-screen z-10">
             {message ? <Alert message={message}/> : null}
-            <Navbar isProcessing={isChatProcessing}/>
+            <Navbar isProcessing={isDetailLoading}/>
             <div className="flex w-full flex-col h-full p-2.5">
                 {isDetailLoading ? (
                     <div className="flex justify-center items-center h-full">

@@ -1,16 +1,10 @@
+import type { ChatbotIntrf, IChatBotResultService } from "../models/chatbot.model";
 import { Query, useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import type { ChatbotIntrf, IChatbotServices } from "../models/chatbot.model";
-import UserServices from "./user.service";
-import { useChatbotStore } from "../stores/chatbot.store";
 
-export default function ChatbotServices(props?: IChatbotServices) {
+export default function chatbotResultService(props?: IChatBotResultService) {
     const queryClient = useQueryClient();
     const baseUrl = `${import.meta.env.VITE_BASE_API_URL}/chatbots`;
-    const { currentUser } = UserServices();
-
-    const question = useChatbotStore((state) => state.question);
-    const setQuestion = useChatbotStore((state) => state.setQuestion);
-
+    
     const {
         data: results,
         error: resultsError,
@@ -19,12 +13,12 @@ export default function ChatbotServices(props?: IChatbotServices) {
         isFetchingNextPage: resultsFetchNextPage,
         isLoading: isResultsLoading
     } = useInfiniteQuery({
-        enabled: !!currentUser.user?.user_id && !currentUser.isUserLoading,
+        enabled: !!props?.currentUserId,
         getNextPageParam: (lastPage, allPages) => {
             if (lastPage.length <= 14) return;
             return allPages.length + 1;
         },
-        queryKey: [`all-results-${currentUser.user?.user_id}`],
+        queryKey: [`all-results-${props?.currentUserId}`],
         queryFn: async ({ pageParam = 1}: { pageParam?: number }) => {
             try {
                 const request = await fetch(`${baseUrl}/show-all?page=${pageParam}&limit=${14}`, {
@@ -54,40 +48,6 @@ export default function ChatbotServices(props?: IChatbotServices) {
         resultsFetchNextPage, 
         isResultsLoading 
     }
-
-    const askAiMt = useMutation({
-        mutationFn: async () => {
-            try {
-                const request = await fetch(`${baseUrl}/ask-ai`, {
-                    body: JSON.stringify({ question: question.trim() }),
-                    credentials: "include",
-                    method: "POST"
-                });
-
-                const response = await request.json();
-                if (!request.ok) throw new Error(response.message);
-                return response;
-            } catch (error) {
-                throw error;
-            }
-        },
-        onError: (response) => {
-            props?.setMessage!(response.message);
-        },
-        onSuccess: () => {
-            queryClient.invalidateQueries({
-                predicate: (query: Query<unknown, Error, unknown, readonly unknown[]>) => {
-                    const queryKey = query.queryKey;
-                    if (Array.isArray(queryKey) && queryKey.length > 0 && typeof queryKey[0] === "string") {
-                        return queryKey[0].startsWith(`result-${props?._id}`) ||
-                        queryKey[0].startsWith(`all-results-${currentUser.user?.user_id}`);
-                    }
-                    return false;
-                }
-            });
-        }
-    });
-
     const { data: result, error: resultError, isLoading: isResultLoading } = useQuery<ChatbotIntrf>({
         enabled: !!props?._id,
         queryFn: async () => {
@@ -135,7 +95,7 @@ export default function ChatbotServices(props?: IChatbotServices) {
                     const queryKey = query.queryKey;
                     if (Array.isArray(queryKey) && queryKey.length > 0 && typeof queryKey[0] === "string") {
                         return queryKey[0].startsWith(`result-${props?._id}`) ||
-                        queryKey[0].startsWith(`all-results-${currentUser.user?.user_id}`);
+                        queryKey[0].startsWith(`all-results-${props?.currentUserId}`);
                     }
                     return false;
                 }
@@ -167,7 +127,7 @@ export default function ChatbotServices(props?: IChatbotServices) {
                     const queryKey = query.queryKey;
                     if (Array.isArray(queryKey) && queryKey.length > 0 && typeof queryKey[0] === "string") {
                         return queryKey[0].startsWith(`result-${props?._id}`) ||
-                        queryKey[0].startsWith(`all-results-${currentUser.user?.user_id}`);
+                        queryKey[0].startsWith(`all-results-${props?.currentUserId}`);
                     }
                     return false;
                 }
@@ -175,13 +135,5 @@ export default function ChatbotServices(props?: IChatbotServices) {
         }
     });
 
-    return {
-        allResults,
-        askAiMt,
-        currentResult,
-        deleteAllResultsMt,
-        deleteResultMt,
-        question,
-        setQuestion
-    }
+    return { allResults, currentResult, deleteAllResultsMt, deleteResultMt }
 }

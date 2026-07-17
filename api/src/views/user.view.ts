@@ -36,6 +36,7 @@ export async function getCurrentUser(req: AuthRequest, res: Response) {
         if (!user) return res.status(404).json({ message: "user not found" });
         res.status(200).json({
             address: user.address,
+            created_at: user.created_at,
             email: user.email,
             gender: user.gender,
             profile_pic: user.profile_picture,

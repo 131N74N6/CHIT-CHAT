@@ -45,25 +45,3 @@ export interface ChatListIntrf {
     onDeleteOnePermanent: UseMutationResult<any, Error, string, unknown>;
     onDeleteOne: UseMutationResult<any, Error, string, unknown>;
 }
-
-export interface UserChatWindowIntrf {
-    chats: ChatIntrf[];
-    currentUserId: string;
-    error: Error | null;
-    fetchNextPage: (options?: FetchNextPageOptions | undefined) => Promise<InfiniteQueryObserverResult<InfiniteData<any, unknown>, Error>>;
-    hasNextPage: boolean;
-    isFetchingNextPage: boolean;
-    isLoading: boolean;
-    isProcessing: boolean;
-    onClearOne: UseMutationResult<any, Error, string, unknown>;
-    onDeleteOnePermanent: UseMutationResult<any, Error, string, unknown>;
-    onDeleteOne: UseMutationResult<any, Error, string, unknown>;
-    profilePicture: {
-        public_id: string;
-        resource_type: string;
-        url: string;
-    } | null;
-    receiverId: string;
-    sendChatToUser: UseMutationResult<any, Error, void, unknown>;
-    username: string;
-}

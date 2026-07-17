@@ -1,5 +1,6 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 import type { IRoomMemberService } from "../models/room.model";
+import type { UserIntrf } from "../models/user.model";
 
 export default function roomMemberService(props?: IRoomMemberService) {
     const baseUrl = `${import.meta.env.VITE_BASE_API_URL}/rooms`;
@@ -36,7 +37,7 @@ export default function roomMemberService(props?: IRoomMemberService) {
         staleTime: Infinity
     });
 
-    const roomMember = paginatedRoomMember ? paginatedRoomMember.pages.flat() : [];
+    const roomMember: UserIntrf[] = paginatedRoomMember ? paginatedRoomMember.pages.flat() : [];
 
     const currentRoomMember = { 
         roomMember, 

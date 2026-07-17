@@ -45,7 +45,7 @@ export default function SignUp() {
                 <div className="flex flex-col gap-2">
                     <label htmlFor="email" className="font-medium text-gray-900">Email</label>
                     <input
-                        className="bg-blue-300 p-1.5 text-[0.85rem] font-medium w-full inline-0 text-gray-900"
+                        className="bg-blue-300 p-1.5 text-[0.85rem] font-medium w-full focus:outline-none text-gray-900"
                         id="email"
                         name="email"
                         onChange={(event) => setEmail(event.target.value)}
@@ -56,7 +56,7 @@ export default function SignUp() {
                 <div className="flex flex-col gap-2">
                     <label htmlFor="username" className="font-medium text-gray-900">Username</label>
                     <input
-                        className="bg-blue-300 p-1.5 text-[0.85rem] font-medium w-full inline-0 text-gray-900"
+                        className="bg-blue-300 p-1.5 text-[0.85rem] font-medium w-full focus:outline-none text-gray-900"
                         id="username"
                         name="username"
                         onChange={(event) => setUserName(event.target.value)}
@@ -67,7 +67,7 @@ export default function SignUp() {
                 <div className="flex flex-col gap-2 relative">
                     <label htmlFor="password" className="font-medium text-gray-900">Password</label>
                     <input
-                        className="bg-blue-300 p-1.5 text-[0.85rem] font-medium w-full inline-0 text-gray-900"
+                        className="bg-blue-300 p-1.5 text-[0.85rem] font-medium w-full focus:outline-none text-gray-900"
                         id="password"
                         name="password"
                         onChange={(event) => setPassword(event.target.value)}

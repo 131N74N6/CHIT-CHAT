@@ -1,7 +1,14 @@
 import type { FetchNextPageOptions, InfiniteData, InfiniteQueryObserverResult, UseMutationResult } from "@tanstack/react-query";
 
-export interface IChatbotServices {
+export interface IChatBotResultService {
     _id?: string;
+    currentUserId?: string;
+    setMessage?: (message:  string | null) => void;
+}
+
+export interface IChatbotQuestionServices {
+    _id?: string;
+    currentUserId?: string;
     setMessage?: (message:  string | null) => void;
 }
 

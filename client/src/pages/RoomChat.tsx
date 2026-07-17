@@ -2,13 +2,14 @@ import Alert from "../components/Alert";
 import cn from "../utils/cn";
 import ChatList from "../components/ChatList";
 import Loading from "../components/Loading";
-import RoomServices from "../services/room.service";
+import roomChatService from "../services/room_chat.service";
 import { File, SendIcon } from "lucide-react";
 import { useEffect } from "react";
 import { useMessageStore } from "../stores/message.store";
 import { useNavigate, useParams } from "react-router-dom";
 import UserServices from "../services/user.service";
 import Navbar from "../components/Navbar";
+import roomProfileService from "../services/room_profile.service";
 
 export default function RoomChat() {
     const { room_id } = useParams();
@@ -17,20 +18,19 @@ export default function RoomChat() {
     const message = useMessageStore((state) => state.message);
     const setMessage = useMessageStore((state) => state.setMessage);
 
-    const { currentUser, isUserProcessing } = UserServices();
-
+    const { currentUser, isUserProcessing } = UserServices({ setMessage: setMessage });
+    
+    const { currentRoomProfile } = roomProfileService({ roomId: room_id });
+    
     const { 
         allChatsInRoom, 
         clearChatInRoomForMeMt,
-        currentRoomProfile,
         deleteChaForRoomMt,
         deleteChatPermanentlyForRoomMt,
-        isRoomProcessing, 
+        isRoomChatProcessing,
         sendChatToRoomMt 
-    } = RoomServices({ 
-        roomId: room_id, 
-        setMessage: setMessage 
-    });
+    } = roomChatService({ roomId: room_id, setMessage: setMessage });
+
 
     useEffect(() => {
         if (message) {
@@ -44,7 +44,7 @@ export default function RoomChat() {
     return (
         <section className="flex flex-col relative h-screen z-10">
             {message ? <Alert message={message}/> : null}
-            <Navbar isProcessing={isRoomProcessing || isUserProcessing}/>
+            <Navbar isProcessing={isRoomChatProcessing || isUserProcessing}/>
             <div className="flex flex-col gap-2.5">
                 <div className="bg-gray-500 flex gap-1.5 p-2 w-full" onClick={() => navigate(`/room/profile/${room_id}`)}>
                     <div className="w-20 h-20 rounded-full">
@@ -85,7 +85,7 @@ export default function RoomChat() {
                             fetchNextPage={allChatsInRoom.fecthNextRoomChat}
                             hasNextPage={allChatsInRoom.roomChatHasNextPage}
                             isFetchingNextPage={allChatsInRoom.isRoomChatFetchNext}
-                            isProcessing={isRoomProcessing || isUserProcessing}
+                            isProcessing={isRoomChatProcessing || isUserProcessing}
                             onClearOne={clearChatInRoomForMeMt}
                             onDeleteOne={deleteChaForRoomMt}
                             onDeleteOnePermanent={deleteChatPermanentlyForRoomMt}
@@ -111,7 +111,7 @@ export default function RoomChat() {
                                     "text-white rounded-full flex justify-center items-center p-1.5",
                                     "bg-blue-600 w-[10%] h-[10%] transition-colors hover:bg-blue-500" 
                                 )}
-                                disabled={isRoomProcessing || isUserProcessing}
+                                disabled={isRoomChatProcessing || isUserProcessing}
                                 type="submit"
                             >
                                 <SendIcon size={22}/>
@@ -123,8 +123,8 @@ export default function RoomChat() {
                                     "cursor-pointer disabled:cursor-not-allowed", 
                                     "border border-gray-500 bg-white text-gray-500 w-[20%] p-1.5"
                                 )}
-                                disabled={isRoomProcessing || isUserProcessing}
-                                onClick={() => navigate(`/media/preview`)}
+                                disabled={isRoomChatProcessing || isUserProcessing}
+                                onClick={() => navigate(`/room/chat/preview/${room_id}`)}
                                 type="button"
                             >
                                 <File size={22}/>

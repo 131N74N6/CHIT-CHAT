@@ -204,7 +204,6 @@ export default function UserServices(props?: IUserService) {
         deleteUserMt,
         isUserProcessing,
         kickMemberMt,
-        leftRoomMt,
-        
+        leftRoomMt
     }
 }

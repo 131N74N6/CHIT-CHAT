@@ -273,6 +273,7 @@ export default function roomChatService(props: IRoomChatService) {
         isRoomChatProcessing,
         media,
         mediaUrl,
+        sendChatToRoomMt,
         setMedia,
         setMediaUrl,
         setText,

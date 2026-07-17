@@ -1,16 +1,16 @@
 import { File, SendIcon } from "lucide-react";
 import cn from "../utils/cn"
-import type { UserChatWindowIntrf } from "../models/chat.model";
+import type { IUserChatWindow } from "../models/user.model";
 import ChatList from "./ChatList";
 import Loading from "./Loading";
 import { useNavigate } from "react-router-dom";
 
-export default function UserChatWindow(props: UserChatWindowIntrf) {
+export default function UserChatWindow(props: IUserChatWindow) {
     const navigate = useNavigate();
 
     return (
         <div className="h-full flex-col gap-2.5 md:w-2/4 md:flex md:p-2.5 md:flex-col hidden">
-            <div className="bg-gray-500 p-2 flex gap-1.5">
+            <div className="bg-gray-500 p-2 flex gap-1.5" onClick={props.seeProfile}>
                 <div className="w-20 h-20 rounded-full">
                     {props.profilePicture !== null ? (
                         <div className="w-full h-full">
@@ -32,23 +32,23 @@ export default function UserChatWindow(props: UserChatWindowIntrf) {
                 <div className="text-white text-[1.2rem] font-extralight">{props.username}</div>
             </div>
             <div className="flex flex-col gap-2.5 p-1">
-                {props.isLoading ? (
+                {props.isUserChatLoading ? (
                     <div className="flex justify-center items-center bg-white h-full">
                         <Loading/>
                     </div>
-                ) : props.error ? (
+                ) : props.userChatError ? (
                     <div className="flex justify-center items-center h-full">
                         <div className="text-gray-700 font-medium text-center">
-                            {props.error.message}
+                            {props.userChatError.message}
                         </div>
                     </div>
                 ) : (
                     <ChatList 
-                        chats={props.chats} 
+                        chats={props.userChats} 
                         currentUserId={props.currentUserId} 
-                        fetchNextPage={props.fetchNextPage}
-                        hasNextPage={props.hasNextPage}
-                        isFetchingNextPage={props.isFetchingNextPage}
+                        fetchNextPage={props.fetchNextUserChat}
+                        hasNextPage={props.hasNextUserChat}
+                        isFetchingNextPage={props.isFetchingNextUserChats}
                         isProcessing={props.isProcessing}
                         onClearOne={props.onClearOne}
                         onDeleteOne={props.onDeleteOne}

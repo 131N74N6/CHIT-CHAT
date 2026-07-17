@@ -252,11 +252,18 @@ export default function userChatService(props: IUserChatService) {
     sendChatToUserMt.isPending;
 
     return { 
+        clearChatForMeMt,
+        clearChatsForMeMt,
+        deleteAllChatsForUsererMt,
+        deleteAllChatsPermanentlyForUsererMt,
+        deleteChatForUserMt,
+        deleteChatPermanentlyForUserMt,
         handleImagePreview, 
         inputMediaRef, 
         isUserChatProcessing, 
         media, 
-        mediaUrl, 
+        mediaUrl,
+        sendChatToUserMt, 
         setMedia, 
         setMediaUrl, 
         setText, 

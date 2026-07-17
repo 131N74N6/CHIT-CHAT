@@ -6,8 +6,10 @@ export default function RoomItem(props: RoomItemIntrf) {
 
     const showWindowChat = () => {
         props.setRoomId(props.room._id);
+        props.setCreatedAt(new Date(props.room.created_at).toLocaleString());
         props.setRoomName(props.room.name);
         props.setRoomProfilePicture(props.room.profile_picture);
+        props.setDescription(props.room.description);
     }
     
     return (

@@ -6,9 +6,12 @@ export default function UserData(props: UserItemIntrf) {
     const navigate = useNavigate();
 
     const showWindowChat = () => {
-        props.setProfilePicture(props.user.profile_picture);
-        props.setReceiverId(props.user._id);
-        props.setUserName(props.user.username);
+        props.setAddress!(props.user.address !== null ? props.user.address : "-");
+        props.setCreatedAt!(props.user.created_at);
+        props.setGender!(props.user.gender !== null ? props.user.gender : "-");
+        props.setProfilePicture!(props.user.profile_picture);
+        props.setReceiverId!(props.user.user_id);
+        props.setUserName!(props.user.username);
     }
 
     return (
@@ -35,7 +38,7 @@ export default function UserData(props: UserItemIntrf) {
                 <div className="text-gray-950 font-medium">{props.user.username}</div>
             </div>
             <div className={cn("border bg-white border-b-gray-600 md:hidden flex gap-1.5")} 
-                onClick={() => navigate(`/user/chat/${props.user._id}`)}
+                onClick={() => navigate(`/user/chat/${props.user.user_id}`)}
             >
                 <div className={cn("w-20 h-20 rounded-full")}>
                     {props.user.profile_picture !== null ? (

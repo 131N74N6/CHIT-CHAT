@@ -1,5 +1,5 @@
 import { useNavigate, useParams } from "react-router-dom";
-import RoomServices from "../services/room.service";
+import roomProfileService from "../services/room_profile.service";
 import { useMessageStore } from "../stores/message.store";
 import { useEffect } from "react";
 import Alert from "../components/Alert";
@@ -8,7 +8,6 @@ import { ArrowBigLeft } from "lucide-react";
 import Navbar from "../components/Navbar";
 import cn from "../utils/cn";
 import UserServices from "../services/user.service";
-import UserList from "../components/UserList";
 
 export default function RoomProfile() {
     const { room_id } = useParams();
@@ -35,11 +34,7 @@ export default function RoomProfile() {
 
     const { user } = currentUser;
 
-    const { 
-        currentRoomMember, 
-        currentRoomProfile, 
-        isRoomProcessing 
-    } = RoomServices({ currentUserId: user?.user_id, roomId: room_id, setMessage: setMessage });
+    const { currentRoomProfile } = roomProfileService({ roomId: room_id });
 
     const { 
         detail, 
@@ -47,21 +42,12 @@ export default function RoomProfile() {
         isDetailLoading 
     } = currentRoomProfile;
 
-    const { 
-        fetchNextRoomMember, 
-        isRoomMemberFetchNextPage, 
-        isRoomMemberLoading, 
-        roomMember, 
-        roomMemberError, 
-        roomMmeberHaveNextPage 
-    } = currentRoomMember;
-
     const isRoomOwner = user && detail && user.user_id === detail.creator_id;
 
     return (
         <section className="flex flex-col relative h-screen z-10">
             {message ? <Alert message={message}/> : null}
-            <Navbar isProcessing={isRoomProcessing || isUserProcessing}/>
+            <Navbar isProcessing={isUserProcessing}/>
             <div className="flex w-full flex-col h-full bg-gray-400 gap-2.5 p-1.5">
                 {isDetailLoading ? (
                     <div className="flex justify-center items-center h-full">
@@ -133,14 +119,14 @@ export default function RoomProfile() {
                                 </div>
                             </div>
                         </div>
-                        <div className="flex">
+                        <div className="grid grid-cols-2 gap-2">
                             {isRoomOwner ? (
                                 <button
                                     className={cn(
                                         "bg-gray-400 cursor-pointer disabled:cursor-not-allowed text-amber-600", 
                                         "text-[0.8rem] hover:bg-gray-500 transition-colors font-medium p-1.5"
                                     )}
-                                    disabled={isRoomProcessing || isUserProcessing}
+                                    disabled={isUserProcessing}
                                     onClick={() => deleteRoomMt.mutate()}
                                     type="button"
                                 >
@@ -152,34 +138,26 @@ export default function RoomProfile() {
                                         "bg-gray-400 cursor-pointer disabled:cursor-not-allowed text-red-600", 
                                         "text-[0.8rem] hover:bg-gray-500 transition-colors font-medium p-1.5"
                                     )}
-                                    disabled={isRoomProcessing || isUserProcessing}
+                                    disabled={isUserProcessing}
                                     onClick={() => leftRoomMt.mutate()}
                                 >
                                     Left room
                                 </button>
                             )}
+                            <button
+                                className={cn(
+                                    "bg-gray-400 cursor-pointer disabled:cursor-not-allowed text-olive-600", 
+                                    "text-[0.8rem] hover:bg-gray-500 transition-colors font-medium p-1.5"
+                                )}
+                                disabled={isUserProcessing}
+                                type="button"
+                                onClick={() => navigate(`/room/member/${room_id}`)}
+                            >
+                                See Room Member
+                            </button>
                         </div>
                     </div>
                 )}
-                <div className="bg-white p-2.5">
-                    {isRoomMemberLoading ? (
-                        <div className="flex justify-center items-center h-full">
-                            <Loading/>
-                        </div>
-                    ) : roomMemberError ? (
-                        <div className="flex justify-center items-center h-full">
-                            <div className="text-center font-medium text-4xl text-gray-800">{roomMemberError.message}</div>
-                        </div>
-                    ) : (
-                        <UserList
-                            fetchNextUser={fetchNextRoomMember}
-                            hasNextPage={roomMmeberHaveNextPage}
-                            isFetchingNextPage={isRoomMemberFetchNextPage}
-                            isProcessing={isUserProcessing || isRoomProcessing}
-                            users={roomMember}
-                        />
-                    )}
-                </div>
             </div>
         </section>
     );
