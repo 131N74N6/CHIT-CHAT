@@ -33,12 +33,12 @@ export default function RoomProfileWindow(props: IRoomProfileWindow) {
                     </div>
                     <div className="flex justify-center">
                         <div className="w-20 h-20 rounded-full">
-                            {props.roomProfilePicture && props.roomProfilePicture !== null ? (
+                            {props.roomProfile.profile_picture && props.roomProfile.profile_picture !== null ? (
                                 <div className="w-full h-full rounded-full">
                                     <img
-                                        alt={props.roomProfilePicture.public_id}
+                                        alt={props.roomProfile.profile_picture.public_id}
                                         className="w-full h-full object-cover"
-                                        src={props.roomProfilePicture.url}
+                                        src={props.roomProfile.profile_picture.url}
                                     />
                                 </div>
                             ) : (
@@ -46,7 +46,7 @@ export default function RoomProfileWindow(props: IRoomProfileWindow) {
                                     "bg-blue-600 text-white font-medium text-2xl",
                                     "flex justify-center items-center w-full h-full rounded-full"
                                 )}>
-                                    {props.roomName[0]}
+                                    {props.roomProfile.name[0]}
                                 </div>
                             )}
                         </div>
@@ -55,25 +55,25 @@ export default function RoomProfileWindow(props: IRoomProfileWindow) {
                         <div className="flex flex-col gap-1.5">
                             <div className="text-xl font-medium text-gray-800">Created At</div>
                             <div className="text-xl font-medium text-gray-800">
-                                {props.createdAt || "-"}
+                                {props.roomProfile.created_at || "-"}
                             </div>
                         </div>
                         <div className="flex flex-col gap-1.5">
                             <div className="text-xl font-medium text-gray-800">Room ID</div>
                             <div className="text-xl font-medium text-gray-800">
-                                {props.roomId || "-"}
+                                {props.roomProfile._id || "-"}
                             </div>
                         </div>
                         <div className="flex flex-col gap-1.5">
-                            <div className="text-xl font-medium text-gray-800">Username</div>
+                            <div className="text-xl font-medium text-gray-800">Name</div>
                             <div className="text-xl font-medium text-gray-800">
-                                {props.roomName || "-"}
+                                {props.roomProfile.name || "-"}
                             </div>
                         </div>
                         <div className="flex flex-col gap-1.5">
                             <div className="text-xl font-medium text-gray-800">Description</div>
                             <div className="text-xl font-medium text-gray-800">
-                                {props.description || "-"}
+                                {props.roomProfile.description || "-"}
                             </div>
                         </div>
                     </div>

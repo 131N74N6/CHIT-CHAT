@@ -10,6 +10,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import UserServices from "../services/user.service";
 import Navbar from "../components/Navbar";
 import roomProfileService from "../services/room_profile.service";
+import useSocketIo from "../hooks/useSocketIo";
 
 export default function RoomChat() {
     const { room_id } = useParams();
@@ -30,6 +31,12 @@ export default function RoomChat() {
         isRoomChatProcessing,
         sendChatToRoomMt 
     } = roomChatService({ roomId: room_id, setMessage: setMessage });
+        
+    useSocketIo({
+        currentUserId: currentUser.user?.user_id!,
+        identifier: ["room-chat"],
+        marks: room_id!
+    });
 
 
     useEffect(() => {

@@ -12,11 +12,7 @@ export default function RoomList(props: RoomListIntrf) {
                             isProcessing={props.isProcessing} 
                             key={room._id}
                             room={room} 
-                            setCreatedAt={props.setCreatedAt}
-                            setDescription={props.setDescription}
                             setRoomId={props.setRoomId}
-                            setRoomName={props.setRoomName}
-                            setRoomProfilePicture={props.setRoomProfilePicture}
                         />
                     );
                 })}

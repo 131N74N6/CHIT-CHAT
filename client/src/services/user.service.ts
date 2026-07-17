@@ -1,5 +1,5 @@
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import type { IUserService, UserProfileIntrf } from "../models/user.model";
+import type { IOtherUser, IUserService, IUserProfile } from "../models/user.model";
 import { useNavigate } from "react-router-dom";
 
 export default function UserServices(props?: IUserService) {
@@ -7,7 +7,7 @@ export default function UserServices(props?: IUserService) {
     const navigate = useNavigate();
     const queryClient = useQueryClient();
 
-    const { data: user, error: userError, isLoading: isUserLoading } = useQuery<UserProfileIntrf>({
+    const { data: user, error: userError, isLoading: isUserLoading } = useQuery<IUserProfile>({
         retry: false,
         queryFn: async () => {
             try {
@@ -62,12 +62,14 @@ export default function UserServices(props?: IUserService) {
         staleTime: Infinity
     });
 
+    const paginatedUser: IOtherUser[] = users ? users.pages.flat() : [];
+
     const allUsers = { 
         fetchNextUser, 
         usersHaveNextPage, 
         isFetchNextUser, 
         isUsersLoading, 
-        users: users ? users.pages.flat() : [], 
+        users: paginatedUser, 
         usersError 
     }
 

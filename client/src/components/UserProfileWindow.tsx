@@ -66,7 +66,7 @@ export default function UserProfileWindow(props: IUserProfileWindow) {
                         <div className="flex flex-col gap-1.5">
                             <div className="text-xl font-medium text-gray-800">User ID</div>
                             <div className="text-xl font-medium text-gray-800">
-                                {props.userProfile.user_id || "-"}
+                                {props.userProfile._id || "-"}
                             </div>
                         </div>
                         <div className="flex flex-col gap-1.5">

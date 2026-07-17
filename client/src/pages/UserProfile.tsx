@@ -81,7 +81,7 @@ export default function UserProfile() {
                             <div className="flex flex-col gap-1.5">
                                 <div className="text-xl font-medium text-gray-800">User ID</div>
                                 <div className="text-xl font-medium text-gray-800">
-                                    {detail && detail.user_id ? detail.user_id : "-"}
+                                    {detail && detail._id ? detail._id : "-"}
                                 </div>
                             </div>
                             <div className="flex flex-col gap-1.5">

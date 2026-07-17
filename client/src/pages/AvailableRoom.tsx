@@ -12,31 +12,27 @@ import { MessageCircle } from "lucide-react";
 import { useEffect } from "react";
 import { useMessageStore } from "../stores/message.store";
 import { useRoomStore } from "../stores/room.store";
+import useSocketIo from "../hooks/useSocketIo";
 
 export default function AvailableRoom() {
     const message = useMessageStore((state) => state.message);
     const setMessage = useMessageStore((state) => state.setMessage);
 
-    const createdAt = useRoomStore((state) => state.createdAt);
-    const setCreatedAt = useRoomStore((state) => state.setCreatedAt);
-
-    const description = useRoomStore((state) => state.description);
-    const setDescription = useRoomStore((state) => state.setDescription);
-
     const roomId = useRoomStore((state) => state.roomId);
     const setRoomId = useRoomStore((state) => state.setRoomId);
-
-    const roomName = useRoomStore((state) => state.roomName);
-    const setRoomName = useRoomStore((state) => state.setRoomName);
-
-    const oldRoomPicture = useRoomStore((state) => state.oldRoomPicture);
-    const setOldRoomPicture = useRoomStore((state) => state.setOldRoomPicture);
 
     const showMember = useRoomStore((state) => state.showMember);
     const setShowMember = useRoomStore((state) => state.setShowMember);
 
     const showProfile = useRoomStore((state) => state.showProfile);
     const setShowProfile = useRoomStore((state) => state.setShowProfile);
+
+    const { 
+        currentUser, 
+        deleteRoomMt,
+        isUserProcessing,
+        leftRoomMt
+    } = UserServices({ setMessage: setMessage });
 
     useEffect(() => {
         if (message) {
@@ -46,14 +42,13 @@ export default function AvailableRoom() {
 
             return () => clearTimeout(timer);
         }
-    }, [message, setMessage])
+    }, [message, setMessage]);
 
-    const { 
-        currentUser, 
-        deleteRoomMt,
-        isUserProcessing,
-        leftRoomMt
-    } = UserServices({ setMessage: setMessage });
+    useSocketIo({
+        identifier: ["available-room", "room-chat", "room-profile"],
+        currentUserId: currentUser.user?.user_id!,
+        marks: roomId
+    });
 
     const { currentAvailableRooms } = availableRoomService({ currentUserId: currentUser.user?.user_id });
 
@@ -91,29 +86,21 @@ export default function AvailableRoom() {
                         isFetchingNextPage={currentAvailableRooms.isFetchNextAvailableRoom}
                         isProcessing={currentAvailableRooms.isAvailableRoomLoading}
                         rooms={currentAvailableRooms.availableRooms}
-                        setCreatedAt={setCreatedAt}
-                        setDescription={setDescription}
                         setRoomId={setRoomId}
-                        setRoomName={setRoomName}
-                        setRoomProfilePicture={setOldRoomPicture}
                     />
                 )}
             </div>
             {roomId ? (
                 <RoomWindow
-                    createdAt={createdAt}
                     currentUserId={currentUser.user ? currentUser.user.user_id : "-"}
                     deleteRoomMt={deleteRoomMt}
-                    description={description}
                     fetchNextRoomChat={allChatsInRoom.fecthNextRoomChat}
                     fetchNextUser={currentRoomMember.fetchNextRoomMember}
                     hasNextRoomChat={allChatsInRoom.roomChatHasNextPage}
                     isFetchingNextRoomChat={allChatsInRoom.isRoomChatFetchNext}
-                    isLoading={
-                        allChatsInRoom.isRoomChatLoading || 
-                        currentRoomMember.isRoomMemberLoading || 
-                        currentRoomProfile.isDetailLoading
-                    }
+                    isRoomChatLoading={allChatsInRoom.isRoomChatLoading}
+                    isRoomMemberLoading={currentRoomMember.isRoomMemberLoading}
+                    isRoomProfileLoading={currentRoomProfile.isDetailLoading}
                     isProcessing={
                         currentRoomProfile.isDetailLoading || 
                         isRoomChatProcessing || 
@@ -129,12 +116,10 @@ export default function AvailableRoom() {
                     roomChats={allChatsInRoom.roomChats}
                     roomChatError={allChatsInRoom.roomChatsError}
                     sendChatToRoom={sendChatToRoomMt}
-                    roomId={roomId}
+                    roomProfile={currentRoomProfile.detail!}
                     roomMemberError={currentRoomMember.roomMemberError}
                     roomMemberHaveNextPage={currentRoomMember.roomMmeberHaveNextPage}
-                    roomName={roomName}
                     roomProfileError={currentRoomProfile.errorDetail}
-                    roomProfilePicture={oldRoomPicture}
                     setShowMember={setShowMember}
                     setShowProfile={setShowProfile}
                     showMember={showMember}

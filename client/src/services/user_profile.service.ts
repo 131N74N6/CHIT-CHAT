@@ -1,8 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
-import type { IUserProfileService, UserProfileIntrf } from '../models/user.model';
+import type { IUserProfileService, IOtherUser } from '../models/user.model';
 
 export default function userProfileService(props?: IUserProfileService) {
-    const { data: detail, error: detailError, isLoading: isDetailLoading } = useQuery<UserProfileIntrf>({
+    const { data: detail, error: detailError, isLoading: isDetailLoading } = useQuery<IOtherUser>({
         enabled: !!props?.receiverId,
         queryFn: async () => {
             try {

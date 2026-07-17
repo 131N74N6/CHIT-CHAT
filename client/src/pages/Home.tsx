@@ -9,31 +9,17 @@ import { useEffect } from "react";
 import { useMessageStore } from "../stores/message.store";
 import { useChatStore } from "../stores/chat.store";
 import userProfileService from "../services/user_profile.service";
+import useSocketIo from "../hooks/useSocketIo";
 
 export default function Home() {
     const message = useMessageStore((state) => state.message);
     const setMessage = useMessageStore((state) => state.setMessage);
-
-    const address = useChatStore((state) => state.address);
-    const setAddress = useChatStore((state) => state.setAddress);
-
-    const createdAt = useChatStore((state) => state.createdAt);
-    const setCreatedAt = useChatStore((state) => state.setCreatedAt);
-
-    const gender = useChatStore((state) => state.gender);
-    const setGender = useChatStore((state) => state.setGender);
-
-    const name = useChatStore((state) => state.name);
-    const setName = useChatStore((state) => state.setName);
-
-    const profilePicture = useChatStore((state) => state.profilePicture);
-    const setProfilePicture = useChatStore((state) => state.setProfilePicture);
-    
-    const receiverId = useChatStore((state) => state.receiverId);
-    const setReceiverId = useChatStore((state) => state.setReceiverId);
     
     const showUserProfile = useChatStore((state) => state.showUserProfile);
     const setShowUserProfile = useChatStore((state) => state.setShowUserProfile);
+    
+    const receiverId = useChatStore((state) => state.receiverId);
+    const setReceiverId = useChatStore((state) => state.setReceiverId);
 
     const { 
         allUsers, 
@@ -51,6 +37,12 @@ export default function Home() {
         sendChatToUserMt,
         userChats 
     } = userChatService({ setMessage: setMessage });
+        
+    useSocketIo({
+        currentUserId: currentUser.user?.user_id!,
+        identifier: ["user-chat"],
+        marks: receiverId
+    });
 
     useEffect(() => {
         if (message) {
@@ -79,12 +71,7 @@ export default function Home() {
                         hasNextPage={allUsers.usersHaveNextPage}
                         isProcessing={isUserChatProcessing || isUserProcessing}
                         isFetchingNextPage={allUsers.isFetchNextUser}
-                        setAddress={setAddress}
-                        setCreatedAt={setCreatedAt}
-                        setGender={setGender}
-                        setProfilePicture={setProfilePicture}
                         setReceiverId={setReceiverId}
-                        setUserName={setName}
                         users={allUsers.users}
                     />
                 )}
@@ -102,15 +89,13 @@ export default function Home() {
                     onClearOne={clearChatForMeMt}
                     onDeleteOne={deleteChatForUserMt}
                     onDeleteOnePermanent={deleteChatPermanentlyForUserMt}
-                    profilePicture={profilePicture}
                     receiverId={receiverId}
                     sendChatToUser={sendChatToUserMt}
                     setShowUserProfile={setShowUserProfile}
                     showUserProfile={showUserProfile}
                     userChatError={userChats.error}
                     userChats={userChats.getUserChats}
-                    userProfile={currentUser.user!}
-                    username={name}
+                    userProfile={currentUserProfile.detail!}
                 />
             ) : (
                 <div className="md:flex md:justify-center md:items-center md:h-full md:bg-white hidden">

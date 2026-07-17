@@ -97,7 +97,7 @@ export async function changeUser(req: AuthRequest, res: Response) {
         });
 
         user.room_id.forEach(roomId => {
-            io.to(`room:${roomId}`)
+            io.to(`room-profile:${roomId}`)
             .emit("user:changed", {
                 _id: updated?._id,
                 profile_picture: updated?.profile_picture,
@@ -297,6 +297,7 @@ export async function joinRoom(req: AuthRequest, res: Response) {
         });
 
         io.to(`room-profile:${room_code}`)
+        .to(`available-room:${userId}`)
         .emit("user:joined", {
             _id: updated?._id,
             profile_picture: updated?.profile_picture,
@@ -342,6 +343,7 @@ export async function leftRoom(req: AuthRequest, res: Response) {
         });
 
         io.to(`room-profile:${roomId}`)
+        .to(`available-room:${userId}`)
         .emit("user:left", {
             _id: updated?._id,
             profile_picture: updated?.profile_picture,

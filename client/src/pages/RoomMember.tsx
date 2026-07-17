@@ -1,11 +1,22 @@
+import { useParams } from "react-router-dom";
 import Loading from "../components/Loading";
 import Navbar from "../components/Navbar";
 import UserList from "../components/UserList";
+import useSocketIo from "../hooks/useSocketIo";
 import roomMemberService from "../services/room_member.service";
 import cn from "../utils/cn";
+import UserServices from "../services/user.service";
 
 export default function RoomMember() {
+    const { room_id } = useParams();
+    const { currentUser } = UserServices();
     const { currentRoomMember } = roomMemberService();
+    
+    useSocketIo({
+        currentUserId: currentUser.user?.user_id!,
+        identifier: ["room-member"],
+        marks: room_id!
+    });
 
     return (
         <section className="flex flex-col h-screen relative z-10">

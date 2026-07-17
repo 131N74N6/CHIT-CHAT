@@ -12,12 +12,12 @@ export default function UserChatWindow(props: IUserChatWindow) {
         <div className="h-full flex-col gap-2.5 md:w-2/4 md:flex md:p-2.5 md:flex-col hidden">
             <div className="bg-gray-500 p-2 flex gap-1.5" onClick={props.seeProfile}>
                 <div className="w-20 h-20 rounded-full">
-                    {props.profilePicture !== null ? (
+                    {props.userProfile.profile_picture !== null ? (
                         <div className="w-full h-full">
                             <img 
                                 className="w-full h-full object-cover" 
-                                src={props.profilePicture.url} 
-                                alt={props.profilePicture.public_id}
+                                src={props.userProfile.profile_picture.url} 
+                                alt={props.userProfile.profile_picture.public_id}
                             />
                         </div>
                     ) : (
@@ -25,11 +25,11 @@ export default function UserChatWindow(props: IUserChatWindow) {
                             "w-full h-full rounded-full flex items-center", 
                             "justify-center bg-blue-600 text-white font-extralight"
                         )}>
-                            {props.username[0]}
+                            {props.userProfile.username[0]}
                         </div>
                     )}
                 </div>
-                <div className="text-white text-[1.2rem] font-extralight">{props.username}</div>
+                <div className="text-white text-[1.2rem] font-extralight">{props.userProfile.username}</div>
             </div>
             <div className="flex flex-col gap-2.5 p-1">
                 {props.isUserChatLoading ? (

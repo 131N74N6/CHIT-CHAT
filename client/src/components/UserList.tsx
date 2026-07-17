@@ -10,13 +10,8 @@ export default function UserList(props: UserListIntrf) {
                 {props.users.map((user) => {
                     return (
                         <UserData 
-                            key={user.user_id}
-                            setAddress={props.setAddress}
-                            setCreatedAt={props.setCreatedAt}
-                            setGender={props.setGender}
-                            setProfilePicture={props.setProfilePicture}
+                            key={user._id}
                             setReceiverId={props.setReceiverId} 
-                            setUserName={props.setUserName}
                             user={user} 
                         />
                     );

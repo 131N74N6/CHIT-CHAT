@@ -26,13 +26,12 @@ export default function UserWindow(props: IUserWindow) {
                     onClearOne={props.onClearOne}
                     onDeleteOne={props.onDeleteOne}
                     onDeleteOnePermanent={props.onDeleteOnePermanent}
-                    profilePicture={props.profilePicture}
                     receiverId={props.receiverId}
                     seeProfile={seeProfile}
                     sendChatToUser={props.sendChatToUser}
                     userChats={props.userChats}
                     userChatError={props.userChatError}
-                    username={props.username}
+                    userProfile={props.userProfile}
                 />
             )}
         </div>

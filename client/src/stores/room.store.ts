@@ -1,12 +1,6 @@
 import { create } from "zustand";
 
 export interface RoomState {
-    createdAt: string;
-    setCreatedAt: (createdAt: string) => void;
-
-    description: string;
-    setDescription: (description: string) => void;
-
     deleteRoomImage: {
         public_id: string;
         resource_type: string;
@@ -51,12 +45,6 @@ export interface RoomState {
 }
 
 export const useRoomStore = create<RoomState>((set) => ({
-    createdAt: "",
-    setCreatedAt: (createdAt) => set({ createdAt }),
-
-    description: "",
-    setDescription: (description) => set({ description }),
-
     deleteRoomImage: null,
     setDeleteRoomImage: (deleteRoomImage) => set({ deleteRoomImage }),
 
@@ -83,7 +71,6 @@ export const useRoomStore = create<RoomState>((set) => ({
 
     resetRoomState: () => set({
         deleteRoomImage: null,
-        description: "",
         oldRoomPicture: null,
         roomName: "",
         selectedProfileRoom: null,

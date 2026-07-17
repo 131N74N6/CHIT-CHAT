@@ -25,24 +25,19 @@ export interface IUserChatWindow {
     onClearOne: UseMutationResult<any, Error, string, unknown>;
     onDeleteOnePermanent: UseMutationResult<any, Error, string, unknown>;
     onDeleteOne: UseMutationResult<any, Error, string, unknown>;
-    profilePicture: {
-        public_id: string;
-        resource_type: string;
-        url: string;
-    } | null;
     receiverId: string;
     seeProfile: () => void;
     sendChatToUser: UseMutationResult<any, Error, void, unknown>;
     userChats: ChatIntrf[];
     userChatError: Error | null;
-    username: string;
+    userProfile: IOtherUser;
 }
 
 export interface IUserProfileWindow {
     isProfileLoading: boolean;
     errorProfile: Error | null;
     seeUserChat: () => void;
-    userProfile: UserProfileIntrf;
+    userProfile: IOtherUser;
 }
 
 export interface IUserWindow {
@@ -57,22 +52,16 @@ export interface IUserWindow {
     onClearOne: UseMutationResult<any, Error, string, unknown>;
     onDeleteOnePermanent: UseMutationResult<any, Error, string, unknown>;
     onDeleteOne: UseMutationResult<any, Error, string, unknown>;
-    profilePicture: {
-        public_id: string;
-        resource_type: string;
-        url: string;
-    } | null;
     receiverId: string;
     sendChatToUser: UseMutationResult<any, Error, void, unknown>;
     setShowUserProfile: (showUserProfile: boolean) => void;
     showUserProfile: boolean;
     userChats: ChatIntrf[];
     userChatError: Error | null;
-    username: string;
-    userProfile: UserProfileIntrf;
+    userProfile: IOtherUser;
 }
 
-export interface UserProfileIntrf {
+export interface IUserProfile {
     address: string;
     created_at: string;
     gender: string;
@@ -85,44 +74,29 @@ export interface UserProfileIntrf {
     username: string;
 }
 
-export interface UserIntrf {
+export interface IOtherUser {
     _id: string;
+    address: string;
+    created_at: string;
+    gender: string;
     profile_picture: {
         public_id: string;
         resource_type: string;
         url: string;
-    };
+    }
     username: string;
 }
 
 export interface UserListIntrf {
-    users: UserProfileIntrf[];
+    users: IOtherUser[];
     fetchNextUser: (options?: FetchNextPageOptions | undefined) => Promise<InfiniteQueryObserverResult<InfiniteData<any, unknown>, Error>>;
     hasNextPage: boolean;
     isFetchingNextPage: boolean;
     isProcessing: boolean;
-    setAddress?: (address: string) => void
-    setCreatedAt?: (createdAt: string) => void
-    setGender?: (gender: string) => void;
-    setProfilePicture?: (profilePicture: {
-        public_id: string;
-        resource_type: string;
-        url: string;
-    } | null) => void;
     setReceiverId?: (receiverId: string) => void;
-    setUserName?: (username: string) => void;
 }
 
 export interface UserItemIntrf {
-    setAddress?: (address: string) => void
-    setCreatedAt?: (createdAt: string) => void
-    setGender?: (gender: string) => void;
-    setProfilePicture?: (profilePicture: {
-        public_id: string;
-        resource_type: string;
-        url: string;
-    } | null) => void;
     setReceiverId?: (receiverId: string) => void;
-    setUserName?: (username: string) => void;
-    user: UserProfileIntrf;
+    user: IOtherUser;
 }

@@ -1,4 +1,5 @@
 import type { FetchNextPageOptions, InfiniteData, InfiniteQueryObserverResult, UseMutationResult } from "@tanstack/react-query";
+import type { NavigateFunction } from "react-router-dom";
 
 export interface IChatBotResultService {
     _id?: string;
@@ -12,7 +13,7 @@ export interface IChatbotQuestionServices {
     setMessage?: (message:  string | null) => void;
 }
 
-export interface ChatbotIntrf {
+export interface IChatbot {
     _id: string;
     created_at: string;
     question: string;
@@ -20,15 +21,19 @@ export interface ChatbotIntrf {
     user_id: string;
 }
 
-export interface ChatbotListIntrf {
-    results: ChatbotIntrf[];
+export interface IChatbotList {
+    results: IChatbot[];
     fetchNextPage: (options?: FetchNextPageOptions | undefined) => Promise<InfiniteQueryObserverResult<InfiniteData<any, unknown>, Error>>
     hasNextPage: boolean;
     isFetchingNextPage: boolean;
+    isProcessing: boolean;
+    navigate: NavigateFunction;
     onDelete: UseMutationResult<any, Error, string, unknown>;
 }
 
-export interface ChatBotItemIntrf {
-    result: ChatbotIntrf;
+export interface IChatbotCard {
+    isProcessing: boolean;
+    navigate: NavigateFunction;
+    result: IChatbot;
     onDelete: UseMutationResult<any, Error, string, unknown>;
 }

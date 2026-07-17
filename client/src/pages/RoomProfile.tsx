@@ -8,6 +8,7 @@ import { ArrowBigLeft } from "lucide-react";
 import Navbar from "../components/Navbar";
 import cn from "../utils/cn";
 import UserServices from "../services/user.service";
+import useSocketIo from "../hooks/useSocketIo";
 
 export default function RoomProfile() {
     const { room_id } = useParams();
@@ -31,6 +32,12 @@ export default function RoomProfile() {
         isUserProcessing, 
         leftRoomMt 
     } = UserServices({ setMessage: setMessage });
+
+    useSocketIo({
+        currentUserId: currentUser.user?.user_id!,
+        identifier: ["room-profile"],
+        marks: room_id!
+    });
 
     const { user } = currentUser;
 

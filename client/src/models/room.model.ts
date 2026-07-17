@@ -1,7 +1,7 @@
 import type { FetchNextPageOptions, InfiniteData, InfiniteQueryObserverResult, UseMutationResult } from "@tanstack/react-query";
 import type { ChatIntrf } from "./chat.model";
 import type { NavigateFunction } from "react-router-dom";
-import type { UserIntrf } from "./user.model";
+import type { IOtherUser } from "./user.model";
 
 export interface IAvailableRoomService {
     currentUserId?: string;
@@ -51,15 +51,7 @@ export interface RoomIntrf {
 export interface RoomItemIntrf {
     isProcessing: boolean;
     room: RoomIntrf;
-    setCreatedAt: (createdAt: string) => void;
-    setDescription: (description: string) => void;
     setRoomId: (roomId: string) => void;
-    setRoomName: (roomName: string) => void;
-    setRoomProfilePicture: (roomProfilePicture: {
-        public_id: string;
-        resource_type: string;
-        url: string;
-    } | null) => void;
 }
 
 export interface RoomListIntrf {
@@ -68,15 +60,7 @@ export interface RoomListIntrf {
     isFetchingNextPage: boolean;
     isProcessing: boolean;
     rooms: RoomIntrf[];
-    setCreatedAt: (createdAt: string) => void;
-    setDescription: (description: string) => void;
     setRoomId: (roomId: string) => void;
-    setRoomName: (roomName: string) => void;
-    setRoomProfilePicture: (roomProfilePicture: {
-        public_id: string;
-        resource_type: string;
-        url: string;
-    } | null) => void;
 }
 
 export interface IRoomChatWindow {
@@ -92,12 +76,7 @@ export interface IRoomChatWindow {
     onDeleteOne: UseMutationResult<any, Error, string, unknown>;
     roomChats: ChatIntrf[];
     roomChatError: Error | null;
-    roomName: string;
-    roomProfilePicture: {
-        public_id: string;
-        resource_type: string;
-        url: string;
-    } | null;
+    roomProfile: RoomIntrf;
     sendChatToRoom: UseMutationResult<any, Error, void, unknown>;
     seeProfile: () => void;
 }
@@ -109,61 +88,47 @@ export interface IRoomMemberWindow {
     roomMemberError: Error | null;
     roomMemberHaveNextPage: boolean;
     seeProfile: () => void;
-    users: UserIntrf[];
+    users: IOtherUser[];
 }
 
 export interface IRoomProfileWindow {
-    createdAt: string;
     deleteRoomMt: UseMutationResult<any, Error, void, unknown>;
-    description: string;
     isProcessing: boolean;
     isRoomOwner: boolean;
     isRoomProfileLoading: boolean;
     leftRoomMt: UseMutationResult<any, Error, void, unknown>;
-    roomId: string;
-    roomName: string;
+    roomProfile: RoomIntrf;
     roomProfileError: Error | null;
-    roomProfilePicture: {
-        public_id: string;
-        resource_type: string;
-        url: string;
-    } | null;
     seeMember: () => void;
     seeRoomChat: () => void;
 }
 
 export interface IRoomWindow {
-    createdAt: string;
     currentUserId: string;
     deleteRoomMt: UseMutationResult<any, Error, void, unknown>;
-    description: string;
     fetchNextUser: (options?: FetchNextPageOptions | undefined) => Promise<InfiniteQueryObserverResult<InfiniteData<any, unknown>, Error>>;
     fetchNextRoomChat: (options?: FetchNextPageOptions | undefined) => Promise<InfiniteQueryObserverResult<InfiniteData<any, unknown>, Error>>
     hasNextRoomChat: boolean;
     isRoomMemberFetchNextPage: boolean;
     isFetchingNextRoomChat: boolean;
-    isLoading: boolean;
     isProcessing: boolean;
+    isRoomChatLoading: boolean;
+    isRoomMemberLoading: boolean;
+    isRoomProfileLoading: boolean;
     leftRoomMt: UseMutationResult<any, Error, void, unknown>;
     onClearOne: UseMutationResult<any, Error, string, unknown>;
     onDeleteOnePermanent: UseMutationResult<any, Error, string, unknown>;
     onDeleteOne: UseMutationResult<any, Error, string, unknown>;
+    roomProfile: RoomIntrf;
     roomChats: ChatIntrf[];
     roomChatError: Error | null;
-    roomId: string;
     roomMemberError: Error | null;
     roomMemberHaveNextPage: boolean;
-    roomName: string;
     roomProfileError: Error | null;
-    roomProfilePicture: {
-        public_id: string;
-        resource_type: string;
-        url: string;
-    } | null;
     sendChatToRoom: UseMutationResult<any, Error, void, unknown>;
     setShowProfile: (showProfile: boolean) => void;
     showProfile: boolean;
     setShowMember: (showMember: boolean) => void;
     showMember: boolean;
-    users: UserIntrf[];
+    users: IOtherUser[];
 }

@@ -2,9 +2,12 @@ import { Query, useMutation, useQueryClient } from "@tanstack/react-query";
 import type { IChatbotQuestionServices } from "../models/chatbot.model";
 import { useChatbotStore } from "../stores/chatbot.store";
 
-export default function ChatbotServices(props?: IChatbotQuestionServices) {
+export default function chatbotQuestionService(props?: IChatbotQuestionServices) {
     const queryClient = useQueryClient();
     const baseUrl = `${import.meta.env.VITE_BASE_API_URL}/chatbots`;
+
+    const answer = useChatbotStore((state) => state.answer);
+    const setAnswer = useChatbotStore((state) => state.setAnswer);
 
     const question = useChatbotStore((state) => state.question);
     const setQuestion = useChatbotStore((state) => state.setQuestion);
@@ -28,7 +31,7 @@ export default function ChatbotServices(props?: IChatbotQuestionServices) {
         onError: (response) => {
             props?.setMessage!(response.message);
         },
-        onSuccess: () => {
+        onSuccess: (response) => {
             queryClient.invalidateQueries({
                 predicate: (query: Query<unknown, Error, unknown, readonly unknown[]>) => {
                     const queryKey = query.queryKey;
@@ -39,8 +42,9 @@ export default function ChatbotServices(props?: IChatbotQuestionServices) {
                     return false;
                 }
             });
+            setAnswer(response.message);
         }
     });
 
-    return { askAiMt, question, setQuestion }
+    return { answer, askAiMt, setAnswer, setQuestion, question }
 }

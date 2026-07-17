@@ -9,12 +9,12 @@ export default function RoomChatWindow(props: IRoomChatWindow) {
         <div className="flex flex-col gap-2.5">
             <div className="bg-gray-500 flex gap-1.5 p-2 cursor-pointer" onClick={props.seeProfile}>
                 <div className="w-20 h-20 rounded-full">
-                    {props.roomProfilePicture !== null ? (
+                    {props.roomProfile.profile_picture && props.roomProfile.profile_picture !== null ? (
                         <div className="w-full h-full">
                             <img
                                 className="w-full h-full object-cover"
-                                alt={props.roomProfilePicture.public_id}
-                                src={props.roomProfilePicture.url}
+                                alt={props.roomProfile.profile_picture.public_id}
+                                src={props.roomProfile.profile_picture.url}
                             />
                         </div>
                     ) : (
@@ -22,7 +22,7 @@ export default function RoomChatWindow(props: IRoomChatWindow) {
                             "w-full h-full rounded-full flex items-center", 
                             "justify-center bg-blue-600 text-white font-extralight"
                         )}>
-                            {props.roomName[0]}
+                            {props.roomProfile.name[0]}
                         </div>
                     )}
                 </div>
