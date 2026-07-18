@@ -8,6 +8,7 @@ import { useMessageStore } from "../stores/message.store";
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect } from "react";
 import useUserProfileService from "../services/useUserProfileService";
+import Navbar from "../components/Navbar";
 
 export default function UserChat() {
     const { receiver_id } = useParams();
@@ -38,7 +39,8 @@ export default function UserChat() {
 
     return (
         <section className="flex flex-col h-screen relative z-10">
-            <div className="flex flex-col p-2.5 h-full">
+            <Navbar isProcessing={isUserChatProcessing || isUserProcessing || currentUserProfile.isDetailLoading}/>
+            <div className="flex flex-col h-full px-2.5 pt-2.5 w-full">
                 <div className="bg-gray-500 p-2 flex gap-1.5 cursor-pointer" onClick={() => navigate(`/user/profile/${receiver_id}`)}>
                     <div className="w-20 h-20 rounded-full">
                         {currentUserProfile.detail && currentUserProfile.detail.profile_picture !== null ? (

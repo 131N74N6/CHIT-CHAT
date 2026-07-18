@@ -2,9 +2,9 @@ import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-q
 import { useRef } from 'react'
 import type { IRoomChatService } from '../models/room.model';
 import { useChatStore } from '../stores/chat.store';
-import type { ChatIntrf } from '../models/chat.model';
+import type { ChatIntrf, IFileViewer } from '../models/chat.model';
 
-export default function useRoomChatService(props: IRoomChatService) {
+export default function useRoomChatService(props?: IRoomChatService) {
     const queryClient = useQueryClient();
     const baseUrl = `${import.meta.env.VITE_BASE_API_URL}/rooms`;
     
@@ -13,9 +13,6 @@ export default function useRoomChatService(props: IRoomChatService) {
 
     const media = useChatStore((state) => state.media);
     const setMedia = useChatStore((state) => state.setMedia);
-
-    const mediaUrl = useChatStore((state) => state.mediaUrl);
-    const setMediaUrl = useChatStore((state) => state.setMediaUrl);
 
     const text = useChatStore((state) => state.text);
     const setText = useChatStore((state) => state.setText);
@@ -212,19 +209,22 @@ export default function useRoomChatService(props: IRoomChatService) {
     });
 
     const handleImagePreview = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files;
-        const urls: string[] = [];
-        
-        if (file && file.length > 0) setMedia(file);
+        const files = event.target.files;
+        const temp: IFileViewer[] = [];
 
-        if (media && media.length > 0) {
-            for (let a = 0; a < media.length; a++) {
-                const previewUrl = URL.createObjectURL(media[a] as Blob);
-                urls.push(previewUrl);
-            }
+        if (!files || files.length === 0) return;
+
+        for (let x = 0; x < files.length; x++) {
+            temp.push({
+                file: files[x],
+                fileName: files[x].name,
+                fileType: files[x].type,
+                previewUrl: URL.createObjectURL(files[x])
+            });
         }
+
+        setMedia(prev => [...prev, ...temp]);
         
-        setMediaUrl(urls);
         if (inputMediaRef.current) inputMediaRef.current.value = "";
     }
     
@@ -237,7 +237,7 @@ export default function useRoomChatService(props: IRoomChatService) {
 
                 if (media && media.length > 0) {
                     for (let t = 0; t < media.length; t++) {
-                        formData.append("media", media[t]);
+                        formData.append("media", media[t].file);
                     }
                 }
 
@@ -279,10 +279,8 @@ export default function useRoomChatService(props: IRoomChatService) {
         inputMediaRef,
         isRoomChatProcessing,
         media,
-        mediaUrl,
         sendChatToRoomMt,
         setMedia,
-        setMediaUrl,
         setText,
         text 
     }

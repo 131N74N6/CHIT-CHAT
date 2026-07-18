@@ -6,11 +6,11 @@ import Loading from "./Loading";
 export default function ChatbotList(props: IChatbotList) {
     if (props.results.length === 0) {
         return (
-            <section className="flex justify-center items-center fixed inset-0 z-20 border bg-[rgba(0,0,0,0.66)] p-3">
+            <div className="flex justify-center items-center fixed inset-0 z-20 border bg-[rgba(0,0,0,0.66)] p-3">
                 <div className="bg-white">
                     <span className="text-gray-700 font-semibold text-[1rem]">No results found...</span>
                 </div>
-            </section>
+            </div>
         );
     }
 

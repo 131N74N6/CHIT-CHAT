@@ -1,11 +1,9 @@
 import { create } from "zustand";
+import type { IFileViewer } from "../models/chat.model";
 
 export interface ChatState {
-    media: FileList | null;
-    setMedia: (media: FileList | null) => void;
-
-    mediaUrl: string[];
-    setMediaUrl: (mediaUrl: string[]) => void;
+    media: IFileViewer[];
+    setMedia: (media: IFileViewer[] | ((prev: IFileViewer[]) => IFileViewer[])) => void;
 
     receiverId: string;
     setReceiverId: (receiverId: string) => void;
@@ -21,24 +19,21 @@ export interface ChatState {
 }
 
 export const useChatStore = create<ChatState>((set) => ({
-    media: null,
-    setMedia: (media) => set({ media }),
-
-    mediaUrl: [],
-    setMediaUrl: (mediaUrl) => set({ mediaUrl }),
+    media: [],
+    setMedia: (media) => set((state) => ({ 
+        media: typeof media === 'function' ? media(state.media) : media 
+    })),
 
     receiverId: "",
     setReceiverId: (receiverId) => set({ receiverId }),
 
     resetChats: () => set({ 
-        media: null, 
-        mediaUrl: [], 
+        media: [], 
         text: "" 
     }),
 
     resetChatState: () => set({
-        media: null, 
-        mediaUrl: [], 
+        media: [], 
         receiverId: "",
         showUserProfile: false,
         text: "", 

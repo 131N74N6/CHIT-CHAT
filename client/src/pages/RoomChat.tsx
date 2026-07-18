@@ -52,7 +52,7 @@ export default function RoomChat() {
         <section className="flex flex-col relative h-screen z-10">
             {message ? <Alert message={message}/> : null}
             <Navbar isProcessing={isRoomChatProcessing || isUserProcessing}/>
-            <div className="flex flex-col gap-2.5">
+            <div className="flex flex-col h-full px-2.5 pt-2.5 w-full">
                 <div className="bg-gray-500 flex gap-1.5 p-2 w-full" onClick={() => navigate(`/room/profile/${room_id}`)}>
                     <div className="w-20 h-20 rounded-full">
                         {currentRoomProfile.detail && currentRoomProfile.detail.profile_picture !== null ? (

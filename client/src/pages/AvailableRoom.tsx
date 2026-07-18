@@ -68,7 +68,7 @@ export default function AvailableRoom() {
     return (
         <section className="flex flex-col h-screen relative z-10">
             {message ? <Alert message={message}/> : null}
-            <div className="flex md:w-2/4 w-full flex-col p-2.5 h-full">
+            <div className="flex flex-col h-full px-2.5 pt-2.5 md:2/4 w-full">
                 {currentAvailableRooms.isAvailableRoomLoading ? (
                     <div className="flex justify-center items-center h-full">
                         <Loading/>

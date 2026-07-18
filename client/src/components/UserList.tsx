@@ -4,8 +4,18 @@ import Loading from "./Loading";
 import UserData from "./UserData";
 
 export default function UserList(props: UserListIntrf) {
+    if (props.users.length === 0) {
+        return (
+            <div className="flex justify-center items-center fixed inset-0 z-20 border bg-[rgba(0,0,0,0.66)] p-3">
+                <div className="bg-white">
+                    <span className="text-gray-700 font-semibold text-[1rem]">No users found...</span>
+                </div>
+            </div>
+        );
+    }
+
     return (
-        <div className="flex flex-col gap-2.5 overflow-y-auto">
+        <div className="flex flex-col py-2.5 overflow-y-auto">
             <div className="flex flex-col gap-2">
                 {props.users.map((user) => {
                     return (

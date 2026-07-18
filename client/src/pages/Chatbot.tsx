@@ -6,7 +6,7 @@ export default function Chatbot() {
     return (
         <section className="flex md:flex-row flex-col h-screen relative z-10">
             <form 
-                className="flex flex-col" 
+                className="flex flex-col h-full" 
                 onSubmit={(event: React.SubmitEvent<HTMLFormElement>) => {
                     event.preventDefault();
                     askAiMt.mutate();

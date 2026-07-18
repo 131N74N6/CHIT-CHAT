@@ -6,6 +6,13 @@ export interface IChatService {
     setMessage?: (message:  string | null) => void;
 }
 
+export interface IFileViewer {
+    file: File;
+    fileName: string;
+    fileType: string;
+    previewUrl: string;
+}
+
 export interface IUserChatService {
     receiverId?: string;
     setMessage?: (message: string | null) => void;

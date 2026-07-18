@@ -5,7 +5,7 @@ import Loading from "./Loading";
 
 export default function ChatList(props: ChatListIntrf) {
     return (
-        <div className="flex flex-col gap-2.5 overflow-y-auto">
+        <div className="flex flex-col py-2.5 overflow-y-auto">
             <div className="flex flex-col gap-2">
                 {props.chats.map((chat) => {
                     return (
