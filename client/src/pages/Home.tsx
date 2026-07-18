@@ -28,7 +28,6 @@ export default function Home() {
     } = useUserServices({ setMessage: setMessage });
 
     const { currentUserProfile } = useUserProfileService({ receiverId: receiverId });
-    console.log(currentUser.user?.address);
 
     const { 
         clearChatForMeMt, 
@@ -37,7 +36,7 @@ export default function Home() {
         isUserChatProcessing, 
         sendChatToUserMt,
         userChats 
-    } = useUserChatService({ setMessage: setMessage });
+    } = useUserChatService({ setMessage: setMessage, receiverId: receiverId });
         
     useSocketIo({
         currentUserId: currentUser.user?.user_id!,

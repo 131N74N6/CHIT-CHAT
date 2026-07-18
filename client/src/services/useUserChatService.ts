@@ -24,7 +24,6 @@ export default function useUserChatService(props: IUserChatService) {
             try {
                 const request = await fetch(`${baseUrl}/clear/${_id}`, {
                     credentials: "include",
-                    headers: { 'Content-Type': 'application/json' },
                     method: "PUT"
                 });
 
@@ -49,7 +48,6 @@ export default function useUserChatService(props: IUserChatService) {
             try {
                 const request = await fetch(`${baseUrl}/clears/${props?.receiverId}`, {
                     credentials: "include",
-                    headers: { 'Content-Type': 'application/json' },
                     method: "PUT"
                 });
 
@@ -74,7 +72,6 @@ export default function useUserChatService(props: IUserChatService) {
             try {
                 const request = await fetch(`${baseUrl}/rm-all/permanently`, {
                     credentials: "include",
-                    headers: { 'Content-Type': 'application/json' },
                     method: "DELETE"
                 });
 
@@ -99,7 +96,6 @@ export default function useUserChatService(props: IUserChatService) {
             try {
                 const request = await fetch(`${baseUrl}/rm-all`, {
                     credentials: "include",
-                    headers: { 'Content-Type': 'application/json' },
                     method: "DELETE"
                 });
 
@@ -124,7 +120,6 @@ export default function useUserChatService(props: IUserChatService) {
             try {
                 const request = await fetch(`${baseUrl}/rm/permanently/${_id}`, {
                     credentials: "include",
-                    headers: { 'Content-Type': 'application/json' },
                     method: "DELETE"
                 });
 
@@ -149,7 +144,6 @@ export default function useUserChatService(props: IUserChatService) {
             try {
                 const request = await fetch(`${baseUrl}/rm/${_id}`, {
                     credentials: "include",
-                    headers: { 'Content-Type': 'application/json' },
                     method: "DELETE"
                 });
 
@@ -168,9 +162,11 @@ export default function useUserChatService(props: IUserChatService) {
             resetChats();
         }
     });
+    
+    const isReceiverValid = !!props?.receiverId;
 
     const { data, error, fetchNextPage, isFetchingNextPage, isLoading, hasNextPage } = useInfiniteQuery({
-        enabled: !!props?.receiverId,
+        enabled: isReceiverValid,
         getNextPageParam: (lastPage, allPages) => {
             if (lastPage.length <= 14) return;
             return allPages.length + 1;
@@ -179,7 +175,6 @@ export default function useUserChatService(props: IUserChatService) {
             try {
                 const request = await fetch(`${baseUrl}/show-all/${props?.receiverId}?page=${pageParam}&limit=${14}`, {
                     credentials: "include",
-                    headers: { 'Content-Type': 'application/json' },
                     method: "GET"
                 });
                 
@@ -199,10 +194,12 @@ export default function useUserChatService(props: IUserChatService) {
     });
 
     const handleImagePreview = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files;
+        const files = event.target.files;
         const urls: string[] = [];
         
-        if (file && file.length > 0) setMedia(file);
+        if (!files || files.length === 0) return;
+        
+        setMedia(files);
 
         if (media && media.length > 0) {
             for (let a = 0; a < media.length; a++) {

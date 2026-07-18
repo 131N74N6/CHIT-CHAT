@@ -9,7 +9,7 @@ interface ProtectedRouteIntrf {
 export default function ProtectedRoute(props: ProtectedRouteIntrf) {
     const { currentUser } = UserServices();
 
-    if (currentUser.isUserLoading) {
+    if (!currentUser.user && currentUser.isUserLoading) {
         return (
             <div className="bg-white flex justify-center items-center h-screen">
                 <Loading/>
