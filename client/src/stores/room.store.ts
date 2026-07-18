@@ -12,6 +12,9 @@ export interface RoomState {
         url: string;
     } | null) => void;
 
+    description: string;
+    setDescription: (description: string) => void;
+
     oldRoomPicture: {
         public_id: string;
         resource_type: string;
@@ -48,6 +51,9 @@ export const useRoomStore = create<RoomState>((set) => ({
     deleteRoomImage: null,
     setDeleteRoomImage: (deleteRoomImage) => set({ deleteRoomImage }),
 
+    description: "",
+    setDescription: (description) => set({ description }),
+
     oldRoomPicture: null,
     setOldRoomPicture: (oldRoomPicture) => set({ oldRoomPicture }),
     
@@ -71,6 +77,7 @@ export const useRoomStore = create<RoomState>((set) => ({
 
     resetRoomState: () => set({
         deleteRoomImage: null,
+        description: "",
         oldRoomPicture: null,
         roomName: "",
         selectedProfileRoom: null,

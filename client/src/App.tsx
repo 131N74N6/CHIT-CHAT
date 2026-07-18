@@ -30,10 +30,9 @@ export default function App() {
         <QueryClientProvider client={queryClient}>
             <BrowserRouter>
                 <Routes>
+                    <Route path="/" element={<Navigate to="/home" replace/>}/>
                     <Route element={<SignIn/>} path="/sign-in"/>
                     <Route element={<SignUp/>} path="/sign-up"/>
-                    <Route path="*" element={<Navigate to="/sign-in" replace/>}/>
-                    <Route path="/" element={<Navigate to="/home" replace/>}/>
                     <Route element={<ProtectedRoute><JoinRoom/></ProtectedRoute>} path="/join-room"/>
                     <Route element={<ProtectedRoute><Home/></ProtectedRoute>} path="/home"/>
                     <Route element={<ProtectedRoute><YourProfile/></ProtectedRoute>} path="/profile"/>
@@ -53,6 +52,7 @@ export default function App() {
                     <Route element={<ProtectedRoute><Chatbot/></ProtectedRoute>} path="/chatbot"/>
                     <Route element={<ProtectedRoute><ChatbotResults/></ProtectedRoute>} path="/chatbot/histories"/>
                     <Route element={<ProtectedRoute><ChatbotDetail/></ProtectedRoute>} path="/chatbot/detail/:_id"/>
+                    <Route path="*" element={<Navigate to="/sign-in" replace/>}/>
                 </Routes>
             </BrowserRouter>
         </QueryClientProvider>

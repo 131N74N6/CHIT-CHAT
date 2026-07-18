@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import socketIoServices from "../services/socket_io.service";
+import useSocketIoServices from "../services/useSocketIoServices";
 import { Query, useQueryClient } from "@tanstack/react-query";
 
 interface ChatSocketIntrf {
@@ -34,7 +34,7 @@ export default function useSocketIo(props: ChatSocketIntrf) {
         onRoomProfileJoin,
         onSendToRoom,
         onSendToUser
-    } = socketIoServices();
+    } = useSocketIoServices();
 
     //  ['all-users'];
     //  ['current-user'];

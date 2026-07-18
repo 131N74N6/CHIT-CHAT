@@ -1,4 +1,4 @@
-import userProfileService from "../services/user_profile.service";
+import useUserProfileService from "../services/useUserProfileService";
 import { useNavigate, useParams } from "react-router-dom";
 import { useMessageStore } from "../stores/message.store";
 import { useEffect } from "react";
@@ -24,7 +24,7 @@ export default function UserProfile() {
         }
     }, [message, setMessage]);
 
-    const { currentUserProfile } = userProfileService({ receiverId: receiver_id });
+    const { currentUserProfile } = useUserProfileService({ receiverId: receiver_id });
 
     const { detail, detailError, isDetailLoading } = currentUserProfile;
 

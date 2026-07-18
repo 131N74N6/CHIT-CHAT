@@ -1,7 +1,7 @@
-import chatbotQuestionService from "../services/chatbot_question.service";
+import useChatbotQuestionService from "../services/useChatbotQuestionService";
 
 export default function Chatbot() {
-    const { answer, askAiMt, setQuestion, question } = chatbotQuestionService();
+    const { answer, askAiMt, setQuestion, question } = useChatbotQuestionService();
 
     return (
         <section className="flex md:flex-row flex-col h-screen relative z-10">

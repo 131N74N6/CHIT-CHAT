@@ -2,14 +2,14 @@ import Alert from "../components/Alert";
 import cn from "../utils/cn";
 import ChatList from "../components/ChatList";
 import Loading from "../components/Loading";
-import roomChatService from "../services/room_chat.service";
+import useRoomChatService from "../services/useRoomChatService";
 import { File, SendIcon } from "lucide-react";
 import { useEffect } from "react";
 import { useMessageStore } from "../stores/message.store";
 import { useNavigate, useParams } from "react-router-dom";
-import UserServices from "../services/user.service";
+import useUserServices from "../services/useUserServices";
 import Navbar from "../components/Navbar";
-import roomProfileService from "../services/room_profile.service";
+import useRoomProfileService from "../services/useRoomProfileService";
 import useSocketIo from "../hooks/useSocketIo";
 
 export default function RoomChat() {
@@ -19,9 +19,9 @@ export default function RoomChat() {
     const message = useMessageStore((state) => state.message);
     const setMessage = useMessageStore((state) => state.setMessage);
 
-    const { currentUser, isUserProcessing } = UserServices({ setMessage: setMessage });
+    const { currentUser, isUserProcessing } = useUserServices({ setMessage: setMessage });
     
-    const { currentRoomProfile } = roomProfileService({ roomId: room_id });
+    const { currentRoomProfile } = useRoomProfileService({ roomId: room_id });
     
     const { 
         allChatsInRoom, 
@@ -30,7 +30,7 @@ export default function RoomChat() {
         deleteChatPermanentlyForRoomMt,
         isRoomChatProcessing,
         sendChatToRoomMt 
-    } = roomChatService({ roomId: room_id, setMessage: setMessage });
+    } = useRoomChatService({ roomId: room_id, setMessage: setMessage });
         
     useSocketIo({
         currentUserId: currentUser.user?.user_id!,

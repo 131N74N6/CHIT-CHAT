@@ -1,5 +1,5 @@
 import cn from "../utils/cn";
-import joinRoomService from "../services/join_room.service";
+import useJoinRoomService from "../services/useJoinRoomService";
 import Navbar from "../components/Navbar";
 import { useMessageStore } from "../stores/message.store";
 import { useEffect } from "react";
@@ -18,7 +18,7 @@ export default function JoinRoom() {
         }
     }, [message, setMessage]);
 
-    const { isJoinRoomProcessing, joinRoomMt, roomCode, setRoomCode } = joinRoomService({ setMessage: setMessage });
+    const { isJoinRoomProcessing, joinRoomMt, roomCode, setRoomCode } = useJoinRoomService({ setMessage: setMessage });
 
     return (
         <section className="flex flex-col h-screen z-10 relative">

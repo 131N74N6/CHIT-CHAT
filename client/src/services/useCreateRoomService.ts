@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useRef } from 'react';
 import { useRoomStore } from '../stores/room.store';
 
-export default function createRoomService(props?: ICreateRoom) {
+export default function useCreateRoomService(props?: ICreateRoom) {
     const navigate = useNavigate();
     const queryClient = useQueryClient();
     

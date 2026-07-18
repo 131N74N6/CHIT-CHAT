@@ -55,7 +55,8 @@ export async function signUp (req: Request, res: Response) {
         const { email, password, username } = req.body;
         const created_at = new Date().toISOString();
 
-        if (!username && !password) return res.status(400).json({ message: "all fields are required" });
+        if (!email && !username && !password) return res.status(400).json({ message: "all fields are required" });
+        if (!email) return res.status(400).json({ message: "please provide email" });
         if (!password) return res.status(400).json({ message: "please provide password" });
         if (!username) return res.status(400).json({ message: "please provide email" });
 

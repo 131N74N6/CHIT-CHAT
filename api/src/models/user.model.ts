@@ -22,9 +22,9 @@ const userSchema = new Schema<UserIntrf>({
     gender: { type: String },
     password: { type: String, required: true },
     profile_picture: {
-        public_id: { type: String, required: true },
-        resource_type: { type: String, required: true },
-        url: { type: String, required: true }
+        public_id: { type: String },
+        resource_type: { type: String },
+        url: { type: String }
     },
     room_id: [{ type: Schema.Types.ObjectId }],
     username: { type: String, required: true },

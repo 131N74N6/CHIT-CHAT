@@ -4,7 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRef } from "react";
 import type { IChangeRoom, RoomIntrf } from "../models/room.model";
 
-export default function changeRoomService(props?: IChangeRoom) {
+export default function useChangeRoomService(props?: IChangeRoom) {
     const navigate = useNavigate();
     const queryClient = useQueryClient();
     
@@ -41,6 +41,7 @@ export default function changeRoomService(props?: IChangeRoom) {
                     const request = await fetch(`${import.meta.env.VITE_BASE_API_URL}/users/rm-room-pict/${props?.roomId}`, {
                         body: JSON.stringify({ old_image: deleteRoomImage }),
                         credentials: "include",
+                        headers: { 'Content-Type': 'application/json' },
                         method: "DELETE"
                     });
 
@@ -87,6 +88,7 @@ export default function changeRoomService(props?: IChangeRoom) {
             try {
                 const request = await fetch(`${import.meta.env.VITE_BASE_API_URL}/rooms/profile/${props?.roomId}`, {
                     credentials: "include",
+                    headers: { 'Content-Type': 'application/json' },
                     method: "GET"
                 });
 

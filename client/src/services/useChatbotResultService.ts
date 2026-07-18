@@ -1,7 +1,7 @@
-import type { ChatbotIntrf, IChatBotResultService } from "../models/chatbot.model";
+import type { IChatbot, IChatBotResultService } from "../models/chatbot.model";
 import { Query, useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-export default function chatbotResultService(props?: IChatBotResultService) {
+export default function useChatbotResultService(props?: IChatBotResultService) {
     const queryClient = useQueryClient();
     const baseUrl = `${import.meta.env.VITE_BASE_API_URL}/chatbots`;
     
@@ -23,6 +23,7 @@ export default function chatbotResultService(props?: IChatBotResultService) {
             try {
                 const request = await fetch(`${baseUrl}/show-all?page=${pageParam}&limit=${14}`, {
                     credentials: "include",
+                    headers: { 'Content-Type': 'application/json' },
                     method: "GET"
                 });
 
@@ -48,12 +49,13 @@ export default function chatbotResultService(props?: IChatBotResultService) {
         resultsFetchNextPage, 
         isResultsLoading 
     }
-    const { data: result, error: resultError, isLoading: isResultLoading } = useQuery<ChatbotIntrf>({
+    const { data: result, error: resultError, isLoading: isResultLoading } = useQuery<IChatbot>({
         enabled: !!props?._id,
         queryFn: async () => {
             try {
                 const request = await fetch(`${baseUrl}/show/${props?._id}`, {
                     credentials: "include",
+                    headers: { 'Content-Type': 'application/json' },
                     method: "GET"
                 });
 
@@ -76,6 +78,7 @@ export default function chatbotResultService(props?: IChatBotResultService) {
             try {
                 const request = await fetch(`${baseUrl}/rm-all`, {
                     credentials: "include",
+                    headers: { 'Content-Type': 'application/json' },
                     method: "DELETE"
                 });
 
@@ -108,6 +111,7 @@ export default function chatbotResultService(props?: IChatBotResultService) {
             try {
                 const request = await fetch(`${baseUrl}/rm/${id}`, {
                     credentials: "include",
+                    headers: { 'Content-Type': 'application/json' },
                     method: "DELETE"
                 });
 

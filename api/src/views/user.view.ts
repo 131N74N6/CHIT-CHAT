@@ -13,11 +13,11 @@ export async function getAllUsers(req: AuthRequest, res: Response) {
         let users;
 
         if (searched === undefined) {
-            users = User.find({ _id: { $ne: userId } }).limit(limit).skip(skip).sort({ username: 1 });
+            users = await User.find({ _id: { $ne: userId } }).limit(limit).skip(skip).sort({ username: 1 });
             
             res.status(200).json(users);
         } else {
-            users = User
+            users = await User
             .find({ _id: { $ne: userId }, username: { $regex: new RegExp(searched, 'i') } })
             .limit(limit)
             .skip(skip)

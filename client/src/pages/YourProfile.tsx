@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import UserServices from "../services/user.service";
+import useUserServices from "../services/useUserServices";
 import { useMessageStore } from "../stores/message.store";
 import Loading from "../components/Loading";
 import Navbar from "../components/Navbar";
@@ -23,7 +23,7 @@ export default function YourProfile() {
         }
     }, [message, setMessage]);
 
-    const { currentUser, isUserProcessing } = UserServices({ setMessage: setMessage });
+    const { currentUser, isUserProcessing } = useUserServices({ setMessage: setMessage });
 
     const { isUserLoading, user, userError } = currentUser;
 

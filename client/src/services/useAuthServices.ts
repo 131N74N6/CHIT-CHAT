@@ -2,8 +2,10 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useUserStore } from "../stores/user.store";
 import { useNavigate } from "react-router-dom";
 import type { IAuthService } from "../models/user.model";
+import { useRoomStore } from "../stores/room.store";
+import { useChatStore } from "../stores/chat.store";
 
-export default function AuthServices(props?: IAuthService) {
+export default function useAuthServices(props?: IAuthService) {
     const navigate = useNavigate();
     const queryClient = useQueryClient();
 
@@ -19,6 +21,9 @@ export default function AuthServices(props?: IAuthService) {
     const resetSignIn = useUserStore((state) => state.resetSignIn);
     const resetSignUp = useUserStore((state) => state.resetSignUp);
 
+    const resetRoomState = useRoomStore((state) => state.resetRoomState);
+    const resetChatState = useChatStore((state) => state.resetChatState);
+
     const signInMt = useMutation({
         mutationFn: async () => {
             try {
@@ -28,6 +33,7 @@ export default function AuthServices(props?: IAuthService) {
                         password: password.trim()
                     }),
                     credentials: "include",
+                    headers: { 'Content-Type': 'application/json' },
                     method: "POST"
                 });
 
@@ -53,6 +59,7 @@ export default function AuthServices(props?: IAuthService) {
             try {
                 const request = await fetch(`${import.meta.env.VITE_BASE_API_URL}/auths/signout`, {
                     credentials: "include",
+                    headers: { 'Content-Type': 'application/json' },
                     method: "POST"
                 });
 
@@ -69,6 +76,8 @@ export default function AuthServices(props?: IAuthService) {
         onSuccess: () => {
             queryClient.setQueryData(['current-user'], null);
             queryClient.clear();
+            resetChatState();
+            resetRoomState();
             navigate("/sign-in");
         }
     });
@@ -83,6 +92,7 @@ export default function AuthServices(props?: IAuthService) {
                         username: username.trim()
                     }),
                     credentials: "include",
+                    headers: { 'Content-Type': 'application/json' },
                     method: "POST"
                 });
 

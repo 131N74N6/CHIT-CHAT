@@ -1,5 +1,5 @@
 import { useNavigate, useParams } from "react-router-dom";
-import roomProfileService from "../services/room_profile.service";
+import useRoomProfileService from "../services/useRoomProfileService";
 import { useMessageStore } from "../stores/message.store";
 import { useEffect } from "react";
 import Alert from "../components/Alert";
@@ -7,7 +7,7 @@ import Loading from "../components/Loading";
 import { ArrowBigLeft } from "lucide-react";
 import Navbar from "../components/Navbar";
 import cn from "../utils/cn";
-import UserServices from "../services/user.service";
+import useUserServices from "../services/useUserServices";
 import useSocketIo from "../hooks/useSocketIo";
 
 export default function RoomProfile() {
@@ -31,7 +31,7 @@ export default function RoomProfile() {
         deleteRoomMt, 
         isUserProcessing, 
         leftRoomMt 
-    } = UserServices({ setMessage: setMessage });
+    } = useUserServices({ setMessage: setMessage });
 
     useSocketIo({
         currentUserId: currentUser.user?.user_id!,
@@ -41,7 +41,7 @@ export default function RoomProfile() {
 
     const { user } = currentUser;
 
-    const { currentRoomProfile } = roomProfileService({ roomId: room_id });
+    const { currentRoomProfile } = useRoomProfileService({ roomId: room_id });
 
     const { 
         detail, 

@@ -1,13 +1,13 @@
 import Alert from "../components/Alert";
-import availableRoomService from "../services/available_room.service";
+import useAvailableRoomService from "../services/useAvailableRoomService";
 import Loading from "../components/Loading";
 import Navbar from "../components/Navbar";
-import roomChatService from "../services/room_chat.service";
+import useRoomChatService from "../services/useRoomChatService";
 import RoomList from "../components/RoomList";
-import roomMemberService from "../services/room_member.service";
-import roomProfileService from "../services/room_profile.service";
+import useRoomMemberService from "../services/useRoomMemberService";
+import useRoomProfileService from "../services/useRoomProfileService";
 import RoomWindow from "../components/RoomWindow";
-import UserServices from "../services/user.service";
+import UserServices from "../services/useUserServices";
 import { MessageCircle } from "lucide-react";
 import { useEffect } from "react";
 import { useMessageStore } from "../stores/message.store";
@@ -50,11 +50,11 @@ export default function AvailableRoom() {
         marks: roomId
     });
 
-    const { currentAvailableRooms } = availableRoomService({ currentUserId: currentUser.user?.user_id });
+    const { currentAvailableRooms } = useAvailableRoomService({ currentUserId: currentUser.user?.user_id });
 
-    const { currentRoomMember } = roomMemberService({ roomId: roomId });
+    const { currentRoomMember } = useRoomMemberService({ roomId: roomId });
 
-    const { currentRoomProfile } = roomProfileService({ roomId: roomId });
+    const { currentRoomProfile } = useRoomProfileService({ roomId: roomId });
 
     const { 
         allChatsInRoom, 
@@ -63,7 +63,7 @@ export default function AvailableRoom() {
         deleteChatPermanentlyForRoomMt, 
         isRoomChatProcessing, 
         sendChatToRoomMt 
-    } = roomChatService({ roomId: roomId, setMessage: setMessage });
+    } = useRoomChatService({ roomId: roomId, setMessage: setMessage });
 
     return (
         <section className="flex flex-col h-screen relative z-10">

@@ -2,17 +2,17 @@ import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tansta
 import type { IOtherUser, IUserService, IUserProfile } from "../models/user.model";
 import { useNavigate } from "react-router-dom";
 
-export default function UserServices(props?: IUserService) {
+export default function useUserServices(props?: IUserService) {
     const baseUrl = `${import.meta.env.VITE_BASE_API_URL}/users`;
     const navigate = useNavigate();
     const queryClient = useQueryClient();
 
     const { data: user, error: userError, isLoading: isUserLoading } = useQuery<IUserProfile>({
-        retry: false,
         queryFn: async () => {
             try {
                 const request = await fetch(`${baseUrl}/show`, {
                     credentials: "include",
+                    headers: { 'Content-Type': 'application/json' },
                     method: "GET"
                 });
 
@@ -24,6 +24,7 @@ export default function UserServices(props?: IUserService) {
             }
         },
         queryKey: ['current-user'],
+        retry: false,
         staleTime: Infinity,
     });
 
@@ -46,6 +47,7 @@ export default function UserServices(props?: IUserService) {
             try {
                 const request = await fetch(`${baseUrl}/show-all?page=${pageParam}&limit=${14}`, {
                     credentials: "include",
+                    headers: { 'Content-Type': 'application/json' },
                     method: "GET"
                 });
 
@@ -78,6 +80,7 @@ export default function UserServices(props?: IUserService) {
             try {
                 const request = await fetch(`${baseUrl}/rm-room/${props?.roomId}`, {
                     credentials: "include",
+                    headers: { 'Content-Type': 'application/json' },
                     method: "DELETE"
                 });
 
@@ -111,6 +114,7 @@ export default function UserServices(props?: IUserService) {
             try {
                 const request = await fetch(`${baseUrl}/rm`, {
                     credentials: "include",
+                    headers: { 'Content-Type': 'application/json' },
                     method: "DELETE"
                 });
 
@@ -136,6 +140,7 @@ export default function UserServices(props?: IUserService) {
             try {
                 const request = await fetch(`${baseUrl}/kick/${userId}`, {
                     credentials: "include",
+                    headers: { 'Content-Type': 'application/json' },
                     method: "PUT"
                 });
 
@@ -168,6 +173,7 @@ export default function UserServices(props?: IUserService) {
             try {
                 const request = await fetch(`${baseUrl}/left-room/${props?.roomId}`, {
                     credentials: "include",
+                    headers: { 'Content-Type': 'application/json' },
                     method: "PUT"
                 });
 

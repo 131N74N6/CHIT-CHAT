@@ -2,7 +2,7 @@ import { Query, useMutation, useQueryClient } from "@tanstack/react-query";
 import type { IChatbotQuestionServices } from "../models/chatbot.model";
 import { useChatbotStore } from "../stores/chatbot.store";
 
-export default function chatbotQuestionService(props?: IChatbotQuestionServices) {
+export default function useChatbotQuestionService(props?: IChatbotQuestionServices) {
     const queryClient = useQueryClient();
     const baseUrl = `${import.meta.env.VITE_BASE_API_URL}/chatbots`;
 
@@ -18,6 +18,7 @@ export default function chatbotQuestionService(props?: IChatbotQuestionServices)
                 const request = await fetch(`${baseUrl}/ask-ai`, {
                     body: JSON.stringify({ question: question.trim() }),
                     credentials: "include",
+                    headers: { 'Content-Type': 'application/json' },
                     method: "POST"
                 });
 

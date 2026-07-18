@@ -3,14 +3,14 @@ import Loading from "../components/Loading";
 import Navbar from "../components/Navbar";
 import UserList from "../components/UserList";
 import useSocketIo from "../hooks/useSocketIo";
-import roomMemberService from "../services/room_member.service";
+import useRoomMemberService from "../services/useRoomMemberService";
 import cn from "../utils/cn";
-import UserServices from "../services/user.service";
+import UserServices from "../services/useUserServices";
 
 export default function RoomMember() {
     const { room_id } = useParams();
     const { currentUser } = UserServices();
-    const { currentRoomMember } = roomMemberService();
+    const { currentRoomMember } = useRoomMemberService();
     
     useSocketIo({
         currentUserId: currentUser.user?.user_id!,

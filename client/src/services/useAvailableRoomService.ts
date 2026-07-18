@@ -1,7 +1,7 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
 import type { IAvailableRoomService } from '../models/room.model';
 
-export default function availableRoomService(props?: IAvailableRoomService) {
+export default function useAvailableRoomService(props?: IAvailableRoomService) {
     const baseUrl = `${import.meta.env.VITE_BASE_API_URL}/rooms`;
 
     const { 
@@ -21,6 +21,7 @@ export default function availableRoomService(props?: IAvailableRoomService) {
             try {
                 const request = await fetch(`${baseUrl}/show-all?page=${pageParam}&limit=${14}`, {
                     credentials: "include",
+                    headers: { 'Content-Type': 'application/json' },
                     method: "GET"
                 });
                 

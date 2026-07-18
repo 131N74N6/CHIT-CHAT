@@ -1,13 +1,13 @@
 import ChatList from "../components/ChatList";
-import userChatService from "../services/user_chat.service";
+import useUserChatService from "../services/useUserChatService";
 import cn from "../utils/cn";
 import Loading from "../components/Loading";
-import UserServices from "../services/user.service";
+import useUserServices from "../services/useUserServices";
 import { File, SendIcon } from "lucide-react";
 import { useMessageStore } from "../stores/message.store";
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect } from "react";
-import userProfileService from "../services/user_profile.service";
+import useUserProfileService from "../services/useUserProfileService";
 
 export default function UserChat() {
     const { receiver_id } = useParams();
@@ -16,9 +16,9 @@ export default function UserChat() {
     const message = useMessageStore((state) => state.message);
     const setMessage = useMessageStore((state) => state.setMessage);
 
-    const { currentUser, isUserProcessing } = UserServices({ setMessage: setMessage });
+    const { currentUser, isUserProcessing } = useUserServices({ setMessage: setMessage });
 
-    const { currentUserProfile } = userProfileService({ receiverId: receiver_id });
+    const { currentUserProfile } = useUserProfileService({ receiverId: receiver_id });
 
     const { 
         clearChatForMeMt, 
@@ -27,7 +27,7 @@ export default function UserChat() {
         isUserChatProcessing, 
         sendChatToUserMt,
         userChats 
-    } = userChatService({ receiverId: receiver_id, setMessage: setMessage });
+    } = useUserChatService({ receiverId: receiver_id, setMessage: setMessage });
     
     useEffect(() => {
         if (message) {

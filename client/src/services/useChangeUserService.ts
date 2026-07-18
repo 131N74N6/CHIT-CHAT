@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useRef } from "react";
 import type { IChangeUser } from "../models/user.model";
 
-export default function changeUserService(props?: IChangeUser) {
+export default function useChangeUserService(props?: IChangeUser) {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const navigate = useNavigate();
     const queryClient = useQueryClient();
@@ -44,6 +44,7 @@ export default function changeUserService(props?: IChangeUser) {
                     const request = await fetch(`${import.meta.env.VITE_BASE_API_URL}/users/rm-pict`, {
                         body: JSON.stringify({ old_image: deleteProfilePicture }),
                         credentials: "include",
+                        headers: { 'Content-Type': 'application/json' },
                         method: "DELETE"
                     });
 

@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import ChatbotList from "../components/ChatbotList";
-import chatbotResultService from "../services/chatbot_result.service";
+import useChatbotResultService from "../services/useChatbotResultService";
 import { useMessageStore } from "../stores/message.store";
 import { useEffect } from "react";
 import { Trash2 } from "lucide-react";
@@ -13,7 +13,7 @@ export default function ChatbotResults() {
     const message = useMessageStore((state) => state.message);
     const setMessage = useMessageStore((state) => state.setMessage);
 
-    const { allResults, deleteAllResultsMt, deleteResultMt } = chatbotResultService({ setMessage: setMessage });
+    const { allResults, deleteAllResultsMt, deleteResultMt } = useChatbotResultService({ setMessage: setMessage });
 
     useEffect(() => {
         if (message) {

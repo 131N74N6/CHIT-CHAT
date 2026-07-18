@@ -6,8 +6,8 @@ import Loading from "../components/Loading";
 import Navbar from "../components/Navbar";
 import cn from "../utils/cn";
 import { ArrowBigLeft, Camera, X } from "lucide-react";
-import changeUserService from "../services/change_user.service";
-import UserServices from "../services/user.service";
+import useChangeUserService from "../services/useChangeUserService";
+import useUserServices from "../services/useUserServices";
 
 export default function ChangeUser() {
     const navigate = useNavigate();
@@ -42,9 +42,9 @@ export default function ChangeUser() {
         setProfilePictureUrl,
         setUserName,
         username 
-    } = changeUserService({ setMessage: setMessage });
+    } = useChangeUserService({ setMessage: setMessage });
 
-    const { currentUser, isUserProcessing } = UserServices({ setMessage: setMessage });
+    const { currentUser, isUserProcessing } = useUserServices({ setMessage: setMessage });
     const { isUserLoading, user, userError } = currentUser;
     
     useEffect(() => {

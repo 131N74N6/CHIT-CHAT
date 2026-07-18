@@ -1,8 +1,8 @@
 import Alert from "../components/Alert";
-import changeRoomService from "../services/change_room.service";
+import useChangeRoomService from "../services/useChangeRoomService";
 import cn from "../utils/cn";
 import Navbar from "../components/Navbar";
-import UserServices from "../services/user.service";
+import useUserServices from "../services/useUserServices";
 import { Camera, X } from "lucide-react";
 import { useEffect } from "react";
 import { useMessageStore } from "../stores/message.store";
@@ -15,7 +15,7 @@ export default function ChangeRoom() {
     const message = useMessageStore((state) => state.message);
     const setMessage = useMessageStore((state) => state.setMessage);
 
-    const { currentUser, isUserProcessing } = UserServices();
+    const { currentUser, isUserProcessing } = useUserServices();
 
     const { 
         changeRoomMt, 
@@ -35,7 +35,7 @@ export default function ChangeRoom() {
         setRoomName, 
         setSelectedProfileRoom, 
         setSelectedProfileRoomUrl 
-    } = changeRoomService({ 
+    } = useChangeRoomService({ 
         currentUserId: currentUser.user?.user_id,
         roomId: room_id,
         setMessage: setMessage 

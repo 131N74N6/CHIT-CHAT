@@ -1,11 +1,11 @@
 import { Camera, X } from "lucide-react";
 import Navbar from "../components/Navbar";
-import UserServices from "../services/user.service";
+import useUserServices from "../services/useUserServices";
 import cn from "../utils/cn";
 import { useMessageStore } from "../stores/message.store";
 import { useEffect } from "react";
 import Alert from "../components/Alert";
-import createRoomService from "../services/create_room.service";
+import useCreateRoomService from "../services/useCreateRoomService";
 
 export default function CreateRoom() {
     const message = useMessageStore((state) => state.message);
@@ -20,7 +20,7 @@ export default function CreateRoom() {
         }
     }, [message, setMessage]);
 
-    const { currentUser, isUserProcessing } = UserServices();
+    const { currentUser, isUserProcessing } = useUserServices();
 
     const { 
         description,
@@ -35,7 +35,7 @@ export default function CreateRoom() {
         setRoomName, 
         setSelectedProfileRoom, 
         setSelectedProfileRoomUrl 
-    } = createRoomService({ 
+    } = useCreateRoomService({ 
         currentUserId: currentUser.user?.user_id,
         setMessage: setMessage 
     });

@@ -1,14 +1,14 @@
 import Loading from "../components/Loading";
 import Navbar from "../components/Navbar";
-import userChatService from "../services/user_chat.service";
+import useUserChatService from "../services/useUserChatService";
 import UserList from "../components/UserList";
-import UserServices from "../services/user.service";
+import useUserServices from "../services/useUserServices";
 import UserWindow from "../components/UserWindow";
 import { MessageCircle } from "lucide-react";
 import { useEffect } from "react";
 import { useMessageStore } from "../stores/message.store";
 import { useChatStore } from "../stores/chat.store";
-import userProfileService from "../services/user_profile.service";
+import useUserProfileService from "../services/useUserProfileService";
 import useSocketIo from "../hooks/useSocketIo";
 
 export default function Home() {
@@ -25,9 +25,10 @@ export default function Home() {
         allUsers, 
         currentUser, 
         isUserProcessing 
-    } = UserServices({ setMessage: setMessage });
+    } = useUserServices({ setMessage: setMessage });
 
-    const { currentUserProfile } = userProfileService({ receiverId: receiverId });
+    const { currentUserProfile } = useUserProfileService({ receiverId: receiverId });
+    console.log(currentUser.user?.address);
 
     const { 
         clearChatForMeMt, 
@@ -36,7 +37,7 @@ export default function Home() {
         isUserChatProcessing, 
         sendChatToUserMt,
         userChats 
-    } = userChatService({ setMessage: setMessage });
+    } = useUserChatService({ setMessage: setMessage });
         
     useSocketIo({
         currentUserId: currentUser.user?.user_id!,
