@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import AuthServices from "../services/useAuthServices";
+import useAuthServices from "../services/useAuthServices";
 import { Bot, Group, Handshake, Home, Power, UserCircle2 } from "lucide-react";
 
 interface INavbar {
@@ -8,7 +8,7 @@ interface INavbar {
 
 export default function Navbar(props?: INavbar) {
     const navigate = useNavigate();
-    const { signOutMt } = AuthServices();
+    const { signOutMt } = useAuthServices();
 
     return (
         <>

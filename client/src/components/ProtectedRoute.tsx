@@ -1,5 +1,5 @@
 import { Navigate } from "react-router-dom";
-import UserServices from "../services/useUserServices";
+import useUserServices from "../services/useUserServices";
 import Loading from "./Loading";
 
 interface ProtectedRouteIntrf {
@@ -7,7 +7,7 @@ interface ProtectedRouteIntrf {
 }
 
 export default function ProtectedRoute(props: ProtectedRouteIntrf) {
-    const { currentUser } = UserServices();
+    const { currentUser } = useUserServices();
 
     if (!currentUser.user && currentUser.isUserLoading) {
         return (

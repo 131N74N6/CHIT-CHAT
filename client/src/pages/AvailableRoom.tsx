@@ -1,4 +1,3 @@
-import Alert from "../components/Alert";
 import useAvailableRoomService from "../services/useAvailableRoomService";
 import Loading from "../components/Loading";
 import Navbar from "../components/Navbar";
@@ -7,17 +6,12 @@ import RoomList from "../components/RoomList";
 import useRoomMemberService from "../services/useRoomMemberService";
 import useRoomProfileService from "../services/useRoomProfileService";
 import RoomWindow from "../components/RoomWindow";
-import UserServices from "../services/useUserServices";
+import useUserServices from "../services/useUserServices";
 import { MessageCircle } from "lucide-react";
-import { useEffect } from "react";
-import { useMessageStore } from "../stores/message.store";
 import { useRoomStore } from "../stores/room.store";
 import useSocketIo from "../hooks/useSocketIo";
 
 export default function AvailableRoom() {
-    const message = useMessageStore((state) => state.message);
-    const setMessage = useMessageStore((state) => state.setMessage);
-
     const roomId = useRoomStore((state) => state.roomId);
     const setRoomId = useRoomStore((state) => state.setRoomId);
 
@@ -32,17 +26,7 @@ export default function AvailableRoom() {
         deleteRoomMt,
         isUserProcessing,
         leftRoomMt
-    } = UserServices({ setMessage: setMessage });
-
-    useEffect(() => {
-        if (message) {
-            const timer = setTimeout(() => {
-                setMessage(null);
-            }, 1500);
-
-            return () => clearTimeout(timer);
-        }
-    }, [message, setMessage]);
+    } = useUserServices();
 
     useSocketIo({
         identifier: ["available-room", "room-chat", "room-profile"],
@@ -63,11 +47,10 @@ export default function AvailableRoom() {
         deleteChatPermanentlyForRoomMt, 
         isRoomChatProcessing, 
         sendChatToRoomMt 
-    } = useRoomChatService({ roomId: roomId, setMessage: setMessage });
+    } = useRoomChatService({ roomId: roomId });
 
     return (
         <section className="flex flex-col h-screen relative z-10">
-            {message ? <Alert message={message}/> : null}
             <div className="flex flex-col h-full px-2.5 pt-2.5 md:2/4 w-full">
                 {currentAvailableRooms.isAvailableRoomLoading ? (
                     <div className="flex justify-center items-center h-full">
