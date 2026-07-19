@@ -11,11 +11,6 @@ export default function useSocketIoServices() {
             transports: ["websocket"]
         });
 
-        socket = io(new URL(import.meta.env.VITE_BASE_API_URL).origin, {
-            auth: { currentUserId },
-            transports: ["websocket"]
-        });
-
         socket.on("connect", () => {
             console.log(`socket connected: ${socket?.id}`);
         });
