@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import { User } from "../models/user.model";
 import jwt from "jsonwebtoken";
+import { io } from "../services/socket_io.service";
 
 export async function signIn(req: Request, res: Response) {
     try {
@@ -91,6 +92,12 @@ export async function signUp (req: Request, res: Response) {
             maxAge: 86400000,
             sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
             secure: process.env.NODE_ENV === 'production'
+        });
+
+        io.to(`available-user:${newUser._id}`)
+        .emit("user:added", {
+            _id: newUser._id,
+            username: newUser.username
         });
         
         res.status(200).json({ message: "new user added" });

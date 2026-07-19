@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import useAuthServices from "../services/useAuthServices";
+import useAuthServices from "../services/useAuthService";
 import { Bot, Group, Handshake, Home, Menu, PlusCircle, Power, UserCircle2 } from "lucide-react";
 import cn from "../utils/cn";
 import { useNavbarStore } from "../stores/navbar.store";

@@ -4,7 +4,7 @@ import { useRef } from "react";
 import { useChatStore } from "../stores/chat.store";
 
 export default function useUserChatService(props: IUserChatService) {
-    const baseUrl = `${import.meta.env.VITE_BASE_API_URL}/chats`;
+    const baseUrl = `${import.meta.env.VITE_BASE_API_URL}/users/chats`;
     const queryClient = useQueryClient();
 
     const inputMediaRef = useRef<HTMLInputElement>(null);
@@ -227,7 +227,7 @@ export default function useUserChatService(props: IUserChatService) {
                     }
                 }
 
-                const request = await fetch(`${baseUrl}/to-user`, {
+                const request = await fetch(`${baseUrl}/send`, {
                     body: formData,
                     credentials: "include",
                     method: "POST"

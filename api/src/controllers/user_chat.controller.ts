@@ -4,6 +4,7 @@ import { Chats } from "../models/chat.model";
 import { CloudinaryUploadResult, uploadTOCloudinary } from "../services/cloudinary.service";
 import { v2 } from "cloudinary";
 import { io } from "../services/socket_io.service";
+import { User } from "../models/user.model";
 
 export async function clearChatForMe(req: AuthRequest, res: Response) {
     try {
@@ -66,7 +67,7 @@ export async function deleteAllChats(req: AuthRequest, res: Response) {
             })
         ]);
 
-        io.to(`receiver:${chats[0].receiver_id}`).emit("chat:all-deleted", chats);
+        io.to(`user-chat:${chats[0].receiver_id}`).emit("user-chat:all-deleted", chats);
 
         res.status(200).json({ message: "all chats deleted" });
     } catch (error) {
@@ -91,7 +92,7 @@ export async function deleteAllChatsPermanently(req: AuthRequest, res: Response)
             Chats.deleteMany({ sender_id: senderId })
         ]);
 
-        io.to(`receiver:${chats[0].receiver_id}`).emit("chat:all-deleted-permanently", chats);
+        io.to(`user-chat:${chats[0].receiver_id}`).emit("user-chat:all-deleted-permanently", chats);
 
         res.status(200).json({ message: "all chats deleted" });
     } catch (error) {
@@ -125,8 +126,8 @@ export async function deleteChat(req: Request, res: Response) {
             })
         ]);
 
-        io.to(`receiver:${chat.receiver_id}`)
-        .emit("chat:deleted", {
+        io.to(`user-chat:${chat.receiver_id}`)
+        .emit("user-chat:deleted", {
             _id: chat._id,
             created_at: chat.created_at,
             media: chat.media,
@@ -160,8 +161,8 @@ export async function deleteChatPermanently(req: Request, res: Response) {
             Chats.deleteOne({ _id: id })
         ]);
 
-        io.to(`receiver:${chat.receiver_id}`)
-        .emit("chat:deleted-permanently", {
+        io.to(`user-chat:${chat.receiver_id}`)
+        .emit("user-chat:deleted-permanently", {
             _id: chat._id,
             created_at: chat.created_at,
             media: chat.media,
@@ -207,7 +208,7 @@ export async function sendToOtherUser(req: AuthRequest, res: Response) {
 
         await newChat.save();
 
-        io.to(`receiver:${newChat.receiver_id}`).emit("chat:send", {
+        io.to(`user-chat:${newChat.receiver_id}`).emit("user-chat:send-new-chat", {
             _id: newChat._id,
             created_at: newChat.created_at,
             media: newChat.media,
@@ -217,6 +218,62 @@ export async function sendToOtherUser(req: AuthRequest, res: Response) {
         });
 
         res.status(200).json({ message: "new chat for other user added" });
+    } catch (error) {
+        res.status(500).json({ message: "something went wrong" });
+    }
+}
+
+export async function showAllUsers(req: AuthRequest, res: Response) {
+    try {
+        const searched = req.query.searched as string | undefined;
+        const page = parseInt(req.query.page as string) || 1;
+        const limit = parseInt(req.query.limit as string) || 14;
+        const skip = (page - 1) * limit;
+
+        const userId = req.user?.user_id;
+        let users;
+
+        if (searched === undefined) {
+            users = await User.find({ _id: { $ne: userId } }).limit(limit).skip(skip).sort({ username: 1 });
+            
+            res.status(200).json(users);
+        } else {
+            users = await User
+            .find({ _id: { $ne: userId }, username: { $regex: new RegExp(searched, 'i') } })
+            .limit(limit)
+            .skip(skip)
+            .sort({ username: 1 });
+
+            res.status(200).json(users);
+        }
+    } catch (error) {
+        res.status(500).json({ message: "something went wrong" });
+    }
+}
+
+export async function showAllChats(req: AuthRequest, res: Response) {
+    try {
+        const receiverId = req.params.receiver_id;
+        const senderId = req.user?.user_id;
+
+        const limit = parseInt(req.query.limit as string) || 13;
+        const page = parseInt(req.query.page as string) || 1;
+        const skip = (page - 1) * limit;
+
+        const chats = await Chats
+        .find({ 
+            $or: [
+                { receiver_id: receiverId }, 
+                { receiver_id: senderId }, 
+                { sender_id: receiverId }, 
+                { sender_id: senderId }
+            ], 
+            hidden_for: { $nin: [senderId!] } 
+        })
+        .limit(limit)
+        .skip(skip);
+
+        res.status(200).json(chats);
     } catch (error) {
         res.status(500).json({ message: "something went wrong" });
     }

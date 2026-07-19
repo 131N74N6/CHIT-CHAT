@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import useUserServices from "../services/useUserServices";
+import useUserServices from "../services/useUserService";
 import { useMessageStore } from "../stores/message.store";
 import Loading from "../components/Loading";
 import Navbar from "../components/Navbar";

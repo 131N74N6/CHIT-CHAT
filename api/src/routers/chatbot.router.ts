@@ -1,7 +1,6 @@
 import { Router } from "express";
 import { verifyToken } from "../middlewares/auth.middleware";
-import { askAi, deleteAllChats, deleteChat } from "../controllers/chatbot.controller";
-import { getAllResults, getResult } from "../views/chatbot.view";
+import { askAi, deleteAllChats, deleteChat, getAllResults, getResult } from "../controllers/chatbot.controller";
 
 const chatBotRouters = Router();
 

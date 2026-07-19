@@ -6,7 +6,7 @@ export default function useRoomProfileService(props?: IRoomProfileService) {
         enabled: !!props?.roomId,
         queryFn: async () => {
             try {
-                const request = await fetch(`${import.meta.env.VITE_BASE_API_URL}/rooms/profile/${props?.roomId}`, {
+                const request = await fetch(`${import.meta.env.VITE_BASE_API_URL}/rooms/profiles/show/${props?.roomId}`, {
                     credentials: "include",
                     headers: { 'Content-Type': 'application/json' },
                     method: "GET"

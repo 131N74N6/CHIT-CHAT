@@ -11,24 +11,32 @@ const io = new Server(server, {
 io.on("connection", (socket) => {
     console.log("user connected");
 
+    socket.on("join:available-room", (userId: string) => {
+        socket.join(`available-room:${userId}`);
+    });
+
+    socket.on("join:available-user", (userId: string) => {
+        socket.join(`available-user:${userId}`);
+    });
+
     socket.on("join:room-chat", (roomId: string) => {
         socket.join(`room-chat:${roomId}`);
+    });
+
+    socket.on("join:room-member", (roomId: string) => {
+        socket.join(`room-member:${roomId}`);
     });
 
     socket.on("join:room-profile", (roomId: string) => {
         socket.join(`room-profile:${roomId}`);
     });
 
-    socket.on("join:available-room", (userId: string) => {
-        socket.join(`available-room:${userId}`);
+    socket.on("join:user-chat", (userId: string) => {
+        socket.join(`user-chat:${userId}`);
     });
 
-    socket.on("join:receiver", (userId: string) => {
-        socket.join(`receiver:${userId}`);
-    });
-
-    socket.on("join:receiver-profile", (userId: string) => {
-        socket.join(`receiver-profile:${userId}`);
+    socket.on("join:user-profile", (userId: string) => {
+        socket.join(`user-profile:${userId}`);
     });
 
     socket.on("disconnect", () => {

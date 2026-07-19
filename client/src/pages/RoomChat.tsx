@@ -7,7 +7,7 @@ import { File, SendIcon } from "lucide-react";
 import { useEffect } from "react";
 import { useMessageStore } from "../stores/message.store";
 import { useNavigate, useParams } from "react-router-dom";
-import useUserServices from "../services/useUserServices";
+import useUserServices from "../services/useUserService";
 import Navbar from "../components/Navbar";
 import useRoomProfileService from "../services/useRoomProfileService";
 import useSocketIo from "../hooks/useSocketIo";

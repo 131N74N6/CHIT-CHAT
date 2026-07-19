@@ -2,11 +2,13 @@ import Alert from "../components/Alert";
 import useChangeRoomService from "../services/useChangeRoomService";
 import cn from "../utils/cn";
 import Navbar from "../components/Navbar";
-import useUserServices from "../services/useUserServices";
+import useUserServices from "../services/useUserService";
 import { Camera, X } from "lucide-react";
 import { useEffect } from "react";
 import { useMessageStore } from "../stores/message.store";
 import { useNavigate, useParams } from "react-router-dom";
+import useRoomProfileService from "../services/useRoomProfileService";
+import useSocketIo from "../hooks/useSocketIo";
 
 export default function ChangeRoom() {
     const { room_id } = useParams();
@@ -19,7 +21,6 @@ export default function ChangeRoom() {
 
     const { 
         changeRoomMt, 
-        currentRoomProfile,
         description,
         fileInputRef, 
         handleImagePreview,
@@ -41,6 +42,8 @@ export default function ChangeRoom() {
         setMessage: setMessage 
     });
 
+    const { currentRoomProfile } = useRoomProfileService({ roomId: room_id });
+
     useEffect(() => {
         if (message) {
             const timer = setTimeout(() => {
@@ -59,6 +62,12 @@ export default function ChangeRoom() {
         setOldRoomPicture(currentRoomProfile.detail.profile_picture) :
         setOldRoomPicture(null);
     }, [room_id]);
+
+    useSocketIo({
+        currentUserId: currentUser.user?.user_id!,
+        identifier: ["room-profile"],
+        marks: { roomId: room_id }
+    });
 
     return (
         <section className="flex flex-col h-screen relative z-10">

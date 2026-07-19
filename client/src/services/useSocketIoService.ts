@@ -1,7 +1,8 @@
 import { io, type Socket } from "socket.io-client"
 
+let socket: Socket | null = null;
+
 export default function useSocketIoServices() {
-    let socket: Socket | null = null;
 
     function connect(currentUserId: string) {
         if (socket?.connected) return;
@@ -28,44 +29,68 @@ export default function useSocketIoServices() {
         socket?.emit("join:available-room", userId);
     }
 
+    function onAvailableUserJoin(userId: string) {
+        socket?.emit("join:available-user", userId);
+    }
+
+    function onUserChatJoin(receiverId: string) {
+        socket?.emit("join:user-chat", receiverId);
+    }
+
+    function onUserProfileJoin(receiverId: string) {
+        socket?.emit("join:user-profile", receiverId);
+    }
+
+    function onRoomChatJoin(roomId: string) {
+        socket?.emit("join:room-chat", roomId);
+    }
+
+    function onRoomMemberJoin(roomId: string) {
+        socket?.emit("join:room-member", roomId);
+    }
+
+    function onRoomProfileJoin(roomId: string) {
+        socket?.emit("join:room-profile", roomId);
+    }
+
     function onChangeRoom(callback: (data: any) => void) {
-        socket?.on("room:profile-changed", callback);
+        socket?.on("room-profile:changed", callback);
     }
 
     function onChangeUser(callback: (data: any) => void) {
-        socket?.on("user:changed", callback);
+        socket?.on("user-profile:changed", callback);
     }
 
     function onDeleteAllChatsPermanently(callback: (data: any) => void) {
-        socket?.on("chat:all-deleted-permanently", callback);
+        socket?.on("user-chat:all-deleted-permanently", callback);
     }
 
     function onDeleteAllChats(callback: (data: any) => void) {
-        socket?.on("chat:all-deleted", callback);
+        socket?.on("user-chat:all-deleted", callback);
     }
 
     function onDeleteChatPermanently(callback: (data: any) => void) {
-        socket?.on("chat:deleted-permanently", callback);
+        socket?.on("user-chat:deleted-permanently", callback);
     }
 
     function onDeleteChat(callback: (data: any) => void) {
-        socket?.on("chat:deleted", callback);
+        socket?.on("user-chat:deleted", callback);
     }
 
     function onDeleteAllChatsPermanentlyInRoom(callback: (data: any) => void) {
-        socket?.on("room:deleted-all-chats-permanently", callback);
+        socket?.on("room-chat:all-deleted-permanently", callback);
     }
 
     function onDeleteAllChatsInRoom(callback: (data: any) => void) {
-        socket?.on("room:deleted-all-chat", callback);
+        socket?.on("room-chat:all-deleted", callback);
     }
 
     function onDeleteChatPermanentlyInRoom(callback: (data: any) => void) {
-        socket?.on("room:chat-deleted-permanently", callback);
+        socket?.on("room-chat:deleted-permanently", callback);
     }
 
     function onDeleteChatInRoom(callback: (data: any) => void) {
-        socket?.on("room:chat-deleted", callback);
+        socket?.on("room-chat:deleted", callback);
     }
 
     function onDeleteRoom(callback: (data: any) => void) {
@@ -76,36 +101,24 @@ export default function useSocketIoServices() {
         socket?.on("user:deleted", callback);
     }
 
+    function onJoinNewMember(callback: (data: any) => void) {
+        socket?.on("user:join-room-successfully", callback);
+    }
+
     function onKickMember(callback: (data: any) => void) {
         socket?.on("room:member-kicked", callback);
     }
 
     function onLeftTheRoom(callback: (data: any) => void) {
-        socket?.on("user:left", callback);
-    }
-
-    function onReceiverJoin(receiverId: string) {
-        socket?.emit("join:receiver", receiverId);
-    }
-
-    function onReceiverProfileJoin(receiverId: string) {
-        socket?.emit("join:receiver-profile", receiverId);
-    }
-
-    function onRoomChatJoin(roomId: string) {
-        socket?.emit("join:room-chat", roomId);
-    }
-
-    function onRoomProfileJoin(roomId: string) {
-        socket?.emit("join:room-profile", roomId);
+        socket?.on("user:left-room-successfully", callback);
     }
 
     function onSendToUser(callback: (data: any) => void) {
-        socket?.on("chat:send", callback);
+        socket?.on("user-chat:send-new-chat", callback);
     }
 
     function onSendToRoom(callback: (data: any) => void) {
-        socket?.on("room-chat:send", callback);
+        socket?.on("room-chat:send-new-chat", callback);
     }
 
     function removeAllListeners() {
@@ -126,6 +139,7 @@ export default function useSocketIoServices() {
         disconnect,
         getSocket,
         onAvailableRoomJoin,
+        onAvailableUserJoin,
         onChangeRoom,
         onChangeUser,
         onDeleteAllChats,
@@ -138,11 +152,13 @@ export default function useSocketIoServices() {
         onDeleteChatPermanentlyInRoom,
         onDeleteRoom,
         onDeleteUser,
+        onJoinNewMember,
         onKickMember,
         onLeftTheRoom,
-        onReceiverJoin,
-        onReceiverProfileJoin,
+        onUserChatJoin,
+        onUserProfileJoin,
         onRoomChatJoin,
+        onRoomMemberJoin,
         onRoomProfileJoin,
         onSendToRoom,
         onSendToUser,

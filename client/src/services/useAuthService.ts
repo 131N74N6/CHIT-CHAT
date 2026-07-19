@@ -5,7 +5,7 @@ import type { IAuthService } from "../models/user.model";
 import { useRoomStore } from "../stores/room.store";
 import { useChatStore } from "../stores/chat.store";
 
-export default function useAuthServices(props?: IAuthService) {
+export default function useAuthService(props?: IAuthService) {
     const navigate = useNavigate();
     const queryClient = useQueryClient();
 

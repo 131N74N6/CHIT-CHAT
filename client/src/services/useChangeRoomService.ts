@@ -1,8 +1,8 @@
 import { useNavigate } from "react-router-dom";
 import { useRoomStore } from "../stores/room.store";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRef } from "react";
-import type { IChangeRoom, RoomIntrf } from "../models/room.model";
+import type { IChangeRoom } from "../models/room.model";
 
 export default function useChangeRoomService(props?: IChangeRoom) {
     const navigate = useNavigate();
@@ -38,7 +38,7 @@ export default function useChangeRoomService(props?: IChangeRoom) {
                 if (selectedProfileRoom) formData.append("image", selectedProfileRoom);
 
                 if (deleteRoomImage !== null && deleteRoomImage.public_id) {
-                    const request = await fetch(`${import.meta.env.VITE_BASE_API_URL}/users/rm-room-pict/${props?.roomId}`, {
+                    const request = await fetch(`${import.meta.env.VITE_BASE_API_URL}/rooms/profiles/rm-pict/${props?.roomId}`, {
                         body: JSON.stringify({ old_image: deleteRoomImage }),
                         credentials: "include",
                         headers: { 'Content-Type': 'application/json' },
@@ -50,7 +50,7 @@ export default function useChangeRoomService(props?: IChangeRoom) {
                     return response;
                 }
 
-                const request = await fetch(`${import.meta.env.VITE_BASE_API_URL}/users/remake-room/${props?.roomId}`, {
+                const request = await fetch(`${import.meta.env.VITE_BASE_API_URL}/rooms/profiles/remake/${props?.roomId}`, {
                     body: formData,
                     credentials: "include",
                     method: "PUT"
@@ -82,29 +82,6 @@ export default function useChangeRoomService(props?: IChangeRoom) {
         }
     });
 
-    const { data: detail, error: errorDetail, isLoading: isDetailLoading } = useQuery<RoomIntrf>({
-        enabled: !!props?.roomId,
-        queryFn: async () => {
-            try {
-                const request = await fetch(`${import.meta.env.VITE_BASE_API_URL}/rooms/profile/${props?.roomId}`, {
-                    credentials: "include",
-                    headers: { 'Content-Type': 'application/json' },
-                    method: "GET"
-                });
-
-                const response = await request.json();
-                if (!request.ok) throw new Error(response.message);
-                return response;
-            } catch (error) {
-                throw error;
-            }
-        },
-        queryKey: [`room-profile-${props?.roomId}`],
-        staleTime: Infinity
-    });
-
-    const currentRoomProfile = { detail, errorDetail, isDetailLoading }
-
     const handleImagePreview = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0]
         setSelectedProfileRoom(file!);
@@ -117,7 +94,6 @@ export default function useChangeRoomService(props?: IChangeRoom) {
 
     return {
         changeRoomMt,
-        currentRoomProfile,
         deleteRoomImage,
         fileInputRef,
         description,

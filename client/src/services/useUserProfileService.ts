@@ -6,7 +6,7 @@ export default function useUserProfileService(props?: IUserProfileService) {
         enabled: !!props?.receiverId,
         queryFn: async () => {
             try {
-                const request = await fetch(`${import.meta.env.VITE_BASE_API_URL}/chats/profile/${props?.receiverId}`, {
+                const request = await fetch(`${import.meta.env.VITE_BASE_API_URL}/users/profiles/other/${props?.receiverId}`, {
                     credentials: "include",
                     headers: { 'Content-Type': 'application/json' },
                     method: "GET"

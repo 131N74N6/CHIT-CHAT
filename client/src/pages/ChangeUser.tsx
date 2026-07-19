@@ -7,22 +7,14 @@ import Navbar from "../components/Navbar";
 import cn from "../utils/cn";
 import { ArrowBigLeft, MessageCircle, X } from "lucide-react";
 import useChangeUserService from "../services/useChangeUserService";
-import useUserServices from "../services/useUserServices";
+import useUserServices from "../services/useUserService";
+import useSocketIo from "../hooks/useSocketIo";
 
 export default function ChangeUser() {
     const navigate = useNavigate();
 
     const message = useMessageStore((state) => state.message);
     const setMessage = useMessageStore((state) => state.setMessage);
-    
-    useEffect(() => {
-        if (message) {
-            const timer = setTimeout(() => {
-                setMessage(null);
-            }, 1500);
-            return () => clearTimeout(timer);
-        }
-    }, [message, setMessage]);
 
     const { 
         address,
@@ -48,11 +40,26 @@ export default function ChangeUser() {
     const { isUserLoading, user, userError } = currentUser;
     
     useEffect(() => {
+        if (message) {
+            const timer = setTimeout(() => {
+                setMessage(null);
+            }, 1500);
+            return () => clearTimeout(timer);
+        }
+    }, [message, setMessage]);
+    
+    useEffect(() => {
         user && user.address ? setAddress(user.address) : setAddress("-");
         user && user.gender ? setGender(user.gender) : setGender("-");
         user && user.username ? setUserName(user.username) : setUserName("-");
         user && user.profile_picture ? setOldProfilePicture(user.profile_picture) : setOldProfilePicture(null);
     }, []);
+
+    useSocketIo({
+        currentUserId: currentUser.user?.user_id!,
+        identifier: ["user-profile"],
+        marks: currentUser.user?.user_id!
+    });
 
     return (
         <section className="flex flex-col md:flex-row relative h-screen p-2.5 gap-2.5 z-10">

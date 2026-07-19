@@ -2,13 +2,14 @@ import ChatList from "../components/ChatList";
 import useUserChatService from "../services/useUserChatService";
 import cn from "../utils/cn";
 import Loading from "../components/Loading";
-import useUserServices from "../services/useUserServices";
+import useUserServices from "../services/useUserService";
 import { File, SendIcon } from "lucide-react";
 import { useMessageStore } from "../stores/message.store";
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect } from "react";
 import useUserProfileService from "../services/useUserProfileService";
 import Navbar from "../components/Navbar";
+import useSocketIo from "../hooks/useSocketIo";
 
 export default function UserChat() {
     const { receiver_id } = useParams();
@@ -32,7 +33,11 @@ export default function UserChat() {
         userChats 
     } = useUserChatService({ receiverId: receiver_id, setMessage: setMessage });
 
-    console.log(userChats.getUserChats);
+    useSocketIo({
+        currentUserId: currentUser.user?.user_id!,
+        identifier: ["user-chat"],
+        marks: receiver_id!
+    });
     
     useEffect(() => {
         if (message) {

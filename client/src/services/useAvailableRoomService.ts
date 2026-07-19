@@ -2,7 +2,7 @@ import { useInfiniteQuery } from '@tanstack/react-query';
 import type { IAvailableRoomService } from '../models/room.model';
 
 export default function useAvailableRoomService(props?: IAvailableRoomService) {
-    const baseUrl = `${import.meta.env.VITE_BASE_API_URL}/rooms`;
+    const baseUrl = `${import.meta.env.VITE_BASE_API_URL}/rooms/profiles`;
 
     const { 
         data: paginatedAvailableRooms,

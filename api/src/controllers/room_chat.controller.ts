@@ -61,7 +61,7 @@ export async function deleteAllChatsPermanentlyInRoom(req: AuthRequest, res: Res
             Chats.deleteMany({ sender_id: userId, room_id: roomId })
         ]);
 
-        io.to(`room-chat:${roomId}`).emit("room:deleted-all-chats-permanently", chats);
+        io.to(`room-chat:${roomId}`).emit("room-chat:all-deleted-permanently", chats);
 
         res.status(200).json({ message: "all your message in group deleted permanently" });
     } catch (error) {
@@ -91,7 +91,7 @@ export async function deleteAllChatsInRoom(req: AuthRequest, res: Response) {
             })
         ]);
 
-        io.to(`room-chat:${roomId}`).emit("room:deleted-all-chat", chats);
+        io.to(`room-chat:${roomId}`).emit("room-chat:all-deleted", chats);
 
         res.status(200).json({ message: "all your message in group deleted permanently" });
     } catch (error) {
@@ -123,7 +123,7 @@ export async function deleteChatPermanentlyInRoom(req: Request, res: Response) {
         ]);
 
         io.to(`room-chat:${chat.room_id}`)
-        .emit("room:chat-deleted-permanently", {
+        .emit("room-chat:deleted-permanently", {
             _id: chat._id,
             created_at: chat.created_at,
             media: chat.media,
@@ -165,7 +165,7 @@ export async function deleteChatInRoom(req: Request, res: Response) {
         ]);
 
         io.to(`room-chat:${chat.room_id}`)
-        .emit("room:chat-deleted", {
+        .emit("room-chat:deleted", {
             _id: chat._id,
             created_at: chat.created_at,
             media: chat.media,
@@ -211,7 +211,7 @@ export async function sendToOtherRoom(req: AuthRequest, res: Response) {
 
         await newChat.save();
 
-        io.to(`room-chat:${newChat.room_id}`).emit("room-chat:send", {
+        io.to(`room-chat:${newChat.room_id}`).emit("room-chat:send-new-chat", {
             _id: newChat._id,
             created_at: newChat.created_at,
             media: newChat.media,
@@ -221,6 +221,26 @@ export async function sendToOtherRoom(req: AuthRequest, res: Response) {
         });
 
         res.status(200).json({ message: "new chat for room only added" });
+    } catch (error) {
+        res.status(500).json({ message: "something went wrong" });
+    }
+}
+
+export async function showwAllChatsForRoom(req: AuthRequest, res: Response) {
+    try {
+        const roomId = req.params.room_id;
+        const userId = req.user?.user_id;
+
+        const limit = parseInt(req.query.limit as string) || 13;
+        const page = parseInt(req.query.page as string) || 1;
+        const skip = (page - 1) * limit;
+
+        const chats = await Chats
+        .find({ room_id: roomId, hidden_for: { $nin: [userId!] } })
+        .limit(limit)
+        .skip(skip);
+
+        res.status(200).json(chats);
     } catch (error) {
         res.status(500).json({ message: "something went wrong" });
     }

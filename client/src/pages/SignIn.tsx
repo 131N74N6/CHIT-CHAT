@@ -1,8 +1,8 @@
 import { useEffect } from "react";
 import { useMessageStore } from "../stores/message.store";
-import useAuthServices from "../services/useAuthServices";
+import useAuthService from "../services/useAuthService";
 import { Link, useNavigate } from "react-router-dom";
-import useUserServices from "../services/useUserServices";
+import useUserServices from "../services/useUserService";
 import cn from "../utils/cn";
 import { MessageCircle } from "lucide-react";
 
@@ -11,7 +11,7 @@ export default function SignIn() {
     const message = useMessageStore((state) => state.message);
     const setMessage = useMessageStore((state) => state.setMessage);
 
-    const { password, setPassword, setUserName, signInMt, username } = useAuthServices({ setMessage: setMessage });
+    const { password, setPassword, setUserName, signInMt, username } = useAuthService({ setMessage: setMessage });
     const { currentUser } = useUserServices({ setMessage: setMessage });
 
     useEffect(() => {

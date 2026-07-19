@@ -3,7 +3,7 @@ import type { IRoomMemberService } from "../models/room.model";
 import type { IOtherUser } from "../models/user.model";
 
 export default function useRoomMemberService(props?: IRoomMemberService) {
-    const baseUrl = `${import.meta.env.VITE_BASE_API_URL}/rooms`;
+    const baseUrl = `${import.meta.env.VITE_BASE_API_URL}/rooms/members`;
     
     const { 
         data: paginatedRoomMember, 
@@ -20,7 +20,7 @@ export default function useRoomMemberService(props?: IRoomMemberService) {
         },
         queryFn: async ({ pageParam = 1 }: { pageParam?: number }) => {
             try {
-                const request = await fetch(`${baseUrl}/member/${props?.roomId}?page=${pageParam}&limit=${14}`, {
+                const request = await fetch(`${baseUrl}/show-all/${props?.roomId}?page=${pageParam}&limit=${14}`, {
                     credentials: "include",
                     headers: { 'Content-Type': 'application/json' },
                     method: "GET"

@@ -6,7 +6,7 @@ import RoomList from "../components/RoomList";
 import useRoomMemberService from "../services/useRoomMemberService";
 import useRoomProfileService from "../services/useRoomProfileService";
 import RoomWindow from "../components/RoomWindow";
-import useUserServices from "../services/useUserServices";
+import useUserServices from "../services/useUserService";
 import { MessageCircle } from "lucide-react";
 import { useRoomStore } from "../stores/room.store";
 import useSocketIo from "../hooks/useSocketIo";
@@ -30,7 +30,7 @@ export default function AvailableRoom() {
     } = useUserServices();
 
     useSocketIo({
-        identifier: ["available-room", "room-chat", "room-profile"],
+        identifier: ["available-room", "room-chat", "room-profile", "room-member"],
         currentUserId: currentUser.user?.user_id!,
         marks: roomId
     });

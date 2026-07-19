@@ -7,7 +7,7 @@ import Loading from "../components/Loading";
 import { ArrowBigLeft } from "lucide-react";
 import Navbar from "../components/Navbar";
 import cn from "../utils/cn";
-import useUserServices from "../services/useUserServices";
+import useUserServices from "../services/useUserService";
 import useSocketIo from "../hooks/useSocketIo";
 
 export default function RoomProfile() {

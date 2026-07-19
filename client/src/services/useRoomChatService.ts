@@ -6,7 +6,7 @@ import type { ChatIntrf, IFileViewer } from '../models/chat.model';
 
 export default function useRoomChatService(props?: IRoomChatService) {
     const queryClient = useQueryClient();
-    const baseUrl = `${import.meta.env.VITE_BASE_API_URL}/rooms`;
+    const baseUrl = `${import.meta.env.VITE_BASE_API_URL}/rooms/chats`;
     
     const inputMediaRef = useRef<HTMLInputElement>(null);
     const resetChats = useChatStore((state) => state.resetChats);
@@ -241,7 +241,7 @@ export default function useRoomChatService(props?: IRoomChatService) {
                     }
                 }
 
-                const request = await fetch(`${baseUrl}/rooms/to-room`, {
+                const request = await fetch(`${baseUrl}/rooms/send`, {
                     body: formData,
                     credentials: "include",
                     method: "POST"

@@ -39,7 +39,7 @@ export default function useCreateRoomService(props?: ICreateRoom) {
                 formData.append("name", roomName.trim());
                 if (selectedProfileRoom) formData.append("image", selectedProfileRoom);
 
-                const request = await fetch(`${import.meta.env.VITE_BASE_API_URL}/users/make-room`, {
+                const request = await fetch(`${import.meta.env.VITE_BASE_API_URL}/rooms/profiles/make-room`, {
                     body: formData,
                     credentials: "include",
                     method: "POST"

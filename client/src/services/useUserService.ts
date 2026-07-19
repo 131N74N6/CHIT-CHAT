@@ -5,8 +5,7 @@ import { useRoomStore } from "../stores/room.store";
 import { useChatStore } from "../stores/chat.store";
 import { useUserStore } from "../stores/user.store";
 
-export default function useUserServices(props?: IUserService) {
-    const baseUrl = `${import.meta.env.VITE_BASE_API_URL}/users`;
+export default function useUserService(props?: IUserService) {
     const navigate = useNavigate();
     const queryClient = useQueryClient();
     
@@ -17,7 +16,7 @@ export default function useUserServices(props?: IUserService) {
     const { data: user, error: userError, isLoading: isUserLoading } = useQuery<IUserProfile>({
         queryFn: async () => {
             try {
-                const request = await fetch(`${baseUrl}/show`, {
+                const request = await fetch(`${import.meta.env.VITE_BASE_API_URL}/users/profiles/show`, {
                     credentials: "include",
                     headers: { 'Content-Type': 'application/json' },
                     method: "GET"
@@ -52,7 +51,7 @@ export default function useUserServices(props?: IUserService) {
         },
         queryFn: async ({pageParam = 1}: { pageParam?:number }) => {
             try {
-                const request = await fetch(`${baseUrl}/show-all?page=${pageParam}&limit=${14}`, {
+                const request = await fetch(`${import.meta.env.VITE_BASE_API_URL}/users/profiles/show-all?page=${pageParam}&limit=${14}`, {
                     credentials: "include",
                     headers: { 'Content-Type': 'application/json' },
                     method: "GET"
@@ -85,7 +84,7 @@ export default function useUserServices(props?: IUserService) {
     const deleteRoomMt = useMutation({
         mutationFn: async () => {
             try {
-                const request = await fetch(`${baseUrl}/rm-room/${props?.roomId}`, {
+                const request = await fetch(`${import.meta.env.VITE_BASE_API_URL}/rooms/profiles/rm/${props?.roomId}`, {
                     credentials: "include",
                     headers: { 'Content-Type': 'application/json' },
                     method: "DELETE"
@@ -119,7 +118,7 @@ export default function useUserServices(props?: IUserService) {
     const deleteUserMt = useMutation({
         mutationFn: async () => {
             try {
-                const request = await fetch(`${baseUrl}/rm`, {
+                const request = await fetch(`${import.meta.env.VITE_BASE_API_URL}/users/profiles/rm`, {
                     credentials: "include",
                     headers: { 'Content-Type': 'application/json' },
                     method: "DELETE"
@@ -148,7 +147,7 @@ export default function useUserServices(props?: IUserService) {
     const kickMemberMt = useMutation({
         mutationFn: async (userId: string) => {
             try {
-                const request = await fetch(`${baseUrl}/kick/${userId}`, {
+                const request = await fetch(`${import.meta.env.VITE_BASE_API_URL}/rooms/members/kick/${userId}`, {
                     credentials: "include",
                     headers: { 'Content-Type': 'application/json' },
                     method: "PUT"
@@ -181,7 +180,7 @@ export default function useUserServices(props?: IUserService) {
     const leftRoomMt = useMutation({
         mutationFn: async () => {
             try {
-                const request = await fetch(`${baseUrl}/left-room/${props?.roomId}`, {
+                const request = await fetch(`${import.meta.env.VITE_BASE_API_URL}/rooms/members/left-room/${props?.roomId}`, {
                     credentials: "include",
                     headers: { 'Content-Type': 'application/json' },
                     method: "PUT"

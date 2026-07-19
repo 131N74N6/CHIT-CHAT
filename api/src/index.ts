@@ -13,11 +13,13 @@ import express from "express";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import { app, server } from "./services/socket_io.service";
-import userRouters from "./routers/user.router";
+import userProfileRouters from "./routers/user_profile.router";
 import authRouters from "./routers/auth.router";
-import chatsRouters from "./routers/chat.router";
+import userChatsRouters from "./routers/user_chat.router";
 import chatBotRouters from "./routers/chatbot.router";
-import roomRouters from "./routers/room.router";
+import roomChatsRouters from "./routers/room_chat.router";
+import roomProfileRouters from "./routers/room_profile.router";
+import roomMembersRouters from "./routers/room_member.router";
 
 v2.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -35,10 +37,12 @@ app.use(cors({
     ]
 }));
 app.use("/api/auths", authRouters);
-app.use("/api/chats", chatsRouters);
 app.use("/api/chatbots", chatBotRouters);
-app.use("/api/rooms", roomRouters);
-app.use("/api/users", userRouters);
+app.use("/api/rooms/chats", roomChatsRouters);
+app.use("/api/rooms/members", roomMembersRouters);
+app.use("/api/rooms/profiles", roomProfileRouters);
+app.use("/api/users/chats", userChatsRouters);
+app.use("/api/users/profiles", userProfileRouters);
 
 if (process.env.NODE_ENV !== "production") {
     mongodb.then(() => {

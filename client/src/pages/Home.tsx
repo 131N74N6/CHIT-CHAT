@@ -2,7 +2,7 @@ import Loading from "../components/Loading";
 import Navbar from "../components/Navbar";
 import useUserChatService from "../services/useUserChatService";
 import UserList from "../components/UserList";
-import useUserServices from "../services/useUserServices";
+import useUserServices from "../services/useUserService";
 import UserWindow from "../components/UserWindow";
 import { MessageCircle } from "lucide-react";
 import { useEffect } from "react";
@@ -47,7 +47,7 @@ export default function Home() {
         
     useSocketIo({
         currentUserId: currentUser.user?.user_id!,
-        identifier: ["user-chat"],
+        identifier: ["available-user", "user-chat", "user-profile"],
         marks: receiverId
     });
 

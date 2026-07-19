@@ -41,7 +41,7 @@ export default function useChangeUserService(props?: IChangeUser) {
                 if (profilePicture) formData.append("image", profilePicture);
 
                 if (deleteProfilePicture && deleteProfilePicture.public_id) {
-                    const request = await fetch(`${import.meta.env.VITE_BASE_API_URL}/users/rm-pict`, {
+                    const request = await fetch(`${import.meta.env.VITE_BASE_API_URL}/users/profiles/rm-pict`, {
                         body: JSON.stringify({ old_image: deleteProfilePicture }),
                         credentials: "include",
                         headers: { 'Content-Type': 'application/json' },
@@ -53,7 +53,7 @@ export default function useChangeUserService(props?: IChangeUser) {
                     return response;
                 }
 
-                const request = await fetch(`${import.meta.env.VITE_BASE_API_URL}/users/remake`, {
+                const request = await fetch(`${import.meta.env.VITE_BASE_API_URL}/users/profiles/remake`, {
                     body: formData,
                     credentials: "include",
                     method: "PUT"

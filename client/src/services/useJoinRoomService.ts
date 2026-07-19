@@ -11,7 +11,7 @@ export default function useJoinRoomService(props?: IJoinRoom) {
     const joinRoomMt = useMutation({
         mutationFn: async () => {
             try {
-                const request = await fetch(`${import.meta.env.VITE_BASE_API_URL}/users/join-room`, {
+                const request = await fetch(`${import.meta.env.VITE_BASE_API_URL}/users/profiles/join-room`, {
                     body: JSON.stringify({ room_code: roomCode.trim() }),
                     credentials: "include",
                     headers: { 'Content-Type': 'application/json' },

@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import useSocketIoServices from "../services/useSocketIoServices";
+import useSocketIoService from "../services/useSocketIoService";
 import { Query, useQueryClient } from "@tanstack/react-query";
 
 interface ChatSocketIntrf {
@@ -14,6 +14,7 @@ export default function useSocketIo(props: ChatSocketIntrf) {
     const {
         connect,
         onAvailableRoomJoin,
+        onAvailableUserJoin,
         onChangeRoom,
         onChangeUser,
         onDeleteAllChatsInRoom,
@@ -28,19 +29,15 @@ export default function useSocketIo(props: ChatSocketIntrf) {
         onDeleteUser,
         onKickMember,
         onLeftTheRoom,
-        onReceiverJoin,
-        onReceiverProfileJoin,
+        onUserChatJoin,
+        onUserProfileJoin,
         onRoomChatJoin,
+        onRoomMemberJoin,
         onRoomProfileJoin,
         onSendToRoom,
         onSendToUser,
         removeAllListeners
-    } = useSocketIoServices();
-
-    //  ['all-users'];
-    //  ['current-user'];
-    //  ['room-profile', 'room-member', 'available-room', 'room-chat'];
-    //  ['user-chat'];
+    } = useSocketIoService();
 
     function invalidations(queryNames: string[]) {
         queryClient.invalidateQueries({
@@ -60,19 +57,28 @@ export default function useSocketIo(props: ChatSocketIntrf) {
 
         if (props.identifier.includes("available-room")) {
             onAvailableRoomJoin(props.marks);
+        } else if (props.identifier.includes("available-user")) {
+            onAvailableUserJoin(props.marks);
         } else if (props.identifier.includes("room-chat")) {
             onRoomChatJoin(props.marks);
+        } else if (props.identifier.includes("room-member")) {
+            onRoomMemberJoin(props.marks);
         } else if (props.identifier.includes("room-profile")) {
             onRoomProfileJoin(props.marks);
         } else if (props.identifier.includes("user-chat")) {
-            onReceiverJoin(props.marks);
+            onUserChatJoin(props.marks);
         } else {
-            onReceiverProfileJoin(props.marks);
+            onUserProfileJoin(props.marks);
         }
 
         if (props.identifier.includes("available-rooms")) {
             onChangeRoom(() => invalidations(["room-profile", "available-room"]));
             onDeleteRoom(() => invalidations(["available-room", "room-profile", "room-chat", "room-member"]));
+        }
+
+        if (props.identifier.includes("available-users")) {
+            onChangeUser(() => invalidations(["all-users", "current-user", "user", "room-member"]));
+            onDeleteUser(() => invalidations(["all-users", "current-user", "user-chat", "user", "room-member"]));
         }
 
         if (props.identifier.includes("room-chat")) {
@@ -85,9 +91,9 @@ export default function useSocketIo(props: ChatSocketIntrf) {
         }
 
         if (props.identifier.includes("room-member")) {
-            onChangeUser(() => invalidations(["all-users", "current-user"]));
+            onChangeUser(() => invalidations(["all-users", "current-user", "room-member"]));
             onDeleteRoom(() => invalidations(["available-room", "room-profile", "room-chat", "room-member"]));
-            onDeleteUser(() => invalidations(["current-user", "user-chat"]));
+            onDeleteUser(() => invalidations(["current-user", "room-member", "user-chat"]));
             onKickMember(() => invalidations(["room-member"]));
             onLeftTheRoom(() => invalidations(["current-user", "user", "room-member"]));
         }
@@ -97,7 +103,7 @@ export default function useSocketIo(props: ChatSocketIntrf) {
             onDeleteRoom(() => invalidations(["available-room", "room-profile", "room-chat", "room-member"]));
         }
 
-        if (props.identifier.includes("receiver")) {
+        if (props.identifier.includes("user-chat")) {
             onChangeUser(() => invalidations(["all-users", "current-user", "user"]));
             onDeleteAllChats(() => invalidations(["user-chat"]));
             onDeleteAllChatsPermanently(() => invalidations(["user-chat"]));
@@ -107,9 +113,9 @@ export default function useSocketIo(props: ChatSocketIntrf) {
             onSendToUser(() => invalidations(["user-chat"]));
         }
 
-        if (props.identifier.includes("receiver-profile")) {
-            onChangeUser(() => invalidations(["all-users", "current-user", "user"]));
-            onDeleteUser(() => invalidations(["current-user", "user-chat", "user"]));
+        if (props.identifier.includes("user-profile")) {
+            onChangeUser(() => invalidations(["all-users", "current-user", "user", "room-member"]));
+            onDeleteUser(() => invalidations(["all-users", "current-user", "user", "user-chat", "room-member"]));
         }
 
         return () => removeAllListeners();
