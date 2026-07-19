@@ -23,6 +23,7 @@ export default function useAuthServices(props?: IAuthService) {
 
     const resetRoomState = useRoomStore((state) => state.resetRoomState);
     const resetChatState = useChatStore((state) => state.resetChatState);
+    const resetUserState = useUserStore((state) => state.resetUserState);
 
     const signInMt = useMutation({
         mutationFn: async () => {
@@ -78,6 +79,7 @@ export default function useAuthServices(props?: IAuthService) {
             queryClient.clear();
             resetChatState();
             resetRoomState();
+            resetUserState();
             navigate("/sign-in");
         }
     });

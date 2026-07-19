@@ -26,8 +26,11 @@ export interface IUserChatWindow {
     onDeleteOnePermanent: UseMutationResult<any, Error, string, unknown>;
     onDeleteOne: UseMutationResult<any, Error, string, unknown>;
     receiverId: string;
+    text: string;
+    seeMedia: () => void;
     seeProfile: () => void;
     sendChatToUser: UseMutationResult<any, Error, void, unknown>;
+    setText: (text: string) => void;
     userChats: ChatIntrf[];
     userChatError: Error | null;
     userProfile: IOtherUser;
@@ -54,8 +57,12 @@ export interface IUserWindow {
     onDeleteOne: UseMutationResult<any, Error, string, unknown>;
     receiverId: string;
     sendChatToUser: UseMutationResult<any, Error, void, unknown>;
+    setShowUserMedia: (showUserMedia: boolean) => void;
     setShowUserProfile: (showUserProfile: boolean) => void;
+    setText: (text: string) => void;
+    showUserMedia: boolean;
     showUserProfile: boolean;
+    text: string;
     userChats: ChatIntrf[];
     userChatError: Error | null;
     userProfile: IOtherUser;
@@ -75,7 +82,6 @@ export interface IUserProfile {
 }
 
 export interface IOtherUser {
-    _id: string;
     address: string;
     created_at: string;
     gender: string;
@@ -84,6 +90,7 @@ export interface IOtherUser {
         resource_type: string;
         url: string;
     }
+    user_id: string;
     username: string;
 }
 

@@ -10,6 +10,7 @@ import useUserServices from "../services/useUserServices";
 import { MessageCircle } from "lucide-react";
 import { useRoomStore } from "../stores/room.store";
 import useSocketIo from "../hooks/useSocketIo";
+import cn from "../utils/cn";
 
 export default function AvailableRoom() {
     const roomId = useRoomStore((state) => state.roomId);
@@ -50,8 +51,9 @@ export default function AvailableRoom() {
     } = useRoomChatService({ roomId: roomId });
 
     return (
-        <section className="flex flex-col h-screen relative z-10">
-            <div className="flex flex-col h-full px-2.5 pt-2.5 md:2/4 w-full">
+        <section className="flex md:flex-row flex-col gap-2.5 p-2.5 h-screen relative z-10">
+            <Navbar isProcessing={isRoomChatProcessing || isUserProcessing}/>
+            <div className="flex flex-col md:w-2/5 h-full px-2.5 w-full inset-shadow-sm inset-shadow-gray-400 border border-gray-400">
                 {currentAvailableRooms.isAvailableRoomLoading ? (
                     <div className="flex justify-center items-center h-full">
                         <Loading/>
@@ -110,16 +112,23 @@ export default function AvailableRoom() {
                     users={currentRoomMember.roomMember}
                 />
             ) : (
-                <div className="md:flex md:justify-center md:items-center md:h-full md:bg-white hidden">
+                <div 
+                    className={cn(
+                        "md:flex md:justify-center md:items-center md:h-full md:w-2/5", 
+                        "md:bg-white hidden inset-shadow-sm inset-shadow-gray-400",
+                        "border border-gray-400"
+                    )}
+                >
                     <div className="flex flex-col gap-2">
-                        <div className="text-gray-500 font-medium flex justify-center"><MessageCircle size={34}/></div>
+                        <div className="text-gray-500 font-medium flex justify-center">
+                            <MessageCircle size={34}/>
+                        </div>
                         <div className="text-gray-700 font-medium text-center">
                             Welcome to Chit Chat
                         </div>
                     </div>
                 </div>
             )}
-            <Navbar isProcessing={isRoomChatProcessing || isUserProcessing}/>
         </section>
     );
 }

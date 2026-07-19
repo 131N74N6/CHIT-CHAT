@@ -5,7 +5,7 @@ import Alert from "../components/Alert";
 import Loading from "../components/Loading";
 import Navbar from "../components/Navbar";
 import cn from "../utils/cn";
-import { ArrowBigLeft, Camera, X } from "lucide-react";
+import { ArrowBigLeft, MessageCircle, X } from "lucide-react";
 import useChangeUserService from "../services/useChangeUserService";
 import useUserServices from "../services/useUserServices";
 
@@ -55,22 +55,16 @@ export default function ChangeUser() {
     }, []);
 
     return (
-        <section className="flex flex-col relative h-screen z-10">
+        <section className="flex flex-col md:flex-row relative h-screen p-2.5 gap-2.5 z-10">
             {message ? <Alert message={message}/> : null}
             <Navbar isProcessing={isUserLoading || isUserProcessing}/>
             <form 
-                className="flex w-full flex-col h-full p-2.5"
+                className="flex w-full md:w-2/5 flex-col h-full p-2.5 inset-shadow-sm inset-shadow-gray-400 border border-gray-400"
                 onSubmit={(event: React.SubmitEvent<HTMLFormElement>) => {
                     event.preventDefault();
                     changeUserMt.mutate();
                 }}
             >
-                <input
-                    className="hidden"
-                    onChange={handleImagePreview}
-                    ref={fileInputRef}
-                    type="file"
-                />
                 {isUserLoading ? (
                     <div className="flex justify-center items-center h-full">
                         <Loading/>
@@ -83,13 +77,19 @@ export default function ChangeUser() {
                     </div>
                 ) : (
                     <div className="bg-white flex flex-col gap-2.5">
+                        <input
+                            className="hidden"
+                            onChange={handleImagePreview}
+                            ref={fileInputRef}
+                            type="file"
+                        />
                         <div className="flex gap-1.5">
                             <button
                                 className={cn(
                                     "disabled:cursor-not-allowed cursor-pointer", 
                                     "hover:text-gray-500 transition-colors text-gray-800 font-medium"
                                 )}
-                                onClick={() => navigate(`/home`)}
+                                onClick={() => navigate(`/profile`)}
                                 type="button"
                             >
                                 <ArrowBigLeft size={24}/>
@@ -98,10 +98,10 @@ export default function ChangeUser() {
                         <div className="flex justify-center">
                             <div className="w-20 h-20 rounded-full">
                                 {profilePicture && profilePictureUrl ? (
-                                    <div className="w-full h-full rounded-full relative group">
+                                    <div className="w-full h-full relative group">
                                         <img
                                             alt={`user-profile-${Date.now()}`}
-                                            className="w-full h-full object-cover"
+                                            className="w-full h-full object-cover rounded-full"
                                             src={profilePictureUrl}
                                         />
                                         <button
@@ -123,10 +123,10 @@ export default function ChangeUser() {
                                         </button>
                                     </div>
                                 ) : oldProfile !== null ? (
-                                    <div className="w-full h-full rounded-full relative group">
+                                    <div className="w-full h-full relative group">
                                         <img
                                             alt={oldProfile.public_id}
-                                            className="w-full h-full object-cover"
+                                            className="w-full h-full object-cover rounded-full"
                                             src={oldProfile.url}
                                         />
                                         <button
@@ -149,35 +149,35 @@ export default function ChangeUser() {
                                 ) : (
                                     <div 
                                         className={cn(
-                                            "border-dashed border-gray-500 flex justify-center items-center bg-white",
-                                            "w-full h-full rounded-full cursor-pointer font-medium text-gray-500"
+                                            "border-dashed border-gray-500 flex justify-center items-center bg-purple-400",
+                                            "w-full text-white h-full rounded-full cursor-pointer font-medium text-[1.2rem]"
                                         )}
                                         onClick={() => fileInputRef.current?.click()}
                                     >
-                                        <Camera size={14}/>
+                                        {user?.username[0]}
                                     </div>
                                 )}
                             </div>
                         </div>
                         <div className="flex flex-col gap-3">
                             <div className="flex flex-col gap-1.5">
-                                <label htmlFor="new-username" className="text-gray-900 font-medium text-[1.2rem]">Username</label>
+                                <label htmlFor="new-username" className="text-gray-900 font-medium text-[1rem]">Username</label>
                                 <input
-                                    className={cn("inline-0 bg-gray-400 text-gray-900 font-medium p-1.5 text-[1.2rem] w-full")}
+                                    className={cn("focus:outline-0 bg-blue-200 text-gray-900 font-medium p-1.5 text-[1rem] w-full")}
                                     id="new-username"
                                     name="new-username"
-                                    onChange={(event: React.ChangeEvent<HTMLInputElement, HTMLInputElement>) => setUserName(event.target.value)}
+                                    onChange={(event) => setUserName(event.target.value)}
                                     type="text"
                                     value={username}
                                 />
                             </div>
                             <div className="flex flex-col gap-1.5">
-                                <label htmlFor="new-gender" className="text-gray-900 font-medium text-[1.2rem]">Gender</label>
+                                <label htmlFor="new-gender" className="text-gray-900 font-medium text-[1rem]">Gender</label>
                                 <select 
                                     disabled={isChangeUserProcessing || isUserLoading}
                                     value={gender}
                                     onChange={(event: React.ChangeEvent<HTMLSelectElement, HTMLSelectElement>) => setGender(event.target.value)}
-                                    className="bg-gray-400 text-gray-900 p-2 outline-none"
+                                    className="bg-blue-200 text-gray-900 p-2 outline-none"
                                 >
                                     <option value="">-- Choose Status --</option>
                                     <option value="-">-</option> 
@@ -186,20 +186,46 @@ export default function ChangeUser() {
                                 </select>
                             </div>
                             <div className="flex flex-col gap-1.5">
-                                <label htmlFor="new-address" className="text-gray-900 font-medium text-[1.2rem]">Address</label>
+                                <label htmlFor="new-address" className="text-gray-900 font-medium text-[1rem]">Address</label>
                                 <input
-                                    className={cn("inline-0 bg-gray-400 text-gray-900 font-medium p-1.5 text-[1.2rem] w-full")}
+                                    className={cn("focus:outline-0 bg-blue-200 text-gray-900 font-medium p-1.5 text-[1rem] w-full")}
                                     id="new-address"
                                     name="new-address"
-                                    onChange={(event: React.ChangeEvent<HTMLInputElement, HTMLInputElement>) => setAddress(event.target.value)}
+                                    onChange={(event) => setAddress(event.target.value)}
                                     type="text"
                                     value={address}
                                 />
                             </div>
+                            <button
+                                className={cn(
+                                    "bg-purple-400 text-white font-medium text-[1rem] p-1.5 cursor-pointer", 
+                                    "rounded disabled:cursor-not-allowed hover:bg-purple-600 transition-colors"
+                                )}
+                                disabled={isChangeUserProcessing || isUserProcessing}
+                                type="submit"
+                            >
+                                Save
+                            </button>
                         </div>
                     </div>
                 )}
             </form>
+            <div 
+                className={cn(
+                    "md:flex md:justify-center md:items-center md:h-full md:w-2/5", 
+                    "md:bg-white hidden inset-shadow-sm inset-shadow-gray-400",
+                    "border border-gray-400"
+                )}
+            >
+                <div className="flex flex-col gap-2">
+                    <div className="text-gray-500 font-medium flex justify-center">
+                        <MessageCircle size={34}/>
+                    </div>
+                    <div className="text-gray-700 font-medium text-center">
+                        Welcome to Chit Chat
+                    </div>
+                </div>
+            </div>
         </section>
     );
 }

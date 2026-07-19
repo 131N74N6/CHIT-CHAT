@@ -6,7 +6,7 @@ import UserData from "./UserData";
 export default function UserList(props: UserListIntrf) {
     if (props.users.length === 0) {
         return (
-            <div className="flex justify-center items-center fixed inset-0 z-20 border bg-[rgba(0,0,0,0.66)] p-3">
+            <div className="flex justify-center items-center h-full">
                 <div className="bg-white">
                     <span className="text-gray-700 font-semibold text-[1rem]">No users found...</span>
                 </div>

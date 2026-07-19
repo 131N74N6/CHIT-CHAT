@@ -107,9 +107,24 @@ export default function useSocketIoServices() {
     function onSendToRoom(callback: (data: any) => void) {
         socket?.on("room-chat:send", callback);
     }
+
+    function removeAllListeners() {
+        socket?.removeAllListeners();
+    }
+
+    function disconnect() {
+        socket?.disconnect();
+        socket = null;
+    }
+
+    function getSocket() {
+        return socket;
+    }
     
     return {
         connect,
+        disconnect,
+        getSocket,
         onAvailableRoomJoin,
         onChangeRoom,
         onChangeUser,
@@ -130,6 +145,7 @@ export default function useSocketIoServices() {
         onRoomChatJoin,
         onRoomProfileJoin,
         onSendToRoom,
-        onSendToUser
+        onSendToUser,
+        removeAllListeners
     }
 }

@@ -27,8 +27,12 @@ export default function UserChat() {
         deleteChatPermanentlyForUserMt, 
         isUserChatProcessing, 
         sendChatToUserMt,
+        setText,
+        text,
         userChats 
     } = useUserChatService({ receiverId: receiver_id, setMessage: setMessage });
+
+    console.log(userChats.getUserChats);
     
     useEffect(() => {
         if (message) {
@@ -38,11 +42,14 @@ export default function UserChat() {
     }, [message, setMessage]);
 
     return (
-        <section className="flex flex-col h-screen relative z-10">
+        <section className="flex flex-col h-screen relative z-10 p-2.5 gap-2.5">
             <Navbar isProcessing={isUserChatProcessing || isUserProcessing || currentUserProfile.isDetailLoading}/>
-            <div className="flex flex-col h-full px-2.5 pt-2.5 w-full">
-                <div className="bg-gray-500 p-2 flex gap-1.5 cursor-pointer" onClick={() => navigate(`/user/profile/${receiver_id}`)}>
-                    <div className="w-20 h-20 rounded-full">
+            <div className="flex flex-col h-full w-full md:hidden border border-gray-400 inset-shadow-sm inset-shadow-gray-400 p-2">
+                <div 
+                    className="bg-gray-300 p-2 flex gap-1.5 cursor-pointer" 
+                    onClick={() => navigate(`/user/profile/${receiver_id}`)}
+                >
+                    <div className="w-10 h-10 rounded-full">
                         {currentUserProfile.detail && currentUserProfile.detail.profile_picture !== null ? (
                             <div className="w-full h-full">
                                 <img 
@@ -53,16 +60,16 @@ export default function UserChat() {
                             </div>
                         ) : (
                             <div className={cn(
-                                "w-full h-full rounded-full flex items-center", 
-                                "justify-center bg-blue-600 text-white font-extralight"
+                                "w-full h-full rounded-full flex items-center text-[1rem]", 
+                                "justify-center bg-purple-500 text-white font-medium"
                             )}>
                                 {currentUserProfile.detail?.username[0]}
                             </div>
                         )}
                     </div>
-                    <div className="text-white text-[1.2rem] font-extralight">Username</div>
+                    <div className="text-gray-900 text-[1.2rem] font-medium">{currentUserProfile.detail?.username}</div>
                 </div>
-                <div className="flex flex-col gap-2.5 p-1">
+                <div className="flex flex-col gap-2.5 p-1 h-full">
                     {userChats.isLoading ? (
                         <div className="flex justify-center items-center bg-white h-full">
                             <Loading/>
@@ -86,36 +93,38 @@ export default function UserChat() {
                             onDeleteOnePermanent={deleteChatPermanentlyForUserMt}
                         />
                     )}
-                    <form 
-                        className="bg-white inset-shadow-gray-200 p-1.5 flex flex-col gap-1.5 max-h-[30%] overflow-y-auto"
-                        onSubmit={(event: React.SubmitEvent<HTMLFormElement>) => {
-                            event.preventDefault();
-                            sendChatToUserMt.mutate();
-                        }}
-                    >
-                        <div className="flex justify-end">
-                            <input
-                                className="inline-0 text-gray-900 font-light w-[90%]"
-                                id="message"
-                                name="message"
-                                type="text"
-                            />
+                </div>
+                <form 
+                    className="bg-white inset-shadow-gray-200 p-1.5 flex flex-col gap-1.5 border border-gray-400"
+                    onSubmit={(event: React.SubmitEvent<HTMLFormElement>) => {
+                        event.preventDefault();
+                        sendChatToUserMt.mutate();
+                    }}
+                >
+                    <div className="flex flex-col gap-1.5">
+                        <input
+                            className="focus:outline-0 outline-0 text-gray-600 font-medium w-full max-h-[25%] overflow-y-auto"
+                            id="message"
+                            name="message"
+                            onChange={(event) => setText(event.target.value)}
+                            value={text}
+                            type="text"
+                        />
+                        <div className="flex gap-2 justify-end">
                             <button
                                 className={cn(
-                                    "cursor-pointer disabled:cursor-not-allowed", 
+                                    "cursor-pointer disabled:cursor-not-allowed w-10 h-10", 
                                     "text-white rounded-full flex justify-center items-center p-1.5",
-                                    "bg-blue-600 w-[10%] h-[10%] transition-colors hover:bg-blue-500" 
+                                    "bg-blue-600 transition-colors hover:bg-blue-500" 
                                 )}
                                 disabled={isUserChatProcessing || isUserProcessing}
                                 type="submit"
                             >
                                 <SendIcon size={22}/>
                             </button>
-                        </div>
-                        <div>
                             <button 
                                 className={cn(
-                                    "cursor-pointer disabled:cursor-not-allowed", 
+                                    "cursor-pointer disabled:cursor-not-allowed border border-gray-400", 
                                     "border border-gray-500 bg-white text-gray-500 w-[20%] p-1.5"
                                 )}
                                 disabled={isUserChatProcessing || isUserProcessing}
@@ -125,8 +134,8 @@ export default function UserChat() {
                                 <File size={22}/>
                             </button>
                         </div>
-                    </form>
-                </div>
+                    </div>
+                </form>
             </div>
         </section>
     );

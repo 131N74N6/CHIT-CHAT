@@ -11,6 +11,9 @@ export interface ChatState {
     resetChats: () => void;
     resetChatState: () => void;
 
+    showUserMedia: boolean;
+    setShowUserMedia: (showUserMedia: boolean) => void;
+
     showUserProfile: boolean;
     setShowUserProfile: (showUserProfile: boolean) => void;
 
@@ -38,6 +41,9 @@ export const useChatStore = create<ChatState>((set) => ({
         showUserProfile: false,
         text: "", 
     }),
+
+    showUserMedia: false,
+    setShowUserMedia: (showUserMedia) => set({ showUserMedia }),
 
     showUserProfile: false,
     setShowUserProfile: (showUserProfile) => set({ showUserProfile }),

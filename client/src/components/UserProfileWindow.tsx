@@ -32,7 +32,9 @@ export default function UserProfileWindow(props: IUserProfileWindow) {
                     </div>
                     <div className="flex justify-center">
                         <div className="w-20 h-20 rounded-full">
-                            {props.userProfile && props.userProfile.profile_picture !== null ? (
+                            {props.userProfile && 
+                            props.userProfile.profile_picture !== null && 
+                            props.userProfile.profile_picture.public_id !== null ? (
                                 <div className="w-full h-full rounded-full">
                                     <img
                                         alt={props.userProfile.profile_picture.public_id}
@@ -66,7 +68,7 @@ export default function UserProfileWindow(props: IUserProfileWindow) {
                         <div className="flex flex-col gap-1.5">
                             <div className="text-xl font-medium text-gray-800">User ID</div>
                             <div className="text-xl font-medium text-gray-800">
-                                {props.userProfile._id || "-"}
+                                {props.userProfile.user_id || "-"}
                             </div>
                         </div>
                         <div className="flex flex-col gap-1.5">

@@ -33,7 +33,6 @@ export default function App() {
                     <Route path="/" element={<Navigate to="/home" replace/>}/>
                     <Route element={<SignIn/>} path="/sign-in"/>
                     <Route element={<SignUp/>} path="/sign-up"/>
-                    <Route element={<ProtectedRoute><JoinRoom/></ProtectedRoute>} path="/join-room"/>
                     <Route element={<ProtectedRoute><Home/></ProtectedRoute>} path="/home"/>
                     <Route element={<ProtectedRoute><YourProfile/></ProtectedRoute>} path="/profile"/>
                     <Route element={<ProtectedRoute><ChangeUser/></ProtectedRoute>} path="/profile/edit"/>
@@ -43,6 +42,7 @@ export default function App() {
                     <Route element={<ProtectedRoute><UserProfile/></ProtectedRoute>} path="/user/profile/:receiver_id"/>
                     <Route element={<ProtectedRoute><AvailableRoom/></ProtectedRoute>} path="/rooms"/>
                     <Route element={<ProtectedRoute><CreateRoom/></ProtectedRoute>} path="/rooms/create"/>
+                    <Route element={<ProtectedRoute><JoinRoom/></ProtectedRoute>} path="/rooms/join"/>
                     <Route element={<ProtectedRoute><ChangeRoom/></ProtectedRoute>} path="/rooms/edit/:room_id"/>
                     <Route element={<ProtectedRoute><RoomChat/></ProtectedRoute>} path="/rooms/chat/:room_id"/>
                     <Route element={<ProtectedRoute><RoomMediaPreview/></ProtectedRoute>} path="/room/chat/preview/:room_id"/>

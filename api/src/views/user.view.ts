@@ -39,7 +39,7 @@ export async function getCurrentUser(req: AuthRequest, res: Response) {
             created_at: user.created_at,
             email: user.email,
             gender: user.gender,
-            profile_pic: user.profile_picture,
+            profile_picture: user.profile_picture,
             user_id: user._id,
             username: user.username
         });

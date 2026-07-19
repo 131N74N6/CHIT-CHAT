@@ -33,7 +33,8 @@ export default function useSocketIo(props: ChatSocketIntrf) {
         onRoomChatJoin,
         onRoomProfileJoin,
         onSendToRoom,
-        onSendToUser
+        onSendToUser,
+        removeAllListeners
     } = useSocketIoServices();
 
     //  ['all-users'];
@@ -110,6 +111,8 @@ export default function useSocketIo(props: ChatSocketIntrf) {
             onChangeUser(() => invalidations(["all-users", "current-user", "user"]));
             onDeleteUser(() => invalidations(["current-user", "user-chat", "user"]));
         }
+
+        return () => removeAllListeners();
         
     }, [props.identifier, props.currentUserId, props.marks, queryClient]);
 }

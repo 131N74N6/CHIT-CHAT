@@ -11,8 +11,12 @@ export default function UserData(props: UserItemIntrf) {
 
     return (
         <>
-            <div className={cn("border bg-white border-b-gray-600 md:flex gap-1.5 hidden")} onClick={showWindowChat}>
-                <div className={cn("w-20 h-20 rounded-full")}>
+            <div 
+                className={cn(
+                    "border-b bg-white border-b-gray-600 p-1.5 cursor-pointer md:flex gap-1.5 hidden"
+                )} 
+                onClick={showWindowChat}>
+                <div className={cn("w-10 h-10 rounded-full")}>
                     {props.user.profile_picture !== null ? (
                         <div className="w-full h-full">
                             <img 
@@ -32,10 +36,13 @@ export default function UserData(props: UserItemIntrf) {
                 </div>
                 <div className="text-gray-950 font-medium">{props.user.username}</div>
             </div>
-            <div className={cn("border bg-white border-b-gray-600 md:hidden flex gap-1.5")} 
+            <div 
+                className={cn(
+                    "border-b bg-white border-b-gray-600 p-1.5 cursor-pointer md:hidden flex gap-1.5"
+                )} 
                 onClick={() => navigate(`/user/chat/${props.user._id}`)}
             >
-                <div className={cn("w-20 h-20 rounded-full")}>
+                <div className={cn("w-10 h-10 rounded-full")}>
                     {props.user.profile_picture !== null ? (
                         <div className="w-full h-full">
                             <img 

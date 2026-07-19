@@ -10,6 +10,7 @@ import { useMessageStore } from "../stores/message.store";
 import { useChatStore } from "../stores/chat.store";
 import useUserProfileService from "../services/useUserProfileService";
 import useSocketIo from "../hooks/useSocketIo";
+import cn from "../utils/cn";
 
 export default function Home() {
     const message = useMessageStore((state) => state.message);
@@ -17,6 +18,12 @@ export default function Home() {
     
     const showUserProfile = useChatStore((state) => state.showUserProfile);
     const setShowUserProfile = useChatStore((state) => state.setShowUserProfile);
+    
+    const showUserMedia = useChatStore((state) => state.showUserMedia);
+    const setShowUserMedia = useChatStore((state) => state.setShowUserMedia);
+    
+    const text = useChatStore((state) => state.text);
+    const setText = useChatStore((state) => state.setText);
     
     const receiverId = useChatStore((state) => state.receiverId);
     const setReceiverId = useChatStore((state) => state.setReceiverId);
@@ -52,9 +59,9 @@ export default function Home() {
     }, [message, setMessage]);
 
     return (
-        <section className="flex md:flex-row gap-2.5 flex-col h-screen relative z-10">
+        <section className="flex md:flex-row p-2.5 gap-2.5 flex-col h-screen relative z-10">
             <Navbar isProcessing={isUserChatProcessing || isUserProcessing}/>
-            <div className="md:w-2/4 w-full h-full p-2.5 flex flex-col">
+            <div className="md:w-2/5 w-full h-full flex flex-col px-2.5 inset-shadow-sm inset-shadow-gray-400 border border-gray-400">
                 {allUsers.usersError ? (
                     <div className="flex justify-center items-center h-full">
                         <div className="text-gray-700 font-medium text-center">
@@ -91,16 +98,28 @@ export default function Home() {
                     onDeleteOnePermanent={deleteChatPermanentlyForUserMt}
                     receiverId={receiverId}
                     sendChatToUser={sendChatToUserMt}
+                    setShowUserMedia={setShowUserMedia}
                     setShowUserProfile={setShowUserProfile}
+                    setText={setText}
+                    showUserMedia={showUserMedia}
                     showUserProfile={showUserProfile}
+                    text={text}
                     userChatError={userChats.error}
                     userChats={userChats.getUserChats}
                     userProfile={currentUserProfile.detail!}
                 />
             ) : (
-                <div className="md:flex md:justify-center md:items-center md:h-full md:bg-white hidden">
+                <div 
+                    className={cn(
+                        "md:flex md:justify-center md:items-center md:h-full md:w-2/5", 
+                        "md:bg-white hidden inset-shadow-sm inset-shadow-gray-400",
+                        "border border-gray-400"
+                    )}
+                >
                     <div className="flex flex-col gap-2">
-                        <div className="text-gray-500 font-medium flex justify-center"><MessageCircle size={34}/></div>
+                        <div className="text-gray-500 font-medium flex justify-center">
+                            <MessageCircle size={34}/>
+                        </div>
                         <div className="text-gray-700 font-medium text-center">
                             Welcome to Chit Chat
                         </div>

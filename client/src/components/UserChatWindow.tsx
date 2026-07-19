@@ -3,16 +3,13 @@ import cn from "../utils/cn"
 import type { IUserChatWindow } from "../models/user.model";
 import ChatList from "./ChatList";
 import Loading from "./Loading";
-import { useNavigate } from "react-router-dom";
 
 export default function UserChatWindow(props: IUserChatWindow) {
-    const navigate = useNavigate();
-
     return (
         <div className="h-full flex-col gap-2.5 md:w-2/4 md:flex md:p-2.5 md:flex-col hidden">
             <div className="bg-gray-500 p-2 flex gap-1.5" onClick={props.seeProfile}>
                 <div className="w-20 h-20 rounded-full">
-                    {props.userProfile.profile_picture !== null ? (
+                    {props.userProfile.profile_picture && props.userProfile.profile_picture !== null ? (
                         <div className="w-full h-full">
                             <img 
                                 className="w-full h-full object-cover" 
@@ -64,10 +61,12 @@ export default function UserChatWindow(props: IUserChatWindow) {
                 >
                     <div className="flex justify-end">
                         <input
-                            className="inline-0 text-gray-900 font-light w-[90%]"
+                            className="inline-0 text-gray-900 font-light w-[90%] border border-gray-500 p-2"
                             id="message"
                             name="message"
+                            onChange={(event) => props.setText(event.target.value)}
                             type="text"
+                            value={props.text}
                         />
                         <button
                             className={cn(
@@ -88,7 +87,7 @@ export default function UserChatWindow(props: IUserChatWindow) {
                                 "border border-gray-500 bg-white text-gray-500 w-[20%] p-1.5"
                             )}
                             disabled={props.isProcessing}
-                            onClick={() => navigate(`/media/preview`)}
+                            onClick={props.seeMedia}
                             type="button"
                         >
                             <File size={22}/>

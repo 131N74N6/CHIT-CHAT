@@ -4,6 +4,16 @@ import ChatBubble from "./ChatBubble";
 import Loading from "./Loading";
 
 export default function ChatList(props: ChatListIntrf) {
+    if (props.chats.length === 0) {
+        return (
+            <div className="flex justify-center items-center h-full">
+                <div className="bg-white">
+                    <span className="text-gray-700 font-semibold text-[1rem]">No chats found...</span>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="flex flex-col py-2.5 overflow-y-auto">
             <div className="flex flex-col gap-2">

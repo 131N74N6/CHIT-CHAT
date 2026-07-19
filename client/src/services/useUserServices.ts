@@ -1,11 +1,18 @@
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { IOtherUser, IUserService, IUserProfile } from "../models/user.model";
 import { useNavigate } from "react-router-dom";
+import { useRoomStore } from "../stores/room.store";
+import { useChatStore } from "../stores/chat.store";
+import { useUserStore } from "../stores/user.store";
 
 export default function useUserServices(props?: IUserService) {
     const baseUrl = `${import.meta.env.VITE_BASE_API_URL}/users`;
     const navigate = useNavigate();
     const queryClient = useQueryClient();
+    
+    const resetRoomState = useRoomStore((state) => state.resetRoomState);
+    const resetChatState = useChatStore((state) => state.resetChatState);
+    const resetUserState = useUserStore((state) => state.resetUserState);
 
     const { data: user, error: userError, isLoading: isUserLoading } = useQuery<IUserProfile>({
         queryFn: async () => {
@@ -131,6 +138,9 @@ export default function useUserServices(props?: IUserService) {
         onSuccess: () => {
             queryClient.setQueryData(['current-user'], null);
             queryClient.clear();
+            resetChatState();
+            resetRoomState();
+            resetUserState();
             navigate("/sign-in");
         }
     });
