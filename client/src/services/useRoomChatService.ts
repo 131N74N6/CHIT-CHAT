@@ -110,59 +110,11 @@ export default function useRoomChatService(props?: IRoomChatService) {
             resetChats();
         }
     });
-    
-    const deleteAllChatsPermanentlyForRoomMt = useMutation({
-        mutationFn: async () => {
-            try {
-                const request = await fetch(`${baseUrl}/rm-all/permanently/${props?.roomId}`, {
-                    credentials: "include",
-                    headers: { 'Content-Type': 'application/json' },
-                    method: "DELETE"
-                });
-
-                const response = await request.json();
-                if (!request.ok) throw new Error(response.message);
-                return response;
-            } catch (error) {
-                throw error;
-            }
-        },
-        onError: (error) => {
-            props?.setMessage!(error.message);
-        },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: [`room-chat-${props?.roomId}`] });
-        }
-    });
 
     const deleteAllChatsForRoomMt = useMutation({
         mutationFn: async () => {
             try {
                 const request = await fetch(`${baseUrl}/rooms/rm-all/${props?.roomId}`, {
-                    credentials: "include",
-                    headers: { 'Content-Type': 'application/json' },
-                    method: "DELETE"
-                });
-
-                const response = await request.json();
-                if (!request.ok) throw new Error(response.message);
-                return response;
-            } catch (error) {
-                throw error;
-            }
-        },
-        onError: (error) => {
-            props?.setMessage!(error.message);
-        },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: [`room-chat-${props?.roomId}`] });
-        }
-    });
-
-    const deleteChatPermanentlyForRoomMt = useMutation({
-        mutationFn: async (_id: string) => {
-            try {
-                const request = await fetch(`${baseUrl}/rooms/rm/permanently/${_id}/${props?.roomId}`, {
                     credentials: "include",
                     headers: { 'Content-Type': 'application/json' },
                     method: "DELETE"
@@ -264,17 +216,15 @@ export default function useRoomChatService(props?: IRoomChatService) {
     });
 
     const isRoomChatProcessing = clearChatInRoomForMeMt.isPending || clearChatsInRoomForMeMt.isPending ||
-    deleteAllChatsForRoomMt.isPending || deleteAllChatsPermanentlyForRoomMt.isPending || deleteChaForRoomMt.isPending ||
-    deleteChatPermanentlyForRoomMt.isPending || allChatsInRoom.isRoomChatLoading || sendChatToRoomMt.isPending;
+    deleteAllChatsForRoomMt.isPending || deleteChaForRoomMt.isPending || allChatsInRoom.isRoomChatLoading || 
+    sendChatToRoomMt.isPending;
 
     return { 
         allChatsInRoom, 
         clearChatInRoomForMeMt, 
         clearChatsInRoomForMeMt, 
         deleteAllChatsForRoomMt,
-        deleteAllChatsPermanentlyForRoomMt,
         deleteChaForRoomMt,
-        deleteChatPermanentlyForRoomMt,
         handleImagePreview,
         inputMediaRef,
         isRoomChatProcessing,

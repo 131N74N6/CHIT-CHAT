@@ -65,61 +65,11 @@ export default function useUserChatService(props: IUserChatService) {
             resetChats();
         }
     });
-    
-    const deleteAllChatsPermanentlyForUsererMt = useMutation({
-        mutationFn: async () => {
-            try {
-                const request = await fetch(`${baseUrl}/rm-all/permanently`, {
-                    credentials: "include",
-                    headers: { 'Content-Type': 'application/json' },
-                    method: "DELETE"
-                });
-
-                const response = await request.json();
-                if (!request.ok) throw new Error(response.message);
-                return response;
-            } catch (error) {
-                throw error;
-            }
-        },
-        onError: (error) => {
-            props?.setMessage!(error.message);
-        },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: [`user-chat-${props?.receiverId}`] });
-            resetChats();
-        }
-    });
 
     const deleteAllChatsForUsererMt = useMutation({
         mutationFn: async () => {
             try {
                 const request = await fetch(`${baseUrl}/rm-all`, {
-                    credentials: "include",
-                    headers: { 'Content-Type': 'application/json' },
-                    method: "DELETE"
-                });
-
-                const response = await request.json();
-                if (!request.ok) throw new Error(response.message);
-                return response;
-            } catch (error) {
-                throw error;
-            }
-        },
-        onError: (error) => {
-            props?.setMessage!(error.message);
-        },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: [`user-chat-${props?.receiverId}`] });
-            resetChats();
-        }
-    });
-
-    const deleteChatPermanentlyForUserMt = useMutation({
-        mutationFn: async (_id: string) => {
-            try {
-                const request = await fetch(`${baseUrl}/rm/permanently/${_id}`, {
                     credentials: "include",
                     headers: { 'Content-Type': 'application/json' },
                     method: "DELETE"
@@ -253,17 +203,13 @@ export default function useUserChatService(props: IUserChatService) {
     const userChats = { error, fetchNextPage, getUserChats, isFetchingNextPage, isLoading, hasNextPage }
 
     const isUserChatProcessing = clearChatForMeMt.isPending || clearChatsForMeMt.isPending || 
-    deleteAllChatsForUsererMt.isPending || deleteAllChatsPermanentlyForUsererMt.isPending || 
-    deleteChatForUserMt.isPending || deleteChatPermanentlyForUserMt.isPending ||
-    sendChatToUserMt.isPending;
+    deleteAllChatsForUsererMt.isPending || deleteChatForUserMt.isPending || sendChatToUserMt.isPending;
 
     return { 
         clearChatForMeMt,
         clearChatsForMeMt,
         deleteAllChatsForUsererMt,
-        deleteAllChatsPermanentlyForUsererMt,
         deleteChatForUserMt,
-        deleteChatPermanentlyForUserMt,
         handleImagePreview, 
         inputMediaRef, 
         isUserChatProcessing, 

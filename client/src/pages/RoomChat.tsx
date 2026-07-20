@@ -33,9 +33,9 @@ export default function RoomChat() {
     } = useRoomChatService({ roomId: room_id, setMessage: setMessage });
         
     useSocketIo({
-        currentUserId: currentUser.user?.user_id!,
+        currentUserId: currentUser.user ? currentUser.user.user_id : '',
         identifier: ["room-chat"],
-        marks: room_id!
+        marks: room_id ? room_id : ''
     });
 
 

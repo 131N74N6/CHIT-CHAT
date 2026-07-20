@@ -6,9 +6,10 @@ import Alert from "../components/Alert";
 import Loading from "../components/Loading";
 import cn from "../utils/cn";
 import Navbar from "../components/Navbar";
-import { ArrowBigLeft, MessageCircle } from "lucide-react";
+import { ArrowBigLeft, MessageCircle, Trash } from "lucide-react";
 import useSocketIo from "../hooks/useSocketIo";
 import useUserService from "../services/useUserService";
+import useUserChatService from "../services/useUserChatService";
 
 export default function UserProfile() {
     const { receiver_id } = useParams();
@@ -21,6 +22,7 @@ export default function UserProfile() {
     const { currentUserProfile } = useUserProfileService({ receiverId: receiver_id });
 
     const { detail, detailError, isDetailLoading } = currentUserProfile;
+    const { deleteAllChatsPermanentlyForUsererMt } = useUserChatService({ receiverId: receiver_id, setMessage: setMessage });
     
     useEffect(() => {
         if (message) {
@@ -111,6 +113,18 @@ export default function UserProfile() {
                                     {detail && detail.address ? detail.address : "-"}
                                 </div>
                             </div>
+                        </div>
+                        <div className="grid md:grid-cols-2 grid-cols-1 gap-2">
+                            <button
+                                className="text-white font-medium flex items-center gap-2 bg-gray-700 cursor-pointer disabled:cursor-not-allowed p-2 text-[1rem]"
+                                disabled={isDetailLoading}
+                                onClick={() => deleteAllChatsPermanentlyForUsererMt.mutate()}
+                                type="button"
+                            >
+                                <Trash size={23}/>
+                                <div className="">Delete All For Me</div>
+                            </button>
+                            <button></button>
                         </div>
                     </div>
                 )}

@@ -34,9 +34,9 @@ export default function UserChat() {
     } = useUserChatService({ receiverId: receiver_id, setMessage: setMessage });
 
     useSocketIo({
-        currentUserId: currentUser.user?.user_id!,
+        currentUserId: currentUser.user ? currentUser.user.user_id : '',
         identifier: ["user-chat"],
-        marks: receiver_id!
+        marks: receiver_id ? receiver_id : ''
     });
     
     useEffect(() => {

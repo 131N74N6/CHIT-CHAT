@@ -13,30 +13,37 @@ io.on("connection", (socket) => {
 
     socket.on("join:available-room", (userId: string) => {
         socket.join(`available-room:${userId}`);
+        console.log(`available-room:${userId}`);
     });
 
     socket.on("join:available-user", (userId: string) => {
         socket.join(`available-user:${userId}`);
+        console.log(`available-user:${userId}`);
     });
 
     socket.on("join:room-chat", (roomId: string) => {
         socket.join(`room-chat:${roomId}`);
+        console.log(`room-chat:${roomId}`);
     });
 
     socket.on("join:room-member", (roomId: string) => {
         socket.join(`room-member:${roomId}`);
+        console.log(`room-member:${roomId}`);
     });
 
     socket.on("join:room-profile", (roomId: string) => {
         socket.join(`room-profile:${roomId}`);
+        console.log(`room-profile:${roomId}`);
     });
 
     socket.on("join:user-chat", (userId: string) => {
         socket.join(`user-chat:${userId}`);
+        console.log(`user-chat:${userId}`);
     });
 
     socket.on("join:user-profile", (userId: string) => {
         socket.join(`user-profile:${userId}`);
+        console.log(`user-profile:${userId}`);
     });
 
     socket.on("disconnect", () => {

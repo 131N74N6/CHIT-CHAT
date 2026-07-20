@@ -13,9 +13,11 @@ import {
 const roomProfileRouters = Router();
 
 roomProfileRouters.delete("/rm/:room_id", verifyToken, deleteRoom);
+
 roomProfileRouters.delete("/rm-pict/:room_id", verifyToken, deleteOldRoomProfile);
 
 roomProfileRouters.get("/show-all", verifyToken, showAvailableRoom);
+
 roomProfileRouters.get("/show/:room_id", verifyToken, showRoomProfile);
 
 roomProfileRouters.post("/make-room", verifyToken, uploadImage, createRoom);

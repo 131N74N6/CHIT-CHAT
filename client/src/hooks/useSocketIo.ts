@@ -39,18 +39,6 @@ export default function useSocketIo(props: ChatSocketIntrf) {
         removeAllListeners
     } = useSocketIoService();
 
-    function invalidations(queryNames: string[]) {
-        queryClient.invalidateQueries({
-            predicate: (query: Query<unknown, Error, unknown, readonly unknown[]>) => {
-                const queryKey = query.queryKey;
-                if (Array.isArray(queryKey) && queryKey.length > 0 && typeof queryKey[0] === 'string') {
-                    return queryNames.some(queryName => queryKey[0].startsWith(queryName));
-                }
-                return false;
-            }
-        });
-    }
-
     useEffect(() => {
         if (!props.currentUserId) return;
         connect(props.currentUserId);
@@ -69,6 +57,18 @@ export default function useSocketIo(props: ChatSocketIntrf) {
             onUserChatJoin(props.marks);
         } else {
             onUserProfileJoin(props.marks);
+        }
+
+        function invalidations(queryNames: string[]) {
+            queryClient.invalidateQueries({
+                predicate: (query: Query<unknown, Error, unknown, readonly unknown[]>) => {
+                    const queryKey = query.queryKey;
+                    if (Array.isArray(queryKey) && queryKey.length > 0 && typeof queryKey[0] === 'string') {
+                        return queryNames.some(queryName => queryKey[0].startsWith(queryName));
+                    }
+                    return false;
+                }
+            });
         }
 
         if (props.identifier.includes("available-rooms")) {

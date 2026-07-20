@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import type { IAuthService } from "../models/user.model";
 import { useRoomStore } from "../stores/room.store";
 import { useChatStore } from "../stores/chat.store";
+import { useNavbarStore } from "../stores/navbar.store";
 
 export default function useAuthService(props?: IAuthService) {
     const navigate = useNavigate();
@@ -24,6 +25,7 @@ export default function useAuthService(props?: IAuthService) {
     const resetRoomState = useRoomStore((state) => state.resetRoomState);
     const resetChatState = useChatStore((state) => state.resetChatState);
     const resetUserState = useUserStore((state) => state.resetUserState);
+    const resetNavbarState = useNavbarStore((state) => state.resetNavbarState);
 
     const signInMt = useMutation({
         mutationFn: async () => {
@@ -80,6 +82,7 @@ export default function useAuthService(props?: IAuthService) {
             resetChatState();
             resetRoomState();
             resetUserState();
+            resetNavbarState();
             navigate("/sign-in");
         }
     });

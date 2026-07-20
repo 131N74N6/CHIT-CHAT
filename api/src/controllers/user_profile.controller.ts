@@ -156,22 +156,29 @@ export async function joinRoom(req: AuthRequest, res: Response) {
     }
 }
 
-export async function showReceiverProfile(req: Request, res: Response) {
+export async function showAllUsers(req: AuthRequest, res: Response) {
     try {
-        const receiverIdParams = req.params.receiver_id;
-        const receiverId = Array.isArray(receiverIdParams) ? receiverIdParams[0] : receiverIdParams;
+        const searched = req.query.searched as string | undefined;
+        const page = parseInt(req.query.page as string) || 1;
+        const limit = parseInt(req.query.limit as string) || 14;
+        const skip = (page - 1) * limit;
 
-        const receiver = await User.findOne({ _id: receiverId });
-        if (!receiver) return res.status(404).json({ message: "user not found" });
+        const userId = req.user?.user_id;
+        let users;
 
-        res.status(200).json({
-            address: receiver.address,
-            created_at: receiver.created_at,
-            gender: receiver.gender,
-            profile_picture: receiver.profile_picture,
-            user_id: receiver._id,
-            username: receiver.username
-        });
+        if (searched === undefined) {
+            users = await User.find({ _id: { $ne: userId } }).limit(limit).skip(skip).sort({ username: 1 });
+            
+            res.status(200).json(users);
+        } else {
+            users = await User
+            .find({ _id: { $ne: userId }, username: { $regex: new RegExp(searched, 'i') } })
+            .limit(limit)
+            .skip(skip)
+            .sort({ username: 1 });
+
+            res.status(200).json(users);
+        }
     } catch (error) {
         res.status(500).json({ message: "something went wrong" });
     }
@@ -189,6 +196,27 @@ export async function showCurrentUser(req: AuthRequest, res: Response) {
             profile_picture: user.profile_picture,
             user_id: user._id,
             username: user.username
+        });
+    } catch (error) {
+        res.status(500).json({ message: "something went wrong" });
+    }
+}
+
+export async function showReceiverProfile(req: Request, res: Response) {
+    try {
+        const receiverIdParams = req.params.receiver_id;
+        const receiverId = Array.isArray(receiverIdParams) ? receiverIdParams[0] : receiverIdParams;
+
+        const receiver = await User.findOne({ _id: receiverId });
+        if (!receiver) return res.status(404).json({ message: "user not found" });
+
+        res.status(200).json({
+            address: receiver.address,
+            created_at: receiver.created_at,
+            gender: receiver.gender,
+            profile_picture: receiver.profile_picture,
+            user_id: receiver._id,
+            username: receiver.username
         });
     } catch (error) {
         res.status(500).json({ message: "something went wrong" });

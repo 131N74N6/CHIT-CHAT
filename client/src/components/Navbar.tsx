@@ -135,7 +135,10 @@ export default function Navbar(props?: INavbar) {
                         "font-medium text-left bg-white hover:bg-blue-200 transition-colors"
                     )}
                     disabled={props?.isProcessing}
-                    onClick={() => navigate("/home")}
+                    onClick={() => {
+                        navigate("/home");
+                        navbarToggle();
+                    }}
                     type="button"
                 >
                     <Home size={23}/>
@@ -147,7 +150,10 @@ export default function Navbar(props?: INavbar) {
                         "font-medium text-left bg-white hover:bg-blue-200 transition-colors"
                     )}
                     disabled={props?.isProcessing}
-                    onClick={() => navigate("/rooms")}
+                    onClick={() => {
+                        navigate("/rooms");
+                        navbarToggle();
+                    }}
                     type="button"
                 >
                     <Group size={23}/>
@@ -159,7 +165,10 @@ export default function Navbar(props?: INavbar) {
                         "font-medium text-left bg-white hover:bg-blue-200 transition-colors"
                     )}
                     disabled={props?.isProcessing}
-                    onClick={() => navigate("/rooms/create")}
+                    onClick={() => {
+                        navigate("/rooms/create");
+                        navbarToggle();
+                    }}
                     type="button"
                 >
                     <PlusCircle size={23}/>
@@ -171,7 +180,10 @@ export default function Navbar(props?: INavbar) {
                         "font-medium text-left bg-white hover:bg-blue-200 transition-colors"
                     )}
                     disabled={props?.isProcessing}
-                    onClick={() => navigate("/rooms/join")}
+                    onClick={() => {
+                        navigate("/rooms/join");
+                        navbarToggle();
+                    }}
                     type="button"
                 >
                     <Handshake size={23}/>
@@ -183,7 +195,10 @@ export default function Navbar(props?: INavbar) {
                         "font-medium text-left bg-white hover:bg-blue-200 transition-colors"
                     )}
                     disabled={props?.isProcessing}
-                    onClick={() => navigate("/chatbot")}
+                    onClick={() => {
+                        navigate("/chatbot");
+                        navbarToggle();
+                    }}
                     type="button"
                 >
                     <Bot size={23}/>
@@ -195,7 +210,10 @@ export default function Navbar(props?: INavbar) {
                         "font-medium text-left bg-white hover:bg-blue-200 transition-colors"
                     )}
                     disabled={props?.isProcessing}
-                    onClick={() => navigate("/profile")}
+                    onClick={() => {
+                        navigate("/profile");
+                        navbarToggle();
+                    }}
                     type="button"
                 >
                     <UserCircle2 size={23}/>

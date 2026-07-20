@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useRoomStore } from "../stores/room.store";
 import { useChatStore } from "../stores/chat.store";
 import { useUserStore } from "../stores/user.store";
+import { useNavbarStore } from "../stores/navbar.store";
 
 export default function useUserService(props?: IUserService) {
     const navigate = useNavigate();
@@ -12,6 +13,7 @@ export default function useUserService(props?: IUserService) {
     const resetRoomState = useRoomStore((state) => state.resetRoomState);
     const resetChatState = useChatStore((state) => state.resetChatState);
     const resetUserState = useUserStore((state) => state.resetUserState);
+    const resetNavbarState = useNavbarStore((state) => state.resetNavbarState);
 
     const { data: user, error: userError, isLoading: isUserLoading } = useQuery<IUserProfile>({
         queryFn: async () => {
@@ -140,6 +142,7 @@ export default function useUserService(props?: IUserService) {
             resetChatState();
             resetRoomState();
             resetUserState();
+            resetNavbarState();
             navigate("/sign-in");
         }
     });

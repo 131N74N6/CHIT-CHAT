@@ -44,11 +44,17 @@ export default function Home() {
         sendChatToUserMt,
         userChats 
     } = useUserChatService({ setMessage: setMessage, receiverId: receiverId });
-        
+    
     useSocketIo({
         currentUserId: currentUser.user ? currentUser.user.user_id : '',
-        identifier: ["available-user", "user-chat", "user-profile"],
+        identifier: ["user-chat", "user-profile"],
         marks: receiverId
+    });
+
+    useSocketIo({
+        currentUserId: currentUser.user ? currentUser.user.user_id : '',
+        identifier: ["available-user"],
+        marks: currentUser.user ? currentUser.user.user_id : ''
     });
 
     useEffect(() => {
