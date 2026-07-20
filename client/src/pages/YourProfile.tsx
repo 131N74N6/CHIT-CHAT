@@ -7,6 +7,7 @@ import Navbar from "../components/Navbar";
 import { MessageCircle, Pen } from "lucide-react";
 import Alert from "../components/Alert";
 import cn from "../utils/cn";
+import useSocketIo from "../hooks/useSocketIo";
 
 export default function YourProfile() {
     const navigate = useNavigate();
@@ -14,6 +15,11 @@ export default function YourProfile() {
     const message = useMessageStore((state) => state.message);
     const setMessage = useMessageStore((state) => state.setMessage);
     
+
+    const { currentUser, isUserProcessing } = useUserServices({ setMessage: setMessage });
+
+    const { isUserLoading, user, userError } = currentUser;
+
     useEffect(() => {
         if (message) {
             const timer = setTimeout(() => {
@@ -23,9 +29,11 @@ export default function YourProfile() {
         }
     }, [message, setMessage]);
 
-    const { currentUser, isUserProcessing } = useUserServices({ setMessage: setMessage });
-
-    const { isUserLoading, user, userError } = currentUser;
+    useSocketIo({
+        currentUserId: user ? user.user_id : '',
+        identifier: ["user-profile"],
+        marks: user ? user.user_id : ''
+    });
 
     return (
         <section className="flex md:flex-row gap-2.5 p-2.5 flex-col relative h-screen z-10">

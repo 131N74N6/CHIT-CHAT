@@ -7,6 +7,8 @@ import Loading from "../components/Loading";
 import cn from "../utils/cn";
 import Navbar from "../components/Navbar";
 import { ArrowBigLeft, MessageCircle } from "lucide-react";
+import useSocketIo from "../hooks/useSocketIo";
+import useUserService from "../services/useUserService";
 
 export default function UserProfile() {
     const { receiver_id } = useParams();
@@ -14,6 +16,11 @@ export default function UserProfile() {
 
     const message = useMessageStore((state) => state.message);
     const setMessage = useMessageStore((state) => state.setMessage);
+
+    const { currentUser } = useUserService({ setMessage: setMessage });
+    const { currentUserProfile } = useUserProfileService({ receiverId: receiver_id });
+
+    const { detail, detailError, isDetailLoading } = currentUserProfile;
     
     useEffect(() => {
         if (message) {
@@ -24,9 +31,11 @@ export default function UserProfile() {
         }
     }, [message, setMessage]);
 
-    const { currentUserProfile } = useUserProfileService({ receiverId: receiver_id });
-
-    const { detail, detailError, isDetailLoading } = currentUserProfile;
+    useSocketIo({
+        currentUserId: currentUser.user ? currentUser.user.user_id : '',
+        identifier: ["user-profile"],
+        marks: receiver_id ? receiver_id : ''
+    });
 
     return (
         <section className="flex md:flex-row gap-2.5 p-2.5 flex-col relative h-screen z-10">

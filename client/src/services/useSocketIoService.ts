@@ -33,14 +33,6 @@ export default function useSocketIoServices() {
         socket?.emit("join:available-user", userId);
     }
 
-    function onUserChatJoin(receiverId: string) {
-        socket?.emit("join:user-chat", receiverId);
-    }
-
-    function onUserProfileJoin(receiverId: string) {
-        socket?.emit("join:user-profile", receiverId);
-    }
-
     function onRoomChatJoin(roomId: string) {
         socket?.emit("join:room-chat", roomId);
     }
@@ -51,6 +43,14 @@ export default function useSocketIoServices() {
 
     function onRoomProfileJoin(roomId: string) {
         socket?.emit("join:room-profile", roomId);
+    }
+
+    function onUserChatJoin(userId: string) {
+        socket?.emit("join:user-chat", userId);
+    }
+
+    function onUserProfileJoin(userId: string) {
+        socket?.emit("join:user-profile", userId);
     }
 
     function onChangeRoom(callback: (data: any) => void) {

@@ -66,7 +66,7 @@ export default function ChangeRoom() {
     useSocketIo({
         currentUserId: currentUser.user?.user_id!,
         identifier: ["room-profile"],
-        marks: { roomId: room_id }
+        marks: room_id ? room_id : ''
     });
 
     return (
