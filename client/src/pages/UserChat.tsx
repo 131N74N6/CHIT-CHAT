@@ -2,7 +2,7 @@ import ChatList from "../components/ChatList";
 import useUserChatService from "../services/useUserChatService";
 import cn from "../utils/cn";
 import Loading from "../components/Loading";
-import useUserServices from "../services/useUserService";
+import useUserServices from "../services/useUserProfileService";
 import { File, SendIcon } from "lucide-react";
 import { useMessageStore } from "../stores/message.store";
 import { useNavigate, useParams } from "react-router-dom";

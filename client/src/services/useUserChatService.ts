@@ -3,7 +3,7 @@ import type { ChatIntrf, IFileViewer, IUserChatService } from "../models/chat.mo
 import { useRef } from "react";
 import { useChatStore } from "../stores/chat.store";
 
-export default function useUserChatService(props: IUserChatService) {
+export default function useUserChatService(props?: IUserChatService) {
     const baseUrl = `${import.meta.env.VITE_BASE_API_URL}/users/chats`;
     const queryClient = useQueryClient();
 
@@ -15,33 +15,11 @@ export default function useUserChatService(props: IUserChatService) {
 
     const text = useChatStore((state) => state.text);
     const setText = useChatStore((state) => state.setText);
-    
-    const clearChatForMeMt = useMutation({
-        mutationFn: async (_id: string) => {
-            try {
-                const request = await fetch(`${baseUrl}/clear/${_id}`, {
-                    credentials: "include",
-                    headers: { 'Content-Type': 'application/json' },
-                    method: "PUT"
-                });
 
-                const response = await request.json();
-                if (!request.ok) throw new Error(response.message);
-                return response;
-            } catch (error) {
-                throw error;
-            }
-        },
-        onError: (error) => {
-            props?.setMessage!(error.message);
-        },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: [`user-chat-${props?.receiverId}`] });
-            resetChats();
-        }
-    });
+    const userChatsIdsToDelete = useChatStore((state) => state.userChatsIdsToDelete);
+    const setUserChatsIdsToDelete = useChatStore((state) => state.setUserChatsIdsToDelete);
 
-    const clearChatsForMeMt = useMutation({
+    const clearAllUserChatsForMeMt = useMutation({
         mutationFn: async () => {
             try {
                 const request = await fetch(`${baseUrl}/clears/${props?.receiverId}`, {
@@ -65,8 +43,34 @@ export default function useUserChatService(props: IUserChatService) {
             resetChats();
         }
     });
+    
+    const clearChosenUserChatForMeMt = useMutation({
+        mutationFn: async () => {
+            try {
+                const request = await fetch(`${baseUrl}/clear/${props?.receiverId}`, {
+                    body: JSON.stringify({ chatsIds: userChatsIdsToDelete }),
+                    credentials: "include",
+                    headers: { 'Content-Type': 'application/json' },
+                    method: "PUT"
+                });
 
-    const deleteAllChatsForUsererMt = useMutation({
+                const response = await request.json();
+                if (!request.ok) throw new Error(response.message);
+                return response;
+            } catch (error) {
+                throw error;
+            }
+        },
+        onError: (error) => {
+            props?.setMessage!(error.message);
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: [`user-chat-${props?.receiverId}`] });
+            resetChats();
+        }
+    });
+
+    const deleteAllUserChatsMt = useMutation({
         mutationFn: async () => {
             try {
                 const request = await fetch(`${baseUrl}/rm-all`, {
@@ -91,10 +95,11 @@ export default function useUserChatService(props: IUserChatService) {
         }
     });
 
-    const deleteChatForUserMt = useMutation({
-        mutationFn: async (_id: string) => {
+    const deleteChosenUsersChatMt = useMutation({
+        mutationFn: async () => {
             try {
-                const request = await fetch(`${baseUrl}/rm/${_id}`, {
+                const request = await fetch(`${baseUrl}/rm/${props?.receiverId}`, {
+                    body: JSON.stringify({ chatsIds: userChatsIdsToDelete }),
                     credentials: "include",
                     headers: { 'Content-Type': 'application/json' },
                     method: "DELETE"
@@ -163,7 +168,17 @@ export default function useUserChatService(props: IUserChatService) {
         setMedia(prev => [...prev, ...tempt]);
         if (inputMediaRef.current) inputMediaRef.current.value = "";
     }
+
+    const resetSelectedChatToDelete = () => {
+        setUserChatsIdsToDelete([]);
+    }
     
+    const selectedChatToDelete = (id: string) => {
+        const temp: string[] = [];
+        temp.push(id);
+        setUserChatsIdsToDelete(prev => [...prev, ...temp]);
+    }
+
     const sendChatToUserMt = useMutation({
         mutationFn: async () => {
             try {
@@ -202,18 +217,20 @@ export default function useUserChatService(props: IUserChatService) {
     const getUserChats: ChatIntrf[] = data ? data.pages.flat() : [];
     const userChats = { error, fetchNextPage, getUserChats, isFetchingNextPage, isLoading, hasNextPage }
 
-    const isUserChatProcessing = clearChatForMeMt.isPending || clearChatsForMeMt.isPending || 
-    deleteAllChatsForUsererMt.isPending || deleteChatForUserMt.isPending || sendChatToUserMt.isPending;
+    const isUserChatProcessing = clearChosenUserChatForMeMt.isPending || clearAllUserChatsForMeMt.isPending || 
+    deleteAllUserChatsMt.isPending || deleteChosenUsersChatMt.isPending || sendChatToUserMt.isPending;
 
     return { 
-        clearChatForMeMt,
-        clearChatsForMeMt,
-        deleteAllChatsForUsererMt,
-        deleteChatForUserMt,
+        clearChosenUserChatForMeMt,
+        clearAllUserChatsForMeMt,
+        deleteAllUserChatsMt,
+        deleteChosenUsersChatMt,
         handleImagePreview, 
         inputMediaRef, 
         isUserChatProcessing, 
         media, 
+        resetSelectedChatToDelete,
+        selectedChatToDelete,
         sendChatToUserMt, 
         setMedia, 
         setText, 

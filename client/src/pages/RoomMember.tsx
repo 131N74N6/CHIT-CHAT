@@ -5,7 +5,7 @@ import UserList from "../components/UserList";
 import useSocketIo from "../hooks/useSocketIo";
 import useRoomMemberService from "../services/useRoomMemberService";
 import cn from "../utils/cn";
-import UserServices from "../services/useUserService";
+import UserServices from "../services/useUserProfileService";
 
 export default function RoomMember() {
     const { room_id } = useParams();

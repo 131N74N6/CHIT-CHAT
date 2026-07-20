@@ -3,19 +3,23 @@ import { useRef } from 'react'
 import type { IRoomChatService } from '../models/room.model';
 import { useChatStore } from '../stores/chat.store';
 import type { ChatIntrf, IFileViewer } from '../models/chat.model';
+import { useRoomStore } from '../stores/room.store';
 
 export default function useRoomChatService(props?: IRoomChatService) {
     const queryClient = useQueryClient();
     const baseUrl = `${import.meta.env.VITE_BASE_API_URL}/rooms/chats`;
     
     const inputMediaRef = useRef<HTMLInputElement>(null);
-    const resetChats = useChatStore((state) => state.resetChats);
+    const resetRoomState = useRoomStore((state) => state.resetRoomState);
 
     const media = useChatStore((state) => state.media);
     const setMedia = useChatStore((state) => state.setMedia);
 
     const text = useChatStore((state) => state.text);
     const setText = useChatStore((state) => state.setText);
+    
+    const userChatsIdsToDelete = useRoomStore((state) => state.userChatsIdsToDelete);
+    const setUserChatsIdsToDelete = useRoomStore((state) => state.setUserChatsIdsToDelete);
 
     const { 
         data: paginatedRoomChats, 
@@ -61,32 +65,7 @@ export default function useRoomChatService(props?: IRoomChatService) {
         isRoomChatLoading
     }
 
-    const clearChatInRoomForMeMt = useMutation({
-        mutationFn: async (_id: string) => {
-            try {
-                const request = await fetch(`${baseUrl}/clear/${_id}/${props?.roomId}`, {
-                    credentials: "include",
-                    headers: { 'Content-Type': 'application/json' },
-                    method: "PUT"
-                });
-
-                const response = await request.json();
-                if (!request.ok) throw new Error(response.message)
-                return response;
-            } catch (error) {
-                throw error;
-            }
-        },
-        onError: (error) => {
-            props?.setMessage!(error.message);
-        },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: [`room-chat-${props?.roomId}`] });
-            resetChats();
-        }
-    });
-
-    const clearChatsInRoomForMeMt = useMutation({
+    const clearAllRoomChatsForMeMt = useMutation({
         mutationFn: async (_id: string) => {
             try {
                 const request = await fetch(`${baseUrl}/clears/${props?.roomId}`, {
@@ -107,14 +86,40 @@ export default function useRoomChatService(props?: IRoomChatService) {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: [`room-chat-${props?.roomId}`] });
-            resetChats();
+            resetRoomState();
         }
     });
 
-    const deleteAllChatsForRoomMt = useMutation({
+    const clearChosenRoomChatsForMeMt = useMutation({
         mutationFn: async () => {
             try {
-                const request = await fetch(`${baseUrl}/rooms/rm-all/${props?.roomId}`, {
+                const request = await fetch(`${baseUrl}/clear/${props?.roomId}`, {
+                    body: JSON.stringify({ chatsIds: userChatsIdsToDelete }),
+                    credentials: "include",
+                    headers: { 'Content-Type': 'application/json' },
+                    method: "PUT"
+                });
+
+                const response = await request.json();
+                if (!request.ok) throw new Error(response.message)
+                return response;
+            } catch (error) {
+                throw error;
+            }
+        },
+        onError: (error) => {
+            props?.setMessage!(error.message);
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: [`room-chat-${props?.roomId}`] });
+            resetRoomState();
+        }
+    });
+
+    const deleteAllChatsInRoomMt = useMutation({
+        mutationFn: async () => {
+            try {
+                const request = await fetch(`${baseUrl}/rm-all/${props?.roomId}`, {
                     credentials: "include",
                     headers: { 'Content-Type': 'application/json' },
                     method: "DELETE"
@@ -135,10 +140,11 @@ export default function useRoomChatService(props?: IRoomChatService) {
         }
     });
 
-    const deleteChaForRoomMt = useMutation({
-        mutationFn: async (_id: string) => {
+    const deleteChosenChatsInRoomMt = useMutation({
+        mutationFn: async () => {
             try {
-                const request = await fetch(`${baseUrl}/rooms/rm/${_id}/${props?.roomId}`, {
+                const request = await fetch(`${baseUrl}/rm/${props?.roomId}`, {
+                    body: JSON.stringify({ chatsIds: userChatsIdsToDelete }),
                     credentials: "include",
                     headers: { 'Content-Type': 'application/json' },
                     method: "DELETE"
@@ -156,7 +162,7 @@ export default function useRoomChatService(props?: IRoomChatService) {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: [`room-chat-${props?.roomId}`] });
-            resetChats();
+            resetRoomState();
         }
     });
 
@@ -179,6 +185,16 @@ export default function useRoomChatService(props?: IRoomChatService) {
         
         if (inputMediaRef.current) inputMediaRef.current.value = "";
     }
+
+    const resetSelectedChat = () => {
+        setUserChatsIdsToDelete([]);
+    }
+
+    const selectedChatToDelete = (id: string) => {
+        const temp: string[] = [];
+        temp.push(id);
+        setUserChatsIdsToDelete((prev) => [...prev, ...temp]);
+    }
     
     const sendChatToRoomMt = useMutation({
         mutationFn: async () => {
@@ -193,7 +209,7 @@ export default function useRoomChatService(props?: IRoomChatService) {
                     }
                 }
 
-                const request = await fetch(`${baseUrl}/rooms/send`, {
+                const request = await fetch(`${baseUrl}/send`, {
                     body: formData,
                     credentials: "include",
                     method: "POST"
@@ -211,24 +227,26 @@ export default function useRoomChatService(props?: IRoomChatService) {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: [`room-chat-${props?.roomId}`] });
-            resetChats();
+            resetRoomState();
         }
     });
 
-    const isRoomChatProcessing = clearChatInRoomForMeMt.isPending || clearChatsInRoomForMeMt.isPending ||
-    deleteAllChatsForRoomMt.isPending || deleteChaForRoomMt.isPending || allChatsInRoom.isRoomChatLoading || 
+    const isRoomChatProcessing = clearAllRoomChatsForMeMt.isPending || clearChosenRoomChatsForMeMt.isPending ||
+    deleteAllChatsInRoomMt.isPending || deleteChosenChatsInRoomMt.isPending || allChatsInRoom.isRoomChatLoading || 
     sendChatToRoomMt.isPending;
 
     return { 
         allChatsInRoom, 
-        clearChatInRoomForMeMt, 
-        clearChatsInRoomForMeMt, 
-        deleteAllChatsForRoomMt,
-        deleteChaForRoomMt,
+        clearAllRoomChatsForMeMt, 
+        clearChosenRoomChatsForMeMt, 
+        deleteAllChatsInRoomMt,
+        deleteChosenChatsInRoomMt,
         handleImagePreview,
         inputMediaRef,
         isRoomChatProcessing,
         media,
+        resetSelectedChat,
+        selectedChatToDelete,
         sendChatToRoomMt,
         setMedia,
         setText,

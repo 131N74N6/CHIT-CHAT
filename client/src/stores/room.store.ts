@@ -29,6 +29,8 @@ export interface RoomState {
     roomId: string;
     setRoomId: (roomId: string) => void;
     
+    resetRoomState: () => void;
+
     roomName: string;
     setRoomName: (roomName: string) => void;
     
@@ -44,7 +46,8 @@ export interface RoomState {
     showProfile: boolean;
     setShowProfile: (showProfile: boolean) => void;
     
-    resetRoomState: () => void;
+    userChatsIdsToDelete: string[];
+    setUserChatsIdsToDelete: (userChatsIdsToDelete: string[] | ((prev: string[]) => string[])) => void;
 }
 
 export const useRoomStore = create<RoomState>((set) => ({
@@ -57,6 +60,16 @@ export const useRoomStore = create<RoomState>((set) => ({
     oldRoomPicture: null,
     setOldRoomPicture: (oldRoomPicture) => set({ oldRoomPicture }),
     
+    resetRoomState: () => set({
+        deleteRoomImage: null,
+        description: "",
+        oldRoomPicture: null,
+        roomName: "",
+        selectedProfileRoom: null,
+        selectedProfileRoomUrl: null,
+        userChatsIdsToDelete: []
+    }),
+
     roomId: "",
     setRoomId: (roomId) => set({ roomId }),
 
@@ -75,12 +88,9 @@ export const useRoomStore = create<RoomState>((set) => ({
     showProfile: false,
     setShowProfile: (showProfile) => set({ showProfile }),
 
-    resetRoomState: () => set({
-        deleteRoomImage: null,
-        description: "",
-        oldRoomPicture: null,
-        roomName: "",
-        selectedProfileRoom: null,
-        selectedProfileRoomUrl: null,
-    }),
+    userChatsIdsToDelete: [],
+    setUserChatsIdsToDelete: (userChatsIdsToDelete) => set((state) => ({
+        userChatsIdsToDelete: typeof userChatsIdsToDelete === 'function' ?
+        userChatsIdsToDelete(state.userChatsIdsToDelete) : userChatsIdsToDelete
+    })),
 }));

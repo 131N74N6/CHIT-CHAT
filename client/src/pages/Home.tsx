@@ -2,7 +2,7 @@ import Loading from "../components/Loading";
 import Navbar from "../components/Navbar";
 import useUserChatService from "../services/useUserChatService";
 import UserList from "../components/UserList";
-import useUserServices from "../services/useUserService";
+import useUserServices from "../services/useUserProfileService";
 import UserWindow from "../components/UserWindow";
 import { MessageCircle } from "lucide-react";
 import { useEffect } from "react";

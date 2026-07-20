@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useMessageStore } from "../stores/message.store";
 import useAuthServices from "../services/useAuthService";
 import { Link, useNavigate } from "react-router-dom";
-import useUserService from "../services/useUserService";
+import useUserService from "../services/useUserProfileService";
 import cn from "../utils/cn";
 import { MessageCircle } from "lucide-react";
 

@@ -1,7 +1,7 @@
 import type { FetchNextPageOptions, InfiniteData, InfiniteQueryObserverResult, UseMutationResult } from "@tanstack/react-query";
 import type { NavigateFunction } from "react-router-dom";
 
-export interface IChatBotResultService {
+export interface IChatBotService {
     _id?: string;
     currentUserId?: string;
     setMessage?: (message:  string | null) => void;

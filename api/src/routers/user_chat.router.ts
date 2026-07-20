@@ -1,10 +1,10 @@
 import { Router } from "express";
 import { verifyToken } from "../middlewares/auth.middleware";
 import { 
-    clearUserChatForMe, 
-    clearUserChatsForMe, 
+    clearAllUserChatsForMe, 
+    clearChosenUserChatsForMe, 
     deleteAllUserChats, 
-    deleteUserChat, 
+    deleteChosenUsersChat, 
     sendToOtherUser, 
     showAllChats,
 } from "../controllers/user_chat.controller";
@@ -12,13 +12,13 @@ import { uploadMedia } from "../middlewares/upload.middleware";
 
 const userChatsRouters = Router();
 
-userChatsRouters.delete("/clear/:receiver_id", verifyToken, clearUserChatForMe);
+userChatsRouters.delete("/clear/:receiver_id", verifyToken, clearChosenUserChatsForMe);
 
-userChatsRouters.delete("/clears/:receiver_id", verifyToken, clearUserChatsForMe);
+userChatsRouters.delete("/clears/:receiver_id", verifyToken, clearAllUserChatsForMe);
 
 userChatsRouters.delete("/rm-all", verifyToken, deleteAllUserChats);
 
-userChatsRouters.delete("/rm/:_id", verifyToken, deleteUserChat);
+userChatsRouters.delete("/rm/:receiver_id", verifyToken, deleteChosenUsersChat);
 
 userChatsRouters.get("/show-all/:receiver_id", verifyToken, showAllChats);
 

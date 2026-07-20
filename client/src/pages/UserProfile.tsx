@@ -8,7 +8,7 @@ import cn from "../utils/cn";
 import Navbar from "../components/Navbar";
 import { ArrowBigLeft, MessageCircle, Trash } from "lucide-react";
 import useSocketIo from "../hooks/useSocketIo";
-import useUserService from "../services/useUserService";
+import useUserService from "../services/useUserProfileService";
 import useUserChatService from "../services/useUserChatService";
 
 export default function UserProfile() {

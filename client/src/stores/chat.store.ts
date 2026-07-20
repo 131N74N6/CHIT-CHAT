@@ -19,6 +19,9 @@ export interface ChatState {
 
     text: string;
     setText: (text: string) => void;
+
+    userChatsIdsToDelete: string[];
+    setUserChatsIdsToDelete: (userChatsIdsToDelete: string[] | ((prev: string[]) => string[])) => void;
 }
 
 export const useChatStore = create<ChatState>((set) => ({
@@ -32,7 +35,8 @@ export const useChatStore = create<ChatState>((set) => ({
 
     resetChats: () => set({ 
         media: [], 
-        text: "" 
+        text: "",
+        userChatsIdsToDelete: [] 
     }),
 
     resetChatState: () => set({
@@ -40,6 +44,7 @@ export const useChatStore = create<ChatState>((set) => ({
         receiverId: "",
         showUserProfile: false,
         text: "", 
+        userChatsIdsToDelete: []
     }),
 
     showUserMedia: false,
@@ -50,4 +55,10 @@ export const useChatStore = create<ChatState>((set) => ({
 
     text: "",
     setText: (text) => set({ text }),
+
+    userChatsIdsToDelete: [],
+    setUserChatsIdsToDelete: (userChatsIdsToDelete) => set((state) => ({
+        userChatsIdsToDelete: typeof userChatsIdsToDelete === 'function' ? 
+        userChatsIdsToDelete(state.userChatsIdsToDelete) : userChatsIdsToDelete
+    })),
 }));

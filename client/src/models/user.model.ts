@@ -11,7 +11,8 @@ export interface IUserProfileService {
     receiverId?: string;
 }
 
-export interface IUserService extends IAuthService {
+export interface IUserProfileService extends IAuthService {
+    receiverId?: string;
     roomId?: string;
 }
 

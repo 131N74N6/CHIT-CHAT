@@ -7,7 +7,7 @@ import Navbar from "../components/Navbar";
 import cn from "../utils/cn";
 import { ArrowBigLeft, MessageCircle, X } from "lucide-react";
 import useChangeUserService from "../services/useChangeUserService";
-import useUserServices from "../services/useUserService";
+import useUserServices from "../services/useUserProfileService";
 import useSocketIo from "../hooks/useSocketIo";
 
 export default function ChangeUser() {

@@ -1,10 +1,10 @@
 import { MessageCircle } from "lucide-react";
-import useChatbotQuestionService from "../services/useChatbotQuestionService";
+import useChatbotService from "../services/useChatbotService";
 import cn from "../utils/cn";
 import Navbar from "../components/Navbar";
 
 export default function Chatbot() {
-    const { answer, askAiMt, setQuestion, question } = useChatbotQuestionService();
+    const { answer, askAiMt, setQuestion, question } = useChatbotService();
 
     return (
         <section className="flex md:flex-row flex-col h-screen relative z-10 p-2.5 gap-2.5">

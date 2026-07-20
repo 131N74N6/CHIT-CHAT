@@ -2,7 +2,7 @@ import Alert from "../components/Alert";
 import useChangeRoomService from "../services/useChangeRoomService";
 import cn from "../utils/cn";
 import Navbar from "../components/Navbar";
-import useUserServices from "../services/useUserService";
+import useUserServices from "../services/useUserProfileService";
 import { Camera, X } from "lucide-react";
 import { useEffect } from "react";
 import { useMessageStore } from "../stores/message.store";

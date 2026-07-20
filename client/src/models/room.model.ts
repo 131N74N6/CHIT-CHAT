@@ -29,9 +29,12 @@ export interface IRoomChatService {
 
 export interface IRoomMemberService {
     roomId?: string;
+    setMessage?: (message: string) => void;
 }
 
 export interface IRoomProfileService {
+    currentUserId?: string;
+    setMessage?: (message: string) => void;
     roomId?: string;
 }
 

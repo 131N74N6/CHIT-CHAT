@@ -1,4 +1,3 @@
-import useAvailableRoomService from "../services/useAvailableRoomService";
 import Loading from "../components/Loading";
 import Navbar from "../components/Navbar";
 import useRoomChatService from "../services/useRoomChatService";
@@ -6,7 +5,7 @@ import RoomList from "../components/RoomList";
 import useRoomMemberService from "../services/useRoomMemberService";
 import useRoomProfileService from "../services/useRoomProfileService";
 import RoomWindow from "../components/RoomWindow";
-import useUserServices from "../services/useUserService";
+import useUserServices from "../services/useUserProfileService";
 import { MessageCircle } from "lucide-react";
 import { useRoomStore } from "../stores/room.store";
 import useSocketIo from "../hooks/useSocketIo";
@@ -22,12 +21,8 @@ export default function AvailableRoom() {
     const showProfile = useRoomStore((state) => state.showProfile);
     const setShowProfile = useRoomStore((state) => state.setShowProfile);
 
-    const { 
-        currentUser, 
-        deleteRoomMt,
-        isUserProcessing,
-        leftRoomMt
-    } = useUserServices();
+    const { currentUser, isUserProcessing } = useUserServices();
+    const { currentAvailableRooms } = useRoomProfileService({ currentUserId: currentUser.user?.user_id });
 
     useSocketIo({
         identifier: ["available-room", "room-chat", "room-profile", "room-member"],
@@ -35,7 +30,6 @@ export default function AvailableRoom() {
         marks: roomId
     });
 
-    const { currentAvailableRooms } = useAvailableRoomService({ currentUserId: currentUser.user?.user_id });
 
     const { currentRoomMember } = useRoomMemberService({ roomId: roomId });
 
@@ -43,7 +37,7 @@ export default function AvailableRoom() {
 
     const { 
         allChatsInRoom, 
-        clearChatInRoomForMeMt, 
+        clearChosenRoomChatsForMeMt, 
         deleteChaForRoomMt, 
         deleteChatPermanentlyForRoomMt, 
         isRoomChatProcessing, 
@@ -95,7 +89,7 @@ export default function AvailableRoom() {
                     }
                     isRoomMemberFetchNextPage={currentRoomMember.isRoomMemberFetchNextPage}
                     leftRoomMt={leftRoomMt}
-                    onClearOne={clearChatInRoomForMeMt}
+                    onClearOne={clearChosenRoomChatsForMeMt}
                     onDeleteOne={deleteChaForRoomMt}
                     onDeleteOnePermanent={deleteChatPermanentlyForRoomMt}
                     roomChats={allChatsInRoom.roomChats}

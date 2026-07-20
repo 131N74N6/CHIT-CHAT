@@ -7,8 +7,9 @@ import Loading from "../components/Loading";
 import { ArrowBigLeft } from "lucide-react";
 import Navbar from "../components/Navbar";
 import cn from "../utils/cn";
-import useUserServices from "../services/useUserService";
+import useUserServices from "../services/useUserProfileService";
 import useSocketIo from "../hooks/useSocketIo";
+import useRoomMemberService from "../services/useRoomMemberService";
 
 export default function RoomProfile() {
     const { room_id } = useParams();
@@ -16,6 +17,14 @@ export default function RoomProfile() {
 
     const message = useMessageStore((state) => state.message);
     const setMessage = useMessageStore((state) => state.setMessage);
+    
+    const { currentUser, isUserProcessing } = useUserServices({ setMessage: setMessage });
+    const { user } = currentUser;
+
+    const { currentRoomProfile,deleteRoomMt } = useRoomProfileService({ roomId: room_id });
+    const { detail, errorDetail, isDetailLoading } = currentRoomProfile;
+
+    const { leftRoomMt } = useRoomMemberService({ setMessage: setMessage, roomId: room_id });
 
     useEffect(() => {
         if (message) {
@@ -26,28 +35,12 @@ export default function RoomProfile() {
         }
     }, [message, setMessage]);
 
-    const { 
-        currentUser, 
-        deleteRoomMt, 
-        isUserProcessing, 
-        leftRoomMt 
-    } = useUserServices({ setMessage: setMessage });
 
     useSocketIo({
         currentUserId: currentUser.user?.user_id!,
         identifier: ["room-profile"],
         marks: room_id!
     });
-
-    const { user } = currentUser;
-
-    const { currentRoomProfile } = useRoomProfileService({ roomId: room_id });
-
-    const { 
-        detail, 
-        errorDetail, 
-        isDetailLoading 
-    } = currentRoomProfile;
 
     const isRoomOwner = user && detail && user.user_id === detail.creator_id;
 

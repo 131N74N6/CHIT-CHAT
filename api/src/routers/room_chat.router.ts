@@ -1,10 +1,10 @@
 import { Router } from "express";
 import { verifyToken } from "../middlewares/auth.middleware";
 import { 
-    clearRoomChatForMe, 
-    clearRoomChatsForMe, 
+    clearAllRoomChatsForMe, 
+    clearChosenRoomChatsForMe, 
     deleteAllChatsInRoom, 
-    deleteChatInRoom, 
+    deleteChosenChatsInRoom, 
     sendToOtherRoom, 
     showwAllChatsForRoom
 } from "../controllers/room_chat.controller";
@@ -12,13 +12,13 @@ import { uploadMedia } from "../middlewares/upload.middleware";
 
 const roomChatsRouters = Router();
 
-roomChatsRouters.delete("/clear/:_id/:room_id", verifyToken, clearRoomChatForMe);
+roomChatsRouters.delete("/clear/:room_id", verifyToken, clearChosenRoomChatsForMe);
 
-roomChatsRouters.delete("/clears/:room_id", verifyToken, clearRoomChatsForMe)
+roomChatsRouters.delete("/clears/:room_id", verifyToken, clearAllRoomChatsForMe)
 
 roomChatsRouters.delete("/rm-all/:room_id", verifyToken, deleteAllChatsInRoom);
 
-roomChatsRouters.delete("/rm/:_id/:room_id", verifyToken, deleteChatInRoom);
+roomChatsRouters.delete("/rm/:room_id", verifyToken, deleteChosenChatsInRoom);
 
 roomChatsRouters.get("/show-all/:room_id", verifyToken, showwAllChatsForRoom);
 

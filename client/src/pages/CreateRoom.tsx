@@ -1,11 +1,11 @@
 import { Camera, MessageCircle, X } from "lucide-react";
 import Navbar from "../components/Navbar";
-import useUserServices from "../services/useUserService";
+import useUserServices from "../services/useUserProfileService";
 import cn from "../utils/cn";
 import { useMessageStore } from "../stores/message.store";
 import { useEffect } from "react";
 import Alert from "../components/Alert";
-import useCreateRoomService from "../services/useCreateRoomService";
+import useRoomProfileService from "../services/useRoomProfileService";
 
 export default function CreateRoom() {
     const message = useMessageStore((state) => state.message);
@@ -26,7 +26,7 @@ export default function CreateRoom() {
         description,
         fileInputRef, 
         handleImagePreview,
-        isMakeRoomProcessing, 
+        isRoomProfileProcessing, 
         makeRoomMt, 
         roomName,
         selectedProfileRoom, 
@@ -35,7 +35,7 @@ export default function CreateRoom() {
         setRoomName, 
         setSelectedProfileRoom, 
         setSelectedProfileRoomUrl 
-    } = useCreateRoomService({ 
+    } = useRoomProfileService({ 
         currentUserId: currentUser.user?.user_id,
         setMessage: setMessage 
     });
@@ -75,7 +75,7 @@ export default function CreateRoom() {
                                         "disabled:cursor-not-allowed group-hover:opacity-100 duration-300 transition-opacity",
                                         "flex justify-center items-center p-1.5 absolute top-1 left-[46%]"
                                     )}
-                                    disabled={isUserProcessing || isMakeRoomProcessing}
+                                    disabled={isUserProcessing || isRoomProfileProcessing}
                                     onClick={(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
                                         event.stopPropagation();
                                         if (selectedProfileRoomUrl) URL.revokeObjectURL(selectedProfileRoomUrl);
@@ -130,7 +130,7 @@ export default function CreateRoom() {
                         "bg-blue-600 text-white font-medium cursor-pointer p-1.5 text-[1rem]",
                         "hover:bg-blue-800 transition-colors disabled:cursor-not-allowed"
                     )}
-                    disabled={isUserProcessing || isMakeRoomProcessing}
+                    disabled={isUserProcessing || isRoomProfileProcessing}
                     type="submit"
                 >
                     Create room

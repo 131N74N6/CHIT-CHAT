@@ -1,9 +1,51 @@
-import type { IChatbot, IChatBotResultService } from "../models/chatbot.model";
+import type { IChatbot, IChatBotService } from "../models/chatbot.model";
 import { Query, useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useChatbotStore } from "../stores/chatbot.store";
 
-export default function useChatbotResultService(props?: IChatBotResultService) {
+export default function useChatbotService(props?: IChatBotService) {
     const queryClient = useQueryClient();
     const baseUrl = `${import.meta.env.VITE_BASE_API_URL}/chatbots`;
+    
+    const answer = useChatbotStore((state) => state.answer);
+    const setAnswer = useChatbotStore((state) => state.setAnswer);
+
+    const question = useChatbotStore((state) => state.question);
+    const setQuestion = useChatbotStore((state) => state.setQuestion);
+
+    const askAiMt = useMutation({
+        mutationFn: async () => {
+            try {
+                const request = await fetch(`${baseUrl}/ask-ai`, {
+                    body: JSON.stringify({ question: question.trim() }),
+                    credentials: "include",
+                    headers: { 'Content-Type': 'application/json' },
+                    method: "POST"
+                });
+
+                const response = await request.json();
+                if (!request.ok) throw new Error(response.message);
+                return response;
+            } catch (error) {
+                throw error;
+            }
+        },
+        onError: (response) => {
+            props?.setMessage!(response.message);
+        },
+        onSuccess: (response) => {
+            queryClient.invalidateQueries({
+                predicate: (query: Query<unknown, Error, unknown, readonly unknown[]>) => {
+                    const queryKey = query.queryKey;
+                    if (Array.isArray(queryKey) && queryKey.length > 0 && typeof queryKey[0] === "string") {
+                        return queryKey[0].startsWith(`result-${props?._id}`) ||
+                        queryKey[0].startsWith(`all-results-${props?.currentUserId}`);
+                    }
+                    return false;
+                }
+            });
+            setAnswer(response.message);
+        }
+    });
     
     const {
         data: results,
@@ -139,5 +181,19 @@ export default function useChatbotResultService(props?: IChatBotResultService) {
         }
     });
 
-    return { allResults, currentResult, deleteAllResultsMt, deleteResultMt }
+    const isChatbotProcessing = allResults.isResultsLoading || askAiMt.isPending || currentResult.isResultLoading ||
+    deleteAllResultsMt.isPending || deleteResultMt.isPending;
+
+    return { 
+        allResults, 
+        answer, 
+        askAiMt, 
+        currentResult, 
+        deleteAllResultsMt, 
+        deleteResultMt, 
+        isChatbotProcessing, 
+        setAnswer, 
+        setQuestion, 
+        question 
+    }
 }
