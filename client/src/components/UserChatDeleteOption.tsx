@@ -53,10 +53,7 @@ export default function UserChatDeleteOption(props: IUserChatDeleteOption) {
                                 "flex gap-2 justify-center"
                             )}
                             disabled={props.isProcessing}
-                            onClick={() => {
-                                props.setIsSelectMode?.(true);
-                                props.setShowDeleteOption?.(false);
-                            }}
+                            onClick={() => props.setIsSelectMode?.(true)}
                             type="button"
                         >
                             <Check size={23}/>
