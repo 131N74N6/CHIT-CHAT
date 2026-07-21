@@ -17,24 +17,25 @@ export async function clearAllUserChatsForMe(req: AuthRequest, res: Response) {
                 { receiver_id: receiverId, sender_id: userId },
                 { receiver_id: userId, sender_id: receiverId }, 
             ], 
-            hidden_for: { $nin: [userId!, receiverId] } 
+            hidden_for: { $nin: [userId!] } 
         });
         
         if (chats.length === 0) return res.status(404).json({ message: "chat not found" });
         
         const operations = [];
-        const selectedMedia: CloudinaryUploadResult[] = chats.flatMap(chat => chat.media || []);
-
-        const chatsToDeletePermanently = chats.filter(chat => {
+        
+        const toDeleteChatsPermanent = chats.filter(chat => {
             return chat.hidden_for.includes(new Types.ObjectId(receiverId))
         });
 
-        const chatsToDelete = chats.filter(chat => {
+        const selectedMedia: CloudinaryUploadResult[] = toDeleteChatsPermanent.flatMap(chat => chat.media || []);
+
+        const toDeleteChats = chats.filter(chat => {
             return !chat.hidden_for.includes(new Types.ObjectId(receiverId))
         });
 
-        if (chatsToDeletePermanently.length > 0) {
-            const chatIds = chats.map(chat => chat._id);
+        if (toDeleteChatsPermanent.length > 0) {
+            const toDeleteChatsPermanentIds = toDeleteChatsPermanent.map(chat => chat._id);
 
             if (selectedMedia.length > 0) {
                 const deleteFromCloudinary = selectedMedia.map(media => {
@@ -44,21 +45,13 @@ export async function clearAllUserChatsForMe(req: AuthRequest, res: Response) {
                 operations.push(...deleteFromCloudinary);
             }
 
-            operations.push(Chats.deleteMany({ _id: { $in: chatIds } }));
-
-            io.to(`user-chat:${receiverId}`).emit("user-chat:all-deleted-permanently", {
-                deleted_id: chatsToDeletePermanently.map(chat => chat._id)
-            });
+            operations.push(Chats.deleteMany({ _id: { $in: toDeleteChatsPermanentIds } }));
         }
 
-        if (chatsToDelete.length > 0) {
-            operations.push(Chats.updateMany({ 
-                $or: [
-                    { receiver_id: receiverId, sender_id: userId },
-                    { receiver_id: userId, sender_id: receiverId }, 
-                ] 
-            }, {
-                $set: { media: [] },
+        if (toDeleteChats.length > 0) {
+            const toDeleteChatsIds = toDeleteChats.map(chat => chat._id);
+
+            operations.push(Chats.updateMany({ _id: { $in: toDeleteChatsIds } }, {
                 $addToSet: { hidden_for: userId }
             }));
         }
@@ -83,18 +76,18 @@ export async function clearChosenUserChatsForMe(req: AuthRequest, res: Response)
         const chats = await Chats.find({ _id: { $in: ids } });
         if (chats.length === 0) return res.status(404).json({ message: "chat not found" });
 
-        const selectedMedia: CloudinaryUploadResult[] = chats.flatMap(chat => chat.media) || [];
-
-        const chatsToDeletePermanently = chats.filter(chat => {
+        const toDeleteChatsPermanent = chats.filter(chat => {
             return chat.hidden_for.includes(new Types.ObjectId(receiverId))
         });
+        
+        const selectedMedia: CloudinaryUploadResult[] = toDeleteChatsPermanent.flatMap(chat => chat.media) || [];
 
-        const chatsToDelete = chats.filter(chat => {
+        const toDeleteChats = chats.filter(chat => {
             return !chat.hidden_for.includes(new Types.ObjectId(receiverId))
         });
 
-        if (chatsToDeletePermanently.length > 0) {
-            const chatIds = chats.map(chat => chat._id);
+        if (toDeleteChatsPermanent.length > 0) {
+            const toDeleteChatsPermanentIds = toDeleteChatsPermanent.map(chat => chat._id);
 
             if (selectedMedia.length > 0) {
                 const deleteFromCloudinary = selectedMedia.map(media => {
@@ -104,16 +97,13 @@ export async function clearChosenUserChatsForMe(req: AuthRequest, res: Response)
                 operations.push(...deleteFromCloudinary);
             }
 
-            operations.push(Chats.deleteMany({ _id: { $in: chatIds } }));
-
-            io.to(`user-chat:${receiverId}`).emit("user-chat:deleted-permanently", {
-                deleted_id: chatsToDeletePermanently.map(chat => chat._id)
-            });
+            operations.push(Chats.deleteMany({ _id: { $in: toDeleteChatsPermanentIds } }));
         }
 
-        if (chatsToDelete.length > 0) {
-            operations.push(Chats.updateMany({ _id: { $in: ids } }, {
-                $set: { media: [] },
+        if (toDeleteChats.length > 0) {
+            const toDeleteChatsIds = toDeleteChats.map(chat => chat._id);
+
+            operations.push(Chats.updateMany({ _id: { $in: toDeleteChatsIds } }, {
                 $addToSet: { hidden_for: userId }
             }));
         }
@@ -129,33 +119,104 @@ export async function clearChosenUserChatsForMe(req: AuthRequest, res: Response)
 export async function deleteAllUserChats(req: AuthRequest, res: Response) {
     try {
         const operations = [];
-        const senderId = req.user?.user_id;
+        const userId = req.user?.user_id;
 
-        const chats = await Chats.find({ sender_id: senderId });
-        const selectedMedia: CloudinaryUploadResult[] = chats.flatMap(chat => chat.media || []);
+        const receiverIdParams = req.params.receiver_id;
+        const receiverId = Array.isArray(receiverIdParams) ? receiverIdParams[0] : receiverIdParams;
+
+        const chats = await Chats.find({
+            $or: [
+                { receiver_id: receiverId, sender_id: userId },
+                { receiver_id: userId, sender_id: receiverId }
+            ], 
+            hidden_for: { $nin: [userId!] } 
+        });
 
         if (chats.length === 0) return res.status(404).json({ message: "chat not found" });
 
-        if (selectedMedia.length > 0) {
-            const deleteFromCloudinary = selectedMedia.map(media => {
-                return v2.uploader.destroy(media.public_id, { resource_type: media.resource_type });
-            });
+        const toDeleteOwnChatsPermanent = chats.filter(chat => {
+            return chat.hidden_for.includes(new Types.ObjectId(receiverId)) && 
+            (chat.receiver_id === new Types.ObjectId(receiverId) || chat.sender_id === new Types.ObjectId(userId))
+        });
 
-            operations.push(...deleteFromCloudinary);
+        const toDeleteOwnChats = chats.filter(chat => {
+            return !chat.hidden_for.includes(new Types.ObjectId(receiverId)) && 
+            (chat.receiver_id === new Types.ObjectId(receiverId) || chat.sender_id === new Types.ObjectId(userId))
+        });
+
+        const toDeleteOtherChatsPermanent = chats.filter(chat => {
+            return chat.hidden_for.includes(new Types.ObjectId(receiverId)) && 
+            (chat.receiver_id === new Types.ObjectId(userId) || chat.sender_id === new Types.ObjectId(receiverId))
+        });
+
+        const toDeleteOtherChats = chats.filter(chat => {
+            return !chat.hidden_for.includes(new Types.ObjectId(receiverId)) && 
+            (chat.receiver_id === new Types.ObjectId(userId) || chat.sender_id === new Types.ObjectId(receiverId))
+        });
+
+        if (toDeleteOwnChatsPermanent.length > 0) {
+            const toDeleteOwnChatsPermanentIds = toDeleteOwnChatsPermanent.map(chat => chat._id);
+            const selectedMedia: CloudinaryUploadResult[] = toDeleteOwnChatsPermanent.flatMap(chat => chat.media || []);
+
+            if (selectedMedia.length > 0) {
+                const deleteFromCloudinary = selectedMedia.map(media => {
+                    return v2.uploader.destroy(media.public_id, { resource_type: media.resource_type });
+                });
+    
+                operations.push(...deleteFromCloudinary);
+            }
+            
+            operations.push(Chats.deleteMany({ _id: { $in: toDeleteOwnChatsPermanentIds } }));
+        }
+
+        if (toDeleteOwnChats.length > 0) {
+            const toDeleteOwnChatsIds = toDeleteOwnChats.map(chat => chat._id);
+            const selectedMedia: CloudinaryUploadResult[] = toDeleteOwnChats.flatMap(chat => chat.media || []);
+
+            if (selectedMedia.length > 0) {
+                const deleteFromCloudinary = selectedMedia.map(media => {
+                    return v2.uploader.destroy(media.public_id, { resource_type: media.resource_type });
+                });
+    
+                operations.push(...deleteFromCloudinary);
+            }
+            
+            operations.push(Chats.updateMany({ _id: { $in: toDeleteOwnChatsIds } }, {
+                $set: {
+                    media: [],
+                    messages: "This message has been deleted"
+                }
+            }));
+
+            io.to(`user-chat:${receiverId}`).emit("user-chat:all-deleted", {
+                deleted_id: toDeleteOwnChats.map(chat => chat._id)
+            });
+        }
+
+        if (toDeleteOtherChatsPermanent) {
+            const toDeleteOtherChatsPermanentIds = toDeleteOtherChatsPermanent.map(chat => chat._id);
+            const selectedMedia: CloudinaryUploadResult[] = toDeleteOtherChatsPermanent.flatMap(chat => chat.media || []);
+
+            if (selectedMedia.length > 0) {
+                const deleteFormCloudinary = selectedMedia.map(media => {
+                    return v2.uploader.destroy(media.public_id, { resource_type: media.resource_type })
+                });
+
+                operations.push(...deleteFormCloudinary);
+            }
+
+            operations.push(Chats.deleteMany({ _id: { $in: toDeleteOtherChatsPermanentIds } }));
+        }
+
+        if (toDeleteOtherChats.length > 0) {
+            const toDeleteOtherChatsIds = toDeleteOtherChats.map(chat => chat._id);
+
+            operations.push(Chats.updateMany({ _id: { $in: toDeleteOtherChatsIds } }, {
+                $addToSet: { hidden_for: userId }
+            }));
         }
         
-        operations.push(Chats.updateMany({ sender_id: senderId }, {
-            $set: {
-                media: [],
-                messages: "This message has been deleted"
-            }
-        }));
-        
         if (operations.length > 0) await Promise.all(operations);
-
-        io.to(`user-chat:${chats[0].receiver_id}`).emit("user-chat:all-deleted", {
-            deleted_id: chats.map(chat => chat._id)
-        });
 
         res.status(200).json({ message: "all chats deleted" });
     } catch (error) {
@@ -167,38 +228,121 @@ export async function deleteChosenUsersChat(req: AuthRequest, res: Response) {
     try {
         const operations = [];
         const userId = req.user?.user_id;
-        const receiverId = req.params.receiver_id;
+        const receiverIdParams = req.params.receiver_id
+        const receiverId = Array.isArray(receiverIdParams) ? receiverIdParams[0] : receiverIdParams;
 
         const ids = req.body.chatsIds as string[];
-        const chats = await Chats.find({ _id: { $in: ids }, sender_id: userId });
-
+        const chats = await Chats.find({ _id: { $in: ids } });
         if (chats.length === 0) return res.status(404).json({ message: "chat not found" });
-        const selectedMedia: CloudinaryUploadResult[] = chats.flatMap(chat => chat.media) || [];
 
-        if (selectedMedia.length > 0) {
-            const deleteFromCloudinary = selectedMedia.map(media => {
-                return v2.uploader.destroy(media.public_id, { resource_type: media.resource_type });
-            });
+        const toDeleteOwnChatsPermanent = chats.filter(chat => {
+            return chat.hidden_for.includes(new Types.ObjectId(receiverId)) && 
+            (chat.receiver_id === new Types.ObjectId(receiverId) || chat.sender_id === new Types.ObjectId(userId))
+        });
 
-            operations.push(...deleteFromCloudinary);
+        const toDeleteOwnChats = chats.filter(chat => {
+            return !chat.hidden_for.includes(new Types.ObjectId(receiverId)) && 
+            (chat.receiver_id === new Types.ObjectId(receiverId) || chat.sender_id === new Types.ObjectId(userId))
+        });
+
+        const toDeleteOtherChatsPermanent = chats.filter(chat => {
+            return chat.hidden_for.includes(new Types.ObjectId(receiverId)) && 
+            (chat.receiver_id === new Types.ObjectId(userId) || chat.sender_id === new Types.ObjectId(receiverId))
+        });
+
+        const toDeleteOtherChats = chats.filter(chat => {
+            return !chat.hidden_for.includes(new Types.ObjectId(receiverId)) && 
+            (chat.receiver_id === new Types.ObjectId(userId) || chat.sender_id === new Types.ObjectId(receiverId))
+        });
+
+        if (toDeleteOtherChatsPermanent.length > 0) {
+            const toDeleteOtherChatsPermanentIds = toDeleteOtherChatsPermanent.map(chat => chat._id);
+            const selectedMedia: CloudinaryUploadResult[] = toDeleteOtherChatsPermanent.flatMap(chat => chat.media || []);
+
+            if (selectedMedia.length > 0) {
+                const deleteFromCloudinary = selectedMedia.map(media => {
+                    return v2.uploader.destroy(media.public_id, { resource_type: media.resource_type })
+                });
+
+                operations.push(...deleteFromCloudinary);
+            }
+
+            operations.push(Chats.deleteMany({ _id: { $in: toDeleteOtherChatsPermanentIds } }));
         }
 
-        operations.push(Chats.updateMany({ _id: { $in: ids } }, {
-            $set: {
-                media: [],
-                messages: "This message has been deleted"
+        if (toDeleteOwnChats.length > 0) {
+            const toDeleteOwnChatsIds = toDeleteOwnChats.map(chat => chat._id);
+            const selectedMedia: CloudinaryUploadResult[] = toDeleteOwnChats.flatMap(chat => chat.media || []);
+
+            if (selectedMedia.length > 0) {
+                const deleteFromCloudinary = selectedMedia.map(media => {
+                    return v2.uploader.destroy(media.public_id, { resource_type: media.resource_type });
+                });
+    
+                operations.push(...deleteFromCloudinary);
             }
-        }));
+
+            operations.push(Chats.updateMany({ _id: { $in: toDeleteOwnChatsIds } }, {
+                $set: {
+                    media: [],
+                    messages: "This message has been deleted"
+                }
+            }));
+
+            io.to(`user-chat:${receiverId}`).emit("user-chat:deleted", {
+                deleted_id: toDeleteOwnChats.map(chat => chat._id)
+            });
+        }
+
+        if (toDeleteOtherChatsPermanent.length > 0) {
+            const toDeleteOtherChatsPermanentIds = toDeleteOtherChatsPermanent.map(chat => chat._id);
+            const selectedMedia = toDeleteOtherChatsPermanent.flatMap(chat => chat.media || []);
+
+            if (selectedMedia.length > 0) {
+                const deleteFromCloudinary = selectedMedia.map(media => {
+                    return v2.uploader.destroy(media.public_id, { resource_type: media.resource_type })
+                });
+
+                operations.push(...deleteFromCloudinary);
+            }
+
+            operations.push(Chats.deleteMany({ _id: { $in: toDeleteOtherChatsPermanentIds } }));
+        }
+
+        if (toDeleteOtherChats.length > 0) {
+            const toDeleteOtherChatsIds = toDeleteOtherChats.map(chat => chat._id);
+
+            operations.push(Chats.updateMany({ _id: { $in: toDeleteOtherChatsIds } }, {
+                $addToSet: { hidden_for: userId }
+            }));
+        }
 
         if (operations.length > 0) await Promise.all(operations);
 
-        io.to(`user-chat:${receiverId}`).emit("user-chat:deleted", {
-            deleted_id: chats.map(chat => chat._id)
-        });
 
         res.status(200).json({ message: "chat deleted" });
     } catch (error) {
         res.status(500).json({ message: "something went wrong" });
+    }
+}
+
+export async function editSelectedChat(req: Request, res: Response) {
+    try {
+        const { _id, receiverId } = req.params;
+        const { text } = req.body;
+
+        const updatedChat = await Chats.findOneAndUpdate({ _id: _id }, {
+            $set: { messages: text }
+        });
+
+        io.to(`user-chat:${receiverId}`).emit("user-chat:message-changed", {
+            _id: updatedChat?._id,
+            message: updatedChat?.messages
+        });
+
+        res.status(200).json({ message: "1 chat updated successfully" });
+    } catch (error) {
+        res.status(500).json({ message: "something  went wrong" });
     }
 }
 
@@ -254,7 +398,7 @@ export async function showAllChats(req: AuthRequest, res: Response) {
         const userId = req.user?.user_id;
         const receiverId = Array.isArray(receiverIdParams) ? receiverIdParams[0] : receiverIdParams;
 
-        const limit = parseInt(req.query.limit as string) || 13;
+        const limit = parseInt(req.query.limit as string) || 14;
         const page = parseInt(req.query.page as string) || 1;
         const skip = (page - 1) * limit;
 

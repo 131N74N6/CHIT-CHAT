@@ -5,6 +5,7 @@ import {
     clearChosenRoomChatsForMe, 
     deleteAllChatsInRoom, 
     deleteChosenChatsInRoom, 
+    editSelectedChat, 
     sendToOtherRoom, 
     showwAllChatsForRoom
 } from "../controllers/room_chat.controller";
@@ -23,5 +24,7 @@ roomChatsRouters.delete("/rm/:room_id", verifyToken, deleteChosenChatsInRoom);
 roomChatsRouters.get("/show-all/:room_id", verifyToken, showwAllChatsForRoom);
 
 roomChatsRouters.post("/send", verifyToken, uploadMedia, sendToOtherRoom);
+
+roomChatsRouters.put("/remake", verifyToken, editSelectedChat);
 
 export default roomChatsRouters;
