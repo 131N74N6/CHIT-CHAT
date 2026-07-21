@@ -2,29 +2,39 @@ import { create } from "zustand";
 import type { IFileViewer } from "../models/chat.model";
 
 export interface ChatState {
+    clearSelection: () => void;
+
     media: IFileViewer[];
     setMedia: (media: IFileViewer[] | ((prev: IFileViewer[]) => IFileViewer[])) => void;
 
     receiverId: string;
     setReceiverId: (receiverId: string) => void;
 
-    resetChats: () => void;
     resetChatState: () => void;
 
+    selectedIds: string[];
+    
     showUserMedia: boolean;
     setShowUserMedia: (showUserMedia: boolean) => void;
-
+    
+    showDeleteOption: boolean;
+    setShowDeleteOption: (showDeleteOption: boolean) => void;
+    
+    isSelectMode: boolean;
+    setIsSelectMode: (isSelectMode: boolean) => void;
+    
     showUserProfile: boolean;
     setShowUserProfile: (showUserProfile: boolean) => void;
-
+    
     text: string;
     setText: (text: string) => void;
 
-    userChatsIdsToDelete: string[];
-    setUserChatsIdsToDelete: (userChatsIdsToDelete: string[] | ((prev: string[]) => string[])) => void;
+    toggleSelect: (id: string) => void;
 }
 
 export const useChatStore = create<ChatState>((set) => ({
+    clearSelection: () => set({ selectedIds: [] }),
+
     media: [],
     setMedia: (media) => set((state) => ({ 
         media: typeof media === 'function' ? media(state.media) : media 
@@ -33,22 +43,26 @@ export const useChatStore = create<ChatState>((set) => ({
     receiverId: "",
     setReceiverId: (receiverId) => set({ receiverId }),
 
-    resetChats: () => set({ 
-        media: [], 
-        text: "",
-        userChatsIdsToDelete: [] 
-    }),
-
     resetChatState: () => set({
+        isSelectMode: false,
         media: [], 
         receiverId: "",
+        selectedIds: [],
         showUserProfile: false,
         text: "", 
-        userChatsIdsToDelete: []
+        showDeleteOption: false,
     }),
+
+    selectedIds: [],
 
     showUserMedia: false,
     setShowUserMedia: (showUserMedia) => set({ showUserMedia }),
+
+    showDeleteOption: false,
+    setShowDeleteOption: (showDeleteOption) => set({ showDeleteOption }),
+    
+    isSelectMode: false,
+    setIsSelectMode: (isSelectMode) => set({ isSelectMode }),
 
     showUserProfile: false,
     setShowUserProfile: (showUserProfile) => set({ showUserProfile }),
@@ -56,9 +70,8 @@ export const useChatStore = create<ChatState>((set) => ({
     text: "",
     setText: (text) => set({ text }),
 
-    userChatsIdsToDelete: [],
-    setUserChatsIdsToDelete: (userChatsIdsToDelete) => set((state) => ({
-        userChatsIdsToDelete: typeof userChatsIdsToDelete === 'function' ? 
-        userChatsIdsToDelete(state.userChatsIdsToDelete) : userChatsIdsToDelete
+    toggleSelect: (id) => set((state) => ({
+        selectedIds: state.selectedIds.includes(id) ? 
+        state.selectedIds.filter(itemId => itemId !== id) : [...state.selectedIds, id]
     })),
 }));

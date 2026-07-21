@@ -8,7 +8,11 @@ export default function useUserChatService(props?: IUserChatService) {
     const queryClient = useQueryClient();
 
     const inputMediaRef = useRef<HTMLInputElement>(null);
-    const resetChats = useChatStore((state) => state.resetChats);
+
+    const isSelectMode = useChatStore((state) => state.isSelectMode);
+    const setIsSelectMode = useChatStore((state) => state.setIsSelectMode);
+
+    const resetChatState = useChatStore((state) => state.resetChatState);
 
     const media = useChatStore((state) => state.media);
     const setMedia = useChatStore((state) => state.setMedia);
@@ -16,8 +20,12 @@ export default function useUserChatService(props?: IUserChatService) {
     const text = useChatStore((state) => state.text);
     const setText = useChatStore((state) => state.setText);
 
-    const userChatsIdsToDelete = useChatStore((state) => state.userChatsIdsToDelete);
-    const setUserChatsIdsToDelete = useChatStore((state) => state.setUserChatsIdsToDelete);
+    const selectedIds = useChatStore((state) => state.selectedIds);
+    const toggleSelect = useChatStore((state) => state.toggleSelect);
+    const clearSelection = useChatStore((state) => state.clearSelection);
+
+    const showDeleteOption = useChatStore((state) => state.showDeleteOption);
+    const setShowDeleteOption = useChatStore((state) => state.setShowDeleteOption);
 
     const clearAllUserChatsForMeMt = useMutation({
         mutationFn: async () => {
@@ -40,7 +48,7 @@ export default function useUserChatService(props?: IUserChatService) {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: [`user-chat-${props?.receiverId}`] });
-            resetChats();
+            resetChatState();
         }
     });
     
@@ -48,7 +56,7 @@ export default function useUserChatService(props?: IUserChatService) {
         mutationFn: async () => {
             try {
                 const request = await fetch(`${baseUrl}/clear/${props?.receiverId}`, {
-                    body: JSON.stringify({ chatsIds: userChatsIdsToDelete }),
+                    body: JSON.stringify({ chatsIds: selectedIds }),
                     credentials: "include",
                     headers: { 'Content-Type': 'application/json' },
                     method: "PUT"
@@ -66,7 +74,7 @@ export default function useUserChatService(props?: IUserChatService) {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: [`user-chat-${props?.receiverId}`] });
-            resetChats();
+            resetChatState();
         }
     });
 
@@ -91,7 +99,7 @@ export default function useUserChatService(props?: IUserChatService) {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: [`user-chat-${props?.receiverId}`] });
-            resetChats();
+            resetChatState();
         }
     });
 
@@ -99,7 +107,7 @@ export default function useUserChatService(props?: IUserChatService) {
         mutationFn: async () => {
             try {
                 const request = await fetch(`${baseUrl}/rm/${props?.receiverId}`, {
-                    body: JSON.stringify({ chatsIds: userChatsIdsToDelete }),
+                    body: JSON.stringify({ chatsIds: selectedIds }),
                     credentials: "include",
                     headers: { 'Content-Type': 'application/json' },
                     method: "DELETE"
@@ -117,7 +125,7 @@ export default function useUserChatService(props?: IUserChatService) {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: [`user-chat-${props?.receiverId}`] });
-            resetChats();
+            resetChatState();
         }
     });
 
@@ -169,16 +177,6 @@ export default function useUserChatService(props?: IUserChatService) {
         if (inputMediaRef.current) inputMediaRef.current.value = "";
     }
 
-    const resetSelectedChatToDelete = () => {
-        setUserChatsIdsToDelete([]);
-    }
-    
-    const selectedChatToDelete = (id: string) => {
-        const temp: string[] = [];
-        temp.push(id);
-        setUserChatsIdsToDelete(prev => [...prev, ...temp]);
-    }
-
     const sendChatToUserMt = useMutation({
         mutationFn: async () => {
             try {
@@ -210,7 +208,7 @@ export default function useUserChatService(props?: IUserChatService) {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: [`user-chat-${props?.receiverId}`] });
-            resetChats();
+            resetChatState();
         }
     });
 
@@ -223,18 +221,23 @@ export default function useUserChatService(props?: IUserChatService) {
     return { 
         clearChosenUserChatForMeMt,
         clearAllUserChatsForMeMt,
+        clearSelection,
         deleteAllUserChatsMt,
         deleteChosenUsersChatMt,
         handleImagePreview, 
         inputMediaRef, 
+        isSelectMode,
         isUserChatProcessing, 
         media, 
-        resetSelectedChatToDelete,
-        selectedChatToDelete,
         sendChatToUserMt, 
+        selectedIds,
+        setIsSelectMode,
         setMedia, 
         setText, 
+        setShowDeleteOption,
+        showDeleteOption,
         text, 
+        toggleSelect,
         userChats 
     }
 }

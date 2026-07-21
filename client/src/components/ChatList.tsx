@@ -1,9 +1,9 @@
-import type { ChatListIntrf } from "../models/chat.model";
+import type { IChatList } from "../models/chat.model";
 import cn from "../utils/cn";
 import ChatBubble from "./ChatBubble";
 import Loading from "./Loading";
 
-export default function ChatList(props: ChatListIntrf) {
+export default function ChatList(props: IChatList) {
     if (props.chats.length === 0) {
         return (
             <div className="flex justify-center items-center h-full">
@@ -23,10 +23,10 @@ export default function ChatList(props: ChatListIntrf) {
                             chat={chat} 
                             key={chat._id}
                             isProcessing={props.isProcessing} 
-                            onClearOne={props.onClearOne} 
-                            onDeleteOne={props.onDeleteOne}
-                            onDeleteOnePermanent={props.onDeleteOnePermanent}
+                            isSelectMode={props.isSelectMode}
                             own={props.currentUserId === chat.sender_id}
+                            selectedIds={props.selectedIds}
+                            toggleSelect={props.toggleSelect}
                         />
                     );
                 })}

@@ -32,23 +32,34 @@ export interface ChatIntrf {
     sender_id: string;
 }
 
-export interface ChatBubbleIntrf {
+export interface IChatBubble {
     chat: ChatIntrf;
     isProcessing: boolean;
-    onClearOne: UseMutationResult<any, Error, string, unknown>;
-    onDeleteOnePermanent: UseMutationResult<any, Error, string, unknown>;
-    onDeleteOne: UseMutationResult<any, Error, string, unknown>;
+    isSelectMode: boolean;
     own: boolean;
+    selectedIds: string[];
+    toggleSelect: (id: string) => void;
 }
 
-export interface ChatListIntrf {
+export interface IChatList {
     chats: ChatIntrf[];
     currentUserId: string;
     fetchNextPage: (options?: FetchNextPageOptions | undefined) => Promise<InfiniteQueryObserverResult<InfiniteData<any, unknown>, Error>>;
     hasNextPage: boolean;
     isFetchingNextPage: boolean;
     isProcessing: boolean;
-    onClearOne: UseMutationResult<any, Error, string, unknown>;
-    onDeleteOnePermanent: UseMutationResult<any, Error, string, unknown>;
-    onDeleteOne: UseMutationResult<any, Error, string, unknown>;
+    isSelectMode: boolean;
+    selectedIds: string[];
+    toggleSelect: (id: string) => void;
+}
+
+export interface IUserChatDeleteOption {
+    clearAllUserChatsForMeMt?: UseMutationResult<any, Error, void, unknown>;
+    clearChosenUserChatForMeMt?: UseMutationResult<any, Error, void, unknown>;
+    deleteAllUserChatsMt?: UseMutationResult<any, Error, void, unknown>;
+    deleteChosenUsersChatMt?: UseMutationResult<any, Error, void, unknown>;
+    isProcessing: boolean;
+    marks: number;
+    setIsSelectMode?: (isSelectMode: boolean) => void;
+    setShowDeleteOption?: (showDeleteOption: boolean) => void;
 }

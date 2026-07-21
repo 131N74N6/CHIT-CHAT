@@ -5,7 +5,7 @@ import RoomList from "../components/RoomList";
 import useRoomMemberService from "../services/useRoomMemberService";
 import useRoomProfileService from "../services/useRoomProfileService";
 import RoomWindow from "../components/RoomWindow";
-import useUserServices from "../services/useUserProfileService";
+import useUserProfileService from "../services/useUserProfileService";
 import { MessageCircle } from "lucide-react";
 import { useRoomStore } from "../stores/room.store";
 import useSocketIo from "../hooks/useSocketIo";
@@ -21,7 +21,7 @@ export default function AvailableRoom() {
     const showProfile = useRoomStore((state) => state.showProfile);
     const setShowProfile = useRoomStore((state) => state.setShowProfile);
 
-    const { currentUser, isUserProcessing } = useUserServices();
+    const { currentUser, isUserProfileProcessing } = useUserProfileService();
     const { currentAvailableRooms } = useRoomProfileService({ currentUserId: currentUser.user?.user_id });
 
     useSocketIo({
@@ -29,7 +29,6 @@ export default function AvailableRoom() {
         currentUserId: currentUser.user?.user_id!,
         marks: roomId
     });
-
 
     const { currentRoomMember } = useRoomMemberService({ roomId: roomId });
 
@@ -46,7 +45,7 @@ export default function AvailableRoom() {
 
     return (
         <section className="flex md:flex-row flex-col gap-2.5 p-2.5 h-screen relative z-10">
-            <Navbar isProcessing={isRoomChatProcessing || isUserProcessing}/>
+            <Navbar isProcessing={isRoomChatProcessing || isUserProfileProcessing}/>
             <div className="flex flex-col md:w-2/5 h-full px-2.5 w-full inset-shadow-sm inset-shadow-gray-400 border border-gray-400">
                 {currentAvailableRooms.isAvailableRoomLoading ? (
                     <div className="flex justify-center items-center h-full">
@@ -85,7 +84,7 @@ export default function AvailableRoom() {
                         isRoomChatProcessing || 
                         allChatsInRoom.isRoomChatLoading || 
                         currentRoomMember.isRoomMemberLoading ||
-                        isUserProcessing
+                        isUserProfileProcessing
                     }
                     isRoomMemberFetchNextPage={currentRoomMember.isRoomMemberFetchNextPage}
                     leftRoomMt={leftRoomMt}
