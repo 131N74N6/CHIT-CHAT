@@ -28,7 +28,7 @@ export default function RoomItem(props: RoomItemIntrf) {
                 </div>
                 <div className="text-gray-950 font-medium">{props.room.name}</div>
             </div>
-            <div className="border bg-white border-b-gray-600 md:hidden flex gap-1.5" onClick={() => navigate(`/room/chat/${props.room._id}`)}>
+            <div className="border bg-white border-b-gray-600 md:hidden flex gap-1.5" onClick={() => navigate(`/rooms/chat/${props.room._id}`)}>
                 <div className="w-20 h-20 rounded-full">
                     {props.room.profile_picture !== null ? (
                         <div className="w-full h-full">

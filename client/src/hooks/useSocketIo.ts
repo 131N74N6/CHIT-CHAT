@@ -13,20 +13,18 @@ export default function useSocketIo(props: ChatSocketIntrf) {
 
     const {
         connect,
+        getSocket,
         onAvailableRoomJoin,
         onAvailableUserJoin,
         onChangeRoom,
         onChangeUser,
         onDeleteAllChatsInRoom,
-        onDeleteAllChatsPermanentlyInRoom,
         onDeleteChatInRoom,
-        onDeleteChatPermanentlyInRoom,
         onDeleteAllChats,
-        onDeleteAllChatsPermanently,
         onDeleteChat,
-        onDeleteChatPermanently,
         onDeleteRoom,
         onDeleteUser,
+        onJoinNewMember,
         onKickMember,
         onLeftTheRoom,
         onUserChatJoin,
@@ -35,8 +33,7 @@ export default function useSocketIo(props: ChatSocketIntrf) {
         onRoomMemberJoin,
         onRoomProfileJoin,
         onSendToRoom,
-        onSendToUser,
-        removeAllListeners
+        onSendToUser
     } = useSocketIoService();
 
     useEffect(() => {
@@ -54,10 +51,12 @@ export default function useSocketIo(props: ChatSocketIntrf) {
         } else if (props.identifier.includes("room-profile")) {
             onRoomProfileJoin(props.marks);
         } else if (props.identifier.includes("user-chat")) {
-            onUserChatJoin(props.marks);
+            onUserChatJoin(props.currentUserId);
         } else {
             onUserProfileJoin(props.marks);
         }
+
+        const socket = getSocket();
 
         function invalidations(queryNames: string[]) {
             queryClient.invalidateQueries({
@@ -84,9 +83,7 @@ export default function useSocketIo(props: ChatSocketIntrf) {
         if (props.identifier.includes("room-chat")) {
             onChangeRoom(() => invalidations(["room-profile", "available-room"]));
             onDeleteAllChatsInRoom(() => invalidations(["room-chat"]));
-            onDeleteAllChatsPermanentlyInRoom(() => invalidations(["room-chat"]));
             onDeleteChatInRoom(() => invalidations(["room-chat"]));
-            onDeleteChatPermanentlyInRoom(() => invalidations(["room-chat"]));
             onSendToRoom(() => invalidations(["room-chat"]));
         }
 
@@ -94,7 +91,8 @@ export default function useSocketIo(props: ChatSocketIntrf) {
             onChangeUser(() => invalidations(["all-users", "current-user", "room-member"]));
             onDeleteRoom(() => invalidations(["available-room", "room-profile", "room-chat", "room-member"]));
             onDeleteUser(() => invalidations(["current-user", "room-member", "user-chat"]));
-            onKickMember(() => invalidations(["room-member"]));
+            onJoinNewMember(() => invalidations(["room-member"]));
+            onKickMember(() => invalidations(["available-room", "room-member"]));
             onLeftTheRoom(() => invalidations(["current-user", "user", "room-member"]));
         }
 
@@ -106,8 +104,6 @@ export default function useSocketIo(props: ChatSocketIntrf) {
         if (props.identifier.includes("user-chat")) {
             onChangeUser(() => invalidations(["all-users", "current-user", "user"]));
             onDeleteAllChats(() => invalidations(["user-chat"]));
-            onDeleteAllChatsPermanently(() => invalidations(["user-chat"]));
-            onDeleteChatPermanently(() => invalidations(["user-chat"]));
             onDeleteChat(() => invalidations(["user-chat"]));
             onDeleteUser(() => invalidations(["current-user", "user-chat", "user"]));
             onSendToUser(() => invalidations(["user-chat"]));
@@ -118,7 +114,23 @@ export default function useSocketIo(props: ChatSocketIntrf) {
             onDeleteUser(() => invalidations(["all-users", "current-user", "user", "user-chat", "room-member"]));
         }
 
-        return () => removeAllListeners();
+        return () => {
+            if (socket) {
+                socket.off("room-chat:send-new-chat", () => invalidations(["room-chat"]));
+                socket.off("room-chat:all-deleted", () => invalidations(["room-chat"]));
+                socket.off("room-chat:deleted", () => invalidations(["room-chat"]));
+                socket.off("room-profile:changed", () => invalidations(["available-room", "room-profile"]));
+                socket.off("room:deleted", () => invalidations(["available-room", "room-profile", "room-chat", "room-member"]));
+                socket.off("room:member-kicked", () => invalidations(["available-room", "room-member"]));
+                socket.off("user-chat:send-new-chat", () => invalidations(["user-chat"]));
+                socket.off("user-chat:all-deleted", () => invalidations(["user-chat"]));
+                socket.off("user-chat:deleted", () => invalidations(["user-chat"]));
+                socket.off("user-profile:changed", () => invalidations(["all-users", "current-user", "user", "room-member"]));
+                socket.off("user:deleted", () => invalidations(["all-users", "current-user", "user", "user-chat", "room-member"]));
+                socket.off("user:user:join-room-successfully", () => invalidations(["room-member"]));
+                socket.off("user:left-room-successfully", () => invalidations(["current-user", "user", "room-member"]));
+            }
+        }
         
     }, [props.identifier, props.currentUserId, props.marks, queryClient]);
 }

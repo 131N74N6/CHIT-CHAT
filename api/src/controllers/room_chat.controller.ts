@@ -375,6 +375,9 @@ export async function showwAllChatsForRoom(req: AuthRequest, res: Response) {
         const page = parseInt(req.query.page as string) || 1;
         const skip = (page - 1) * limit;
 
+        const chatTotal = await Chats.find({ room_id: roomId, hidden_for: { $nin: [userId!] } }).countDocuments();
+        if (chatTotal === 0) return res.status(404).json({ message: "chat not found" });
+
         const chats = await Chats
         .find({ room_id: roomId, hidden_for: { $nin: [userId!] } })
         .limit(limit)

@@ -3,7 +3,6 @@ import { io, type Socket } from "socket.io-client"
 let socket: Socket | null = null;
 
 export default function useSocketIoServices() {
-
     function connect(currentUserId: string) {
         if (socket?.connected) return;
 
@@ -61,32 +60,16 @@ export default function useSocketIoServices() {
         socket?.on("user-profile:changed", callback);
     }
 
-    function onDeleteAllChatsPermanently(callback: (data: any) => void) {
-        socket?.on("user-chat:all-deleted-permanently", callback);
-    }
-
     function onDeleteAllChats(callback: (data: any) => void) {
         socket?.on("user-chat:all-deleted", callback);
-    }
-
-    function onDeleteChatPermanently(callback: (data: any) => void) {
-        socket?.on("user-chat:deleted-permanently", callback);
     }
 
     function onDeleteChat(callback: (data: any) => void) {
         socket?.on("user-chat:deleted", callback);
     }
 
-    function onDeleteAllChatsPermanentlyInRoom(callback: (data: any) => void) {
-        socket?.on("room-chat:all-deleted-permanently", callback);
-    }
-
     function onDeleteAllChatsInRoom(callback: (data: any) => void) {
         socket?.on("room-chat:all-deleted", callback);
-    }
-
-    function onDeleteChatPermanentlyInRoom(callback: (data: any) => void) {
-        socket?.on("room-chat:deleted-permanently", callback);
     }
 
     function onDeleteChatInRoom(callback: (data: any) => void) {
@@ -146,10 +129,6 @@ export default function useSocketIoServices() {
         onDeleteChat,
         onDeleteAllChatsInRoom,
         onDeleteChatInRoom,
-        onDeleteAllChatsPermanently,
-        onDeleteChatPermanently,
-        onDeleteAllChatsPermanentlyInRoom,
-        onDeleteChatPermanentlyInRoom,
         onDeleteRoom,
         onDeleteUser,
         onJoinNewMember,
