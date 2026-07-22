@@ -10,10 +10,18 @@ import { MessageCircle } from "lucide-react";
 import { useRoomStore } from "../stores/room.store";
 import useSocketIo from "../hooks/useSocketIo";
 import cn from "../utils/cn";
+import { useEffect } from "react";
+import { useMessageStore } from "../stores/message.store";
+import Alert from "../components/Alert";
+import RoomChatDeleteOption1 from "../components/RoomChatDeleteOption1";
+import RoomChatDeleteOption2 from "../components/RoomChatDeleteOption2";
 
 export default function AvailableRoom() {
     const roomId = useRoomStore((state) => state.roomId);
     const setRoomId = useRoomStore((state) => state.setRoomId);
+
+    const message = useMessageStore((state) => state.message);
+    const setMessage = useMessageStore((state) => state.setMessage);
 
     const showMember = useRoomStore((state) => state.showMember);
     const setShowMember = useRoomStore((state) => state.setShowMember);
@@ -21,8 +29,46 @@ export default function AvailableRoom() {
     const showProfile = useRoomStore((state) => state.showProfile);
     const setShowProfile = useRoomStore((state) => state.setShowProfile);
 
-    const { currentUser, isUserProfileProcessing } = useUserProfileService();
-    const { currentAvailableRooms } = useRoomProfileService({ currentUserId: currentUser.user?.user_id });
+    const { currentUser, isUserProfileProcessing } = useUserProfileService({ setMessage: setMessage });
+
+    const { 
+        currentRoomMember, 
+        isRoomMemberProcessing, 
+        leftRoomMt 
+    } = useRoomMemberService({ roomId: roomId, setMessage: setMessage });
+
+    const { 
+        currentAvailableRooms,  
+        currentRoomProfile, 
+        deleteRoomMt, 
+        isRoomProfileProcessing 
+    } = useRoomProfileService({ currentUserId: currentUser.user?.user_id, roomId: roomId, setMessage: setMessage });
+
+    const { 
+        allChatsInRoom, 
+        clearAllRoomChatsForMeMt,
+        clearChosenRoomChatsForMeMt,
+        clearChatsIdsSelection,
+        deleteAllChatsInRoomMt,
+        deleteChosenChatsInRoomMt,
+        isRoomChatProcessing, 
+        isSelectMode,
+        selectedChatsIds,
+        setIsSelectMode,
+        setShowDeleteOption1,
+        setShowDeleteOption2,
+        sendChatToRoomMt,
+        showDeleteOption1, 
+        showDeleteOption2,
+        toggleSelect
+    } = useRoomChatService({ roomId: roomId });
+
+    useEffect(() => {
+        if (message) {
+            const timer = setTimeout(() => setMessage(null), 1500);
+            return () => clearTimeout(timer);
+        }
+    }, [message, setMessage]);
 
     useSocketIo({
         identifier: ["available-room", "room-chat", "room-profile", "room-member"],
@@ -30,22 +76,29 @@ export default function AvailableRoom() {
         marks: roomId
     });
 
-    const { currentRoomMember } = useRoomMemberService({ roomId: roomId });
-
-    const { currentRoomProfile } = useRoomProfileService({ roomId: roomId });
-
-    const { 
-        allChatsInRoom, 
-        clearChosenRoomChatsForMeMt, 
-        deleteChaForRoomMt, 
-        deleteChatPermanentlyForRoomMt, 
-        isRoomChatProcessing, 
-        sendChatToRoomMt 
-    } = useRoomChatService({ roomId: roomId });
-
     return (
         <section className="flex md:flex-row flex-col gap-2.5 p-2.5 h-screen relative z-10">
+            {message ? <Alert message={message}/> : null}
             <Navbar isProcessing={isRoomChatProcessing || isUserProfileProcessing}/>
+            {showDeleteOption1 ? (
+                <RoomChatDeleteOption1
+                    clearAllRoomChatsForMeMt={clearAllRoomChatsForMeMt}
+                    deleteAllChatsInRoomMt={deleteAllChatsInRoomMt}
+                    isProcessing={isRoomChatProcessing || isUserProfileProcessing || isRoomProfileProcessing || isRoomMemberProcessing}
+                    setIsSelectMode={setIsSelectMode}
+                    setShowDeleteOption1={setShowDeleteOption1}
+                />
+            ) : null}
+            {showDeleteOption2 ? (
+                <RoomChatDeleteOption2
+                    clearChosenRoomChatsForMeMt={clearChosenRoomChatsForMeMt}
+                    deleteChosenChatsInRoomMt={deleteChosenChatsInRoomMt}
+                    clearSelection={clearChatsIdsSelection}
+                    isProcessing={isRoomChatProcessing || isUserProfileProcessing || isRoomProfileProcessing || isRoomMemberProcessing}
+                    setIsSelectMode={setIsSelectMode}
+                    setShowDeleteOption2={setShowDeleteOption2}
+                />
+            ) : null}
             <div className="flex flex-col md:w-2/5 h-full px-2.5 w-full inset-shadow-sm inset-shadow-gray-400 border border-gray-400">
                 {currentAvailableRooms.isAvailableRoomLoading ? (
                     <div className="flex justify-center items-center h-full">
@@ -71,6 +124,7 @@ export default function AvailableRoom() {
             {roomId ? (
                 <RoomWindow
                     currentUserId={currentUser.user ? currentUser.user.user_id : "-"}
+                    clearChatsIdsSelection={clearChatsIdsSelection}
                     deleteRoomMt={deleteRoomMt}
                     fetchNextRoomChat={allChatsInRoom.fecthNextRoomChat}
                     fetchNextUser={currentRoomMember.fetchNextRoomMember}
@@ -79,29 +133,25 @@ export default function AvailableRoom() {
                     isRoomChatLoading={allChatsInRoom.isRoomChatLoading}
                     isRoomMemberLoading={currentRoomMember.isRoomMemberLoading}
                     isRoomProfileLoading={currentRoomProfile.isDetailLoading}
-                    isProcessing={
-                        currentRoomProfile.isDetailLoading || 
-                        isRoomChatProcessing || 
-                        allChatsInRoom.isRoomChatLoading || 
-                        currentRoomMember.isRoomMemberLoading ||
-                        isUserProfileProcessing
-                    }
+                    isProcessing={isRoomProfileProcessing || isRoomChatProcessing || isRoomMemberProcessing || isUserProfileProcessing}
                     isRoomMemberFetchNextPage={currentRoomMember.isRoomMemberFetchNextPage}
+                    isSelectMode={isSelectMode}
                     leftRoomMt={leftRoomMt}
-                    onClearOne={clearChosenRoomChatsForMeMt}
-                    onDeleteOne={deleteChaForRoomMt}
-                    onDeleteOnePermanent={deleteChatPermanentlyForRoomMt}
                     roomChats={allChatsInRoom.roomChats}
                     roomChatError={allChatsInRoom.roomChatsError}
+                    selectedChatsIds={selectedChatsIds}
                     sendChatToRoom={sendChatToRoomMt}
                     roomProfile={currentRoomProfile.detail!}
                     roomMemberError={currentRoomMember.roomMemberError}
                     roomMemberHaveNextPage={currentRoomMember.roomMmeberHaveNextPage}
                     roomProfileError={currentRoomProfile.errorDetail}
+                    setIsSelectMode={setIsSelectMode}
+                    setShowDeleteOption2={setShowDeleteOption2}
                     setShowMember={setShowMember}
                     setShowProfile={setShowProfile}
                     showMember={showMember}
                     showProfile={showProfile}
+                    toggleSelect={toggleSelect}
                     users={currentRoomMember.roomMember}
                 />
             ) : (

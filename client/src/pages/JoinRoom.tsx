@@ -1,10 +1,10 @@
 import cn from "../utils/cn";
-import useJoinRoomService from "../services/useJoinRoomService";
 import Navbar from "../components/Navbar";
 import { useMessageStore } from "../stores/message.store";
 import { useEffect } from "react";
 import Alert from "../components/Alert";
 import { MessageCircle } from "lucide-react";
+import useUserProfileService from "../services/useUserProfileService";
 
 export default function JoinRoom() {
     const message = useMessageStore((state) => state.message);
@@ -19,11 +19,11 @@ export default function JoinRoom() {
         }
     }, [message, setMessage]);
 
-    const { isJoinRoomProcessing, joinRoomMt, roomCode, setRoomCode } = useJoinRoomService({ setMessage: setMessage });
+    const { isUserProfileProcessing, joinRoomMt, roomCode, setRoomCode } = useUserProfileService({ setMessage: setMessage });
 
     return (
         <section className="flex md:flex-row flex-col gap-2.5 p-2.5 h-screen relative z-10">
-            <Navbar isProcessing={isJoinRoomProcessing}/>
+            <Navbar isProcessing={isUserProfileProcessing}/>
             {message ? <Alert message={message}/> : null}
             <div 
                 className={cn(

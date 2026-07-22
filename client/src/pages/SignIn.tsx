@@ -1,10 +1,10 @@
-import { useEffect } from "react";
-import { useMessageStore } from "../stores/message.store";
+import cn from "../utils/cn";
+import useUserProfileService from "../services/useUserProfileService";
 import useAuthService from "../services/useAuthService";
 import { Link, useNavigate } from "react-router-dom";
-import useUserService from "../services/useUserProfileService";
-import cn from "../utils/cn";
 import { MessageCircle } from "lucide-react";
+import { useEffect } from "react";
+import { useMessageStore } from "../stores/message.store";
 
 export default function SignIn() {
     const navigate = useNavigate();
@@ -12,7 +12,7 @@ export default function SignIn() {
     const setMessage = useMessageStore((state) => state.setMessage);
 
     const { password, setPassword, setUserName, signInMt, username } = useAuthService({ setMessage: setMessage });
-    const { currentUser } = useUserService({ setMessage: setMessage });
+    const { currentUser } = useUserProfileService({ setMessage: setMessage });
 
     useEffect(() => {
         if (currentUser.user && !currentUser.isUserLoading) navigate("/home", { replace: true });

@@ -1,13 +1,13 @@
-import { useNavigate, useParams } from "react-router-dom";
+import Alert from "../components/Alert";
+import cn from "../utils/cn";
 import useRoomProfileService from "../services/useRoomProfileService";
+import Navbar from "../components/Navbar";
+import { ArrowBigLeft } from "lucide-react";
 import { useMessageStore } from "../stores/message.store";
 import { useEffect } from "react";
-import Alert from "../components/Alert";
+import { useNavigate, useParams } from "react-router-dom";
 import Loading from "../components/Loading";
-import { ArrowBigLeft } from "lucide-react";
-import Navbar from "../components/Navbar";
-import cn from "../utils/cn";
-import useUserServices from "../services/useUserProfileService";
+import useUserProfileService from "../services/useUserProfileService";
 import useSocketIo from "../hooks/useSocketIo";
 import useRoomMemberService from "../services/useRoomMemberService";
 
@@ -18,7 +18,7 @@ export default function RoomProfile() {
     const message = useMessageStore((state) => state.message);
     const setMessage = useMessageStore((state) => state.setMessage);
     
-    const { currentUser, isUserProcessing } = useUserServices({ setMessage: setMessage });
+    const { currentUser, isUserProfileProcessing } = useUserProfileService({ setMessage: setMessage });
     const { user } = currentUser;
 
     const { currentRoomProfile,deleteRoomMt } = useRoomProfileService({ roomId: room_id });
@@ -47,7 +47,7 @@ export default function RoomProfile() {
     return (
         <section className="flex flex-col relative h-screen z-10">
             {message ? <Alert message={message}/> : null}
-            <Navbar isProcessing={isUserProcessing}/>
+            <Navbar isProcessing={isUserProfileProcessing}/>
             <div className="flex w-full flex-col h-full bg-gray-400 gap-2.5 p-1.5">
                 {isDetailLoading ? (
                     <div className="flex justify-center items-center h-full">
@@ -126,7 +126,7 @@ export default function RoomProfile() {
                                         "bg-gray-400 cursor-pointer disabled:cursor-not-allowed text-amber-600", 
                                         "text-[0.8rem] hover:bg-gray-500 transition-colors font-medium p-1.5"
                                     )}
-                                    disabled={isUserProcessing}
+                                    disabled={isUserProfileProcessing}
                                     onClick={() => deleteRoomMt.mutate()}
                                     type="button"
                                 >
@@ -138,7 +138,7 @@ export default function RoomProfile() {
                                         "bg-gray-400 cursor-pointer disabled:cursor-not-allowed text-red-600", 
                                         "text-[0.8rem] hover:bg-gray-500 transition-colors font-medium p-1.5"
                                     )}
-                                    disabled={isUserProcessing}
+                                    disabled={isUserProfileProcessing}
                                     onClick={() => leftRoomMt.mutate()}
                                 >
                                     Left room
@@ -149,7 +149,7 @@ export default function RoomProfile() {
                                     "bg-gray-400 cursor-pointer disabled:cursor-not-allowed text-olive-600", 
                                     "text-[0.8rem] hover:bg-gray-500 transition-colors font-medium p-1.5"
                                 )}
-                                disabled={isUserProcessing}
+                                disabled={isUserProfileProcessing}
                                 type="button"
                                 onClick={() => navigate(`/room/member/${room_id}`)}
                             >

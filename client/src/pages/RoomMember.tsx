@@ -6,11 +6,26 @@ import useSocketIo from "../hooks/useSocketIo";
 import useRoomMemberService from "../services/useRoomMemberService";
 import cn from "../utils/cn";
 import UserServices from "../services/useUserProfileService";
+import { useMessageStore } from "../stores/message.store";
+import { useEffect } from "react";
+import Alert from "../components/Alert";
 
 export default function RoomMember() {
     const { room_id } = useParams();
     const { currentUser } = UserServices();
-    const { currentRoomMember } = useRoomMemberService();
+    const { currentRoomMember } = useRoomMemberService({ roomId: room_id });
+    
+    const message = useMessageStore((state) => state.message);
+    const setMessage = useMessageStore((state) => state.setMessage);
+    
+    useEffect(() => {
+        if (message) {
+            const timer = setTimeout(() => {
+                setMessage(null);
+            }, 1500);
+            return () => clearTimeout(timer);
+        }
+    }, [message, setMessage]);
     
     useSocketIo({
         currentUserId: currentUser.user?.user_id!,
@@ -21,6 +36,7 @@ export default function RoomMember() {
     return (
         <section className="flex flex-col h-screen relative z-10">
             <Navbar isProcessing={currentRoomMember.isRoomMemberLoading}/>
+            {message ? <Alert message={message}/> : null}
             <div className="flex flex-col h-full p-2.5">
                 <div className="flex">
                     <input

@@ -1,8 +1,7 @@
 import Alert from "../components/Alert";
-import useChangeRoomService from "../services/useChangeRoomService";
 import cn from "../utils/cn";
 import Navbar from "../components/Navbar";
-import useUserServices from "../services/useUserProfileService";
+import useUserProfileService from "../services/useUserProfileService";
 import { Camera, X } from "lucide-react";
 import { useEffect } from "react";
 import { useMessageStore } from "../stores/message.store";
@@ -17,14 +16,14 @@ export default function ChangeRoom() {
     const message = useMessageStore((state) => state.message);
     const setMessage = useMessageStore((state) => state.setMessage);
 
-    const { currentUser, isUserProcessing } = useUserServices();
+    const { currentUser, isUserProfileProcessing } = useUserProfileService();
 
     const { 
         changeRoomMt, 
         description,
         fileInputRef, 
         handleImagePreview,
-        isChangeRoomProcessing, 
+        isRoomProfileProcessing, 
         roomName,
         oldRoomPicture,
         resetRoomState,
@@ -36,7 +35,7 @@ export default function ChangeRoom() {
         setRoomName, 
         setSelectedProfileRoom, 
         setSelectedProfileRoomUrl 
-    } = useChangeRoomService({ 
+    } = useRoomProfileService({ 
         currentUserId: currentUser.user?.user_id,
         roomId: room_id,
         setMessage: setMessage 
@@ -71,7 +70,7 @@ export default function ChangeRoom() {
 
     return (
         <section className="flex flex-col h-screen relative z-10">
-            <Navbar isProcessing={isUserProcessing}/>
+            <Navbar isProcessing={isUserProfileProcessing}/>
             {message ? <Alert message={message}/> : null}
             <form 
                 className="flex flex-col h-full p-2.5 gap-3 overflow-y-auto" 
@@ -101,7 +100,7 @@ export default function ChangeRoom() {
                                         "disabled:cursor-not-allowed group-hover:opacity-100 duration-300 transition-opacity",
                                         "flex justify-center items-center p-1.5 absolute top-1 left-[46%]"
                                     )}
-                                    disabled={isUserProcessing || isChangeRoomProcessing}
+                                    disabled={isUserProfileProcessing || isRoomProfileProcessing}
                                     onClick={(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
                                         event.stopPropagation();
                                         if (selectedProfileRoomUrl) URL.revokeObjectURL(selectedProfileRoomUrl);
@@ -126,7 +125,7 @@ export default function ChangeRoom() {
                                         "disabled:cursor-not-allowed group-hover:opacity-100 duration-300 transition-opacity",
                                         "flex justify-center items-center p-1.5 absolute top-1 left-[46%]"
                                     )}
-                                    disabled={isUserProcessing || isChangeRoomProcessing}
+                                    disabled={isUserProfileProcessing || isRoomProfileProcessing}
                                     onClick={(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
                                         event.stopPropagation();
                                         setDeleteRoomImage(oldRoomPicture);
@@ -180,7 +179,7 @@ export default function ChangeRoom() {
                         "bg-blue-600 text-white font-medium cursor-pointer p-1.5 text-[1.2rem]",
                         "hover:bg-blue-800 transition-colors disabled:cursor-not-allowed"
                     )}
-                    disabled={isUserProcessing || isChangeRoomProcessing}
+                    disabled={isUserProfileProcessing || isRoomProfileProcessing}
                     type="submit"
                 >
                     Create room
@@ -190,7 +189,7 @@ export default function ChangeRoom() {
                         "bg-blue-600 text-white font-medium cursor-pointer p-1.5 text-[1.2rem]",
                         "hover:bg-blue-800 transition-colors disabled:cursor-not-allowed"
                     )}
-                    disabled={isUserProcessing || isChangeRoomProcessing}
+                    disabled={isUserProfileProcessing || isRoomProfileProcessing}
                     onClick={() => {
                         resetRoomState();
                         navigate(`/room/profile/${room_id}`);

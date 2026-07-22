@@ -2,7 +2,7 @@ import ChatList from "../components/ChatList";
 import useUserChatService from "../services/useUserChatService";
 import cn from "../utils/cn";
 import Loading from "../components/Loading";
-import { File, MenuSquare, MessageCircle, SendIcon, X } from "lucide-react";
+import { File, Menu, MenuSquare, MessageCircle, SendIcon, X } from "lucide-react";
 import { useMessageStore } from "../stores/message.store";
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect } from "react";
@@ -10,7 +10,8 @@ import useUserProfileService from "../services/useUserProfileService";
 import Navbar from "../components/Navbar";
 import useSocketIo from "../hooks/useSocketIo";
 import Alert from "../components/Alert";
-import UserChatDeleteOption from "../components/UserChatDeleteOption";
+import UserChatDeleteOption1 from "../components/UserChatDeleteOption1";
+import UserChatDeleteOption2 from "../components/UserChatDeleteOption2";
 
 export default function UserChat() {
     const { receiver_id } = useParams();
@@ -28,6 +29,7 @@ export default function UserChat() {
     const { 
         clearAllUserChatsForMeMt,
         clearChosenUserChatForMeMt,
+        clearSelection,
         deleteAllUserChatsMt,
         deleteChosenUsersChatMt,
         isSelectMode,
@@ -36,8 +38,10 @@ export default function UserChat() {
         sendChatToUserMt,
         selectedIds,
         setText,
-        showDeleteOption,
-        setShowDeleteOption,
+        showDeleteOption1,
+        showDeleteOption2,
+        setShowDeleteOption1,
+        setShowDeleteOption2,
         text,
         toggleSelect,
         userChats 
@@ -60,39 +64,52 @@ export default function UserChat() {
         <section className="flex md:flex-row flex-col h-screen relative z-10 p-2.5 gap-2.5">
             <Navbar isProcessing={isUserChatProcessing || isUserProfileProcessing || receiverUserProfile.isDetailLoading}/>
             {message ? <Alert message={message}/> : null}
-            {showDeleteOption ? (
-                <UserChatDeleteOption 
+            {showDeleteOption1 ? (
+                <UserChatDeleteOption1 
                     clearAllUserChatsForMeMt={clearAllUserChatsForMeMt}
                     deleteAllUserChatsMt={deleteAllUserChatsMt}
                     isProcessing={isUserChatProcessing || isUserProfileProcessing}
-                    marks={1}
-                    setShowDeleteOption={setShowDeleteOption}
+                    setIsSelectMode={setIsSelectMode}
+                    setShowDeleteOption1={setShowDeleteOption1}
                 />
             ) : null}
-            {isSelectMode ? (
-                <UserChatDeleteOption 
+            {showDeleteOption2 ? (
+                <UserChatDeleteOption2 
                     clearChosenUserChatForMeMt={clearChosenUserChatForMeMt}
+                    clearSelection={clearSelection}
                     deleteChosenUsersChatMt={deleteChosenUsersChatMt}
                     isProcessing={isUserChatProcessing || isUserProfileProcessing}
-                    marks={2}
                     setIsSelectMode={setIsSelectMode}
+                    setShowDeleteOption2={setShowDeleteOption2}
                 />
             ) : null}
             <div className="md:w-2/5 w-full h-full flex flex-col px-2.5 inset-shadow-sm inset-shadow-gray-400 border border-gray-400">
                 {isSelectMode ? (
-                    <div 
-                        className="bg-gray-300 p-2 flex gap-1.5 cursor-pointer justify-end" 
-                    >
+                    <div className="bg-gray-300 p-2 flex gap-1.5 cursor-pointer justify-end">
                         <button
                             className={cn(
                                 "font-medium text-gray-600 cursor-pointer", 
                                 "disabled:cursor-not-allowed hover:text-gray-400 transition-colors"
                             )}
                             disabled={isUserChatProcessing || isUserProfileProcessing}
-                            onClick={() => setIsSelectMode(false)}
+                            onClick={() => {
+                                clearSelection();
+                                setIsSelectMode(false);
+                            }}
                             type="button"
                         >
                             <X size={23}/>
+                        </button>
+                        <button
+                            className={cn(
+                                "font-medium text-gray-600 cursor-pointer", 
+                                "disabled:cursor-not-allowed hover:text-gray-400 transition-colors"
+                            )}
+                            disabled={isUserChatProcessing || isUserProfileProcessing}
+                            onClick={() => setShowDeleteOption2(true)}
+                            type="button"
+                        >
+                            <Menu size={23}/>
                         </button>
                     </div>
                 ) : (
@@ -125,7 +142,7 @@ export default function UserChat() {
                                 "disabled:cursor-not-allowed hover:text-gray-400 transition-colors"
                             )}
                             disabled={isUserChatProcessing || isUserProfileProcessing}
-                            onClick={() => setShowDeleteOption(true)}
+                            onClick={() => setShowDeleteOption1(true)}
                             type="button"
                         >
                             <MenuSquare size={23}/>

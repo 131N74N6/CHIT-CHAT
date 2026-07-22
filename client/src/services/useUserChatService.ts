@@ -24,8 +24,11 @@ export default function useUserChatService(props?: IUserChatService) {
     const toggleSelect = useChatStore((state) => state.toggleSelect);
     const clearSelection = useChatStore((state) => state.clearSelection);
 
-    const showDeleteOption = useChatStore((state) => state.showDeleteOption);
-    const setShowDeleteOption = useChatStore((state) => state.setShowDeleteOption);
+    const showDeleteOption1 = useChatStore((state) => state.showDeleteOption1);
+    const setShowDeleteOption1 = useChatStore((state) => state.setShowDeleteOption1);
+
+    const showDeleteOption2 = useChatStore((state) => state.showDeleteOption2);
+    const setShowDeleteOption2 = useChatStore((state) => state.setShowDeleteOption2);
 
     const clearAllUserChatsForMeMt = useMutation({
         mutationFn: async () => {
@@ -234,8 +237,10 @@ export default function useUserChatService(props?: IUserChatService) {
         setIsSelectMode,
         setMedia, 
         setText, 
-        setShowDeleteOption,
-        showDeleteOption,
+        setShowDeleteOption1,
+        setShowDeleteOption2,
+        showDeleteOption1,
+        showDeleteOption2,
         text, 
         toggleSelect,
         userChats 

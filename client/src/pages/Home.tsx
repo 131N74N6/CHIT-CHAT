@@ -2,15 +2,17 @@ import Loading from "../components/Loading";
 import Navbar from "../components/Navbar";
 import useUserChatService from "../services/useUserChatService";
 import UserList from "../components/UserList";
-import useUserServices from "../services/useUserProfileService";
+import useUserProfileService from "../services/useUserProfileService";
 import UserWindow from "../components/UserWindow";
 import { MessageCircle } from "lucide-react";
 import { useEffect } from "react";
 import { useMessageStore } from "../stores/message.store";
 import { useChatStore } from "../stores/chat.store";
-import useUserProfileService from "../services/useUserProfileService";
 import useSocketIo from "../hooks/useSocketIo";
 import cn from "../utils/cn";
+import Alert from "../components/Alert";
+import UserChatDeleteOption1 from "../components/UserChatDeleteOption1";
+import UserChatDeleteOption2 from "../components/UserChatDeleteOption2";
 
 export default function Home() {
     const message = useMessageStore((state) => state.message);
@@ -31,17 +33,26 @@ export default function Home() {
     const { 
         allUsers, 
         currentUser, 
-        isUserProcessing 
-    } = useUserServices({ setMessage: setMessage });
-
-    const { currentUserProfile } = useUserProfileService({ receiverId: receiverId });
+        isUserProfileProcessing, 
+        receiverUserProfile 
+    } = useUserProfileService({ receiverId: receiverId, setMessage: setMessage });
 
     const { 
-        clearChatForMeMt, 
-        deleteChatForUserMt, 
-        deleteChatPermanentlyForUserMt, 
+        clearAllUserChatsForMeMt, 
+        clearChosenUserChatForMeMt,
+        clearSelection, 
+        deleteAllUserChatsMt, 
+        deleteChosenUsersChatMt,
+        isSelectMode,
         isUserChatProcessing, 
+        selectedIds,
         sendChatToUserMt,
+        setIsSelectMode,
+        setShowDeleteOption1,
+        setShowDeleteOption2,
+        showDeleteOption1,
+        showDeleteOption2,
+        toggleSelect,
         userChats 
     } = useUserChatService({ setMessage: setMessage, receiverId: receiverId });
     
@@ -66,7 +77,27 @@ export default function Home() {
 
     return (
         <section className="flex md:flex-row p-2.5 gap-2.5 flex-col h-screen relative z-10">
-            <Navbar isProcessing={isUserChatProcessing || isUserProcessing}/>
+            {message ? <Alert message={message}/> : null}
+            <Navbar isProcessing={isUserChatProcessing || isUserProfileProcessing}/>
+            {showDeleteOption1 ? (
+                <UserChatDeleteOption1
+                    deleteAllUserChatsMt={deleteAllUserChatsMt}
+                    clearAllUserChatsForMeMt={clearAllUserChatsForMeMt}
+                    isProcessing={isUserChatProcessing || isUserProfileProcessing}
+                    setIsSelectMode={setIsSelectMode}
+                    setShowDeleteOption1={setShowDeleteOption1}
+                />
+            ) : null}
+            {showDeleteOption2 ? (
+                <UserChatDeleteOption2
+                    clearChosenUserChatForMeMt={clearChosenUserChatForMeMt}
+                    clearSelection={clearSelection}
+                    deleteChosenUsersChatMt={deleteChosenUsersChatMt}
+                    isProcessing={isUserChatProcessing || isUserProfileProcessing}
+                    setIsSelectMode={setIsSelectMode}
+                    setShowDeleteOption2={setShowDeleteOption2}
+                />
+            ) : null}
             <div className="md:w-2/5 w-full h-full flex flex-col px-2.5 inset-shadow-sm inset-shadow-gray-400 border border-gray-400">
                 {allUsers.usersError ? (
                     <div className="flex justify-center items-center h-full">
@@ -82,7 +113,7 @@ export default function Home() {
                     <UserList 
                         fetchNextUser={allUsers.fetchNextUser}
                         hasNextPage={allUsers.usersHaveNextPage}
-                        isProcessing={isUserChatProcessing || isUserProcessing}
+                        isProcessing={isUserChatProcessing || isUserProfileProcessing}
                         isFetchingNextPage={allUsers.isFetchNextUser}
                         setReceiverId={setReceiverId}
                         users={allUsers.users}
@@ -91,28 +122,31 @@ export default function Home() {
             </div>
             {receiverId ? (
                 <UserWindow
+                    clearSelection={clearSelection}
                     currentUserId={currentUser.user ? currentUser.user.user_id : ""}
-                    errorProfile={currentUserProfile.detailError}
+                    errorProfile={receiverUserProfile.detailError}
                     fetchNextUserChat={userChats.fetchNextPage}
                     hasNextUserChat={userChats.hasNextPage}
                     isFetchingNextUserChats={userChats.isFetchingNextPage}
-                    isProcessing={userChats.isLoading || isUserChatProcessing || isUserProcessing}
-                    isProfileLoading={currentUserProfile.isDetailLoading}
+                    isProcessing={userChats.isLoading || isUserChatProcessing || isUserProfileProcessing}
+                    isProfileLoading={receiverUserProfile.isDetailLoading}
                     isUserChatLoading={userChats.isLoading}
-                    onClearOne={clearChatForMeMt}
-                    onDeleteOne={deleteChatForUserMt}
-                    onDeleteOnePermanent={deleteChatPermanentlyForUserMt}
+                    isSelectMode={isSelectMode}
                     receiverId={receiverId}
+                    selectedIds={selectedIds}
                     sendChatToUser={sendChatToUserMt}
+                    setIsSelectMode={setIsSelectMode}
+                    setShowDeleteOption2={setShowDeleteOption2}
                     setShowUserMedia={setShowUserMedia}
                     setShowUserProfile={setShowUserProfile}
                     setText={setText}
                     showUserMedia={showUserMedia}
                     showUserProfile={showUserProfile}
                     text={text}
+                    toggleSelect={toggleSelect}
                     userChatError={userChats.error}
                     userChats={userChats.getUserChats}
-                    userProfile={currentUserProfile.detail!}
+                    userProfile={receiverUserProfile.detail!}
                 />
             ) : (
                 <div 

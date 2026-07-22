@@ -1,0 +1,55 @@
+import { Eraser, Trash2, X } from "lucide-react";
+import type { IRoomChatDeleteOption2 } from "../models/room.model";
+import cn from "../utils/cn";
+
+export default function RoomChatDeleteOption2(props: IRoomChatDeleteOption2) {
+    return (
+        <div className="fixed inset-0 z-20 flex justify-center items-center h-full bg-[rgba(0,0,0,0.4)]">
+            <div className="bg-white flex flex-col gap-2.5">
+                <button
+                    className={cn(
+                        "bg-white border border-gray-600 text-gray-600 cursor-pointer disabled:cursor-not-allowed",
+                        "hover:bg-gray-600 hover:text-white transition-colors font-medium text-[1rem] p-2 rounded-lg",
+                        "flex gap-2 justify-center"
+                    )}
+                    disabled={props.isProcessing}
+                    onClick={() => {
+                        props.clearSelection();
+                        props.setShowDeleteOption2(false);
+                        props.setIsSelectMode(false);
+                    }}
+                    type="button"
+                >
+                    <X size={23}/>
+                    <div>Close</div>
+                </button>
+                <button
+                    className={cn(
+                        "bg-white border border-gray-600 text-gray-600 cursor-pointer disabled:cursor-not-allowed",
+                        "hover:bg-gray-600 hover:text-white transition-colors font-medium text-[1rem] p-2 rounded-lg",
+                        "flex gap-2 justify-center"
+                    )}
+                    disabled={props.isProcessing}
+                    onClick={() => props.clearChosenRoomChatsForMeMt.mutate()}
+                    type="button"
+                >
+                    <Trash2 size={23}/>
+                    <div>Clear Chosen Chats</div>
+                </button>
+                <button
+                    className={cn(
+                        "bg-white border border-gray-600 text-gray-600 cursor-pointer disabled:cursor-not-allowed",
+                        "hover:bg-gray-600 hover:text-white transition-colors font-medium text-[1rem] p-2 rounded-lg",
+                        "flex gap-2 justify-center"
+                    )}
+                    disabled={props.isProcessing}
+                    onClick={() => props.deleteChosenChatsInRoomMt.mutate()}
+                    type="button"
+                >
+                    <Eraser size={23}/>
+                    <div>Delete Chosen Chats</div>
+                </button>
+            </div>
+        </div>
+    )
+}

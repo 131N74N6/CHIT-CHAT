@@ -53,13 +53,19 @@ export interface IChatList {
     toggleSelect: (id: string) => void;
 }
 
-export interface IUserChatDeleteOption {
-    clearAllUserChatsForMeMt?: UseMutationResult<any, Error, void, unknown>;
-    clearChosenUserChatForMeMt?: UseMutationResult<any, Error, void, unknown>;
-    deleteAllUserChatsMt?: UseMutationResult<any, Error, void, unknown>;
-    deleteChosenUsersChatMt?: UseMutationResult<any, Error, void, unknown>;
+export interface IUserChatDeleteOption1 {
+    clearAllUserChatsForMeMt: UseMutationResult<any, Error, void, unknown>;
+    deleteAllUserChatsMt: UseMutationResult<any, Error, void, unknown>;
     isProcessing: boolean;
-    marks: number;
-    setIsSelectMode?: (isSelectMode: boolean) => void;
-    setShowDeleteOption?: (showDeleteOption: boolean) => void;
+    setIsSelectMode: (isSelectMode: boolean) => void;
+    setShowDeleteOption1: (showDeleteOption1: boolean) => void;
+}
+
+export interface IUserChatDeleteOption2 {
+    clearChosenUserChatForMeMt: UseMutationResult<any, Error, void, unknown>;
+    clearSelection: () => void;
+    deleteChosenUsersChatMt: UseMutationResult<any, Error, void, unknown>;
+    isProcessing: boolean;
+    setIsSelectMode: (isSelectMode: boolean) => void;
+    setShowDeleteOption2: (showDeleteOption2: boolean) => void;
 }

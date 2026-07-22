@@ -25,6 +25,7 @@ export default function UserWindow(props: IUserWindow) {
                 <UserProfileWindow
                     errorProfile={props.errorProfile}
                     isProfileLoading={props.isProfileLoading}
+                    isSelectMode={props.isSelectMode}
                     seeUserChat={seeChat}
                     userProfile={props.userProfile}
                 />
@@ -32,21 +33,24 @@ export default function UserWindow(props: IUserWindow) {
                 <UserMediaPreviewWindow/>
             ) : (
                 <UserChatWindow
+                    clearSelection={props.clearSelection}
                     currentUserId={props.currentUserId}
                     fetchNextUserChat={props.fetchNextUserChat}
                     hasNextUserChat={props.hasNextUserChat}
                     isFetchingNextUserChats={props.isFetchingNextUserChats}
                     isProcessing={props.isProcessing}
+                    isSelectMode={props.isSelectMode}
                     isUserChatLoading={props.isUserChatLoading}
-                    onClearOne={props.onClearOne}
-                    onDeleteOne={props.onDeleteOne}
-                    onDeleteOnePermanent={props.onDeleteOnePermanent}
+                    selectedIds={props.selectedIds}
                     receiverId={props.receiverId}
                     seeMedia={seeMedia}
                     seeProfile={seeProfile}
                     sendChatToUser={props.sendChatToUser}
+                    setIsSelectMode={props.setIsSelectMode}
+                    setShowDeleteOption2={props.setShowDeleteOption2}
                     setText={props.setText}
                     text={props.text}
+                    toggleSelect={props.toggleSelect}
                     userChats={props.userChats}
                     userChatError={props.userChatError}
                     userProfile={props.userProfile}

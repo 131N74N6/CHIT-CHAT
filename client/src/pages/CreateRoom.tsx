@@ -1,6 +1,6 @@
 import { Camera, MessageCircle, X } from "lucide-react";
 import Navbar from "../components/Navbar";
-import useUserServices from "../services/useUserProfileService";
+import useUserProfileService from "../services/useUserProfileService";
 import cn from "../utils/cn";
 import { useMessageStore } from "../stores/message.store";
 import { useEffect } from "react";
@@ -20,7 +20,7 @@ export default function CreateRoom() {
         }
     }, [message, setMessage]);
 
-    const { currentUser, isUserProcessing } = useUserServices();
+    const { currentUser, isUserProfileProcessing } = useUserProfileService();
 
     const { 
         description,
@@ -42,7 +42,7 @@ export default function CreateRoom() {
 
     return (
         <section className="flex md:flex-row p-2.5 gap-2.5 flex-col h-screen relative z-10">
-            <Navbar isProcessing={isUserProcessing}/>
+            <Navbar isProcessing={isUserProfileProcessing}/>
             {message ? <Alert message={message}/> : null}
             <form 
                 className={cn(
@@ -75,7 +75,7 @@ export default function CreateRoom() {
                                         "disabled:cursor-not-allowed group-hover:opacity-100 duration-300 transition-opacity",
                                         "flex justify-center items-center p-1.5 absolute top-1 left-[46%]"
                                     )}
-                                    disabled={isUserProcessing || isRoomProfileProcessing}
+                                    disabled={isUserProfileProcessing || isRoomProfileProcessing}
                                     onClick={(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
                                         event.stopPropagation();
                                         if (selectedProfileRoomUrl) URL.revokeObjectURL(selectedProfileRoomUrl);
@@ -130,7 +130,7 @@ export default function CreateRoom() {
                         "bg-blue-600 text-white font-medium cursor-pointer p-1.5 text-[1rem]",
                         "hover:bg-blue-800 transition-colors disabled:cursor-not-allowed"
                     )}
-                    disabled={isUserProcessing || isRoomProfileProcessing}
+                    disabled={isUserProfileProcessing || isRoomProfileProcessing}
                     type="submit"
                 >
                     Create room

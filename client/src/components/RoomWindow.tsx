@@ -48,21 +48,24 @@ export default function RoomWindow(props: IRoomWindow) {
                 />
             ) : (
                 <RoomChatWindow
+                    clearChatsIdsSelection={props.clearChatsIdsSelection}
                     currentUserId={props.currentUserId}
                     fetchNextRoomChat={props.fetchNextRoomChat}
                     hasNextRoomChat={props.hasNextRoomChat}
                     isFetchingNextRoomChat={props.isFetchingNextRoomChat}
                     isProcessing={props.isProcessing}
                     isRoomChatLoading={props.isRoomChatLoading}
+                    isSelectMode={props.isSelectMode}
                     navigate={navigate}
-                    onClearOne={props.onClearOne}
-                    onDeleteOne={props.onDeleteOne}
-                    onDeleteOnePermanent={props.onDeleteOnePermanent}
+                    selectedIds={props.selectedChatsIds}
                     roomChatError={props.roomChatError}
                     roomChats={props.roomChats}
                     roomProfile={props.roomProfile}
                     seeProfile={seeProfile}
                     sendChatToRoom={props.sendChatToRoom}
+                    setIsSelectMode={props.setIsSelectMode}
+                    setShowDeleteOption2={props.setShowDeleteOption2}
+                    toggleSelect={props.toggleSelect}
                 />
             )}
         </div>

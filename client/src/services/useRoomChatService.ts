@@ -18,8 +18,19 @@ export default function useRoomChatService(props?: IRoomChatService) {
     const text = useChatStore((state) => state.text);
     const setText = useChatStore((state) => state.setText);
     
-    const userChatsIdsToDelete = useRoomStore((state) => state.userChatsIdsToDelete);
-    const setUserChatsIdsToDelete = useRoomStore((state) => state.setUserChatsIdsToDelete);
+    const isSelectMode = useRoomStore((state) => state.isSelectMode);
+    const setIsSelectMode = useRoomStore((state) => state.setIsSelectMode);
+
+    const showDeleteOption1 = useRoomStore((state) => state.showDeleteOption1);
+    const setShowDeleteOption1 = useRoomStore((state) => state.setShowDeleteOption1);
+
+    const showDeleteOption2 = useRoomStore((state) => state.showDeleteOption2);
+    const setShowDeleteOption2 = useRoomStore((state) => state.setShowDeleteOption2);
+
+    const toggleSelect = useRoomStore((state) => state.toggleSelect);
+    
+    const selectedChatsIds = useRoomStore((state) => state.selectedChatsIds);
+    const clearChatsIdsSelection = useRoomStore((state) => state.clearChatsIdsSelection);
 
     const { 
         data: paginatedRoomChats, 
@@ -66,7 +77,7 @@ export default function useRoomChatService(props?: IRoomChatService) {
     }
 
     const clearAllRoomChatsForMeMt = useMutation({
-        mutationFn: async (_id: string) => {
+        mutationFn: async () => {
             try {
                 const request = await fetch(`${baseUrl}/clears/${props?.roomId}`, {
                     credentials: "include",
@@ -94,7 +105,7 @@ export default function useRoomChatService(props?: IRoomChatService) {
         mutationFn: async () => {
             try {
                 const request = await fetch(`${baseUrl}/clear/${props?.roomId}`, {
-                    body: JSON.stringify({ chatsIds: userChatsIdsToDelete }),
+                    body: JSON.stringify({ chatsIds: selectedChatsIds }),
                     credentials: "include",
                     headers: { 'Content-Type': 'application/json' },
                     method: "PUT"
@@ -144,7 +155,7 @@ export default function useRoomChatService(props?: IRoomChatService) {
         mutationFn: async () => {
             try {
                 const request = await fetch(`${baseUrl}/rm/${props?.roomId}`, {
-                    body: JSON.stringify({ chatsIds: userChatsIdsToDelete }),
+                    body: JSON.stringify({ chatsIds: selectedChatsIds }),
                     credentials: "include",
                     headers: { 'Content-Type': 'application/json' },
                     method: "DELETE"
@@ -184,16 +195,6 @@ export default function useRoomChatService(props?: IRoomChatService) {
         setMedia(prev => [...prev, ...temp]);
         
         if (inputMediaRef.current) inputMediaRef.current.value = "";
-    }
-
-    const resetSelectedChat = () => {
-        setUserChatsIdsToDelete([]);
-    }
-
-    const selectedChatToDelete = (id: string) => {
-        const temp: string[] = [];
-        temp.push(id);
-        setUserChatsIdsToDelete((prev) => [...prev, ...temp]);
     }
     
     const sendChatToRoomMt = useMutation({
@@ -238,18 +239,25 @@ export default function useRoomChatService(props?: IRoomChatService) {
     return { 
         allChatsInRoom, 
         clearAllRoomChatsForMeMt, 
+        clearChatsIdsSelection,
         clearChosenRoomChatsForMeMt, 
         deleteAllChatsInRoomMt,
         deleteChosenChatsInRoomMt,
         handleImagePreview,
         inputMediaRef,
         isRoomChatProcessing,
+        isSelectMode,
         media,
-        resetSelectedChat,
-        selectedChatToDelete,
+        selectedChatsIds,
         sendChatToRoomMt,
+        setIsSelectMode,
+        setShowDeleteOption1,
+        setShowDeleteOption2,
+        showDeleteOption1,
+        showDeleteOption2,
         setMedia,
         setText,
-        text 
+        text, 
+        toggleSelect
     }
 }
