@@ -57,9 +57,11 @@ export default function AvailableRoom() {
         setIsSelectMode,
         setShowDeleteOption1,
         setShowDeleteOption2,
+        setText,
         sendChatToRoomMt,
         showDeleteOption1, 
         showDeleteOption2,
+        text,
         toggleSelect
     } = useRoomChatService({ roomId: roomId });
 
@@ -149,8 +151,10 @@ export default function AvailableRoom() {
                     setShowDeleteOption2={setShowDeleteOption2}
                     setShowMember={setShowMember}
                     setShowProfile={setShowProfile}
+                    setText={setText}
                     showMember={showMember}
                     showProfile={showProfile}
+                    text={text}
                     toggleSelect={toggleSelect}
                     users={currentRoomMember.roomMember}
                 />

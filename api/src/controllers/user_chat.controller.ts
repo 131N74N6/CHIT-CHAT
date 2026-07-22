@@ -1,10 +1,9 @@
-import { Request, Response } from "express";
+import { Response } from "express";
 import { AuthRequest } from "../middlewares/auth.middleware";
 import { Chats } from "../models/chat.model";
 import { CloudinaryUploadResult, uploadTOCloudinary } from "../services/cloudinary.service";
 import { v2 } from "cloudinary";
 import { io } from "../services/socket_io.service";
-import { Types } from "mongoose";
 
 export async function clearAllUserChatsForMe(req: AuthRequest, res: Response) {
     try {
@@ -25,13 +24,13 @@ export async function clearAllUserChatsForMe(req: AuthRequest, res: Response) {
         const operations = [];
         
         const toDeleteChatsPermanent = chats.filter(chat => {
-            return chat.hidden_for.includes(new Types.ObjectId(receiverId))
+            return chat.hidden_for.some(id => id.toString() === receiverId);
         });
 
         const selectedMedia: CloudinaryUploadResult[] = toDeleteChatsPermanent.flatMap(chat => chat.media || []);
 
         const toDeleteChats = chats.filter(chat => {
-            return !chat.hidden_for.includes(new Types.ObjectId(receiverId))
+            return !chat.hidden_for.some(id => id.toString() === receiverId);
         });
 
         if (toDeleteChatsPermanent.length > 0) {
@@ -77,13 +76,13 @@ export async function clearChosenUserChatsForMe(req: AuthRequest, res: Response)
         if (chats.length === 0) return res.status(404).json({ message: "chat not found" });
 
         const toDeleteChatsPermanent = chats.filter(chat => {
-            return chat.hidden_for.includes(new Types.ObjectId(receiverId))
+            return chat.hidden_for.some(id => id.toString() === receiverId)
         });
         
         const selectedMedia: CloudinaryUploadResult[] = toDeleteChatsPermanent.flatMap(chat => chat.media) || [];
 
         const toDeleteChats = chats.filter(chat => {
-            return !chat.hidden_for.includes(new Types.ObjectId(receiverId))
+            return !chat.hidden_for.some(id => id.toString() === receiverId)
         });
 
         if (toDeleteChatsPermanent.length > 0) {
@@ -135,23 +134,23 @@ export async function deleteAllUserChats(req: AuthRequest, res: Response) {
         if (chats.length === 0) return res.status(404).json({ message: "chat not found" });
 
         const toDeleteOwnChatsPermanent = chats.filter(chat => {
-            return chat.hidden_for.includes(new Types.ObjectId(receiverId)) && 
-            (chat.receiver_id === new Types.ObjectId(receiverId) || chat.sender_id === new Types.ObjectId(userId))
+            return chat.hidden_for.some(id => id.toString() === receiverId) && 
+            (chat.receiver_id.toString() === receiverId || chat.sender_id.toString() === userId)
         });
 
         const toDeleteOwnChats = chats.filter(chat => {
-            return !chat.hidden_for.includes(new Types.ObjectId(receiverId)) && 
-            (chat.receiver_id === new Types.ObjectId(receiverId) || chat.sender_id === new Types.ObjectId(userId))
+            return !chat.hidden_for.some(id => id.toString() === receiverId) && 
+            (chat.receiver_id.toString() === receiverId || chat.sender_id.toString() === userId)
         });
 
         const toDeleteOtherChatsPermanent = chats.filter(chat => {
-            return chat.hidden_for.includes(new Types.ObjectId(receiverId)) && 
-            (chat.receiver_id === new Types.ObjectId(userId) || chat.sender_id === new Types.ObjectId(receiverId))
+            return chat.hidden_for.some(id => id.toString() === receiverId) && 
+            (chat.receiver_id.toString() === userId || chat.sender_id.toString() === receiverId)
         });
 
         const toDeleteOtherChats = chats.filter(chat => {
-            return !chat.hidden_for.includes(new Types.ObjectId(receiverId)) && 
-            (chat.receiver_id === new Types.ObjectId(userId) || chat.sender_id === new Types.ObjectId(receiverId))
+            return !chat.hidden_for.some(id => id.toString() === receiverId) && 
+            (chat.receiver_id.toString() === userId || chat.sender_id.toString() === receiverId)
         });
 
         if (toDeleteOwnChatsPermanent.length > 0) {
@@ -236,28 +235,28 @@ export async function deleteChosenUsersChat(req: AuthRequest, res: Response) {
         if (chats.length === 0) return res.status(404).json({ message: "chat not found" });
 
         const toDeleteOwnChatsPermanent = chats.filter(chat => {
-            return chat.hidden_for.includes(new Types.ObjectId(receiverId)) && 
-            (chat.receiver_id === new Types.ObjectId(receiverId) || chat.sender_id === new Types.ObjectId(userId))
+            return chat.hidden_for.some(id => id.toString() === receiverId) && 
+            (chat.receiver_id.toString() === receiverId || chat.sender_id.toString() === userId)
         });
 
         const toDeleteOwnChats = chats.filter(chat => {
-            return !chat.hidden_for.includes(new Types.ObjectId(receiverId)) && 
-            (chat.receiver_id === new Types.ObjectId(receiverId) || chat.sender_id === new Types.ObjectId(userId))
+            return !chat.hidden_for.some(id => id.toString() === receiverId) && 
+            (chat.receiver_id.toString() === receiverId || chat.sender_id.toString() === userId)
         });
 
         const toDeleteOtherChatsPermanent = chats.filter(chat => {
-            return chat.hidden_for.includes(new Types.ObjectId(receiverId)) && 
-            (chat.receiver_id === new Types.ObjectId(userId) || chat.sender_id === new Types.ObjectId(receiverId))
+            return chat.hidden_for.some(id => id.toString() === receiverId) && 
+            (chat.receiver_id.toString() === userId || chat.sender_id.toString() === receiverId)
         });
 
         const toDeleteOtherChats = chats.filter(chat => {
-            return !chat.hidden_for.includes(new Types.ObjectId(receiverId)) && 
-            (chat.receiver_id === new Types.ObjectId(userId) || chat.sender_id === new Types.ObjectId(receiverId))
+            return !chat.hidden_for.some(id => id.toString() === receiverId) && 
+            (chat.receiver_id.toString() === userId || chat.sender_id.toString() === receiverId)
         });
 
-        if (toDeleteOtherChatsPermanent.length > 0) {
-            const toDeleteOtherChatsPermanentIds = toDeleteOtherChatsPermanent.map(chat => chat._id);
-            const selectedMedia: CloudinaryUploadResult[] = toDeleteOtherChatsPermanent.flatMap(chat => chat.media || []);
+        if (toDeleteOwnChatsPermanent.length > 0) {
+            const toDeleteOwnChatsPermanentIds = toDeleteOwnChatsPermanent.map(chat => chat._id);
+            const selectedMedia: CloudinaryUploadResult[] = toDeleteOwnChatsPermanent.flatMap(chat => chat.media || []);
 
             if (selectedMedia.length > 0) {
                 const deleteFromCloudinary = selectedMedia.map(media => {
@@ -267,7 +266,7 @@ export async function deleteChosenUsersChat(req: AuthRequest, res: Response) {
                 operations.push(...deleteFromCloudinary);
             }
 
-            operations.push(Chats.deleteMany({ _id: { $in: toDeleteOtherChatsPermanentIds } }));
+            operations.push(Chats.deleteMany({ _id: { $in: toDeleteOwnChatsPermanentIds } }));
         }
 
         if (toDeleteOwnChats.length > 0) {
@@ -326,12 +325,13 @@ export async function deleteChosenUsersChat(req: AuthRequest, res: Response) {
     }
 }
 
-export async function editSelectedChat(req: Request, res: Response) {
+export async function editSelectedChat(req: AuthRequest, res: Response) {
     try {
         const { _id, receiverId } = req.params;
         const { text } = req.body;
+        const userId = req.user?.user_id;
 
-        const updatedChat = await Chats.findOneAndUpdate({ _id: _id }, {
+        const updatedChat = await Chats.findOneAndUpdate({ _id: _id, sender_id: userId }, {
             $set: { messages: text }
         });
 
@@ -408,7 +408,7 @@ export async function showAllChats(req: AuthRequest, res: Response) {
                 { receiver_id: receiverId, sender_id: userId },
                 { receiver_id: userId, sender_id: receiverId }, 
             ], 
-            hidden_for: { $nin: [userId!, receiverId] } 
+            hidden_for: { $nin: [userId!] } 
         })
         .limit(limit)
         .skip(skip);

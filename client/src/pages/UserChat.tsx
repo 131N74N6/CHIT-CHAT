@@ -113,29 +113,28 @@ export default function UserChat() {
                         </button>
                     </div>
                 ) : (
-                    <div 
-                        className="bg-gray-300 p-2 flex gap-1.5 cursor-pointer items-center" 
-                        onClick={() => navigate(`/user/profile/${receiver_id}`)}
-                    >
-                        <div className="w-10 h-10 rounded-full">
-                            {receiverUserProfile.detail && receiverUserProfile.detail.profile_picture !== null ? (
-                                <div className="w-full h-full">
-                                    <img 
-                                        className="w-full h-full object-cover" 
-                                        src={receiverUserProfile.detail.profile_picture.url} 
-                                        alt={receiverUserProfile.detail.profile_picture.public_id}
-                                    />
-                                </div>
-                            ) : (
-                                <div className={cn(
-                                    "w-full h-full rounded-full flex items-center text-[1rem]", 
-                                    "justify-center bg-purple-500 text-white font-medium"
-                                )}>
-                                    {receiverUserProfile.detail?.username[0]}
-                                </div>
-                            )}
+                    <div className="bg-gray-300 p-2 flex justify-between items-center cursor-pointer">
+                        <div className="flex items-center gap-2">
+                            <div className="w-10 h-10 rounded-full" onClick={() => navigate(`/user/profile/${receiver_id}`)}>
+                                {receiverUserProfile.detail && receiverUserProfile.detail.profile_picture !== null ? (
+                                    <div className="w-full h-full">
+                                        <img 
+                                            className="w-full h-full object-cover" 
+                                            src={receiverUserProfile.detail.profile_picture.url} 
+                                            alt={receiverUserProfile.detail.profile_picture.public_id}
+                                        />
+                                    </div>
+                                ) : (
+                                    <div className={cn(
+                                        "w-full h-full rounded-full flex items-center text-[0.9rem]", 
+                                        "justify-center bg-purple-500 text-white font-medium"
+                                    )}>
+                                        {receiverUserProfile.detail?.username[0]}
+                                    </div>
+                                )}
+                            </div>
+                            <div className="text-gray-900 text-[1.2rem] font-medium">{receiverUserProfile.detail?.username}</div>
                         </div>
-                        <div className="text-gray-900 text-[1.2rem] font-medium">{receiverUserProfile.detail?.username}</div>
                         <button
                             className={cn(
                                 "font-medium text-gray-600 cursor-pointer", 

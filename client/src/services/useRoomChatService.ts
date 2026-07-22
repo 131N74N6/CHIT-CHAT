@@ -82,7 +82,7 @@ export default function useRoomChatService(props?: IRoomChatService) {
                 const request = await fetch(`${baseUrl}/clears/${props?.roomId}`, {
                     credentials: "include",
                     headers: { 'Content-Type': 'application/json' },
-                    method: "PUT"
+                    method: "DELETE"
                 });
 
                 const response = await request.json();
@@ -108,7 +108,7 @@ export default function useRoomChatService(props?: IRoomChatService) {
                     body: JSON.stringify({ chatsIds: selectedChatsIds }),
                     credentials: "include",
                     headers: { 'Content-Type': 'application/json' },
-                    method: "PUT"
+                    method: "DELETE"
                 });
 
                 const response = await request.json();

@@ -36,7 +36,7 @@ export default function useUserChatService(props?: IUserChatService) {
                 const request = await fetch(`${baseUrl}/clears/${props?.receiverId}`, {
                     credentials: "include",
                     headers: { 'Content-Type': 'application/json' },
-                    method: "PUT"
+                    method: "DELETE"
                 });
 
                 const response = await request.json();
@@ -62,7 +62,7 @@ export default function useUserChatService(props?: IUserChatService) {
                     body: JSON.stringify({ chatsIds: selectedIds }),
                     credentials: "include",
                     headers: { 'Content-Type': 'application/json' },
-                    method: "PUT"
+                    method: "DELETE"
                 });
 
                 const response = await request.json();
@@ -84,7 +84,7 @@ export default function useUserChatService(props?: IUserChatService) {
     const deleteAllUserChatsMt = useMutation({
         mutationFn: async () => {
             try {
-                const request = await fetch(`${baseUrl}/rm-all`, {
+                const request = await fetch(`${baseUrl}/rm-all/${props?.receiverId}`, {
                     credentials: "include",
                     headers: { 'Content-Type': 'application/json' },
                     method: "DELETE"

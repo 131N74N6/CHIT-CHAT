@@ -1,11 +1,10 @@
-import { Request, Response } from "express";
+import { Response } from "express";
 import { Chats } from "../models/chat.model";
 import { CloudinaryUploadResult, uploadTOCloudinary } from "../services/cloudinary.service";
 import { v2 } from "cloudinary";
 import { AuthRequest } from "../middlewares/auth.middleware";
 import { io } from "../services/socket_io.service";
 import { User } from "../models/user.model";
-import { Types } from "mongoose";
 
 export async function clearAllRoomChatsForMe(req: AuthRequest, res: Response) {
     try {
@@ -115,23 +114,19 @@ export async function deleteAllChatsInRoom(req: AuthRequest, res: Response) {
         if (chats.length === 0) return res.status(404).json({ message: "chat not found" });
 
         const toDeleteOwnChatsPermanent = chats.filter(chat => {
-            return chat.hidden_for.length + 1 === members.length &&
-            chat.sender_id === new Types.ObjectId(userId)
+            return chat.hidden_for.length + 1 === members.length && chat.sender_id.toString() === userId
         });
 
         const toDeleteOwnChats = chats.filter(chat => {
-            return chat.hidden_for.length + 1 < members.length &&
-            chat.sender_id === new Types.ObjectId(userId)
+            return chat.hidden_for.length + 1 < members.length && chat.sender_id.toString() === userId
         });
 
         const toDeleteOtherChatsPermanent = chats.filter(chat => {
-            return chat.hidden_for.length + 1 === members.length &&
-            chat.sender_id !== new Types.ObjectId(userId)
+            return chat.hidden_for.length + 1 === members.length && chat.sender_id.toString() !== userId
         });
 
         const toDeleteOtherChats = chats.filter(chat => {
-            return chat.hidden_for.length + 1 < members.length &&
-            chat.sender_id !== new Types.ObjectId(userId)
+            return chat.hidden_for.length + 1 < members.length && chat.sender_id.toString() !== userId
         });
 
 
@@ -219,23 +214,19 @@ export async function deleteChosenChatsInRoom(req: AuthRequest, res: Response) {
         if (chats.length === 0) return res.status(404).json({ message: "chat not found" });
 
         const totoDeleteOwnChatsPermanent = chats.filter(chat => {
-            return chat.hidden_for.length + 1 === members.length &&
-            chat.sender_id === new Types.ObjectId(userId)
+            return chat.hidden_for.length + 1 === members.length && chat.sender_id.toString() === userId
         });
 
         const toDeleteOwnChats = chats.filter(chat => {
-            return chat.hidden_for.length + 1 < members.length &&
-            chat.sender_id === new Types.ObjectId(userId)
+            return chat.hidden_for.length + 1 < members.length && chat.sender_id.toString() === userId
         });
 
         const toDeleteOtherChatsPermanent = chats.filter(chat => {
-            return chat.hidden_for.length + 1 === members.length &&
-            chat.sender_id !== new Types.ObjectId(userId)
+            return chat.hidden_for.length + 1 === members.length && chat.sender_id.toString() !== userId
         });
 
         const toDeleteOtherChats = chats.filter(chat => {
-            return chat.hidden_for.length + 1 < members.length &&
-            chat.sender_id !== new Types.ObjectId(userId)
+            return chat.hidden_for.length + 1 < members.length && chat.sender_id.toString() !== userId
         });
 
         if (totoDeleteOwnChatsPermanent.length > 0) {
@@ -308,12 +299,13 @@ export async function deleteChosenChatsInRoom(req: AuthRequest, res: Response) {
     }
 }
 
-export async function editSelectedChat(req: Request, res: Response) {
+export async function editSelectedChat(req: AuthRequest, res: Response) {
     try {
         const { _id, roomId } = req.params;
         const { text } = req.body;
+        const userId = req.user?.user_id;
 
-        const updatedChat = await Chats.findOneAndUpdate({ _id: _id, room_id: roomId }, {
+        const updatedChat = await Chats.findOneAndUpdate({ _id: _id, room_id: roomId, sender_id: userId }, {
             $set: { messages: text }
         });
 

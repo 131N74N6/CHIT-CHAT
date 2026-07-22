@@ -5,7 +5,7 @@ import cn from "../utils/cn";
 export default function RoomChatDeleteOption2(props: IRoomChatDeleteOption2) {
     return (
         <div className="fixed inset-0 z-20 flex justify-center items-center h-full bg-[rgba(0,0,0,0.4)]">
-            <div className="bg-white flex flex-col gap-2.5">
+            <div className="bg-white flex flex-col gap-2.5 p-2.5 rounded-[10px]">
                 <button
                     className={cn(
                         "bg-white border border-gray-600 text-gray-600 cursor-pointer disabled:cursor-not-allowed",

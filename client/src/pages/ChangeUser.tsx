@@ -6,8 +6,7 @@ import Loading from "../components/Loading";
 import Navbar from "../components/Navbar";
 import cn from "../utils/cn";
 import { ArrowBigLeft, MessageCircle, X } from "lucide-react";
-import useChangeUserService from "../services/useChangeUserService";
-import useUserServices from "../services/useUserProfileService";
+import useUserProfileService from "../services/useUserProfileService";
 import useSocketIo from "../hooks/useSocketIo";
 
 export default function ChangeUser() {
@@ -22,7 +21,6 @@ export default function ChangeUser() {
         fileInputRef,
         gender,
         handleImagePreview,
-        isChangeUserProcessing,
         oldProfile,
         profilePicture,
         profilePictureUrl,
@@ -33,10 +31,11 @@ export default function ChangeUser() {
         setProfilePicture,
         setProfilePictureUrl,
         setUserName,
-        username 
-    } = useChangeUserService({ setMessage: setMessage });
+        username, 
+        currentUser, 
+        isUserProfileProcessing 
+    } = useUserProfileService({ setMessage: setMessage });
 
-    const { currentUser, isUserProcessing } = useUserServices({ setMessage: setMessage });
     const { isUserLoading, user, userError } = currentUser;
     
     useEffect(() => {
@@ -64,7 +63,7 @@ export default function ChangeUser() {
     return (
         <section className="flex flex-col md:flex-row relative h-screen p-2.5 gap-2.5 z-10">
             {message ? <Alert message={message}/> : null}
-            <Navbar isProcessing={isUserLoading || isUserProcessing}/>
+            <Navbar isProcessing={isUserLoading || isUserProfileProcessing}/>
             <form 
                 className="flex w-full md:w-2/5 flex-col h-full p-2.5 inset-shadow-sm inset-shadow-gray-400 border border-gray-400"
                 onSubmit={(event: React.SubmitEvent<HTMLFormElement>) => {
@@ -96,6 +95,7 @@ export default function ChangeUser() {
                                     "disabled:cursor-not-allowed cursor-pointer", 
                                     "hover:text-gray-500 transition-colors text-gray-800 font-medium"
                                 )}
+                                disabled={isUserProfileProcessing}
                                 onClick={() => navigate(`/profile`)}
                                 type="button"
                             >
@@ -117,7 +117,7 @@ export default function ChangeUser() {
                                                 "disabled:cursor-not-allowed group-hover:opacity-100 duration-300 transition-opacity",
                                                 "flex justify-center items-center p-1.5 absolute top-1 left-[46%]"
                                             )}
-                                            disabled={isChangeUserProcessing || isUserLoading}
+                                            disabled={isUserProfileProcessing}
                                             onClick={(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
                                                 event.stopPropagation();
                                                 if (profilePictureUrl) URL.revokeObjectURL(profilePictureUrl);
@@ -142,7 +142,7 @@ export default function ChangeUser() {
                                                 "disabled:cursor-not-allowed group-hover:opacity-100 duration-300 transition-opacity",
                                                 "flex justify-center items-center p-1.5 absolute top-1 left-[46%]"
                                             )}
-                                            disabled={isChangeUserProcessing || isUserLoading}
+                                            disabled={isUserProfileProcessing}
                                             onClick={(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
                                                 event.stopPropagation();
                                                 setDeleteProfilePicture(oldProfile);
@@ -181,7 +181,7 @@ export default function ChangeUser() {
                             <div className="flex flex-col gap-1.5">
                                 <label htmlFor="new-gender" className="text-gray-900 font-medium text-[1rem]">Gender</label>
                                 <select 
-                                    disabled={isChangeUserProcessing || isUserLoading}
+                                    disabled={isUserProfileProcessing}
                                     value={gender}
                                     onChange={(event: React.ChangeEvent<HTMLSelectElement, HTMLSelectElement>) => setGender(event.target.value)}
                                     className="bg-blue-200 text-gray-900 p-2 outline-none"
@@ -208,10 +208,10 @@ export default function ChangeUser() {
                                     "bg-purple-400 text-white font-medium text-[1rem] p-1.5 cursor-pointer", 
                                     "rounded disabled:cursor-not-allowed hover:bg-purple-600 transition-colors"
                                 )}
-                                disabled={isChangeUserProcessing || isUserProcessing}
+                                disabled={isUserProfileProcessing || isUserProfileProcessing}
                                 type="submit"
                             >
-                                Save
+                                {isUserProfileProcessing ? "Saving..." : "Save"}
                             </button>
                         </div>
                     </div>

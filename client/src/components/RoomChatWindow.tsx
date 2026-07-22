@@ -93,7 +93,9 @@ export default function RoomChatWindow(props: IRoomChatWindow) {
                             className="inline-0 text-gray-900 font-light w-[90%]"
                             id="message"
                             name="message"
+                            onChange={(event) => props.setText(event.target.value)}
                             type="text"
+                            value={props.text}
                         />
                         <button
                             className={cn(
