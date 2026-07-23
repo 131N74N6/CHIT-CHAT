@@ -65,7 +65,7 @@ export default function UserProfile() {
                         </div>
                         <div className="flex justify-center">
                             <div className="w-20 h-20 rounded-full">
-                                {detail && detail.profile_picture !== null && detail.profile_picture.public_id !== null ? (
+                                {detail && detail.profile_picture && detail.profile_picture.public_id ? (
                                     <div className="w-full h-full rounded-full">
                                         <img
                                             alt={detail.profile_picture.public_id}
@@ -99,7 +99,7 @@ export default function UserProfile() {
                             <div className="flex flex-col gap-1.5">
                                 <div className="text-[1rem] font-medium text-gray-800">Gender</div>
                                 <div className="text-[1rem] font-medium text-gray-800">
-                                    {detail && detail.gender !== null ? detail.gender : "-"}
+                                    {detail && detail.gender ? detail.gender : "-"}
                                 </div>
                             </div>
                             <div className="flex flex-col gap-1.5">

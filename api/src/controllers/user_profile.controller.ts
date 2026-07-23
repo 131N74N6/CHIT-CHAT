@@ -19,7 +19,7 @@ export async function changeUser(req: AuthRequest, res: Response) {
         if (!user) return res.status(404).json({ message: "user not found" });
 
         if (selectedImage) {
-            if (user.profile_picture !== null) {
+            if (user.profile_picture && user.profile_picture.public_id) {
                 await v2.uploader.destroy(user.profile_picture.public_id, { resource_type: user.profile_picture.resource_type });
 
                 const cloudinary = await uploadTOCloudinary({
