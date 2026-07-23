@@ -94,8 +94,8 @@ export default function useUserProfileService(props?: IUserProfileService) {
                         return queryKey[0].startsWith(`all-users`) ||
                         queryKey[0].startsWith('current-user') ||
                         queryKey[0].startsWith(`receiver-${props?.receiverId}`) ||
-                        queryKey[0].startsWith(`room-chat-${props?.roomId}`)||
-                        queryKey[0].startsWith(`room-member-${props?.roomId}`);
+                        queryKey[0].startsWith(`room-chat-`)||
+                        queryKey[0].startsWith(`room-member-`);
                     }
                     return false;
                 }

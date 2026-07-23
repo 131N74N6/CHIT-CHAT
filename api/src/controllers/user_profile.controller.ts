@@ -20,7 +20,9 @@ export async function changeUser(req: AuthRequest, res: Response) {
 
         if (selectedImage) {
             if (user.profile_picture && user.profile_picture.public_id) {
-                await v2.uploader.destroy(user.profile_picture.public_id, { resource_type: user.profile_picture.resource_type });
+                await v2.uploader.destroy(user.profile_picture.public_id, { 
+                    resource_type: user.profile_picture.resource_type 
+                });
 
                 const cloudinary = await uploadTOCloudinary({
                     file_buffer: selectedImage.buffer,

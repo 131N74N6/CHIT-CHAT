@@ -75,7 +75,7 @@ export default function useRoomMemberService(props?: IRoomMemberService) {
                     const queryKey = query.queryKey;
                     if (Array.isArray(queryKey) && queryKey.length > 0 && typeof queryKey[0] === "string") {
                         return queryKey[0].startsWith(`current-user`) ||
-                        queryKey[0].startsWith(`available-room-${props?.currentUserId}`) ||
+                        queryKey[0].startsWith(`available-room-`) ||
                         queryKey[0].startsWith(`room-chat-${props?.roomId}`) ||
                         queryKey[0].startsWith(`room-member-${props?.roomId}`);
                     }
@@ -110,7 +110,7 @@ export default function useRoomMemberService(props?: IRoomMemberService) {
                     const queryKey = query.queryKey;
                     if (Array.isArray(queryKey) && queryKey.length > 0 && typeof queryKey[0] === "string") {
                         return queryKey[0].startsWith(`current-user`) ||
-                        queryKey[0].startsWith(`available-room-${props?.currentUserId}`) ||
+                        queryKey[0].startsWith(`available-room-`) ||
                         queryKey[0].startsWith(`room-member-${props?.roomId}`);
                     }
                     return false;
