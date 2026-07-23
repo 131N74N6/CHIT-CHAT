@@ -58,7 +58,7 @@ export async function changeUser(req: AuthRequest, res: Response) {
         chats.forEach(chat => {
             const receiverId = chat.sender_id.toString() === currentUserId ? chat.receiver_id.toString() : chat.sender_id.toString();
             io.to(`user-profile:${receiverId}`).emit("user-profile:changed", {
-                _id: updated?._id,
+                _id: chat.receiver_id ?? chat.sender_id,
                 profile_picture: updated?.profile_picture,
                 username: updated?.username
             });

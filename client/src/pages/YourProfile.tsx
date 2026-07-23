@@ -1,16 +1,13 @@
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import useUserService from "../services/useUserProfileService";
 import { useMessageStore } from "../stores/message.store";
 import Loading from "../components/Loading";
 import Navbar from "../components/Navbar";
-import { ArrowBigLeft, MessageCircle, Pen } from "lucide-react";
+import { ArrowBigLeft, MessageCircle, Pen, X } from "lucide-react";
 import Alert from "../components/Alert";
 import cn from "../utils/cn";
 
 export default function YourProfile() {
-    const navigate = useNavigate();
-
     const message = useMessageStore((state) => state.message);
     const setMessage = useMessageStore((state) => state.setMessage);
     
