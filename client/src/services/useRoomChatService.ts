@@ -177,6 +177,32 @@ export default function useRoomChatService(props?: IRoomChatService) {
         }
     });
 
+    const editSelectedChatMt = useMutation({
+        mutationFn: async (id: string) => {
+            try {
+                const request = await fetch(`${baseUrl}/remake/${id}/${props?.roomId}`, {
+                    body: JSON.stringify({ text: text.trim() }),
+                    credentials: "include",
+                    headers: { "Content-Type": "application/json" },
+                    method: "PUT"
+                });
+
+                const response = await request.json();
+                if (!request.ok) throw new Error(response.message);
+                return response;
+            } catch (error) {
+                throw error;
+            }
+        },
+        onError: (error) => {
+            props?.setMessage!(error.message);
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: [`room-chat-${props?.roomId}`] });
+            resetRoomState();
+        }
+    });
+
     const handleImagePreview = (event: React.ChangeEvent<HTMLInputElement>) => {
         const files = event.target.files;
         const temp: IFileViewer[] = [];
@@ -234,7 +260,7 @@ export default function useRoomChatService(props?: IRoomChatService) {
 
     const isRoomChatProcessing = clearAllRoomChatsForMeMt.isPending || clearChosenRoomChatsForMeMt.isPending ||
     deleteAllChatsInRoomMt.isPending || deleteChosenChatsInRoomMt.isPending || allChatsInRoom.isRoomChatLoading || 
-    sendChatToRoomMt.isPending;
+    sendChatToRoomMt.isPending || editSelectedChatMt.isPending;
 
     return { 
         allChatsInRoom, 
@@ -243,6 +269,7 @@ export default function useRoomChatService(props?: IRoomChatService) {
         clearChosenRoomChatsForMeMt, 
         deleteAllChatsInRoomMt,
         deleteChosenChatsInRoomMt,
+        editSelectedChatMt,
         handleImagePreview,
         inputMediaRef,
         isRoomChatProcessing,

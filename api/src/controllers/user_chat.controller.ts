@@ -4,6 +4,7 @@ import { Chats } from "../models/chat.model";
 import { CloudinaryUploadResult, uploadTOCloudinary } from "../services/cloudinary.service";
 import { v2 } from "cloudinary";
 import { io } from "../services/socket_io.service";
+import { User } from "../models/user.model";
 
 export async function clearAllUserChatsForMe(req: AuthRequest, res: Response) {
     try {
@@ -327,7 +328,7 @@ export async function deleteChosenUsersChat(req: AuthRequest, res: Response) {
 
 export async function editSelectedChat(req: AuthRequest, res: Response) {
     try {
-        const { _id, receiverId } = req.params;
+        const { _id, receiver_id } = req.params;
         const { text } = req.body;
         const userId = req.user?.user_id;
 
@@ -335,7 +336,7 @@ export async function editSelectedChat(req: AuthRequest, res: Response) {
             $set: { messages: text }
         });
 
-        io.to(`user-chat:${receiverId}`).emit("user-chat:message-changed", {
+        io.to(`user-chat:${receiver_id}`).emit("user-chat:message-changed", {
             _id: updatedChat?._id,
             message: updatedChat?.messages
         });
@@ -354,6 +355,9 @@ export async function sendToOtherUser(req: AuthRequest, res: Response) {
 
         const media = req.files as Express.Multer.File[] | undefined;
         const { messages, receiver_id } = req.body;
+        
+        const user = await User.findOne({ _id: user_id });
+        if (!user) return res.status(404).json({ message: "user not found" });
 
         if (!messages || !media) return res.status(400).json({ message: "please provide messages" });
 
@@ -374,7 +378,8 @@ export async function sendToOtherUser(req: AuthRequest, res: Response) {
             messages: messages || null,
             media: selectedMedia || [],
             receiver_id: receiver_id,
-            sender_id: user_id
+            sender_id: user_id,
+            sender_name: user.username
         });
 
         await newChat.save();

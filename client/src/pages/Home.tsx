@@ -58,14 +58,8 @@ export default function Home() {
     
     useSocketIo({
         currentUserId: currentUser.user ? currentUser.user.user_id : '',
-        identifier: ["user-chat", "user-profile"],
-        marks: receiverId
-    });
-
-    useSocketIo({
-        currentUserId: currentUser.user ? currentUser.user.user_id : '',
-        identifier: ["available-user"],
-        marks: currentUser.user ? currentUser.user.user_id : ''
+        identifier: ["available-user", "user-chat", "user-profile"],
+        marks: { receiverId: receiverId }
     });
 
     useEffect(() => {

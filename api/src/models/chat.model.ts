@@ -12,6 +12,7 @@ export interface ChatIntrf {
     receiver_id: Types.ObjectId;
     room_id: Types.ObjectId;
     sender_id: Types.ObjectId;
+    sender_name: string;
 }
 
 const chatSchema = new Schema<ChatIntrf>({
@@ -26,6 +27,7 @@ const chatSchema = new Schema<ChatIntrf>({
     receiver_id: { type: Schema.Types.ObjectId },
     room_id: { type: Schema.Types.ObjectId },
     sender_id: { type: Schema.Types.ObjectId, required: true },
+    sender_name: { type: String }
 });
 
 export const Chats = mongoose.model<ChatIntrf>("chats", chatSchema, "chats");

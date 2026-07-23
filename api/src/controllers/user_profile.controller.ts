@@ -18,6 +18,8 @@ export async function changeUser(req: AuthRequest, res: Response) {
         const user = await User.findOne({ _id: currentUserId });
         if (!user) return res.status(404).json({ message: "user not found" });
 
+        const chats = await Chats.find({ $or: [{ receiver_id: currentUserId }, { sender_id: currentUserId }] });
+
         if (selectedImage) {
             if (user.profile_picture !== null) {
                 await v2.uploader.destroy(user.profile_picture.public_id, { resource_type: user.profile_picture.resource_type });
@@ -36,23 +38,33 @@ export async function changeUser(req: AuthRequest, res: Response) {
             $set: {
                 address: address || null,
                 gender: gender || null,
-                profile_picture: newProfilePicture || null,
-                username: username || `user-${Date.now()}`
+                profile_picture: newProfilePicture || user.profile_picture,
+                username: username || user.username
             }
         });
 
-        user.room_id.forEach(roomId => {
-            io.to(`room-member:${roomId}`)
-            .emit("user-profile:changed", {
+        if (user.room_id.length > 0 && user.room_id) {
+            user.room_id.forEach(roomId => {
+                io.to(`room-chat:${roomId}`)
+                .to(`room-member:${roomId}`)
+                .emit("user-profile:changed", {
+                    _id: updated?._id,
+                    profile_picture: updated?.profile_picture,
+                    username: updated?.username
+                });
+            });
+        }
+
+        chats.forEach(chat => {
+            const receiverId = chat.sender_id.toString() === currentUserId ? chat.receiver_id.toString() : chat.sender_id.toString();
+            io.to(`user-profile:${receiverId}`).emit("user-profile:changed", {
                 _id: updated?._id,
                 profile_picture: updated?.profile_picture,
                 username: updated?.username
             });
         });
 
-        io.to(`user-chat:${updated?._id}`)
-        .to(`user-profile:${updated?._id}`)
-        .emit("user-profile:changed", {
+        io.to(`available-user:${updated?._id}`).emit("user-profile:changed", {
             _id: updated?._id,
             profile_picture: updated?.profile_picture,
             username: updated?.username
@@ -110,7 +122,6 @@ export async function deleteUser(req: AuthRequest, res: Response) {
         user.room_id.forEach(roomId => {
             io.to(`room-chat:${roomId}`)
             .to(`room-member:${roomId}`)
-            .to(`room-profile:${roomId}`)
             .emit("user:deleted", {
                 _id: user._id,
                 profile_picture: user.profile_picture,
@@ -120,6 +131,7 @@ export async function deleteUser(req: AuthRequest, res: Response) {
 
         io.to(`user-chat:${user._id}`)
         .to(`user-profile:${user._id}`)
+        .to(`available-user:${user._id}`)
         .emit("user:deleted", {
             _id: user._id,
             profile_picture: user.profile_picture,
@@ -141,8 +153,7 @@ export async function joinRoom(req: AuthRequest, res: Response) {
             $addToSet: { room_id: new Types.ObjectId(room_code) },
         });
 
-        io.to(`room-chat:${room_code}`)
-        .to(`room-member:${room_code}`)
+        io.to(`room-member:${room_code}`)
         .to(`available-room:${userId}`)
         .emit("user:join-room-successfully", {
             _id: updated?._id,

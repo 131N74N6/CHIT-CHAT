@@ -30,7 +30,7 @@ export default function RoomMember() {
     useSocketIo({
         currentUserId: currentUser.user?.user_id!,
         identifier: ["room-member"],
-        marks: room_id!
+        marks: { roomId: room_id }
     });
 
     return (

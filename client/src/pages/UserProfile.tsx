@@ -31,7 +31,7 @@ export default function UserProfile() {
     useSocketIo({
         currentUserId: currentUser.user ? currentUser.user.user_id : '',
         identifier: ["user-profile"],
-        marks: receiver_id ? receiver_id : ''
+        marks: { receiverId: receiver_id }
     });
 
     return (

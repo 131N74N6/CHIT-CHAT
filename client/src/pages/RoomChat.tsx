@@ -46,8 +46,8 @@ export default function RoomChat() {
         
     useSocketIo({
         currentUserId: currentUser.user ? currentUser.user.user_id : '',
-        identifier: ["room-chat"],
-        marks: room_id ? room_id : ''
+        identifier: ["room-chat", "room-profile"],
+        marks: { roomId: room_id }
     });
 
     useEffect(() => {

@@ -15,6 +15,9 @@ export interface UserState {
         url: string;
     } | null) => void;
 
+    editMode: boolean;
+    setEditMode: (editMode: boolean) => void;
+
     email: string;
     setEmail: (email: string) => void;
 
@@ -53,7 +56,6 @@ export interface UserState {
     
     visiblepassword: boolean;
     setVisiblePassword: (visiblepassword: boolean) => void;
-    
 }
 
 export const useUserStore = create<UserState>((set) => ({
@@ -62,6 +64,9 @@ export const useUserStore = create<UserState>((set) => ({
 
     deleteProfilePicture: null,
     setDeleteProfilePicture: (deleteProfilePicture) => set({ deleteProfilePicture }),
+
+    editMode: false,
+    setEditMode: (editMode) => set({ editMode }),
     
     email: "",
     setEmail: (email) => set({ email }),
@@ -83,6 +88,7 @@ export const useUserStore = create<UserState>((set) => ({
 
     resetUserState: () => set({
         deleteProfilePicture: null,
+        editMode: false,
         email: "",
         oldProfile: null,
         password: "",

@@ -5,7 +5,7 @@ import { Query, useQueryClient } from "@tanstack/react-query";
 interface ChatSocketIntrf {
     currentUserId: string;
     identifier: string[];
-    marks: string;
+    marks?: { receiverId?: string; roomId?: string };
 }
 
 export default function useSocketIo(props: ChatSocketIntrf) {
@@ -41,19 +41,19 @@ export default function useSocketIo(props: ChatSocketIntrf) {
         connect(props.currentUserId);
 
         if (props.identifier.includes("available-room")) {
-            onAvailableRoomJoin(props.marks);
+            onAvailableRoomJoin(props.currentUserId);
         } else if (props.identifier.includes("available-user")) {
-            onAvailableUserJoin(props.marks);
+            onAvailableUserJoin(props.currentUserId);
         } else if (props.identifier.includes("room-chat")) {
-            onRoomChatJoin(props.marks);
+            onRoomChatJoin(props.marks?.roomId!);
         } else if (props.identifier.includes("room-member")) {
-            onRoomMemberJoin(props.marks);
+            onRoomMemberJoin(props.marks?.roomId!);
         } else if (props.identifier.includes("room-profile")) {
-            onRoomProfileJoin(props.marks);
+            onRoomProfileJoin(props.marks?.roomId!);
         } else if (props.identifier.includes("user-chat")) {
             onUserChatJoin(props.currentUserId);
         } else {
-            onUserProfileJoin(props.marks);
+            onUserProfileJoin(props.marks?.receiverId!);
         }
 
         const socket = getSocket();
@@ -76,8 +76,8 @@ export default function useSocketIo(props: ChatSocketIntrf) {
         }
 
         if (props.identifier.includes("available-users")) {
-            onChangeUser(() => invalidations(["all-users", "current-user", "user", "room-member"]));
-            onDeleteUser(() => invalidations(["all-users", "current-user", "user-chat", "user", "room-member"]));
+            onChangeUser(() => invalidations(["all-users", "current-user", "receiver", "room-member"]));
+            onDeleteUser(() => invalidations(["all-users", "current-user", "user-chat", "receiver", "room-member"]));
         }
 
         if (props.identifier.includes("room-chat")) {
@@ -93,7 +93,7 @@ export default function useSocketIo(props: ChatSocketIntrf) {
             onDeleteUser(() => invalidations(["current-user", "room-member", "user-chat"]));
             onJoinNewMember(() => invalidations(["room-member"]));
             onKickMember(() => invalidations(["available-room", "room-member"]));
-            onLeftTheRoom(() => invalidations(["current-user", "user", "room-member"]));
+            onLeftTheRoom(() => invalidations(["available-room", "current-user", "receiver", "room-member"]));
         }
 
         if (props.identifier.includes("room-profile")) {
@@ -110,8 +110,8 @@ export default function useSocketIo(props: ChatSocketIntrf) {
         }
 
         if (props.identifier.includes("user-profile")) {
-            onChangeUser(() => invalidations(["all-users", "current-user", "user", "room-member"]));
-            onDeleteUser(() => invalidations(["all-users", "current-user", "user", "user-chat", "room-member"]));
+            onChangeUser(() => invalidations(["all-users", "current-user", "receiver", "room-member"]));
+            onDeleteUser(() => invalidations(["all-users", "current-user", "receiver", "user-chat", "room-member"]));
         }
 
         return () => {
@@ -125,10 +125,10 @@ export default function useSocketIo(props: ChatSocketIntrf) {
                 socket.off("user-chat:send-new-chat", () => invalidations(["user-chat"]));
                 socket.off("user-chat:all-deleted", () => invalidations(["user-chat"]));
                 socket.off("user-chat:deleted", () => invalidations(["user-chat"]));
-                socket.off("user-profile:changed", () => invalidations(["all-users", "current-user", "user", "room-member"]));
-                socket.off("user:deleted", () => invalidations(["all-users", "current-user", "user", "user-chat", "room-member"]));
+                socket.off("user-profile:changed", () => invalidations(["all-users", "current-user", "receiver", "room-member"]));
+                socket.off("user:deleted", () => invalidations(["all-users", "current-user", "receiver", "user-chat", "room-member"]));
                 socket.off("user:user:join-room-successfully", () => invalidations(["room-member"]));
-                socket.off("user:left-room-successfully", () => invalidations(["current-user", "user", "room-member"]));
+                socket.off("user:left-room-successfully", () => invalidations(["current-user", "receiver", "room-member"]));
             }
         }
         

@@ -25,6 +25,6 @@ userChatsRouters.get("/show-all/:receiver_id", verifyToken, showAllChats);
 
 userChatsRouters.post("/send", verifyToken, uploadMedia, sendToOtherUser);
 
-userChatsRouters.put("/remake", verifyToken, editSelectedChat);
+userChatsRouters.put("/remake/:_id/:receiver_id", verifyToken, editSelectedChat);
 
 export default userChatsRouters;

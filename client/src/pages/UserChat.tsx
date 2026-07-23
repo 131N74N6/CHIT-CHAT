@@ -50,7 +50,7 @@ export default function UserChat() {
     useSocketIo({
         currentUserId: currentUser.user ? currentUser.user.user_id : '',
         identifier: ["user-chat", "user-profile"],
-        marks: receiver_id ? receiver_id : ''
+        marks: { receiverId: receiver_id }
     });
     
     useEffect(() => {

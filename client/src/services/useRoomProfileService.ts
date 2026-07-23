@@ -124,7 +124,6 @@ export default function useRoomProfileService(props?: IRoomProfileService) {
                 }
             });
             resetRoomState();
-            navigate(`/room/profile/${props?.roomId}`)
         }
     });
 
@@ -175,7 +174,8 @@ export default function useRoomProfileService(props?: IRoomProfileService) {
                 predicate: (query) => {
                     const queryKey = query.queryKey;
                     if (Array.isArray(queryKey) && queryKey.length > 0 && typeof queryKey[0] === "string") {
-                        return queryKey[0].startsWith(`room-member-${props?.roomId}`) ||
+                        return queryKey[0].startsWith(`room-chat-${props?.roomId}`) ||
+                        queryKey[0].startsWith(`room-member-${props?.roomId}`) ||
                         queryKey[0].startsWith(`available-room-${props?.currentUserId}`) ||
                         queryKey[0].startsWith(`room-profile-${props?.roomId}`);
                     }
@@ -219,6 +219,7 @@ export default function useRoomProfileService(props?: IRoomProfileService) {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: [`available-room-${props?.currentUserId}`] });
+            queryClient.invalidateQueries({ queryKey: [`room-member-${props?.roomId}`] });
             resetRoomState();
             navigate(`/rooms`);
         }

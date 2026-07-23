@@ -132,20 +132,16 @@ export default function useUserChatService(props?: IUserChatService) {
         }
     });
 
-    const { data, error, fetchNextPage, isFetchingNextPage, isLoading, hasNextPage } = useInfiniteQuery({
-        enabled: !!props?.receiverId,
-        getNextPageParam: (lastPage, allPages) => {
-            if (lastPage.length <= 14) return;
-            return allPages.length + 1;
-        },
-        queryFn: async ({ pageParam = 1 }: { pageParam?: number }) => {
+    const editSelectedChatMt = useMutation({
+        mutationFn: async (id: string) => {
             try {
-                const request = await fetch(`${baseUrl}/show-all/${props?.receiverId}?page=${pageParam}&limit=${14}`, {
+                const request = await fetch(`${baseUrl}/remake/${id}/${props?.receiverId}`, {
+                    body: JSON.stringify({ text: text.trim() }),
                     credentials: "include",
-                    headers: { 'Content-Type': 'application/json' },
-                    method: "GET"
+                    headers: { "Content-Type": "application/json" },
+                    method: "PUT"
                 });
-                
+
                 const response = await request.json();
                 if (!request.ok) throw new Error(response.message);
                 return response;
@@ -153,12 +149,13 @@ export default function useUserChatService(props?: IUserChatService) {
                 throw error;
             }
         },
-        queryKey: [`user-chat-${props?.receiverId}`],
-        initialPageParam: 1,
-        refetchOnMount: true,
-        refetchOnReconnect: true,
-        refetchOnWindowFocus: false,
-        staleTime: Infinity
+        onError: (error) => {
+            props?.setMessage!(error.message);
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: [`user-chat-${props?.receiverId}`] });
+            resetChatState();
+        }
     });
 
     const handleImagePreview = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -215,11 +212,41 @@ export default function useUserChatService(props?: IUserChatService) {
         }
     });
 
+    const { data, error, fetchNextPage, isFetchingNextPage, isLoading, hasNextPage } = useInfiniteQuery({
+        enabled: !!props?.receiverId,
+        getNextPageParam: (lastPage, allPages) => {
+            if (lastPage.length <= 14) return;
+            return allPages.length + 1;
+        },
+        queryFn: async ({ pageParam = 1 }: { pageParam?: number }) => {
+            try {
+                const request = await fetch(`${baseUrl}/show-all/${props?.receiverId}?page=${pageParam}&limit=${14}`, {
+                    credentials: "include",
+                    headers: { 'Content-Type': 'application/json' },
+                    method: "GET"
+                });
+                
+                const response = await request.json();
+                if (!request.ok) throw new Error(response.message);
+                return response;
+            } catch (error) {
+                throw error;
+            }
+        },
+        queryKey: [`user-chat-${props?.receiverId}`],
+        initialPageParam: 1,
+        refetchOnMount: true,
+        refetchOnReconnect: true,
+        refetchOnWindowFocus: false,
+        staleTime: Infinity
+    });
+
     const getUserChats: ChatIntrf[] = data ? data.pages.flat() : [];
     const userChats = { error, fetchNextPage, getUserChats, isFetchingNextPage, isLoading, hasNextPage }
 
     const isUserChatProcessing = clearChosenUserChatForMeMt.isPending || clearAllUserChatsForMeMt.isPending || 
-    deleteAllUserChatsMt.isPending || deleteChosenUsersChatMt.isPending || sendChatToUserMt.isPending;
+    deleteAllUserChatsMt.isPending || deleteChosenUsersChatMt.isPending || editSelectedChatMt.isPending || 
+    sendChatToUserMt.isPending;
 
     return { 
         clearChosenUserChatForMeMt,
@@ -227,6 +254,7 @@ export default function useUserChatService(props?: IUserChatService) {
         clearSelection,
         deleteAllUserChatsMt,
         deleteChosenUsersChatMt,
+        editSelectedChatMt,
         handleImagePreview, 
         inputMediaRef, 
         isSelectMode,

@@ -301,15 +301,15 @@ export async function deleteChosenChatsInRoom(req: AuthRequest, res: Response) {
 
 export async function editSelectedChat(req: AuthRequest, res: Response) {
     try {
-        const { _id, roomId } = req.params;
+        const { _id, room_id } = req.params;
         const { text } = req.body;
         const userId = req.user?.user_id;
 
-        const updatedChat = await Chats.findOneAndUpdate({ _id: _id, room_id: roomId, sender_id: userId }, {
+        const updatedChat = await Chats.findOneAndUpdate({ _id: _id, room_id: room_id, sender_id: userId }, {
             $set: { messages: text }
         });
 
-        io.to(`room-chat:${roomId}`).emit("room-chat:message-changed", {
+        io.to(`room-chat:${room_id}`).emit("room-chat:message-changed", {
             _id: updatedChat?._id,
             message: updatedChat?.messages
         });
@@ -328,6 +328,9 @@ export async function sendToOtherRoom(req: AuthRequest, res: Response) {
 
         const media = req.files as Express.Multer.File[] | undefined;
         const { messages, room_id } = req.body;
+
+        const user = await User.findOne({ _id: user_id });
+        if (!user) return res.status(404).json({ message: "user not found" });
 
         if (!messages || !media) return res.status(400).json({ message: "please provide messages" });
 
@@ -348,7 +351,8 @@ export async function sendToOtherRoom(req: AuthRequest, res: Response) {
             messages: messages || null,
             media: selectedMedia || [],
             room_id: room_id,
-            sender_id: user_id
+            sender_id: user_id,
+            sender_name: user.username
         });
 
         await newChat.save();

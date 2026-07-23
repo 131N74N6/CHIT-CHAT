@@ -1,8 +1,8 @@
 import { io, type Socket } from "socket.io-client"
 
-let socket: Socket | null = null;
-
 export default function useSocketIoServices() {
+    let socket: Socket | null = null;
+
     function connect(currentUserId: string) {
         if (socket?.connected) return;
 

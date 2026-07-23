@@ -45,6 +45,7 @@ export interface IRoomChatDeleteOption2 {
 }
 
 export interface IRoomMemberService {
+    currentUserId?: string;
     roomId?: string;
     setMessage?: (message: string) => void;
 }

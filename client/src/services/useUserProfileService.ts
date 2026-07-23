@@ -15,6 +15,9 @@ export default function useUserProfileService(props?: IUserProfileService) {
 
     const address = useUserStore((state) => state.address);
     const setAddress = useUserStore((state) => state.setAddress);
+
+    const editMode = useUserStore((state) => state.editMode);
+    const setEditMode = useUserStore((state) => state.setEditMode);
     
     const deleteProfilePicture = useUserStore((state) => state.deleteProfilePicture);
     const setDeleteProfilePicture = useUserStore((state) => state.setDeleteProfilePicture);
@@ -90,13 +93,14 @@ export default function useUserProfileService(props?: IUserProfileService) {
                     if (Array.isArray(queryKey) && queryKey.length > 0 && typeof queryKey[0] === "string") {
                         return queryKey[0].startsWith(`all-users`) ||
                         queryKey[0].startsWith('current-user') ||
-                        queryKey[0].startsWith(`room-profile`);
+                        queryKey[0].startsWith(`receiver-${props?.receiverId}`) ||
+                        queryKey[0].startsWith(`room-chat-${props?.roomId}`)||
+                        queryKey[0].startsWith(`room-member-${props?.roomId}`);
                     }
                     return false;
                 }
             });
-            resetUserState();
-            navigate(`/profile`);
+            setEditMode(false);
         }
     });
 
@@ -227,7 +231,18 @@ export default function useUserProfileService(props?: IUserProfileService) {
             props?.setMessage!(error.message);
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['current-user'] });
+            queryClient.invalidateQueries({
+                predicate: (query) => {
+                    const queryKey = query.queryKey;
+                    if (Array.isArray(queryKey) && queryKey.length > 0 && typeof queryKey[0] === "string") {
+                        return queryKey[0].startsWith('current-user') ||
+                        queryKey[0].startsWith(`receiver-${props?.receiverId}`) ||
+                        queryKey[0].startsWith(`available-room-${currentUser.user?.user_id}`)||
+                        queryKey[0].startsWith(`room-member-${props?.roomId}`);
+                    }
+                    return false;
+                }
+            });
         }
     });
 
@@ -248,7 +263,7 @@ export default function useUserProfileService(props?: IUserProfileService) {
                 throw error;
             }
         },
-        queryKey: [`user-${props?.receiverId}`],
+        queryKey: [`receiver-${props?.receiverId}`],
         staleTime: Infinity
     });
 
@@ -264,6 +279,7 @@ export default function useUserProfileService(props?: IUserProfileService) {
         currentUser,
         deleteProfilePicture,
         deleteUserMt,
+        editMode,
         fileInputRef,
         gender,
         handleImagePreview,
@@ -273,6 +289,7 @@ export default function useUserProfileService(props?: IUserProfileService) {
         profilePictureUrl,
         setAddress,
         setDeleteProfilePicture,
+        setEditMode,
         setGender,
         setOldProfilePicture,
         setProfilePictureUrl,

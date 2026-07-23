@@ -7,7 +7,6 @@ import { useEffect } from "react";
 import { useMessageStore } from "../stores/message.store";
 import { useNavigate, useParams } from "react-router-dom";
 import useRoomProfileService from "../services/useRoomProfileService";
-import useSocketIo from "../hooks/useSocketIo";
 
 export default function ChangeRoom() {
     const { room_id } = useParams();
@@ -61,12 +60,6 @@ export default function ChangeRoom() {
         setOldRoomPicture(currentRoomProfile.detail.profile_picture) :
         setOldRoomPicture(null);
     }, [room_id]);
-
-    useSocketIo({
-        currentUserId: currentUser.user?.user_id!,
-        identifier: ["room-profile"],
-        marks: room_id ? room_id : ''
-    });
 
     return (
         <section className="flex flex-col h-screen relative z-10">

@@ -25,6 +25,6 @@ roomChatsRouters.get("/show-all/:room_id", verifyToken, showwAllChatsForRoom);
 
 roomChatsRouters.post("/send", verifyToken, uploadMedia, sendToOtherRoom);
 
-roomChatsRouters.put("/remake", verifyToken, editSelectedChat);
+roomChatsRouters.put("/remake/:_id/:room_id", verifyToken, editSelectedChat);
 
 export default roomChatsRouters;
