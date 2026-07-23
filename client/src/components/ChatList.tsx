@@ -22,6 +22,7 @@ export default function ChatList(props: IChatList) {
                         <ChatBubble 
                             chat={chat} 
                             key={chat._id}
+                            isInRoom={props.isInRoom}
                             isProcessing={props.isProcessing} 
                             isSelectMode={props.isSelectMode}
                             own={props.currentUserId === chat.sender_id}

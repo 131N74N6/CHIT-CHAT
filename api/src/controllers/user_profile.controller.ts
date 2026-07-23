@@ -18,8 +18,6 @@ export async function changeUser(req: AuthRequest, res: Response) {
         const user = await User.findOne({ _id: currentUserId });
         if (!user) return res.status(404).json({ message: "user not found" });
 
-        const chats = await Chats.find({ $or: [{ receiver_id: currentUserId }, { sender_id: currentUserId }] });
-
         if (selectedImage) {
             if (user.profile_picture !== null) {
                 await v2.uploader.destroy(user.profile_picture.public_id, { resource_type: user.profile_picture.resource_type });
@@ -41,7 +39,7 @@ export async function changeUser(req: AuthRequest, res: Response) {
                 profile_picture: newProfilePicture || user.profile_picture,
                 username: username || user.username
             }
-        });
+        }, { new: true });
 
         if (user.room_id.length > 0 && user.room_id) {
             user.room_id.forEach(roomId => {
@@ -50,28 +48,22 @@ export async function changeUser(req: AuthRequest, res: Response) {
                 .emit("user-profile:changed", {
                     _id: updated?._id,
                     profile_picture: updated?.profile_picture,
-                    username: updated?.username
+                    username: username
                 });
             });
         }
 
-        chats.forEach(chat => {
-            const receiverId = chat.sender_id.toString() === currentUserId ? chat.receiver_id.toString() : chat.sender_id.toString();
-            io.to(`user-profile:${receiverId}`).emit("user-profile:changed", {
-                _id: chat.receiver_id ?? chat.sender_id,
-                profile_picture: updated?.profile_picture,
-                username: updated?.username
-            });
-        });
-
-        io.to(`available-user:${updated?._id}`).emit("user-profile:changed", {
+        io.to(`available-user:${updated?._id}`)
+        .to(`user-profile:${currentUserId}`)
+        .emit("user-profile:changed", {
             _id: updated?._id,
             profile_picture: updated?.profile_picture,
-            username: updated?.username
+            username: username
         });
 
         res.status(200).json({ message: "user profile updated" });
     } catch (error) {
+        console.log(error);
         res.status(500).json({ message: "something went wrong" });
     }
 }

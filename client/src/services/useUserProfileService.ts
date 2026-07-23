@@ -58,7 +58,7 @@ export default function useUserProfileService(props?: IUserProfileService) {
                 if (profilePicture) formData.append("image", profilePicture);
 
                 if (deleteProfilePicture && deleteProfilePicture.public_id) {
-                    const request = await fetch(`${import.meta.env.VITE_BASE_API_URL}/users/profiles/rm-pict`, {
+                    const request = await fetch(`${baseUrl}/rm-pict`, {
                         body: JSON.stringify({ old_image: deleteProfilePicture }),
                         credentials: "include",
                         headers: { 'Content-Type': 'application/json' },
@@ -70,7 +70,7 @@ export default function useUserProfileService(props?: IUserProfileService) {
                     return response;
                 }
 
-                const request = await fetch(`${import.meta.env.VITE_BASE_API_URL}/users/profiles/remake`, {
+                const request = await fetch(`${baseUrl}/remake`, {
                     body: formData,
                     credentials: "include",
                     method: "PUT"
@@ -236,9 +236,8 @@ export default function useUserProfileService(props?: IUserProfileService) {
                     const queryKey = query.queryKey;
                     if (Array.isArray(queryKey) && queryKey.length > 0 && typeof queryKey[0] === "string") {
                         return queryKey[0].startsWith('current-user') ||
-                        queryKey[0].startsWith(`receiver-${props?.receiverId}`) ||
                         queryKey[0].startsWith(`available-room-${currentUser.user?.user_id}`)||
-                        queryKey[0].startsWith(`room-member-${props?.roomId}`);
+                        queryKey[0].startsWith(`room-member-`);
                     }
                     return false;
                 }

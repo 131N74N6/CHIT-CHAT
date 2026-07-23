@@ -75,6 +75,7 @@ export default function RoomChatWindow(props: IRoomChatWindow) {
                         fetchNextPage={props.fetchNextRoomChat}
                         hasNextPage={props.hasNextRoomChat}
                         isFetchingNextPage={props.isFetchingNextRoomChat}
+                        isInRoom={true}
                         isProcessing={props.isProcessing}
                         isSelectMode={props.isSelectMode}
                         selectedIds={props.selectedIds}

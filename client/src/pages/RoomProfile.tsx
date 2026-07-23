@@ -2,7 +2,7 @@ import Alert from "../components/Alert";
 import cn from "../utils/cn";
 import useRoomProfileService from "../services/useRoomProfileService";
 import Navbar from "../components/Navbar";
-import { ArrowBigLeft } from "lucide-react";
+import { ArrowBigLeft, MessageCircle } from "lucide-react";
 import { useMessageStore } from "../stores/message.store";
 import { useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -45,10 +45,10 @@ export default function RoomProfile() {
     const isRoomOwner = user && detail && user.user_id === detail.creator_id;
 
     return (
-        <section className="flex flex-col relative h-screen z-10">
+        <section className="flex md:flex-row p-2.5 gap-2.5 flex-col relative h-screen z-10">
             {message ? <Alert message={message}/> : null}
             <Navbar isProcessing={isUserProfileProcessing}/>
-            <div className="flex w-full flex-col h-full bg-gray-400 gap-2.5 p-1.5">
+            <div className="flex w-full flex-col h-full gap-2.5 p-2.5 md:w-2/5 inset-shadow-sm inset-shadow-gray-400">
                 {isDetailLoading ? (
                     <div className="flex justify-center items-center h-full">
                         <Loading/>
@@ -67,7 +67,7 @@ export default function RoomProfile() {
                                     "disabled:cursor-not-allowed cursor-pointer", 
                                     "hover:text-gray-500 transition-colors text-gray-800 font-medium"
                                 )}
-                                onClick={() => navigate(`/room/chat/${room_id}`)}
+                                onClick={() => navigate(`/rooms/chat/${room_id}`)}
                                 type="button"
                             >
                                 <ArrowBigLeft size={24}/>
@@ -151,13 +151,29 @@ export default function RoomProfile() {
                                 )}
                                 disabled={isUserProfileProcessing}
                                 type="button"
-                                onClick={() => navigate(`/room/member/${room_id}`)}
+                                onClick={() => navigate(`/rooms/member/${room_id}`)}
                             >
                                 See Room Member
                             </button>
                         </div>
                     </div>
                 )}
+            </div>
+            <div 
+                className={cn(
+                    "md:flex md:justify-center md:items-center md:h-full md:w-2/5", 
+                    "md:bg-white hidden inset-shadow-sm inset-shadow-gray-400",
+                    "border border-gray-400"
+                )}
+            >
+                <div className="flex flex-col gap-2">
+                    <div className="text-gray-500 font-medium flex justify-center">
+                        <MessageCircle size={34}/>
+                    </div>
+                    <div className="text-gray-700 font-medium text-center">
+                        Welcome to Chit Chat
+                    </div>
+                </div>
             </div>
         </section>
     );

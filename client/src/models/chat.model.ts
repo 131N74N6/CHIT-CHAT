@@ -30,11 +30,13 @@ export interface ChatIntrf {
     receiver_id?: string;
     room_id?: string;
     sender_id: string;
+    sender_name: string;
 }
 
 export interface IChatBubble {
     chat: ChatIntrf;
     isProcessing: boolean;
+    isInRoom: boolean;
     isSelectMode: boolean;
     own: boolean;
     selectedIds: string[];
@@ -47,6 +49,7 @@ export interface IChatList {
     fetchNextPage: (options?: FetchNextPageOptions | undefined) => Promise<InfiniteQueryObserverResult<InfiniteData<any, unknown>, Error>>;
     hasNextPage: boolean;
     isFetchingNextPage: boolean;
+    isInRoom: boolean;
     isProcessing: boolean;
     isSelectMode: boolean;
     selectedIds: string[];

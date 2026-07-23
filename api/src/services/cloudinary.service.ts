@@ -15,7 +15,7 @@ export interface CloudinaryUploadOption {
 
 export async function uploadTOCloudinary(props: CloudinaryUploadOption): Promise<CloudinaryUploadResult> {
     return new Promise((resolve, reject) => {
-        const publicId = `${Date.now()}-${props.original_name}`;
+        const publicId = `${Date.now()} ${props.original_name}`;
         const uploadStream = v2.uploader.upload_stream({
             folder: props.folder_name,
             public_id: publicId,
@@ -30,9 +30,9 @@ export async function uploadTOCloudinary(props: CloudinaryUploadOption): Promise
                 return;
             }
             resolve({
-                public_id: result?.public_id,
-                resource_type: result?.resource_type,
-                url: result?.url
+                public_id: result.public_id,
+                resource_type: result.resource_type,
+                url: result.url
             });
         });
 

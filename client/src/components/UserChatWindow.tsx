@@ -76,6 +76,7 @@ export default function UserChatWindow(props: IUserChatWindow) {
                         fetchNextPage={props.fetchNextUserChat}
                         hasNextPage={props.hasNextUserChat}
                         isFetchingNextPage={props.isFetchingNextUserChats}
+                        isInRoom={false}
                         isProcessing={props.isProcessing}
                         isSelectMode={props.isSelectMode}
                         selectedIds={props.selectedIds}

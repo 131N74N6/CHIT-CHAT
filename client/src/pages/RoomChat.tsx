@@ -3,7 +3,7 @@ import cn from "../utils/cn";
 import ChatList from "../components/ChatList";
 import Loading from "../components/Loading";
 import useRoomChatService from "../services/useRoomChatService";
-import { File, Menu, SendIcon, X } from "lucide-react";
+import { File, Menu, MenuSquare, MessageCircle, SendIcon, X } from "lucide-react";
 import { useEffect } from "react";
 import { useMessageStore } from "../stores/message.store";
 import { useNavigate, useParams } from "react-router-dom";
@@ -39,8 +39,10 @@ export default function RoomChat() {
         setIsSelectMode,
         setShowDeleteOption1,
         setShowDeleteOption2,
+        setText,
         showDeleteOption1,
         showDeleteOption2,
+        text,
         toggleSelect
     } = useRoomChatService({ roomId: room_id, setMessage: setMessage });
         
@@ -60,7 +62,7 @@ export default function RoomChat() {
     }, [message, setMessage]);
 
     return (
-        <section className="flex flex-col relative h-screen z-10">
+        <section className="flex md:flex-row gap-2.5 p-2.5 flex-col relative h-screen z-10">
             {message ? <Alert message={message}/> : null}
             <Navbar isProcessing={isRoomChatProcessing || isUserProfileProcessing}/>
             {showDeleteOption1 ? (
@@ -82,9 +84,9 @@ export default function RoomChat() {
                     setShowDeleteOption2={setShowDeleteOption2}
                 />
             ) : null}
-            <div className="flex flex-col h-full px-2.5 pt-2.5 w-full">
+            <div className="md:w-2/5 w-full h-full flex flex-col">
                 {isSelectMode ? (
-                    <div className="bg-gray-300 p-2 flex gap-1.5 cursor-pointer justify-end">
+                    <div className="bg-gray-400 p-2 flex gap-1.5 cursor-pointer justify-end">
                         <button
                             className={cn(
                                 "font-medium text-gray-600 cursor-pointer", 
@@ -112,31 +114,44 @@ export default function RoomChat() {
                         </button>
                     </div>
                 ) : (
-                    <div className="bg-gray-500 flex gap-1.5 p-2 w-full" onClick={() => navigate(`/room/profile/${room_id}`)}>
-                        <div className="w-20 h-20 rounded-full">
-                            {currentRoomProfile.detail && currentRoomProfile.detail.profile_picture !== null ? (
-                                <div className="w-full h-full">
-                                    <img
-                                        className="w-full h-full object-cover"
-                                        alt={currentRoomProfile.detail.profile_picture.public_id}
-                                        src={currentRoomProfile.detail.profile_picture.url}
-                                    />
-                                </div>
-                            ) : (
-                                <div className={cn(
-                                    "w-full h-full rounded-full flex items-center", 
-                                    "justify-center bg-blue-600 text-white font-extralight"
-                                )}>
-                                    {currentRoomProfile.detail?.name[0]}
-                                </div>
-                            )}
+                    <div className="bg-gray-400 p-2 flex justify-between items-center cursor-pointer">
+                        <div className="flex items-center gap-2">
+                            <div className="w-10 h-10 rounded-full" onClick={() => navigate(`/rooms/profile/${room_id}`)}>
+                                {currentRoomProfile.detail && currentRoomProfile.detail.profile_picture !== null ? (
+                                    <div className="w-full h-full">
+                                        <img 
+                                            className="w-full h-full object-cover" 
+                                            src={currentRoomProfile.detail.profile_picture.url} 
+                                            alt={currentRoomProfile.detail.profile_picture.public_id}
+                                        />
+                                    </div>
+                                ) : (
+                                    <div className={cn(
+                                        "w-full h-full rounded-full flex items-center text-[0.9rem]", 
+                                        "justify-center bg-purple-500 text-white font-medium"
+                                    )}>
+                                        {currentRoomProfile.detail?.name[0]}
+                                    </div>
+                                )}
+                            </div>
+                            <div className="text-gray-900 text-[1.2rem] font-medium">{currentRoomProfile.detail?.name}</div>
                         </div>
-                        <div className="text-white text-[1.2rem] font-extralight">{currentRoomProfile.detail?.name}</div>
+                        <button
+                            className={cn(
+                                "font-medium text-gray-600 cursor-pointer", 
+                                "disabled:cursor-not-allowed hover:text-gray-400 transition-colors"
+                            )}
+                            disabled={isRoomChatProcessing || isUserProfileProcessing}
+                            onClick={() => setShowDeleteOption1(true)}
+                            type="button"
+                        >
+                            <MenuSquare size={23}/>
+                        </button>
                     </div>
                 )}
-                <div className="flex flex-col gap-2.5 p-1">
+                <div className="flex flex-col gap-2.5 px-2.5 h-full border-x border-gray-400">
                     {allChatsInRoom.isRoomChatLoading ? (
-                        <div className="flex justify-center items-center h-full">
+                        <div className="flex justify-center items-center bg-white h-full">
                             <Loading/>
                         </div>
                     ) : allChatsInRoom.roomChatsError ? (
@@ -146,58 +161,69 @@ export default function RoomChat() {
                             </div>
                         </div>
                     ) : (
-                        <ChatList
-                            chats={allChatsInRoom.roomChats}
-                            currentUserId={currentUser.user ? currentUser.user.user_id : ""}
+                        <ChatList 
+                            chats={allChatsInRoom.roomChats} 
+                            currentUserId={currentUser.user ? currentUser.user.user_id : ''} 
                             fetchNextPage={allChatsInRoom.fecthNextRoomChat}
                             hasNextPage={allChatsInRoom.roomChatHasNextPage}
                             isFetchingNextPage={allChatsInRoom.isRoomChatFetchNext}
+                            isInRoom={true}
                             isProcessing={isRoomChatProcessing || isUserProfileProcessing}
                             isSelectMode={isSelectMode}
                             selectedIds={selectedChatsIds}
                             toggleSelect={toggleSelect}
                         />
                     )}
-                    <form 
-                        className="bg-white inset-shadow-gray-200 p-1.5 flex flex-col gap-1.5 max-h-[30%] overflow-y-auto"
-                        onSubmit={(event: React.SubmitEvent<HTMLFormElement>) => {
-                            event.preventDefault();
-                            sendChatToRoomMt.mutate();
-                        }}
-                    >
-                        <div className="flex justify-end">
-                            <input
-                                className="inline-0 text-gray-900 font-light w-[90%]"
-                                id="message"
-                                name="message"
-                                type="text"
-                            />
+                </div>
+                <form 
+                    className="bg-white inset-shadow-gray-200 p-1.5 flex flex-col gap-1.5 border border-gray-400"
+                    onSubmit={(event: React.SubmitEvent<HTMLFormElement>) => {
+                        event.preventDefault();
+                        sendChatToRoomMt.mutate();
+                    }}
+                >
+                    <div className="flex gap-1.5">
+                        <textarea
+                            className="focus:outline-0 w-[90%] resize-none"
+                            id="message"
+                            name="message"
+                            onChange={(event) => setText(event.target.value)}
+                            value={text}
+                        />
+                        <div className="flex flex-col gap-2 justify-center">
                             <button
-                                className={cn(
-                                    "cursor-pointer disabled:cursor-not-allowed", 
-                                    "text-white rounded-full flex justify-center items-center p-1.5",
-                                    "bg-blue-600 w-[10%] h-[10%] transition-colors hover:bg-blue-500" 
-                                )}
+                                className="text-blue-500 font-medium cursor-pointer disabled:cursor-not-allowed"
                                 disabled={isRoomChatProcessing || isUserProfileProcessing}
                                 type="submit"
                             >
                                 <SendIcon size={22}/>
                             </button>
-                        </div>
-                        <div>
                             <button 
-                                className={cn(
-                                    "cursor-pointer disabled:cursor-not-allowed", 
-                                    "border border-gray-500 bg-white text-gray-500 w-[20%] p-1.5"
-                                )}
+                                className="text-blue-500 font-medium cursor-pointer disabled:cursor-not-allowed"
                                 disabled={isRoomChatProcessing || isUserProfileProcessing}
-                                onClick={() => navigate(`/room/chat/preview/${room_id}`)}
+                                onClick={() => navigate(`/rooms/chat/preview/${room_id}`)}
                                 type="button"
                             >
                                 <File size={22}/>
                             </button>
                         </div>
-                    </form>
+                    </div>
+                </form>
+            </div>
+            <div 
+                className={cn(
+                    "md:flex md:justify-center md:items-center md:h-full md:w-2/5", 
+                    "md:bg-white hidden inset-shadow-sm inset-shadow-gray-400",
+                    "border border-gray-400"
+                )}
+            >
+                <div className="flex flex-col gap-2">
+                    <div className="text-gray-500 font-medium flex justify-center">
+                        <MessageCircle size={34}/>
+                    </div>
+                    <div className="text-gray-700 font-medium text-center">
+                        Welcome to Chit Chat
+                    </div>
                 </div>
             </div>
         </section>

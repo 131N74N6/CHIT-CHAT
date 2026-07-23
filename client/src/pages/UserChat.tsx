@@ -83,9 +83,9 @@ export default function UserChat() {
                     setShowDeleteOption2={setShowDeleteOption2}
                 />
             ) : null}
-            <div className="md:w-2/5 w-full h-full flex flex-col px-2.5 inset-shadow-sm inset-shadow-gray-400 border border-gray-400">
+            <div className="md:w-2/5 w-full h-full flex flex-col">
                 {isSelectMode ? (
-                    <div className="bg-gray-300 p-2 flex gap-1.5 cursor-pointer justify-end">
+                    <div className="bg-gray-400 p-2 flex gap-1.5 cursor-pointer justify-end">
                         <button
                             className={cn(
                                 "font-medium text-gray-600 cursor-pointer", 
@@ -113,7 +113,7 @@ export default function UserChat() {
                         </button>
                     </div>
                 ) : (
-                    <div className="bg-gray-300 p-2 flex justify-between items-center cursor-pointer">
+                    <div className="bg-gray-400 p-2 flex justify-between items-center cursor-pointer">
                         <div className="flex items-center gap-2">
                             <div className="w-10 h-10 rounded-full" onClick={() => navigate(`/user/profile/${receiver_id}`)}>
                                 {receiverUserProfile.detail && receiverUserProfile.detail.profile_picture !== null ? (
@@ -148,7 +148,7 @@ export default function UserChat() {
                         </button>
                     </div>
                 )}
-                <div className="flex flex-col gap-2.5 p-1 h-full">
+                <div className="flex flex-col gap-2.5 px-2.5 h-full border-x border-gray-400">
                     {userChats.isLoading ? (
                         <div className="flex justify-center items-center bg-white h-full">
                             <Loading/>
@@ -166,6 +166,7 @@ export default function UserChat() {
                             fetchNextPage={userChats.fetchNextPage}
                             hasNextPage={userChats.hasNextPage}
                             isFetchingNextPage={userChats.isFetchingNextPage}
+                            isInRoom={false}
                             isProcessing={isUserChatProcessing || isUserProfileProcessing}
                             isSelectMode={isSelectMode}
                             selectedIds={selectedIds}
@@ -180,32 +181,24 @@ export default function UserChat() {
                         sendChatToUserMt.mutate();
                     }}
                 >
-                    <div className="flex flex-col gap-1.5">
-                        <input
-                            className="focus:outline-0 outline-0 text-gray-600 font-medium w-full max-h-[25%] overflow-y-auto"
+                    <div className="flex gap-1.5">
+                        <textarea
+                            className="focus:outline-0 w-[90%] resize-none"
                             id="message"
                             name="message"
                             onChange={(event) => setText(event.target.value)}
                             value={text}
-                            type="text"
                         />
-                        <div className="flex gap-2 justify-end">
+                        <div className="flex flex-col gap-2 justify-center">
                             <button
-                                className={cn(
-                                    "cursor-pointer disabled:cursor-not-allowed w-10 h-10", 
-                                    "text-white rounded-full flex justify-center items-center p-1.5",
-                                    "bg-blue-600 transition-colors hover:bg-blue-500" 
-                                )}
+                                className="text-blue-500 font-medium cursor-pointer disabled:cursor-not-allowed"
                                 disabled={isUserChatProcessing || isUserProfileProcessing}
                                 type="submit"
                             >
                                 <SendIcon size={22}/>
                             </button>
                             <button 
-                                className={cn(
-                                    "cursor-pointer disabled:cursor-not-allowed border border-gray-400", 
-                                    "border border-gray-500 bg-white text-gray-500 w-[20%] p-1.5"
-                                )}
+                                className="text-blue-500 font-medium cursor-pointer disabled:cursor-not-allowed"
                                 disabled={isUserChatProcessing || isUserProfileProcessing}
                                 onClick={() => navigate(`/user/chat/preview/${receiver_id}`)}
                                 type="button"

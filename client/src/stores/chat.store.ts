@@ -54,6 +54,7 @@ export const useChatStore = create<ChatState>((set) => ({
         media: [], 
         receiverId: "",
         selectedIds: [],
+        showUserMedia: false,
         showUserProfile: false,
         text: "", 
         showDeleteOption1: false,

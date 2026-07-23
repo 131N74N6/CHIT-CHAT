@@ -29,13 +29,13 @@ export default function AvailableRoom() {
     const showProfile = useRoomStore((state) => state.showProfile);
     const setShowProfile = useRoomStore((state) => state.setShowProfile);
 
-    const { currentUser, isUserProfileProcessing } = useUserProfileService({ setMessage: setMessage });
+    const { currentUser, isUserProfileProcessing } = useUserProfileService({ roomId: roomId, setMessage: setMessage });
 
     const { 
         currentRoomMember, 
         isRoomMemberProcessing, 
         leftRoomMt 
-    } = useRoomMemberService({ roomId: roomId, setMessage: setMessage });
+    } = useRoomMemberService({ currentUserId: currentUser.user?.user_id, roomId: roomId, setMessage: setMessage });
 
     const { 
         currentAvailableRooms,  
@@ -63,7 +63,7 @@ export default function AvailableRoom() {
         showDeleteOption2,
         text,
         toggleSelect
-    } = useRoomChatService({ roomId: roomId });
+    } = useRoomChatService({ roomId: roomId, setMessage: setMessage });
 
     useEffect(() => {
         if (message) {

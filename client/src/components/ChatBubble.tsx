@@ -1,8 +1,9 @@
+import { useNavigate } from "react-router-dom";
 import type { IChatBubble } from "../models/chat.model";
 import cn from "../utils/cn";
 
 export default function ChatBubble(props: IChatBubble) {
-    // Cek apakah chat ini sedang dipilih
+    const navigate = useNavigate();
     const isSelected = props.selectedIds.includes(props.chat._id);
 
     return (
@@ -20,8 +21,17 @@ export default function ChatBubble(props: IChatBubble) {
                     [Media: {props.chat.media[0].url}]
                 </div>
             ) : null}
-            
-            <div className="wrap-break-word">{props.chat.messages}</div>
+            {props.isInRoom === true ? (
+                <button 
+                    className="font-light text-[0.7rem] cursor-pointer disabled:cursor-not-allowed" 
+                    disabled={props.isProcessing}
+                    onClick={() => navigate(`/user/chat/${props.chat.receiver_id}`)}
+                    type="button"
+                >
+                    {props.chat.sender_name}
+                </button>
+            ) : null}
+            <div className="wrap-break-word font-medium text-[0.9rem]">{props.chat.messages}</div>
         </div>
     );
 }

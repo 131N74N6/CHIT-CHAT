@@ -46,7 +46,7 @@ export default function App() {
                     <Route element={<ProtectedRoute><RoomMediaPreview/></ProtectedRoute>} path="/room/chat/preview/:room_id"/>
                     <Route element={<ProtectedRoute><RoomMediaDetail/></ProtectedRoute>} path="/room/media/detail/:room_id"/>
                     <Route element={<ProtectedRoute><RoomProfile/></ProtectedRoute>} path="/rooms/profile/:room_id"/>
-                    <Route element={<ProtectedRoute><RoomMember/></ProtectedRoute>} path="/rooms/profile/:room_id"/>
+                    <Route element={<ProtectedRoute><RoomMember/></ProtectedRoute>} path="/rooms/member/:room_id"/>
                     <Route element={<ProtectedRoute><Chatbot/></ProtectedRoute>} path="/chatbot"/>
                     <Route element={<ProtectedRoute><ChatbotResults/></ProtectedRoute>} path="/chatbot/histories"/>
                     <Route element={<ProtectedRoute><ChatbotDetail/></ProtectedRoute>} path="/chatbot/detail/:_id"/>

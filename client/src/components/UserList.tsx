@@ -20,7 +20,7 @@ export default function UserList(props: UserListIntrf) {
                 {props.users.map((user) => {
                     return (
                         <UserData 
-                            key={user._id}
+                            key={`user-${user.user_id}`}
                             setReceiverId={props.setReceiverId} 
                             user={user} 
                         />

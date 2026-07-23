@@ -10,6 +10,8 @@ export default function JoinRoom() {
     const message = useMessageStore((state) => state.message);
     const setMessage = useMessageStore((state) => state.setMessage);
 
+    const { isUserProfileProcessing, joinRoomMt, roomCode, setRoomCode } = useUserProfileService({ setMessage: setMessage });
+    
     useEffect(() => {
         if (message) {
             const timer = setTimeout(() => {
@@ -18,8 +20,6 @@ export default function JoinRoom() {
             return () => clearTimeout(timer);
         }
     }, [message, setMessage]);
-
-    const { isUserProfileProcessing, joinRoomMt, roomCode, setRoomCode } = useUserProfileService({ setMessage: setMessage });
 
     return (
         <section className="flex md:flex-row flex-col gap-2.5 p-2.5 h-screen relative z-10">
