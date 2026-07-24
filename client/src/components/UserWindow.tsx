@@ -20,7 +20,7 @@ export default function UserWindow(props: IUserWindow) {
     }
 
     return (
-        <div className="h-full flex-col gap-2.5 md:w-2/5 md:flex md:p-2.5 md:flex-col hidden inset-shadow-sm inset-shadow-gray-400">
+        <div className="h-full flex-col gap-2.5 md:w-2/5 md:flex md:flex-col hidden">
             {props.showUserProfile ? (
                 <UserProfileWindow
                     errorProfile={props.errorProfile}
@@ -47,6 +47,8 @@ export default function UserWindow(props: IUserWindow) {
                     seeProfile={seeProfile}
                     sendChatToUser={props.sendChatToUser}
                     setIsSelectMode={props.setIsSelectMode}
+                    setReceiverId={props.setReceiverId}
+                    setShowDeleteOption1={props.setShowDeleteOption1}
                     setShowDeleteOption2={props.setShowDeleteOption2}
                     setText={props.setText}
                     text={props.text}

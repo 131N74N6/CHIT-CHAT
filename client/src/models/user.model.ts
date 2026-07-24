@@ -25,6 +25,8 @@ export interface IUserChatWindow {
     selectedIds: string[];
     sendChatToUser: UseMutationResult<any, Error, void, unknown>;
     setIsSelectMode: (isSelectMode: boolean) => void;
+    setReceiverId: (receiverId: string) => void;
+    setShowDeleteOption1: (showDeleteOption1: boolean) => void;
     setShowDeleteOption2: (showDeleteOption2: boolean) => void;
     setText: (text: string) => void;
     toggleSelect: (id: string) => void;
@@ -56,6 +58,8 @@ export interface IUserWindow {
     sendChatToUser: UseMutationResult<any, Error, void, unknown>;
     selectedIds: string[];
     setIsSelectMode: (isSelectMode: boolean) => void;
+    setReceiverId: (receiverId: string) => void;
+    setShowDeleteOption1: (showDeleteOption1: boolean) => void;
     setShowDeleteOption2: (showDeleteOption2: boolean) => void;
     setShowUserMedia: (showUserMedia: boolean) => void;
     setShowUserProfile: (showUserProfile: boolean) => void;
@@ -84,6 +88,7 @@ export interface IUserProfile {
 }
 
 export interface IOtherUser {
+    _id: string;
     address: string;
     created_at: string;
     gender: string;
@@ -92,7 +97,6 @@ export interface IOtherUser {
         resource_type: string;
         url: string;
     }
-    user_id: string;
     username: string;
 }
 

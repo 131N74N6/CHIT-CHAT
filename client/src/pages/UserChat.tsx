@@ -86,7 +86,7 @@ export default function UserChat() {
             ) : null}
             <div className="md:w-2/5 w-full h-full flex flex-col">
                 {isSelectMode ? (
-                    <div className="bg-gray-400 p-2 flex gap-1.5 cursor-pointer justify-end">
+                    <div className="bg-gray-200 p-2 flex gap-1.5 cursor-pointer justify-end">
                         <button
                             className={cn(
                                 "font-medium text-gray-600 cursor-pointer", 

@@ -114,7 +114,7 @@ export default function Home() {
                     />
                 )}
             </div>
-            {receiverId ? (
+            {receiverId && receiverId !== "" ? (
                 <UserWindow
                     clearSelection={clearSelection}
                     currentUserId={currentUser.user ? currentUser.user.user_id : ""}
@@ -130,6 +130,8 @@ export default function Home() {
                     selectedIds={selectedIds}
                     sendChatToUser={sendChatToUserMt}
                     setIsSelectMode={setIsSelectMode}
+                    setReceiverId={setReceiverId}
+                    setShowDeleteOption1={setShowDeleteOption1}
                     setShowDeleteOption2={setShowDeleteOption2}
                     setShowUserMedia={setShowUserMedia}
                     setShowUserProfile={setShowUserProfile}

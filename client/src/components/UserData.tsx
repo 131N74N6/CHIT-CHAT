@@ -12,7 +12,7 @@ export default function UserData(props: UserItemIntrf) {
                     "md:border-b md:bg-white md:border-b-gray-600 p-1.5 md:items-center md:cursor-pointer md:flex md:gap-1.5 hidden"
                 )} 
                 onClick={() => {
-                    if(props.setReceiverId) props.setReceiverId(props.user.user_id);
+                    if(props.setReceiverId) props.setReceiverId(props.user._id);
                 }}
             >
                 <div className={cn("w-10 h-10 rounded-full")}>
@@ -40,8 +40,8 @@ export default function UserData(props: UserItemIntrf) {
                     "border-b bg-white border-b-gray-600 p-1.5 cursor-pointer md:hidden flex items-center gap-1.5"
                 )} 
                 onClick={() => {
-                    if (props.setReceiverId) props.setReceiverId(props.user.user_id);
-                    navigate(`/user/chat/${props.user.user_id}`);
+                    if (props.setReceiverId) props.setReceiverId(props.user._id);
+                    navigate(`/user/chat/${props.user._id}`);
                 }}
             >
                 <div className={cn("w-10 h-10 rounded-full")}>
