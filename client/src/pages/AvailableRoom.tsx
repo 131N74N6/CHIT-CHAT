@@ -42,7 +42,7 @@ export default function AvailableRoom() {
         currentRoomProfile, 
         deleteRoomMt, 
         isRoomProfileProcessing 
-    } = useRoomProfileService({ currentUserId: currentUser.user?.user_id, roomId: roomId, setMessage: setMessage });
+    } = useRoomProfileService({ setMessage: setMessage });
 
     const { 
         allChatsInRoom, 
@@ -63,7 +63,7 @@ export default function AvailableRoom() {
         showDeleteOption2,
         text,
         toggleSelect
-    } = useRoomChatService({ roomId: roomId, setMessage: setMessage });
+    } = useRoomChatService({ setMessage: setMessage });
 
     useEffect(() => {
         if (message) {

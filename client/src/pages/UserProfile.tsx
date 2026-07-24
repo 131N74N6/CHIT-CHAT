@@ -1,5 +1,5 @@
 import useUserProfileService from "../services/useUserProfileService";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useMessageStore } from "../stores/message.store";
 import { useEffect } from "react";
 import Alert from "../components/Alert";
@@ -8,15 +8,16 @@ import cn from "../utils/cn";
 import Navbar from "../components/Navbar";
 import { ArrowBigLeft, MessageCircle } from "lucide-react";
 import useSocketIo from "../hooks/useSocketIo";
+import { useChatStore } from "../stores/chat.store";
 
 export default function UserProfile() {
-    const { receiver_id } = useParams();
+    const receiverId = useChatStore((state) => state.receiverId);
     const navigate = useNavigate();
 
     const message = useMessageStore((state) => state.message);
     const setMessage = useMessageStore((state) => state.setMessage);
 
-    const { currentUser, receiverUserProfile } = useUserProfileService({ receiverId: receiver_id, setMessage: setMessage });
+    const { currentUser, receiverUserProfile } = useUserProfileService({ setMessage: setMessage });
     const { detail, detailError, isDetailLoading } = receiverUserProfile;
     
     useEffect(() => {
@@ -31,7 +32,7 @@ export default function UserProfile() {
     useSocketIo({
         currentUserId: currentUser.user ? currentUser.user.user_id : '',
         identifier: ["user-profile"],
-        marks: { receiverId: receiver_id }
+        marks: { receiverId: receiverId }
     });
 
     return (
@@ -57,7 +58,7 @@ export default function UserProfile() {
                                     "disabled:cursor-not-allowed cursor-pointer", 
                                     "hover:text-gray-500 transition-colors text-gray-800 font-medium"
                                 )}
-                                onClick={() => navigate(`/user/chat/${receiver_id}`)}
+                                onClick={() => navigate(`/user/chat/${receiverId}`)}
                                 type="button"
                             >
                                 <ArrowBigLeft size={24}/>

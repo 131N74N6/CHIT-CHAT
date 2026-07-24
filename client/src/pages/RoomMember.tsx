@@ -1,4 +1,3 @@
-import { useParams } from "react-router-dom";
 import Loading from "../components/Loading";
 import Navbar from "../components/Navbar";
 import UserList from "../components/UserList";
@@ -10,14 +9,15 @@ import { useMessageStore } from "../stores/message.store";
 import { useEffect } from "react";
 import Alert from "../components/Alert";
 import { MessageCircle } from "lucide-react";
+import { useRoomStore } from "../stores/room.store";
 
 export default function RoomMember() {
-    const { room_id } = useParams();
+    const roomId = useRoomStore((state) => state.roomId);
     const message = useMessageStore((state) => state.message);
     const setMessage = useMessageStore((state) => state.setMessage);
     
-    const { currentUser } = UserServices({ setMessage: setMessage, roomId: room_id });
-    const { currentRoomMember } = useRoomMemberService({ roomId: room_id });
+    const { currentUser } = UserServices({ setMessage: setMessage });
+    const { currentRoomMember } = useRoomMemberService({ setMessage: setMessage });
     
     useEffect(() => {
         if (message) {
@@ -31,7 +31,7 @@ export default function RoomMember() {
     useSocketIo({
         currentUserId: currentUser.user?.user_id!,
         identifier: ["room-member"],
-        marks: { roomId: room_id }
+        marks: { roomId: roomId }
     });
 
     return (

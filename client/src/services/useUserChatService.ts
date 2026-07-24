@@ -11,6 +11,8 @@ export default function useUserChatService(props?: IUserChatService) {
     const setIsSelectMode = useChatStore((state) => state.setIsSelectMode);
 
     const resetChatState = useChatStore((state) => state.resetChatState);
+    const receiverId = useChatStore((state) => state.receiverId);
+    console.log(receiverId);
 
     const media = useChatStore((state) => state.media);
     const setMedia = useChatStore((state) => state.setMedia);
@@ -31,7 +33,7 @@ export default function useUserChatService(props?: IUserChatService) {
     const clearAllUserChatsForMeMt = useMutation({
         mutationFn: async () => {
             try {
-                const request = await fetch(`${import.meta.env.VITE_BASE_API_URL}/users/chats/clears/${props?.receiverId}`, {
+                const request = await fetch(`${import.meta.env.VITE_BASE_API_URL}/users/chats/clears/${receiverId}`, {
                     credentials: "include",
                     headers: { 'Content-Type': 'application/json' },
                     method: "DELETE"
@@ -48,7 +50,7 @@ export default function useUserChatService(props?: IUserChatService) {
             props?.setMessage!(error.message);
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: [`user-chat-${props?.receiverId}`] });
+            queryClient.invalidateQueries({ queryKey: [`user-chat-${receiverId}`] });
             resetChatState();
         }
     });
@@ -56,7 +58,7 @@ export default function useUserChatService(props?: IUserChatService) {
     const clearChosenUserChatForMeMt = useMutation({
         mutationFn: async () => {
             try {
-                const request = await fetch(`${import.meta.env.VITE_BASE_API_URL}/users/chats/clear/${props?.receiverId}`, {
+                const request = await fetch(`${import.meta.env.VITE_BASE_API_URL}/users/chats/clear/${receiverId}`, {
                     body: JSON.stringify({ chatsIds: selectedIds }),
                     credentials: "include",
                     headers: { 'Content-Type': 'application/json' },
@@ -74,7 +76,7 @@ export default function useUserChatService(props?: IUserChatService) {
             props?.setMessage!(error.message);
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: [`user-chat-${props?.receiverId}`] });
+            queryClient.invalidateQueries({ queryKey: [`user-chat-${receiverId}`] });
             resetChatState();
         }
     });
@@ -82,7 +84,7 @@ export default function useUserChatService(props?: IUserChatService) {
     const deleteAllUserChatsMt = useMutation({
         mutationFn: async () => {
             try {
-                const request = await fetch(`${import.meta.env.VITE_BASE_API_URL}/users/chats/rm-all/${props?.receiverId}`, {
+                const request = await fetch(`${import.meta.env.VITE_BASE_API_URL}/users/chats/rm-all/${receiverId}`, {
                     credentials: "include",
                     headers: { 'Content-Type': 'application/json' },
                     method: "DELETE"
@@ -99,7 +101,7 @@ export default function useUserChatService(props?: IUserChatService) {
             props?.setMessage!(error.message);
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: [`user-chat-${props?.receiverId}`] });
+            queryClient.invalidateQueries({ queryKey: [`user-chat-${receiverId}`] });
             resetChatState();
         }
     });
@@ -107,7 +109,7 @@ export default function useUserChatService(props?: IUserChatService) {
     const deleteChosenUsersChatMt = useMutation({
         mutationFn: async () => {
             try {
-                const request = await fetch(`${import.meta.env.VITE_BASE_API_URL}/users/chats/rm/${props?.receiverId}`, {
+                const request = await fetch(`${import.meta.env.VITE_BASE_API_URL}/users/chats/rm/${receiverId}`, {
                     body: JSON.stringify({ chatsIds: selectedIds }),
                     credentials: "include",
                     headers: { 'Content-Type': 'application/json' },
@@ -125,7 +127,7 @@ export default function useUserChatService(props?: IUserChatService) {
             props?.setMessage!(error.message);
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: [`user-chat-${props?.receiverId}`] });
+            queryClient.invalidateQueries({ queryKey: [`user-chat-${receiverId}`] });
             resetChatState();
         }
     });
@@ -133,7 +135,7 @@ export default function useUserChatService(props?: IUserChatService) {
     const editSelectedChatMt = useMutation({
         mutationFn: async (id: string) => {
             try {
-                const request = await fetch(`${import.meta.env.VITE_BASE_API_URL}/users/chats/remake/${id}/${props?.receiverId}`, {
+                const request = await fetch(`${import.meta.env.VITE_BASE_API_URL}/users/chats/remake/${id}/${receiverId}`, {
                     body: JSON.stringify({ text: text.trim() }),
                     credentials: "include",
                     headers: { "Content-Type": "application/json" },
@@ -151,7 +153,7 @@ export default function useUserChatService(props?: IUserChatService) {
             props?.setMessage!(error.message);
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: [`user-chat-${props?.receiverId}`] });
+            queryClient.invalidateQueries({ queryKey: [`user-chat-${receiverId}`] });
             resetChatState();
         }
     });
@@ -180,7 +182,7 @@ export default function useUserChatService(props?: IUserChatService) {
             try {
                 const formData = new FormData();
                 formData.append("messages", text.trim());
-                formData.append("receiver_id", props?.receiverId!);
+                formData.append("receiver_id", receiverId!);
 
                 if (media && media.length > 0) {
                     for (let m = 0; m < media.length; m++) {
@@ -205,21 +207,20 @@ export default function useUserChatService(props?: IUserChatService) {
             props?.setMessage!(error.message);
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: [`user-chat-${props?.receiverId}`] });
+            queryClient.invalidateQueries({ queryKey: [`user-chat-${receiverId}`] });
             resetChatState();
         }
     });
 
     const { data, error, fetchNextPage, isFetchingNextPage, isLoading, hasNextPage } = useInfiniteQuery({
-        enabled: !!props?.receiverId,
+        enabled: !!receiverId,
         getNextPageParam: (lastPage, allPages) => {
             if (lastPage.length <= 14) return;
             return allPages.length + 1;
         },
         queryFn: async ({ pageParam = 1 }: { pageParam?: number }) => {
             try {
-                const url = `${import.meta.env.VITE_BASE_API_URL}/users/chats`;
-                const request = await fetch(`${url}/show-all/${props?.receiverId}?page=${pageParam}&limit=${14}`, {
+                const request = await fetch(`${import.meta.env.VITE_BASE_API_URL}/users/chats/show-all/${receiverId}?page=${pageParam}&limit=${14}`, {
                     credentials: "include",
                     headers: { 'Content-Type': 'application/json' },
                     method: "GET"
@@ -232,7 +233,7 @@ export default function useUserChatService(props?: IUserChatService) {
                 throw error;
             }
         },
-        queryKey: [`user-chat-${props?.receiverId}`],
+        queryKey: [`user-chat-${receiverId}`],
         initialPageParam: 1,
         refetchOnMount: true,
         refetchOnReconnect: true,

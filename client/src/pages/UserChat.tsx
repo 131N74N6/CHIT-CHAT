@@ -24,7 +24,7 @@ export default function UserChat() {
         currentUser, 
         isUserProfileProcessing, 
         receiverUserProfile 
-    } = useUserProfileService({ receiverId: receiver_id, setMessage: setMessage });
+    } = useUserProfileService({ receiverId: receiver_id!, setMessage: setMessage });
 
     const { 
         clearAllUserChatsForMeMt,
@@ -45,14 +45,14 @@ export default function UserChat() {
         text,
         toggleSelect,
         userChats 
-    } = useUserChatService({ receiverId: receiver_id, setMessage: setMessage });
+    } = useUserChatService({ receiverId: receiver_id!, setMessage: setMessage });
 
     useSocketIo({
         currentUserId: currentUser.user ? currentUser.user.user_id : '',
         identifier: ["user-chat", "user-profile"],
         marks: { receiverId: receiver_id }
     });
-    
+
     useEffect(() => {
         if (message) {
             const timer = setTimeout(() => setMessage(null), 1500);

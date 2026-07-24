@@ -8,6 +8,7 @@ import { useRoomStore } from '../stores/room.store';
 export default function useRoomChatService(props?: IRoomChatService) {
     const queryClient = useQueryClient();
     const baseUrl = `${import.meta.env.VITE_BASE_API_URL}/rooms/chats`;
+    const roomId = useRoomStore((state) => state.roomId);
     
     const inputMediaRef = useRef<HTMLInputElement>(null);
     const resetRoomState = useRoomStore((state) => state.resetRoomState);
@@ -40,13 +41,13 @@ export default function useRoomChatService(props?: IRoomChatService) {
         isFetchingNextPage: isRoomChatFetchNext, 
         isLoading: isRoomChatLoading, 
     } = useInfiniteQuery({
-        enabled: !!props?.roomId,
+        enabled: !!roomId,
         getNextPageParam: (lastPage, allPages) => {
             if (lastPage.length <= 14) return;
             return allPages.length + 1;
         },
         queryFn: async ({pageParam = 1}: { pageParam?: number }) => {
-            try {const request = await fetch(`${baseUrl}/chat/${props?.roomId}?page=${pageParam}&limit=${14}`, {
+            try {const request = await fetch(`${baseUrl}/chat/${roomId}?page=${pageParam}&limit=${14}`, {
                     credentials: "include",
                     headers: { 'Content-Type': 'application/json' },
                     method: "GET"
@@ -60,7 +61,7 @@ export default function useRoomChatService(props?: IRoomChatService) {
             }
         },
         initialPageParam: 1,
-        queryKey: [`room-chat-${props?.roomId}`],
+        queryKey: [`room-chat-${roomId}`],
         refetchOnReconnect: true,
         staleTime: Infinity
     });
@@ -79,7 +80,7 @@ export default function useRoomChatService(props?: IRoomChatService) {
     const clearAllRoomChatsForMeMt = useMutation({
         mutationFn: async () => {
             try {
-                const request = await fetch(`${baseUrl}/clears/${props?.roomId}`, {
+                const request = await fetch(`${baseUrl}/clears/${roomId}`, {
                     credentials: "include",
                     headers: { 'Content-Type': 'application/json' },
                     method: "DELETE"
@@ -96,7 +97,7 @@ export default function useRoomChatService(props?: IRoomChatService) {
             props?.setMessage!(error.message);
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: [`room-chat-${props?.roomId}`] });
+            queryClient.invalidateQueries({ queryKey: [`room-chat-${roomId}`] });
             resetRoomState();
         }
     });
@@ -104,7 +105,7 @@ export default function useRoomChatService(props?: IRoomChatService) {
     const clearChosenRoomChatsForMeMt = useMutation({
         mutationFn: async () => {
             try {
-                const request = await fetch(`${baseUrl}/clear/${props?.roomId}`, {
+                const request = await fetch(`${baseUrl}/clear/${roomId}`, {
                     body: JSON.stringify({ chatsIds: selectedChatsIds }),
                     credentials: "include",
                     headers: { 'Content-Type': 'application/json' },
@@ -122,7 +123,7 @@ export default function useRoomChatService(props?: IRoomChatService) {
             props?.setMessage!(error.message);
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: [`room-chat-${props?.roomId}`] });
+            queryClient.invalidateQueries({ queryKey: [`room-chat-${roomId}`] });
             resetRoomState();
         }
     });
@@ -130,7 +131,7 @@ export default function useRoomChatService(props?: IRoomChatService) {
     const deleteAllChatsInRoomMt = useMutation({
         mutationFn: async () => {
             try {
-                const request = await fetch(`${baseUrl}/rm-all/${props?.roomId}`, {
+                const request = await fetch(`${baseUrl}/rm-all/${roomId}`, {
                     credentials: "include",
                     headers: { 'Content-Type': 'application/json' },
                     method: "DELETE"
@@ -147,14 +148,14 @@ export default function useRoomChatService(props?: IRoomChatService) {
             props?.setMessage!(error.message);
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: [`room-chat-${props?.roomId}`] });
+            queryClient.invalidateQueries({ queryKey: [`room-chat-${roomId}`] });
         }
     });
 
     const deleteChosenChatsInRoomMt = useMutation({
         mutationFn: async () => {
             try {
-                const request = await fetch(`${baseUrl}/rm/${props?.roomId}`, {
+                const request = await fetch(`${baseUrl}/rm/${roomId}`, {
                     body: JSON.stringify({ chatsIds: selectedChatsIds }),
                     credentials: "include",
                     headers: { 'Content-Type': 'application/json' },
@@ -172,7 +173,7 @@ export default function useRoomChatService(props?: IRoomChatService) {
             props?.setMessage!(error.message);
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: [`room-chat-${props?.roomId}`] });
+            queryClient.invalidateQueries({ queryKey: [`room-chat-${roomId}`] });
             resetRoomState();
         }
     });
@@ -180,7 +181,7 @@ export default function useRoomChatService(props?: IRoomChatService) {
     const editSelectedChatMt = useMutation({
         mutationFn: async (id: string) => {
             try {
-                const request = await fetch(`${baseUrl}/remake/${id}/${props?.roomId}`, {
+                const request = await fetch(`${baseUrl}/remake/${id}/${roomId}`, {
                     body: JSON.stringify({ text: text.trim() }),
                     credentials: "include",
                     headers: { "Content-Type": "application/json" },
@@ -198,7 +199,7 @@ export default function useRoomChatService(props?: IRoomChatService) {
             props?.setMessage!(error.message);
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: [`room-chat-${props?.roomId}`] });
+            queryClient.invalidateQueries({ queryKey: [`room-chat-${roomId}`] });
             resetRoomState();
         }
     });
@@ -228,7 +229,7 @@ export default function useRoomChatService(props?: IRoomChatService) {
             try {
                 const formData = new FormData();
                 formData.append("messages", text.trim());
-                formData.append("room_id", props?.roomId!);
+                formData.append("room_id", roomId!);
 
                 if (media && media.length > 0) {
                     for (let t = 0; t < media.length; t++) {
@@ -253,7 +254,7 @@ export default function useRoomChatService(props?: IRoomChatService) {
             props?.setMessage!(error.message);
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: [`room-chat-${props?.roomId}`] });
+            queryClient.invalidateQueries({ queryKey: [`room-chat-${roomId}`] });
             resetRoomState();
         }
     });

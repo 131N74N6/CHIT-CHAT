@@ -35,7 +35,7 @@ export default function Home() {
         currentUser, 
         isUserProfileProcessing, 
         receiverUserProfile 
-    } = useUserProfileService({ receiverId: receiverId, setMessage: setMessage });
+    } = useUserProfileService({ setMessage: setMessage });
 
     const { 
         clearAllUserChatsForMeMt, 
@@ -54,7 +54,7 @@ export default function Home() {
         showDeleteOption2,
         toggleSelect,
         userChats 
-    } = useUserChatService({ setMessage: setMessage, receiverId: receiverId });
+    } = useUserChatService({ setMessage: setMessage });
     
     useSocketIo({
         currentUserId: currentUser.user ? currentUser.user.user_id : '',

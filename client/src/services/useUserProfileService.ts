@@ -46,6 +46,7 @@ export default function useUserProfileService(props?: IUserProfileService) {
     const resetRoomState = useRoomStore((state) => state.resetRoomState);
 
     const resetChatState = useChatStore((state) => state.resetChatState);
+    const receiverId = useChatStore((state) => state.receiverId);
 
     const resetNavbarState = useNavbarStore((state) => state.resetNavbarState);
 
@@ -70,11 +71,11 @@ export default function useUserProfileService(props?: IUserProfileService) {
         staleTime: Infinity,
     });
 
-    useEffect(() => {
-        if (user && user.user_id && !isUserLoading) setCurrentUserId(user.user_id);
-    }, [user, setCurrentUserId]);
-    
     const currentUser = { isUserLoading, user, userError }
+
+    useEffect(() => {
+        if (currentUser.user && currentUser.user.user_id && !isUserLoading) setCurrentUserId(currentUser.user.user_id);
+    }, [currentUser.user, setCurrentUserId]);
 
     const { 
         data: users, 
@@ -122,10 +123,10 @@ export default function useUserProfileService(props?: IUserProfileService) {
     }
 
     const { data: detail, error: detailError, isLoading: isDetailLoading } = useQuery<IOtherUser>({
-        enabled: !!props?.receiverId,
+        enabled: !!receiverId,
         queryFn: async () => {
             try {
-                const request = await fetch(`${import.meta.env.VITE_BASE_API_URL}/users/profiles/other/${props?.receiverId}`, {
+                const request = await fetch(`${import.meta.env.VITE_BASE_API_URL}/users/profiles/other/${receiverId}`, {
                     credentials: "include",
                     headers: { 'Content-Type': 'application/json' },
                     method: "GET"
@@ -138,7 +139,7 @@ export default function useUserProfileService(props?: IUserProfileService) {
                 throw error;
             }
         },
-        queryKey: [`receiver-${props?.receiverId}`],
+        queryKey: [`receiver-${receiverId}`],
         staleTime: Infinity
     });
 
@@ -185,8 +186,8 @@ export default function useUserProfileService(props?: IUserProfileService) {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['all-users'] });
             queryClient.invalidateQueries({ queryKey: ['current-user'] });
-            queryClient.invalidateQueries({ queryKey: [`receiver-${props?.receiverId}`] });
-            queryClient.invalidateQueries({ queryKey: [`receiver-${user?.user_id}`] });
+            queryClient.invalidateQueries({ queryKey: [`receiver-${receiverId}`] });
+            queryClient.invalidateQueries({ queryKey: [`receiver-${currentUser.user?.user_id}`] });
 
             if (currentUser.user && currentUser.user.room_id.length > 0) {
                 currentUser.user.room_id.forEach((room_id) => {

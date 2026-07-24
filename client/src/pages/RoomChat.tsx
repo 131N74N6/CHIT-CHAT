@@ -6,24 +6,25 @@ import useRoomChatService from "../services/useRoomChatService";
 import { File, Menu, MenuSquare, MessageCircle, SendIcon, X } from "lucide-react";
 import { useEffect } from "react";
 import { useMessageStore } from "../stores/message.store";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import useUserProfileService from "../services/useUserProfileService";
 import Navbar from "../components/Navbar";
 import useRoomProfileService from "../services/useRoomProfileService";
 import useSocketIo from "../hooks/useSocketIo";
 import RoomChatDeleteOption1 from "../components/RoomChatDeleteOption1";
 import RoomChatDeleteOption2 from "../components/RoomChatDeleteOption2";
+import { useRoomStore } from "../stores/room.store";
 
 export default function RoomChat() {
-    const { room_id } = useParams();
     const navigate = useNavigate();
 
     const message = useMessageStore((state) => state.message);
     const setMessage = useMessageStore((state) => state.setMessage);
+    const roomId = useRoomStore((state) => state.roomId);
 
     const { currentUser, isUserProfileProcessing } = useUserProfileService({ setMessage: setMessage });
     
-    const { currentRoomProfile } = useRoomProfileService({ roomId: room_id });
+    const { currentRoomProfile } = useRoomProfileService({ setMessage: setMessage });
     
     const { 
         allChatsInRoom, 
@@ -44,12 +45,12 @@ export default function RoomChat() {
         showDeleteOption2,
         text,
         toggleSelect
-    } = useRoomChatService({ roomId: room_id, setMessage: setMessage });
+    } = useRoomChatService({ setMessage: setMessage });
         
     useSocketIo({
         currentUserId: currentUser.user ? currentUser.user.user_id : '',
         identifier: ["room-chat", "room-profile"],
-        marks: { roomId: room_id }
+        marks: { roomId: roomId }
     });
 
     useEffect(() => {
@@ -116,7 +117,7 @@ export default function RoomChat() {
                 ) : (
                     <div className="bg-gray-400 p-2 flex justify-between items-center cursor-pointer">
                         <div className="flex items-center gap-2">
-                            <div className="w-10 h-10 rounded-full" onClick={() => navigate(`/rooms/profile/${room_id}`)}>
+                            <div className="w-10 h-10 rounded-full" onClick={() => navigate(`/rooms/profile/${roomId}`)}>
                                 {currentRoomProfile.detail && currentRoomProfile.detail.profile_picture !== null ? (
                                     <div className="w-full h-full">
                                         <img 
@@ -201,7 +202,7 @@ export default function RoomChat() {
                             <button 
                                 className="text-blue-500 font-medium cursor-pointer disabled:cursor-not-allowed"
                                 disabled={isRoomChatProcessing || isUserProfileProcessing}
-                                onClick={() => navigate(`/rooms/chat/preview/${room_id}`)}
+                                onClick={() => navigate(`/rooms/chat/preview/${roomId}`)}
                                 type="button"
                             >
                                 <File size={22}/>

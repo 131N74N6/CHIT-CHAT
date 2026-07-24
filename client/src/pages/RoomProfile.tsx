@@ -5,18 +5,19 @@ import Navbar from "../components/Navbar";
 import { ArrowBigLeft, Camera, MessageCircle, X } from "lucide-react";
 import { useMessageStore } from "../stores/message.store";
 import { useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Loading from "../components/Loading";
 import useUserProfileService from "../services/useUserProfileService";
 import useSocketIo from "../hooks/useSocketIo";
 import useRoomMemberService from "../services/useRoomMemberService";
+import { useRoomStore } from "../stores/room.store";
 
 export default function RoomProfile() {
-    const { room_id } = useParams();
     const navigate = useNavigate();
 
     const message = useMessageStore((state) => state.message);
     const setMessage = useMessageStore((state) => state.setMessage);
+    const roomId = useRoomStore((state) => state.roomId);
     
     const { currentUser, isUserProfileProcessing } = useUserProfileService({ setMessage: setMessage });
     const { user } = currentUser;
@@ -33,7 +34,6 @@ export default function RoomProfile() {
         isRoomProfileProcessing, 
         roomName,
         oldRoomPicture,
-        resetRoomState,
         selectedProfileRoom, 
         selectedProfileRoomUrl, 
         setDeleteRoomImage,
@@ -42,11 +42,11 @@ export default function RoomProfile() {
         setRoomName, 
         setSelectedProfileRoom, 
         setSelectedProfileRoomUrl
-    } = useRoomProfileService({ roomId: room_id, setMessage: setMessage });
+    } = useRoomProfileService({ setMessage: setMessage });
 
     const { detail, errorDetail, isDetailLoading } = currentRoomProfile;
 
-    const { leftRoomMt } = useRoomMemberService({ setMessage: setMessage, roomId: room_id });
+    const { leftRoomMt } = useRoomMemberService({ setMessage: setMessage });
 
     useEffect(() => {
         if (message) {
@@ -69,13 +69,13 @@ export default function RoomProfile() {
             setDescription("");
             setOldRoomPicture(null);
         }
-    }, [editMode, room_id, currentRoomProfile.detail]);
+    }, [editMode, roomId, currentRoomProfile.detail]);
 
 
     useSocketIo({
         currentUserId: currentUser.user?.user_id!,
         identifier: ["room-profile"],
-        marks: { roomId: room_id }
+        marks: { roomId: roomId }
     });
 
     const isRoomOwner = user && detail && user.user_id === detail.creator_id;
@@ -203,7 +203,7 @@ export default function RoomProfile() {
                             "hover:bg-blue-800 transition-colors disabled:cursor-not-allowed"
                         )}
                         disabled={isUserProfileProcessing || isRoomProfileProcessing}
-                        onClick={() => resetRoomState()}
+                        onClick={() => setEditMode(false)}
                         type="button"
                     >
                         <X size={23}/>
@@ -229,7 +229,7 @@ export default function RoomProfile() {
                                         "disabled:cursor-not-allowed cursor-pointer", 
                                         "hover:text-gray-500 transition-colors text-gray-800 font-medium"
                                     )}
-                                    onClick={() => navigate(`/rooms/chat/${room_id}`)}
+                                    onClick={() => navigate(`/rooms/chat/${roomId}`)}
                                     type="button"
                                 >
                                     <ArrowBigLeft size={24}/>
@@ -326,7 +326,7 @@ export default function RoomProfile() {
                                     )}
                                     disabled={isUserProfileProcessing}
                                     type="button"
-                                    onClick={() => navigate(`/rooms/member/${room_id}`)}
+                                    onClick={() => navigate(`/rooms/member/${roomId}`)}
                                 >
                                     See Room Member
                                 </button>
