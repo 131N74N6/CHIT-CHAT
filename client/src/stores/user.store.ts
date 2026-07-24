@@ -4,6 +4,9 @@ export interface UserState {
     address: string;
     setAddress: (address: string) => void;
 
+    currentUserId: string | undefined;
+    setCurrentUserId: (currentUserId: string | undefined) => void;
+
     deleteProfilePicture: {
         public_id: string;
         resource_type: string;
@@ -62,6 +65,9 @@ export const useUserStore = create<UserState>((set) => ({
     address: "",
     setAddress: (address) => set({ address }),
 
+    currentUserId: undefined,
+    setCurrentUserId: (currentUserId) => set({ currentUserId }),
+
     deleteProfilePicture: null,
     setDeleteProfilePicture: (deleteProfilePicture) => set({ deleteProfilePicture }),
 
@@ -87,6 +93,8 @@ export const useUserStore = create<UserState>((set) => ({
     setProfilePictureUrl: (profilePictureUrl) => set({ profilePictureUrl }),
 
     resetUserState: () => set({
+        address: "",
+        currentUserId: undefined,
         deleteProfilePicture: null,
         editMode: false,
         email: "",

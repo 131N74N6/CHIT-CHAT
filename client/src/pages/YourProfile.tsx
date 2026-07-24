@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import useUserService from "../services/useUserProfileService";
+import useUserProfileService from "../services/useUserProfileService";
 import { useMessageStore } from "../stores/message.store";
 import Loading from "../components/Loading";
 import Navbar from "../components/Navbar";
@@ -32,7 +32,7 @@ export default function YourProfile() {
         setProfilePictureUrl,
         setUserName,
         username, 
-    } = useUserService({ setMessage: setMessage });
+    } = useUserProfileService({ setMessage: setMessage });
 
     const { isUserLoading, user, userError } = currentUser;
 
@@ -183,7 +183,7 @@ export default function YourProfile() {
                                     <select 
                                         disabled={isUserProfileProcessing}
                                         value={gender}
-                                        onChange={(event: React.ChangeEvent<HTMLSelectElement, HTMLSelectElement>) => setGender(event.target.value)}
+                                        onChange={(event) => setGender(event.target.value)}
                                         className="bg-blue-200 text-gray-900 p-2 outline-none"
                                     >
                                         <option value="">-- Choose Status --</option>

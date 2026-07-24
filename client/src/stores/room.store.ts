@@ -16,6 +16,9 @@ export interface RoomState {
 
     description: string;
     setDescription: (description: string) => void;
+
+    editMode: boolean;
+    setEditMode: (editMode: boolean) => void;
     
     isSelectMode: boolean;
     setIsSelectMode: (isSelectMode: boolean) => void;
@@ -73,6 +76,9 @@ export const useRoomStore = create<RoomState>((set) => ({
 
     description: "",
     setDescription: (description) => set({ description }),
+
+    editMode: false,
+    setEditMode: (editMode) => set({ editMode }),
     
     isSelectMode: false,
     setIsSelectMode: (isSelectMode) => set({ isSelectMode }),
@@ -83,6 +89,7 @@ export const useRoomStore = create<RoomState>((set) => ({
     resetRoomState: () => set({
         deleteRoomImage: null,
         description: "",
+        editMode: false,
         isSelectMode: false,
         oldRoomPicture: null,
         roomName: "",

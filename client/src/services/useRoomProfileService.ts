@@ -3,17 +3,20 @@ import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tansta
 import { useNavigate } from 'react-router-dom';
 import { useRef } from 'react';
 import { useRoomStore } from '../stores/room.store';
+import { useUserStore } from '../stores/user.store';
 
 export default function useRoomProfileService(props?: IRoomProfileService) {
-    const baseUrl = `${import.meta.env.VITE_BASE_API_URL}/rooms/profiles`;
     const navigate = useNavigate();
     const queryClient = useQueryClient();
+    const currentUserId = useUserStore((state) => state.currentUserId);
     
     const deleteRoomImage = useRoomStore((state) => state.deleteRoomImage);
     const setDeleteRoomImage = useRoomStore((state) => state.setDeleteRoomImage);
     
     const fileInputRef = useRef<HTMLInputElement>(null);
     const resetRoomState = useRoomStore((state) => state.resetRoomState);
+    const editMode = useRoomStore((state) => state.editMode);
+    const setEditMode = useRoomStore((state) => state.setEditMode);
 
     const description = useRoomStore((state) => state.description);
     const setDescription = useRoomStore((state) => state.setDescription);
@@ -38,14 +41,14 @@ export default function useRoomProfileService(props?: IRoomProfileService) {
         isLoading: isAvailableRoomLoading,
         hasNextPage: availableRoomHasNextPage
     } = useInfiniteQuery({
-        enabled: !!props?.currentUserId,
+        enabled: !!currentUserId,
         getNextPageParam: (lastPage, allPages) => {
             if (lastPage.length <= 14) return;
             return allPages.length + 1;
         },
         queryFn: async ({ pageParam = 1 }: { pageParam?: number }) => {
             try {
-                const request = await fetch(`${baseUrl}/show-all?page=${pageParam}&limit=${14}`, {
+                const request = await fetch(`${import.meta.env.VITE_BASE_API_URL}/rooms/profiles/show-all?page=${pageParam}&limit=${14}`, {
                     credentials: "include",
                     headers: { 'Content-Type': 'application/json' },
                     method: "GET"
@@ -59,7 +62,7 @@ export default function useRoomProfileService(props?: IRoomProfileService) {
             }
         },
         initialPageParam: 1,
-        queryKey: [`available-room-${props?.currentUserId}`],
+        queryKey: [`available-room-${currentUserId}`],
         refetchOnReconnect: true,
         staleTime: Infinity
     });
@@ -84,7 +87,7 @@ export default function useRoomProfileService(props?: IRoomProfileService) {
                 if (selectedProfileRoom) formData.append("image", selectedProfileRoom);
 
                 if (deleteRoomImage !== null && deleteRoomImage.public_id) {
-                    const request = await fetch(`${baseUrl}/rm-pict/${props?.roomId}`, {
+                    const request = await fetch(`${import.meta.env.VITE_BASE_API_URL}/rooms/profiles/rm-pict/${props?.roomId}`, {
                         body: JSON.stringify({ old_image: deleteRoomImage }),
                         credentials: "include",
                         headers: { 'Content-Type': 'application/json' },
@@ -96,7 +99,7 @@ export default function useRoomProfileService(props?: IRoomProfileService) {
                     return response;
                 }
 
-                const request = await fetch(`${baseUrl}/remake/${props?.roomId}`, {
+                const request = await fetch(`${import.meta.env.VITE_BASE_API_URL}/rooms/profiles/remake/${props?.roomId}`, {
                     body: formData,
                     credentials: "include",
                     method: "PUT"
@@ -118,7 +121,7 @@ export default function useRoomProfileService(props?: IRoomProfileService) {
                     const queryKey = query.queryKey;
                     if (Array.isArray(queryKey) && queryKey.length > 0 && typeof queryKey[0] === "string") {
                         return queryKey[0].startsWith(`room-profile-${props?.roomId}`) ||
-                        queryKey[0].startsWith(`available-room-${props?.currentUserId}`);
+                        queryKey[0].startsWith(`available-room-${currentUserId}`);
                     }
                     return false;
                 }
@@ -131,7 +134,7 @@ export default function useRoomProfileService(props?: IRoomProfileService) {
         enabled: !!props?.roomId,
         queryFn: async () => {
             try {
-                const request = await fetch(`${baseUrl}/show/${props?.roomId}`, {
+                const request = await fetch(`${import.meta.env.VITE_BASE_API_URL}/rooms/profiles/show/${props?.roomId}`, {
                     credentials: "include",
                     headers: { 'Content-Type': 'application/json' },
                     method: "GET"
@@ -153,7 +156,7 @@ export default function useRoomProfileService(props?: IRoomProfileService) {
     const deleteRoomMt = useMutation({
         mutationFn: async () => {
             try {
-                const request = await fetch(`${baseUrl}/rm/${props?.roomId}`, {
+                const request = await fetch(`${import.meta.env.VITE_BASE_API_URL}/rooms/profiles/rm/${props?.roomId}`, {
                     credentials: "include",
                     headers: { 'Content-Type': 'application/json' },
                     method: "DELETE"
@@ -176,7 +179,7 @@ export default function useRoomProfileService(props?: IRoomProfileService) {
                     if (Array.isArray(queryKey) && queryKey.length > 0 && typeof queryKey[0] === "string") {
                         return queryKey[0].startsWith(`room-chat-${props?.roomId}`) ||
                         queryKey[0].startsWith(`room-member-${props?.roomId}`) ||
-                        queryKey[0].startsWith(`available-room-${props?.currentUserId}`) ||
+                        queryKey[0].startsWith(`available-room-${currentUserId}`) ||
                         queryKey[0].startsWith(`room-profile-${props?.roomId}`);
                     }
                     return false;
@@ -201,7 +204,7 @@ export default function useRoomProfileService(props?: IRoomProfileService) {
                 formData.append("name", roomName.trim());
                 if (selectedProfileRoom) formData.append("image", selectedProfileRoom);
 
-                const request = await fetch(`${baseUrl}/make-room`, {
+                const request = await fetch(`${import.meta.env.VITE_BASE_API_URL}/rooms/profiles/make-room`, {
                     body: formData,
                     credentials: "include",
                     method: "POST"
@@ -218,7 +221,7 @@ export default function useRoomProfileService(props?: IRoomProfileService) {
             props?.setMessage!(error.message);
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: [`available-room-${props?.currentUserId}`] });
+            queryClient.invalidateQueries({ queryKey: [`available-room-${currentUserId}`] });
             queryClient.invalidateQueries({ queryKey: [`room-member-${props?.roomId}`] });
             resetRoomState();
             navigate(`/rooms`);
@@ -235,6 +238,7 @@ export default function useRoomProfileService(props?: IRoomProfileService) {
         deleteRoomImage,
         deleteRoomMt,
         description,
+        editMode,
         fileInputRef, 
         handleImagePreview,
         isRoomProfileProcessing, 
@@ -246,6 +250,7 @@ export default function useRoomProfileService(props?: IRoomProfileService) {
         selectedProfileRoomUrl,
         setDeleteRoomImage,
         setDescription,
+        setEditMode,
         setOldRoomPicture, 
         setRoomName,
         setSelectedProfileRoom,

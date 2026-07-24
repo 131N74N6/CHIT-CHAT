@@ -29,13 +29,13 @@ export default function AvailableRoom() {
     const showProfile = useRoomStore((state) => state.showProfile);
     const setShowProfile = useRoomStore((state) => state.setShowProfile);
 
-    const { currentUser, isUserProfileProcessing } = useUserProfileService({ roomId: roomId, setMessage: setMessage });
+    const { currentUser, isUserProfileProcessing } = useUserProfileService({ setMessage: setMessage });
 
     const { 
         currentRoomMember, 
         isRoomMemberProcessing, 
         leftRoomMt 
-    } = useRoomMemberService({ currentUserId: currentUser.user?.user_id, roomId: roomId, setMessage: setMessage });
+    } = useRoomMemberService({ roomId: roomId, setMessage: setMessage });
 
     const { 
         currentAvailableRooms,  

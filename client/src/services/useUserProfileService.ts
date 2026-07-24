@@ -5,16 +5,17 @@ import { useRoomStore } from "../stores/room.store";
 import { useChatStore } from "../stores/chat.store";
 import { useUserStore } from "../stores/user.store";
 import { useNavbarStore } from "../stores/navbar.store";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 
 export default function useUserProfileService(props?: IUserProfileService) {
-    const baseUrl = `${import.meta.env.VITE_BASE_API_URL}/users/profiles`;
     const fileInputRef = useRef<HTMLInputElement>(null);
     const navigate = useNavigate();
     const queryClient = useQueryClient();
 
     const address = useUserStore((state) => state.address);
     const setAddress = useUserStore((state) => state.setAddress);
+
+    const setCurrentUserId = useUserStore((state) => state.setCurrentUserId);
 
     const editMode = useUserStore((state) => state.editMode);
     const setEditMode = useUserStore((state) => state.setEditMode);
@@ -48,66 +49,10 @@ export default function useUserProfileService(props?: IUserProfileService) {
 
     const resetNavbarState = useNavbarStore((state) => state.resetNavbarState);
 
-    const changeUserMt = useMutation({
-        mutationFn: async () => {
-            try {
-                const formData = new FormData();
-                formData.append("address", address.trim());
-                formData.append("gender", gender);
-                formData.append("username", username.trim());
-                if (profilePicture) formData.append("image", profilePicture);
-
-                if (deleteProfilePicture && deleteProfilePicture.public_id) {
-                    const request = await fetch(`${baseUrl}/rm-pict`, {
-                        body: JSON.stringify({ old_image: deleteProfilePicture }),
-                        credentials: "include",
-                        headers: { 'Content-Type': 'application/json' },
-                        method: "DELETE"
-                    });
-
-                    const response = await request.json();
-                    if (!request.ok) throw new Error(response.message);
-                    return response;
-                }
-
-                const request = await fetch(`${baseUrl}/remake`, {
-                    body: formData,
-                    credentials: "include",
-                    method: "PUT"
-                });
-
-                const response = await request.json();
-                if (!request.ok) throw new Error(response.message);
-                return response;
-            } catch (error) {
-                throw error;
-            }
-        },
-        onError: (error) => {
-            props?.setMessage!(error.message);
-        },
-        onSuccess: () => {
-            queryClient.invalidateQueries({
-                predicate: (query) => {
-                    const queryKey = query.queryKey;
-                    if (Array.isArray(queryKey) && queryKey.length > 0 && typeof queryKey[0] === "string") {
-                        return queryKey[0].startsWith(`all-users`) ||
-                        queryKey[0].startsWith('current-user') ||
-                        queryKey[0].startsWith(`receiver-${props?.receiverId}`) ||
-                        queryKey[0].startsWith(`room-chat-`)||
-                        queryKey[0].startsWith(`room-member-`);
-                    }
-                    return false;
-                }
-            });
-            setEditMode(false);
-        }
-    });
-
     const { data: user, error: userError, isLoading: isUserLoading } = useQuery<IUserProfile>({
         queryFn: async () => {
             try {
-                const request = await fetch(`${baseUrl}/show`, {
+                const request = await fetch(`${import.meta.env.VITE_BASE_API_URL}/users/profiles/show`, {
                     credentials: "include",
                     headers: { 'Content-Type': 'application/json' },
                     method: "GET"
@@ -125,6 +70,10 @@ export default function useUserProfileService(props?: IUserProfileService) {
         staleTime: Infinity,
     });
 
+    useEffect(() => {
+        if (user && user.user_id && !isUserLoading) setCurrentUserId(user.user_id);
+    }, [user, setCurrentUserId]);
+    
     const currentUser = { isUserLoading, user, userError }
 
     const { 
@@ -172,10 +121,88 @@ export default function useUserProfileService(props?: IUserProfileService) {
         usersError 
     }
 
+    const { data: detail, error: detailError, isLoading: isDetailLoading } = useQuery<IOtherUser>({
+        enabled: !!props?.receiverId,
+        queryFn: async () => {
+            try {
+                const request = await fetch(`${import.meta.env.VITE_BASE_API_URL}/users/profiles/other/${props?.receiverId}`, {
+                    credentials: "include",
+                    headers: { 'Content-Type': 'application/json' },
+                    method: "GET"
+                });
+
+                const response = await request.json();
+                if (!request.ok) throw new Error(response.message);
+                return response;
+            } catch (error) {
+                throw error;
+            }
+        },
+        queryKey: [`receiver-${props?.receiverId}`],
+        staleTime: Infinity
+    });
+
+    const receiverUserProfile = { detail, detailError, isDetailLoading }
+
+    const changeUserMt = useMutation({
+        mutationFn: async () => {
+            try {
+                const formData = new FormData();
+                formData.append("address", address.trim());
+                formData.append("gender", gender);
+                formData.append("username", username.trim());
+                if (profilePicture) formData.append("image", profilePicture);
+
+                if (deleteProfilePicture && deleteProfilePicture.public_id) {
+                    const request = await fetch(`${import.meta.env.VITE_BASE_API_URL}/users/profiles/rm-pict`, {
+                        body: JSON.stringify({ old_image: deleteProfilePicture }),
+                        credentials: "include",
+                        headers: { 'Content-Type': 'application/json' },
+                        method: "DELETE"
+                    });
+
+                    const response = await request.json();
+                    if (!request.ok) throw new Error(response.message);
+                    return response;
+                }
+
+                const request = await fetch(`${import.meta.env.VITE_BASE_API_URL}/users/profiles/remake`, {
+                    body: formData,
+                    credentials: "include",
+                    method: "PUT"
+                });
+
+                const response = await request.json();
+                if (!request.ok) throw new Error(response.message);
+                return response;
+            } catch (error) {
+                throw error;
+            }
+        },
+        onError: (error) => {
+            props?.setMessage!(error.message);
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['all-users'] });
+            queryClient.invalidateQueries({ queryKey: ['current-user'] });
+            queryClient.invalidateQueries({ queryKey: [`receiver-${props?.receiverId}`] });
+            queryClient.invalidateQueries({ queryKey: [`receiver-${user?.user_id}`] });
+
+            if (currentUser.user && currentUser.user.room_id.length > 0) {
+                currentUser.user.room_id.forEach((room_id) => {
+                    queryClient.invalidateQueries({ queryKey: [`room-chat-${room_id}`] });
+                    queryClient.invalidateQueries({ queryKey: [`room-member-${room_id}`] });
+                });
+            }
+
+            setEditMode(false);
+        }
+    });
+
     const deleteUserMt = useMutation({
         mutationFn: async () => {
             try {
-                const request = await fetch(`${baseUrl}/rm`, {
+                const request = await fetch(`${import.meta.env.VITE_BASE_API_URL}/users/profiles/rm`, {
                     credentials: "include",
                     headers: { 'Content-Type': 'application/json' },
                     method: "DELETE"
@@ -231,42 +258,12 @@ export default function useUserProfileService(props?: IUserProfileService) {
             props?.setMessage!(error.message);
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({
-                predicate: (query) => {
-                    const queryKey = query.queryKey;
-                    if (Array.isArray(queryKey) && queryKey.length > 0 && typeof queryKey[0] === "string") {
-                        return queryKey[0].startsWith('current-user') ||
-                        queryKey[0].startsWith(`available-room-${currentUser.user?.user_id}`)||
-                        queryKey[0].startsWith(`room-member-`);
-                    }
-                    return false;
-                }
-            });
+            queryClient.invalidateQueries({ queryKey: ['current-user'] });
+            queryClient.invalidateQueries({ queryKey: [`available-room-${currentUser.user?.user_id}`] });
+            queryClient.invalidateQueries({ queryKey: [`room-member-${roomCode}`] });
+            setRoomCode("");
         }
     });
-
-    const { data: detail, error: detailError, isLoading: isDetailLoading } = useQuery<IOtherUser>({
-        enabled: !!props?.receiverId,
-        queryFn: async () => {
-            try {
-                const request = await fetch(`${import.meta.env.VITE_BASE_API_URL}/users/profiles/other/${props?.receiverId}`, {
-                    credentials: "include",
-                    headers: { 'Content-Type': 'application/json' },
-                    method: "GET"
-                });
-
-                const response = await request.json();
-                if (!request.ok) throw new Error(response.message);
-                return response;
-            } catch (error) {
-                throw error;
-            }
-        },
-        queryKey: [`receiver-${props?.receiverId}`],
-        staleTime: Infinity
-    });
-
-    const receiverUserProfile = { detail, detailError, isDetailLoading }
 
     const isUserProfileProcessing = changeUserMt.isPending || currentUser.isUserLoading || allUsers.isUsersLoading ||
     deleteUserMt.isPending || joinRoomMt.isPending || receiverUserProfile.isDetailLoading;

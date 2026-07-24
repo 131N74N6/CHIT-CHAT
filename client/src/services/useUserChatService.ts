@@ -4,9 +4,7 @@ import { useRef } from "react";
 import { useChatStore } from "../stores/chat.store";
 
 export default function useUserChatService(props?: IUserChatService) {
-    const baseUrl = `${import.meta.env.VITE_BASE_API_URL}/users/chats`;
     const queryClient = useQueryClient();
-
     const inputMediaRef = useRef<HTMLInputElement>(null);
 
     const isSelectMode = useChatStore((state) => state.isSelectMode);
@@ -33,7 +31,7 @@ export default function useUserChatService(props?: IUserChatService) {
     const clearAllUserChatsForMeMt = useMutation({
         mutationFn: async () => {
             try {
-                const request = await fetch(`${baseUrl}/clears/${props?.receiverId}`, {
+                const request = await fetch(`${import.meta.env.VITE_BASE_API_URL}/users/chats/clears/${props?.receiverId}`, {
                     credentials: "include",
                     headers: { 'Content-Type': 'application/json' },
                     method: "DELETE"
@@ -58,7 +56,7 @@ export default function useUserChatService(props?: IUserChatService) {
     const clearChosenUserChatForMeMt = useMutation({
         mutationFn: async () => {
             try {
-                const request = await fetch(`${baseUrl}/clear/${props?.receiverId}`, {
+                const request = await fetch(`${import.meta.env.VITE_BASE_API_URL}/users/chats/clear/${props?.receiverId}`, {
                     body: JSON.stringify({ chatsIds: selectedIds }),
                     credentials: "include",
                     headers: { 'Content-Type': 'application/json' },
@@ -84,7 +82,7 @@ export default function useUserChatService(props?: IUserChatService) {
     const deleteAllUserChatsMt = useMutation({
         mutationFn: async () => {
             try {
-                const request = await fetch(`${baseUrl}/rm-all/${props?.receiverId}`, {
+                const request = await fetch(`${import.meta.env.VITE_BASE_API_URL}/users/chats/rm-all/${props?.receiverId}`, {
                     credentials: "include",
                     headers: { 'Content-Type': 'application/json' },
                     method: "DELETE"
@@ -109,7 +107,7 @@ export default function useUserChatService(props?: IUserChatService) {
     const deleteChosenUsersChatMt = useMutation({
         mutationFn: async () => {
             try {
-                const request = await fetch(`${baseUrl}/rm/${props?.receiverId}`, {
+                const request = await fetch(`${import.meta.env.VITE_BASE_API_URL}/users/chats/rm/${props?.receiverId}`, {
                     body: JSON.stringify({ chatsIds: selectedIds }),
                     credentials: "include",
                     headers: { 'Content-Type': 'application/json' },
@@ -135,7 +133,7 @@ export default function useUserChatService(props?: IUserChatService) {
     const editSelectedChatMt = useMutation({
         mutationFn: async (id: string) => {
             try {
-                const request = await fetch(`${baseUrl}/remake/${id}/${props?.receiverId}`, {
+                const request = await fetch(`${import.meta.env.VITE_BASE_API_URL}/users/chats/remake/${id}/${props?.receiverId}`, {
                     body: JSON.stringify({ text: text.trim() }),
                     credentials: "include",
                     headers: { "Content-Type": "application/json" },
@@ -190,7 +188,7 @@ export default function useUserChatService(props?: IUserChatService) {
                     }
                 }
 
-                const request = await fetch(`${baseUrl}/send`, {
+                const request = await fetch(`${import.meta.env.VITE_BASE_API_URL}/users/chats/send`, {
                     body: formData,
                     credentials: "include",
                     method: "POST"
@@ -220,7 +218,8 @@ export default function useUserChatService(props?: IUserChatService) {
         },
         queryFn: async ({ pageParam = 1 }: { pageParam?: number }) => {
             try {
-                const request = await fetch(`${baseUrl}/show-all/${props?.receiverId}?page=${pageParam}&limit=${14}`, {
+                const url = `${import.meta.env.VITE_BASE_API_URL}/users/chats`;
+                const request = await fetch(`${url}/show-all/${props?.receiverId}?page=${pageParam}&limit=${14}`, {
                     credentials: "include",
                     headers: { 'Content-Type': 'application/json' },
                     method: "GET"

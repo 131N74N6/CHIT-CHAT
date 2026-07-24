@@ -1,9 +1,10 @@
 import { Query, useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import type { IRoomMemberService } from "../models/room.model";
 import type { IOtherUser } from "../models/user.model";
+import { useUserStore } from "../stores/user.store";
 
 export default function useRoomMemberService(props?: IRoomMemberService) {
-    const baseUrl = `${import.meta.env.VITE_BASE_API_URL}/rooms/members`;
+    const currentUserId = useUserStore((state) => state.currentUserId);
     const queryClient = useQueryClient();
     
     const { 
@@ -21,7 +22,8 @@ export default function useRoomMemberService(props?: IRoomMemberService) {
         },
         queryFn: async ({ pageParam = 1 }: { pageParam?: number }) => {
             try {
-                const request = await fetch(`${baseUrl}/show-all/${props?.roomId}?page=${pageParam}&limit=${14}`, {
+                const url = `${import.meta.env.VITE_BASE_API_URL}/rooms/members`;
+                const request = await fetch(`${url}/show-all/${props?.roomId}?page=${pageParam}&limit=${14}`, {
                     credentials: "include",
                     headers: { 'Content-Type': 'application/json' },
                     method: "GET"
@@ -53,7 +55,7 @@ export default function useRoomMemberService(props?: IRoomMemberService) {
     const kickMemberMt = useMutation({
         mutationFn: async (userId: string) => {
             try {
-                const request = await fetch(`${baseUrl}/kick/${userId}`, {
+                const request = await fetch(`${import.meta.env.VITE_BASE_API_URL}/rooms/members/kick/${userId}`, {
                     credentials: "include",
                     headers: { 'Content-Type': 'application/json' },
                     method: "PUT"
@@ -75,7 +77,7 @@ export default function useRoomMemberService(props?: IRoomMemberService) {
                     const queryKey = query.queryKey;
                     if (Array.isArray(queryKey) && queryKey.length > 0 && typeof queryKey[0] === "string") {
                         return queryKey[0].startsWith(`current-user`) ||
-                        queryKey[0].startsWith(`available-room-`) ||
+                        queryKey[0].startsWith(`available-room-${currentUserId}`) ||
                         queryKey[0].startsWith(`room-chat-${props?.roomId}`) ||
                         queryKey[0].startsWith(`room-member-${props?.roomId}`);
                     }
@@ -88,7 +90,7 @@ export default function useRoomMemberService(props?: IRoomMemberService) {
     const leftRoomMt = useMutation({
         mutationFn: async () => {
             try {
-                const request = await fetch(`${baseUrl}/left-room/${props?.roomId}`, {
+                const request = await fetch(`${import.meta.env.VITE_BASE_API_URL}/rooms/members/left-room/${props?.roomId}`, {
                     credentials: "include",
                     headers: { 'Content-Type': 'application/json' },
                     method: "PUT"
@@ -110,7 +112,7 @@ export default function useRoomMemberService(props?: IRoomMemberService) {
                     const queryKey = query.queryKey;
                     if (Array.isArray(queryKey) && queryKey.length > 0 && typeof queryKey[0] === "string") {
                         return queryKey[0].startsWith(`current-user`) ||
-                        queryKey[0].startsWith(`available-room-`) ||
+                        queryKey[0].startsWith(`available-room-${currentUserId}`) ||
                         queryKey[0].startsWith(`room-member-${props?.roomId}`);
                     }
                     return false;

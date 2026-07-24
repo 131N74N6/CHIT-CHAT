@@ -5,11 +5,8 @@ export interface IAuthService {
     setMessage?: (message: string | null) => void;
 }
 
-export interface IChangeUser extends IAuthService {}
-
 export interface IUserProfileService extends IAuthService {
     receiverId?: string;
-    roomId?: string;
 }
 
 export interface IUserChatWindow {
@@ -81,6 +78,7 @@ export interface IUserProfile {
         resource_type: string;
         url: string;
     }
+    room_id: string[];
     user_id: string;
     username: string;
 }

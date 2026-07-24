@@ -1,5 +1,4 @@
 import AvailableRoom from "./pages/AvailableRoom";
-import ChangeRoom from "./pages/ChangeRoom";
 import Chatbot from "./pages/Chatbot";
 import ChatbotDetail from "./pages/ChatbotDetail";
 import ChatbotResults from "./pages/ChatbotResults";
@@ -22,7 +21,14 @@ import YourProfile from "./pages/YourProfile";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+    defaultOptions: {
+        queries: {
+            refetchOnMount: false,
+            refetchOnWindowFocus: false
+        }
+    }
+});
 
 export default function App() {
     return (
@@ -41,7 +47,6 @@ export default function App() {
                     <Route element={<ProtectedRoute><AvailableRoom/></ProtectedRoute>} path="/rooms"/>
                     <Route element={<ProtectedRoute><CreateRoom/></ProtectedRoute>} path="/rooms/create"/>
                     <Route element={<ProtectedRoute><JoinRoom/></ProtectedRoute>} path="/rooms/join"/>
-                    <Route element={<ProtectedRoute><ChangeRoom/></ProtectedRoute>} path="/rooms/edit/:room_id"/>
                     <Route element={<ProtectedRoute><RoomChat/></ProtectedRoute>} path="/rooms/chat/:room_id"/>
                     <Route element={<ProtectedRoute><RoomMediaPreview/></ProtectedRoute>} path="/room/chat/preview/:room_id"/>
                     <Route element={<ProtectedRoute><RoomMediaDetail/></ProtectedRoute>} path="/room/media/detail/:room_id"/>

@@ -53,7 +53,7 @@ export default function useSocketIo(props: ChatSocketIntrf) {
         } else if (props.identifier.includes("user-chat")) {
             onUserChatJoin(props.currentUserId);
         } else {
-            onUserProfileJoin(props.currentUserId);
+            onUserProfileJoin(props.marks?.receiverId!);
         }
 
         const socket = getSocket();
