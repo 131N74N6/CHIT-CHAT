@@ -4,7 +4,7 @@ import cn from "../utils/cn";
 import Loading from "../components/Loading";
 import { File, Menu, MenuSquare, MessageCircle, SendIcon, X } from "lucide-react";
 import { useMessageStore } from "../stores/message.store";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import useUserProfileService from "../services/useUserProfileService";
 import Navbar from "../components/Navbar";
@@ -12,9 +12,10 @@ import useSocketIo from "../hooks/useSocketIo";
 import Alert from "../components/Alert";
 import UserChatDeleteOption1 from "../components/UserChatDeleteOption1";
 import UserChatDeleteOption2 from "../components/UserChatDeleteOption2";
+import { useChatStore } from "../stores/chat.store";
 
 export default function UserChat() {
-    const { receiver_id } = useParams();
+    const receiverId = useChatStore((state) => state.receiverId);
     const navigate = useNavigate();
     
     const message = useMessageStore((state) => state.message);
@@ -24,7 +25,7 @@ export default function UserChat() {
         currentUser, 
         isUserProfileProcessing, 
         receiverUserProfile 
-    } = useUserProfileService({ receiverId: receiver_id!, setMessage: setMessage });
+    } = useUserProfileService({ setMessage: setMessage });
 
     const { 
         clearAllUserChatsForMeMt,
@@ -45,12 +46,12 @@ export default function UserChat() {
         text,
         toggleSelect,
         userChats 
-    } = useUserChatService({ receiverId: receiver_id!, setMessage: setMessage });
+    } = useUserChatService({ setMessage: setMessage });
 
     useSocketIo({
         currentUserId: currentUser.user ? currentUser.user.user_id : '',
         identifier: ["user-chat", "user-profile"],
-        marks: { receiverId: receiver_id }
+        marks: { receiverId: receiverId }
     });
 
     useEffect(() => {
@@ -115,7 +116,7 @@ export default function UserChat() {
                 ) : (
                     <div className="bg-gray-400 p-2 flex justify-between items-center cursor-pointer">
                         <div className="flex items-center gap-2">
-                            <div className="w-10 h-10 rounded-full" onClick={() => navigate(`/user/profile/${receiver_id}`)}>
+                            <div className="w-10 h-10 rounded-full" onClick={() => navigate(`/user/profile/${receiverId}`)}>
                                 {receiverUserProfile.detail && receiverUserProfile.detail.profile_picture !== null ? (
                                     <div className="w-full h-full">
                                         <img 
@@ -200,7 +201,7 @@ export default function UserChat() {
                             <button 
                                 className="text-blue-500 font-medium cursor-pointer disabled:cursor-not-allowed"
                                 disabled={isUserChatProcessing || isUserProfileProcessing}
-                                onClick={() => navigate(`/user/chat/preview/${receiver_id}`)}
+                                onClick={() => navigate(`/user/chat/preview/${receiverId}`)}
                                 type="button"
                             >
                                 <File size={22}/>

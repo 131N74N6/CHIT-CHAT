@@ -17,13 +17,12 @@ import { useRoomStore } from "../stores/room.store";
 
 export default function RoomChat() {
     const navigate = useNavigate();
+    const roomId = useRoomStore((state) => state.roomId);
 
     const message = useMessageStore((state) => state.message);
     const setMessage = useMessageStore((state) => state.setMessage);
-    const roomId = useRoomStore((state) => state.roomId);
 
     const { currentUser, isUserProfileProcessing } = useUserProfileService({ setMessage: setMessage });
-    
     const { currentRoomProfile } = useRoomProfileService({ setMessage: setMessage });
     
     const { 

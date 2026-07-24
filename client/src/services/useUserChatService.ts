@@ -12,7 +12,6 @@ export default function useUserChatService(props?: IUserChatService) {
 
     const resetChatState = useChatStore((state) => state.resetChatState);
     const receiverId = useChatStore((state) => state.receiverId);
-    console.log(receiverId);
 
     const media = useChatStore((state) => state.media);
     const setMedia = useChatStore((state) => state.setMedia);
