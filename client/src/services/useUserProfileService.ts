@@ -186,10 +186,16 @@ export default function useUserProfileService(props?: IUserProfileService) {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['all-users'] });
             queryClient.invalidateQueries({ queryKey: ['current-user'] });
-            queryClient.invalidateQueries({ queryKey: [`receiver-${receiverId}`] });
-            queryClient.invalidateQueries({ queryKey: [`receiver-${currentUser.user?.user_id}`] });
 
-            if (currentUser.user && currentUser.user.room_id.length > 0) {
+            if (receiverId) {
+                queryClient.invalidateQueries({ queryKey: [`receiver-${receiverId}`] });
+            }
+
+            if (currentUser.user && currentUser.user.user_id) {
+                queryClient.invalidateQueries({ queryKey: [`receiver-${currentUser.user.user_id}`] });
+            }
+
+            if (currentUser.user && currentUser.user.room_id && currentUser.user.room_id.length > 0) {
                 currentUser.user.room_id.forEach((room_id) => {
                     queryClient.invalidateQueries({ queryKey: [`room-chat-${room_id}`] });
                     queryClient.invalidateQueries({ queryKey: [`room-member-${room_id}`] });

@@ -15,7 +15,6 @@ export default function useRoomChatService(props?: IRoomChatService) {
 
     const media = useChatStore((state) => state.media);
     const setMedia = useChatStore((state) => state.setMedia);
-    console.log(roomId);
 
     const text = useChatStore((state) => state.text);
     const setText = useChatStore((state) => state.setText);

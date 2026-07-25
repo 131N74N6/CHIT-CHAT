@@ -27,7 +27,7 @@ export async function changeUser(req: AuthRequest, res: Response) {
                 const cloudinary = await uploadTOCloudinary({
                     file_buffer: selectedImage.buffer,
                     folder_name: "user_profile",
-                    original_name: selectedImage.filename
+                    original_name: selectedImage.originalname
                 });
 
                 newProfilePicture = cloudinary;
@@ -36,8 +36,8 @@ export async function changeUser(req: AuthRequest, res: Response) {
         
         const updated = await User.findOneAndUpdate({ _id: currentUserId }, {
             $set: {
-                address: address || null,
-                gender: gender || null,
+                address: address || user.address,
+                gender: gender || user.gender,
                 profile_picture: newProfilePicture || user.profile_picture,
                 username: username || user.username
             }

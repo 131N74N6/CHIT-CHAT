@@ -45,7 +45,7 @@ export default function RoomMember() {
                 <div className="flex">
                     <input
                         className={cn(
-                            "focus:outline-none bg-gray-500 text-gray-900 font-medium p-1.5 text-[1.2rem] w-full"
+                            "focus:outline-none bg-gray-200 text-gray-900 font-medium p-1.5 text-[1rem] w-full"
                         )}
                         placeholder="find room member..."
                         type="text"
