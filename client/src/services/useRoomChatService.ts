@@ -11,6 +11,7 @@ export default function useRoomChatService(props?: IRoomChatService) {
     const roomId = useRoomStore((state) => state.roomId);
     
     const inputMediaRef = useRef<HTMLInputElement>(null);
+    const resetChatState = useChatStore((state) => state.resetChatState);
 
     const media = useChatStore((state) => state.media);
     const setMedia = useChatStore((state) => state.setMedia);
@@ -98,8 +99,7 @@ export default function useRoomChatService(props?: IRoomChatService) {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: [`room-chat-${roomId}`] });
-            setMedia([]);
-            setText("");
+            resetChatState();
         }
     });
 
@@ -125,8 +125,7 @@ export default function useRoomChatService(props?: IRoomChatService) {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: [`room-chat-${roomId}`] });
-            setMedia([]);
-            setText("");
+            resetChatState();
         }
     });
 
@@ -151,8 +150,7 @@ export default function useRoomChatService(props?: IRoomChatService) {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: [`room-chat-${roomId}`] });
-            setMedia([]);
-            setText("");
+            resetChatState();
         }
     });
 
@@ -178,8 +176,7 @@ export default function useRoomChatService(props?: IRoomChatService) {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: [`room-chat-${roomId}`] });
-            setMedia([]);
-            setText("");
+            resetChatState();
         }
     });
 
@@ -205,8 +202,7 @@ export default function useRoomChatService(props?: IRoomChatService) {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: [`room-chat-${roomId}`] });
-            setMedia([]);
-            setText("");
+            resetChatState();
         }
     });
 
@@ -261,8 +257,7 @@ export default function useRoomChatService(props?: IRoomChatService) {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: [`room-chat-${roomId}`] });
-            setMedia([]);
-            setText("");
+            resetChatState();
         }
     });
 

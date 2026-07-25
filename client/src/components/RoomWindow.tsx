@@ -23,7 +23,7 @@ export default function RoomWindow(props: IRoomWindow) {
     }
 
     return (
-        <div className="h-full flex-col gap-2.5 md:w-2/4 md:flex md:p-2.5 md:flex-col hidden">
+        <div className="h-full flex-col gap-2.5 md:w-2/5 md:flex md:flex-col hidden">
             {props.showProfile ? (
                 <RoomProfileWindow
                     deleteRoomMt={props.deleteRoomMt}

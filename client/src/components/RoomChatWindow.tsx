@@ -8,7 +8,7 @@ export default function RoomChatWindow(props: IRoomChatWindow) {
     return (
         <div className="h-full flex-col md:flex md:flex-col hidden">
             {props.isSelectMode ? (
-                <div className="bg-gray-400 p-2 flex gap-1.5 cursor-pointer justify-end">
+                <div className="bg-gray-200 p-2 flex gap-1.5 cursor-pointer justify-end border border-gray-400">
                     <button
                         className={cn(
                             "font-medium text-gray-600 cursor-pointer", 
@@ -36,10 +36,10 @@ export default function RoomChatWindow(props: IRoomChatWindow) {
                     </button>
                 </div>
             ) : (
-                <div className="bg-gray-200 p-2 flex justify-between items-center">
+                <div className="bg-gray-200 p-2 flex justify-between items-center border border-gray-400">
                     <div className="flex items-center gap-2">
                         <div className="w-10 h-10 cursor-pointer rounded-full" onClick={props.seeProfile}>
-                            {props.roomProfile.profile_picture && props.roomProfile.profile_picture.public_id ? (
+                            {props.roomProfile && props.roomProfile.profile_picture !== null ? (
                                 <div className="w-full h-full">
                                     <img 
                                         className="w-full h-full object-cover" 
@@ -102,7 +102,7 @@ export default function RoomChatWindow(props: IRoomChatWindow) {
                         fetchNextPage={props.fetchNextRoomChat}
                         hasNextPage={props.hasNextRoomChat}
                         isFetchingNextPage={props.isFetchingNextRoomChat}
-                        isInRoom={false}
+                        isInRoom={true}
                         isProcessing={props.isProcessing}
                         isSelectMode={props.isSelectMode}
                         selectedIds={props.selectedIds}

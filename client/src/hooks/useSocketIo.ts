@@ -91,7 +91,7 @@ export default function useSocketIo(props: ChatSocketIntrf) {
             onChangeUser(() => invalidations(["all-users", "current-user", "room-member"]));
             onDeleteRoom(() => invalidations(["available-room", "room-profile", "room-chat", "room-member"]));
             onDeleteUser(() => invalidations(["current-user", "room-member", "user-chat"]));
-            onJoinNewMember(() => invalidations(["room-member"]));
+            onJoinNewMember(() => invalidations(["available-room", "room-member"]));
             onKickMember(() => invalidations(["available-room", "room-member"]));
             onLeftTheRoom(() => invalidations(["available-room", "current-user", "receiver", "room-member"]));
         }
@@ -102,10 +102,10 @@ export default function useSocketIo(props: ChatSocketIntrf) {
         }
 
         if (props.identifier.includes("user-chat")) {
-            onChangeUser(() => invalidations(["all-users", "current-user", "user"]));
+            onChangeUser(() => invalidations(["all-users", "current-user"]));
             onDeleteAllChats(() => invalidations(["user-chat"]));
             onDeleteChat(() => invalidations(["user-chat"]));
-            onDeleteUser(() => invalidations(["current-user", "user-chat", "user"]));
+            onDeleteUser(() => invalidations(["current-user", "user-chat"]));
             onSendToUser(() => invalidations(["user-chat"]));
         }
 
@@ -127,7 +127,7 @@ export default function useSocketIo(props: ChatSocketIntrf) {
                 socket.off("user-chat:deleted", () => invalidations(["user-chat"]));
                 socket.off("user-profile:changed", () => invalidations(["all-users", "current-user", "receiver", "room-member"]));
                 socket.off("user:deleted", () => invalidations(["all-users", "current-user", "receiver", "user-chat", "room-member"]));
-                socket.off("user:user:join-room-successfully", () => invalidations(["room-member"]));
+                socket.off("user:user:join-room-successfully", () => invalidations(["available-room", "room-member"]));
                 socket.off("user:left-room-successfully", () => invalidations(["current-user", "receiver", "room-member"]));
             }
         }
