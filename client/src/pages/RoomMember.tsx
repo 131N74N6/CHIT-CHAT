@@ -4,19 +4,22 @@ import UserList from "../components/UserList";
 import useSocketIo from "../hooks/useSocketIo";
 import useRoomMemberService from "../services/useRoomMemberService";
 import cn from "../utils/cn";
-import UserServices from "../services/useUserProfileService";
+import useUserProfileService from "../services/useUserProfileService";
 import { useMessageStore } from "../stores/message.store";
 import { useEffect } from "react";
 import Alert from "../components/Alert";
 import { MessageCircle } from "lucide-react";
 import { useRoomStore } from "../stores/room.store";
+import { useChatStore } from "../stores/chat.store";
 
 export default function RoomMember() {
     const roomId = useRoomStore((state) => state.roomId);
+    const setReceiverId = useChatStore((state) => state.setReceiverId);
+    
     const message = useMessageStore((state) => state.message);
     const setMessage = useMessageStore((state) => state.setMessage);
     
-    const { currentUser } = UserServices({ setMessage: setMessage });
+    const { currentUser } = useUserProfileService({ setMessage: setMessage });
     const { currentRoomMember } = useRoomMemberService({ setMessage: setMessage });
     
     useEffect(() => {
@@ -62,9 +65,11 @@ export default function RoomMember() {
                     <UserList
                         fetchNextUser={currentRoomMember.fetchNextRoomMember}
                         hasNextPage={currentRoomMember.roomMmeberHaveNextPage}
+                        isInRoom={true}
                         isFetchingNextPage={currentRoomMember.isRoomMemberFetchNextPage}
                         isProcessing={currentRoomMember.isRoomMemberLoading}
                         users={currentRoomMember.roomMember}
+                        setReceiverId={setReceiverId}
                     />
                 )}
             </div>

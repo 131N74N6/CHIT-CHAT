@@ -29,7 +29,7 @@ export default function RoomChatDeleteOption1(props: IRoomChatDeleteOption1) {
                     type="button"
                 >
                     <Trash size={23}/>
-                    <div>Clear All Chats With This Person</div>
+                    <div>Clear All Chats In This Room</div>
                 </button>
                 <button
                     className={cn(
@@ -42,7 +42,7 @@ export default function RoomChatDeleteOption1(props: IRoomChatDeleteOption1) {
                     type="button"
                 >
                     <BrushCleaning size={23}/>
-                    <div>Delete All Chats With This Person</div>
+                    <div>Delete All Chats In This Room</div>
                 </button>
                 <button
                     className={cn(

@@ -10,8 +10,8 @@ export default function ChatBubble(props: IChatBubble) {
         <div 
             onClick={() => props.isSelectMode && props.toggleSelect(props.chat._id)}
             className={cn(
-                "flex flex-col gap-2 p-2 rounded-sm transition-all duration-200",
-                props.own ? "ml-[50%] bg-blue-700 text-white" : "mr-[50%] bg-gray-200 text-gray-900 w-[60%]",
+                "flex flex-col gap-2 p-2 rounded-sm transition-all duration-200 w-[60%]",
+                props.own ? "ml-[50%] bg-blue-700 text-white" : "mr-[50%] bg-gray-200 text-gray-900",
                 props.isSelectMode && "cursor-pointer hover:opacity-80",
                 isSelected && "ring-4 ring-orange-500 border-2 border-orange-600 bg-orange-50 text-gray-900"
             )}
@@ -23,7 +23,7 @@ export default function ChatBubble(props: IChatBubble) {
             ) : null}
             {props.isInRoom === true ? (
                 <button 
-                    className="font-light text-[0.7rem] cursor-pointer disabled:cursor-not-allowed" 
+                    className="text-left font-medium text-[0.7rem] cursor-pointer disabled:cursor-not-allowed" 
                     disabled={props.isProcessing}
                     onClick={() => navigate(`/user/chat/${props.chat.receiver_id}`)}
                     type="button"

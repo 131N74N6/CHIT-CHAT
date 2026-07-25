@@ -105,11 +105,13 @@ export interface UserListIntrf {
     fetchNextUser: (options?: FetchNextPageOptions | undefined) => Promise<InfiniteQueryObserverResult<InfiniteData<any, unknown>, Error>>;
     hasNextPage: boolean;
     isFetchingNextPage: boolean;
+    isInRoom: boolean;
     isProcessing: boolean;
     setReceiverId?: (receiverId: string) => void;
 }
 
 export interface UserItemIntrf {
+    isInRoom: boolean;
     setReceiverId?: (receiverId: string) => void;
     user: IOtherUser;
 }

@@ -21,6 +21,7 @@ export default function UserList(props: UserListIntrf) {
                     return (
                         <UserData 
                             key={`user-${user._id}`}
+                            isInRoom={props.isInRoom}
                             setReceiverId={props.setReceiverId} 
                             user={user} 
                         />

@@ -108,6 +108,7 @@ export default function Home() {
                         fetchNextUser={allUsers.fetchNextUser}
                         hasNextPage={allUsers.usersHaveNextPage}
                         isProcessing={isUserChatProcessing || isUserProfileProcessing}
+                        isInRoom={false}
                         isFetchingNextPage={allUsers.isFetchNextUser}
                         setReceiverId={setReceiverId}
                         users={allUsers.users}

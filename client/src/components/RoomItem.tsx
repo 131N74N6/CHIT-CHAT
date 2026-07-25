@@ -10,8 +10,8 @@ export default function RoomItem(props: RoomItemIntrf) {
     
     return (
         <>
-            <div className="border bg-white border-b-gray-600 md:flex gap-1.5 hidden" onClick={showWindowChat}>
-                <div className="w-20 h-20 rounded-full">
+            <div className="border-b bg-white border-gray-600 p-1.5 items-center cursor-pointer md:flex gap-1.5 hidden" onClick={showWindowChat}>
+                <div className="w-10 h-10 rounded-full">
                     {props.room.profile_picture !== null ? (
                         <div className="w-full h-full">
                             <img 
@@ -29,19 +29,20 @@ export default function RoomItem(props: RoomItemIntrf) {
                 <div className="text-gray-950 font-medium">{props.room.name}</div>
             </div>
             <div 
-                className="border bg-white border-b-gray-600 md:hidden flex gap-1.5" 
+                className="border-b bg-white border-gray-600 p-1.5 items-center cursor-pointer md:hidden flex gap-1.5" 
                 onClick={() => {
                     props.setRoomId(props.room._id);
                     navigate(`/rooms/chat/${props.room._id}`);
                 }}
             >
-                <div className="w-20 h-20 rounded-full">
+                <div className="w-10 h-10 rounded-full">
                     {props.room.profile_picture !== null ? (
                         <div className="w-full h-full">
                             <img 
                                 className="w-full h-full object-cover" 
                                 src={props.room.profile_picture.url} 
-                                alt={props.room.profile_picture.public_id}/>
+                                alt={props.room.profile_picture.public_id}
+                            />
                         </div>
                     ) : (
                         <div className="w-full h-full rounded-full bg-purple-500 text-white font-medium text-lg flex items-center justify-center">

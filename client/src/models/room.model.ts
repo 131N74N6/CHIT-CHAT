@@ -95,10 +95,13 @@ export interface IRoomChatWindow {
     navigate: NavigateFunction;
     roomChats: ChatIntrf[];
     roomChatError: Error | null;
+    roomId: string;
     roomProfile: RoomIntrf;
     selectedIds: string[];
     sendChatToRoom: UseMutationResult<any, Error, void, unknown>;
-    setIsSelectMode: (isSelectMode: boolean) => void
+    setIsSelectMode: (isSelectMode: boolean) => void;
+    setRoomId: (roomId: string) => void;
+    setShowDeleteOption1: (showDeleteOption1: boolean) => void;
     setShowDeleteOption2: (showDeleteOption2: boolean) => void;
     setText: (text: string) => void;
     seeProfile: () => void;
@@ -146,12 +149,15 @@ export interface IRoomWindow {
     roomProfile: RoomIntrf;
     roomChats: ChatIntrf[];
     roomChatError: Error | null;
+    roomId: string;
     roomMemberError: Error | null;
     roomMemberHaveNextPage: boolean;
     roomProfileError: Error | null;
     selectedChatsIds: string[];
     sendChatToRoom: UseMutationResult<any, Error, void, unknown>;
-    setIsSelectMode: (isSelectMode: boolean) => void
+    setIsSelectMode: (isSelectMode: boolean) => void;
+    setRoomId: (roomId: string) => void;
+    setShowDeleteOption1: (showDeleteOption1: boolean) => void;
     setShowDeleteOption2: (showDeleteOption2: boolean) => void
     setShowProfile: (showProfile: boolean) => void;
     setText: (text: string) => void;

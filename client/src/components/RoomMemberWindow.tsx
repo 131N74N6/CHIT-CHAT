@@ -42,6 +42,7 @@ export default function RoomMemberWindow(props: IRoomMemberWindow) {
                     fetchNextUser={props.fetchNextUser}
                     hasNextPage={props.roomMemberHaveNextPage}
                     isFetchingNextPage={props.isRoomMemberFetchNextPage}
+                    isInRoom={true}
                     isProcessing={props.isRoomMemberLoading}
                     users={props.users}
                 />

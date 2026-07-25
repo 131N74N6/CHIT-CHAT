@@ -86,7 +86,7 @@ export default function UserChat() {
             ) : null}
             <div className="md:w-2/5 w-full h-full flex flex-col">
                 {isSelectMode ? (
-                    <div className="bg-gray-200 p-2 flex gap-1.5 cursor-pointer justify-end">
+                    <div className="bg-gray-200 p-2 flex gap-1.5 cursor-pointer justify-end border border-gray-400">
                         <button
                             className={cn(
                                 "font-medium text-gray-600 cursor-pointer", 
@@ -114,7 +114,7 @@ export default function UserChat() {
                         </button>
                     </div>
                 ) : (
-                    <div className="bg-gray-400 p-2 flex justify-between items-center cursor-pointer">
+                    <div className="bg-gray-200 p-2 flex justify-between items-center cursor-pointer border border-gray-400">
                         <div className="flex items-center gap-2">
                             <div className="w-10 h-10 rounded-full" onClick={() => navigate(`/user/profile/${receiverId}`)}>
                                 {receiverUserProfile.detail && receiverUserProfile.detail.profile_picture !== null ? (
