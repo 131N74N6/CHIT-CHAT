@@ -56,6 +56,14 @@ export default function useSocketIo(props: ChatSocketIntrf) {
             onUserProfileJoin(props.marks?.receiverId!);
         }
 
+        if (props.identifier.includes("user-profile")) {
+            onUserProfileJoin(props.currentUserId);
+            
+            if (props.marks?.receiverId) {
+                onUserProfileJoin(props.marks.receiverId);
+            }
+        }
+
         const socket = getSocket();
 
         function invalidations(queryNames: string[]) {
