@@ -14,7 +14,6 @@ export async function changeUser(req: AuthRequest, res: Response) {
         const { address, gender, username } = req.body;
         const selectedImage: Express.Multer.File | undefined = req.file;
 
-        let newProfilePicture;
         const user = await User.findOne({ _id: currentUserId });
         if (!user) return res.status(404).json({ message: "user not found" });
 
@@ -23,43 +22,48 @@ export async function changeUser(req: AuthRequest, res: Response) {
                 await v2.uploader.destroy(user.profile_picture.public_id, { 
                     resource_type: user.profile_picture.resource_type 
                 });
-
-                const cloudinary = await uploadTOCloudinary({
-                    file_buffer: selectedImage.buffer,
-                    folder_name: "user_profile",
-                    original_name: selectedImage.originalname
-                });
-
-                newProfilePicture = cloudinary;
             }
+
+            const newImage = await uploadTOCloudinary({
+                file_buffer: selectedImage.buffer,
+                folder_name: "user_profile",
+                original_name: selectedImage.originalname
+            });
+
+            await User.updateOne({ _id: currentUserId }, {
+                $set: {
+                    address: address || user.address,
+                    gender: gender || user.gender,
+                    profile_picture: newImage || user.profile_picture,
+                    username: username || user.username
+                }
+            });
+        } else {
+            await User.updateOne({ _id: currentUserId }, {
+                $set: {
+                    address: address || user.address,
+                    gender: gender || user.gender,
+                    profile_picture: user.profile_picture,
+                    username: username || user.username
+                }
+            });
         }
-        
-        const updated = await User.findOneAndUpdate({ _id: currentUserId }, {
-            $set: {
-                address: address || user.address,
-                gender: gender || user.gender,
-                profile_picture: newProfilePicture || user.profile_picture,
-                username: username || user.username
-            }
-        }, { new: true });
 
         if (user.room_id.length > 0 && user.room_id) {
             user.room_id.forEach(roomId => {
                 io.to(`room-chat:${roomId}`)
                 .to(`room-member:${roomId}`)
                 .emit("user-profile:changed", {
-                    _id: updated?._id,
-                    profile_picture: updated?.profile_picture,
+                    _id: currentUserId,
                     username: username
                 });
             });
         }
 
-        io.to(`available-user:${updated?._id}`)
+        io.to(`available-user:${currentUserId}`)
         .to(`user-profile:${currentUserId}`)
         .emit("user-profile:changed", {
-            _id: updated?._id,
-            profile_picture: updated?.profile_picture,
+            _id: currentUserId,
             username: username
         });
 
@@ -151,7 +155,6 @@ export async function joinRoom(req: AuthRequest, res: Response) {
         .to(`available-room:${userId}`)
         .emit("user:join-room-successfully", {
             _id: updated?._id,
-            profile_picture: updated?.profile_picture,
             username: updated?.username
         });
 
@@ -216,11 +219,11 @@ export async function showReceiverProfile(req: Request, res: Response) {
         if (!receiver) return res.status(404).json({ message: "user not found" });
 
         res.status(200).json({
+            _id: receiver._id,
             address: receiver.address,
             created_at: receiver.created_at,
             gender: receiver.gender,
             profile_picture: receiver.profile_picture,
-            user_id: receiver._id,
             username: receiver.username
         });
     } catch (error) {

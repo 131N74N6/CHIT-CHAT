@@ -101,17 +101,19 @@ export interface IOtherUser {
 }
 
 export interface UserListIntrf {
-    users: IOtherUser[];
+    currentUserId: string;
     fetchNextUser: (options?: FetchNextPageOptions | undefined) => Promise<InfiniteQueryObserverResult<InfiniteData<any, unknown>, Error>>;
     hasNextPage: boolean;
     isFetchingNextPage: boolean;
     isInRoom: boolean;
     isProcessing: boolean;
-    setReceiverId?: (receiverId: string) => void;
+    setReceiverId: (receiverId: string) => void;
+    users: IOtherUser[];
 }
 
 export interface UserItemIntrf {
     isInRoom: boolean;
-    setReceiverId?: (receiverId: string) => void;
+    own: boolean;
+    setReceiverId: (receiverId: string) => void;
     user: IOtherUser;
 }

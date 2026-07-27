@@ -42,7 +42,7 @@ export default function RoomChatWindow(props: IRoomChatWindow) {
                             {props.roomProfile && props.roomProfile.profile_picture !== null ? (
                                 <div className="w-full h-full">
                                     <img 
-                                        className="w-full h-full object-cover" 
+                                        className="w-full h-full object-cover rounded-full" 
                                         src={props.roomProfile.profile_picture.url} 
                                         alt={props.roomProfile.profile_picture.public_id}
                                     />

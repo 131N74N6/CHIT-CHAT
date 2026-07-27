@@ -39,11 +39,13 @@ export default function RoomMemberWindow(props: IRoomMemberWindow) {
                 </div>
             ) : (
                 <UserList
+                    currentUserId={props.currentUserId}
                     fetchNextUser={props.fetchNextUser}
                     hasNextPage={props.roomMemberHaveNextPage}
                     isFetchingNextPage={props.isRoomMemberFetchNextPage}
                     isInRoom={true}
                     isProcessing={props.isRoomMemberLoading}
+                    setReceiverId={props.setReceiverId}
                     users={props.users}
                 />
             )}

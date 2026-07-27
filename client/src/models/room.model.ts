@@ -111,12 +111,14 @@ export interface IRoomChatWindow {
 }
 
 export interface IRoomMemberWindow {
+    currentUserId: string;
     fetchNextUser: (options?: FetchNextPageOptions | undefined) => Promise<InfiniteQueryObserverResult<InfiniteData<any, unknown>, Error>>;
     isRoomMemberFetchNextPage: boolean;
     isRoomMemberLoading: boolean;
     roomMemberError: Error | null;
     roomMemberHaveNextPage: boolean;
     seeProfile: () => void;
+    setReceiverId: (receiverId: string) => void;
     users: IOtherUser[];
 }
 

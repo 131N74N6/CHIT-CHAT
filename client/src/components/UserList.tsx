@@ -22,6 +22,7 @@ export default function UserList(props: UserListIntrf) {
                         <UserData 
                             key={`user-${user._id}`}
                             isInRoom={props.isInRoom}
+                            own={props.currentUserId === user._id}
                             setReceiverId={props.setReceiverId} 
                             user={user} 
                         />

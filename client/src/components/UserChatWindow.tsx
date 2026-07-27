@@ -3,11 +3,8 @@ import cn from "../utils/cn"
 import type { IUserChatWindow } from "../models/user.model";
 import ChatList from "./ChatList";
 import Loading from "./Loading";
-import { useNavigate } from "react-router-dom";
 
 export default function UserChatWindow(props: IUserChatWindow) {
-    const navigate = useNavigate();
-    
     return (
         <div className="h-full flex-col md:flex md:flex-col hidden">
             {props.isSelectMode ? (
@@ -41,11 +38,11 @@ export default function UserChatWindow(props: IUserChatWindow) {
             ) : (
                 <div className="bg-gray-200 p-2 flex justify-between items-center">
                     <div className="flex items-center gap-2">
-                        <div className="w-10 h-10 cursor-pointer rounded-full" onClick={() => navigate(`/user/profile/${props.receiverId}`)}>
+                        <div className="w-10 h-10 cursor-pointer rounded-full" onClick={props.seeProfile}>
                             {props.userProfile && props.userProfile.profile_picture !== null ? (
                                 <div className="w-full h-full">
                                     <img 
-                                        className="w-full h-full object-cover" 
+                                        className="w-full h-full object-cover rounded-full" 
                                         src={props.userProfile.profile_picture.url} 
                                         alt={props.userProfile.profile_picture.public_id}
                                     />
@@ -140,7 +137,7 @@ export default function UserChatWindow(props: IUserChatWindow) {
                         <button 
                             className="text-blue-500 font-medium cursor-pointer disabled:cursor-not-allowed"
                             disabled={props.isProcessing}
-                            onClick={() => navigate(`/user/chat/preview/${props.receiverId}`)}
+                            onClick={props.seeMedia}
                             type="button"
                         >
                             <File size={22}/>

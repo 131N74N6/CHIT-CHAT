@@ -38,12 +38,14 @@ export default function RoomWindow(props: IRoomWindow) {
                 />
             ) : props.showMember ? (
                 <RoomMemberWindow
+                    currentUserId={props.currentUserId}
                     fetchNextUser={props.fetchNextUser}
                     isRoomMemberFetchNextPage={props.isRoomMemberFetchNextPage}
                     isRoomMemberLoading={props.isRoomMemberLoading}
                     roomMemberError={props.roomMemberError}
                     roomMemberHaveNextPage={props.roomMemberHaveNextPage}
                     seeProfile={seeProfile}
+                    setReceiverId={props.setReceiverId}
                     users={props.users}
                 />
             ) : (

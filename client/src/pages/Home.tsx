@@ -105,6 +105,7 @@ export default function Home() {
                     </div>
                 ) : (
                     <UserList 
+                        currentUserId={currentUser.user?.user_id!}
                         fetchNextUser={allUsers.fetchNextUser}
                         hasNextPage={allUsers.usersHaveNextPage}
                         isProcessing={isUserChatProcessing || isUserProfileProcessing}

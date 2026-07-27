@@ -5,7 +5,7 @@ import Loading from "./Loading";
 
 export default function UserProfileWindow(props: IUserProfileWindow) {
     return (
-        <div className="flex w-full flex-col h-full bg-gray-400 gap-2.5 p-1.5">
+        <div className="flex w-full flex-col p-2.5 h-full border border-gray-400 inset-shadow-sm inset-shadow-gray-400 gap-2.5">
             {props.isProfileLoading ? (
                 <div className="flex justify-center items-center h-full">
                     <Loading/>
@@ -17,7 +17,7 @@ export default function UserProfileWindow(props: IUserProfileWindow) {
                     </div>
                 </div>
             ) : (
-                <div className="bg-white flex flex-col p-2.5 gap-2.5">
+                <div className="">
                     <div className="flex">
                         <button
                             className={cn(
@@ -36,7 +36,7 @@ export default function UserProfileWindow(props: IUserProfileWindow) {
                                 <div className="w-full h-full rounded-full">
                                     <img
                                         alt={props.userProfile.profile_picture.public_id}
-                                        className="w-full h-full object-cover"
+                                        className="w-full h-full object-cover rounded-full"
                                         src={props.userProfile.profile_picture.url}
                                     />
                                 </div>
@@ -50,38 +50,32 @@ export default function UserProfileWindow(props: IUserProfileWindow) {
                             )}
                         </div>
                     </div>
-                    <div className="flex flex-col gap-3">
-                        <div className="flex flex-col gap-1.5">
-                            <div className="text-xl font-medium text-gray-800">Created At</div>
-                            <div className="text-xl font-medium text-gray-800">
-                                {props.userProfile.created_at || "-"}
+                    <div className="flex flex-col gap-5">
+                            <div className="flex flex-col gap-1.5">
+                                <div className="text-[1rem] font-medium text-gray-800">User ID</div>
+                                <div className="text-[1rem] font-medium text-gray-800">
+                                    {props.userProfile._id || "-"}
+                                </div>
+                            </div>
+                            <div className="flex flex-col gap-1.5">
+                                <div className="text-[1rem] font-medium text-gray-800">Username</div>
+                                <div className="text-[1rem] font-medium text-gray-800">
+                                    {props.userProfile.username || "-"}
+                                </div>
+                            </div>
+                            <div className="flex flex-col gap-1.5">
+                                <div className="text-[1rem] font-medium text-gray-800">Gender</div>
+                                <div className="text-[1rem] font-medium text-gray-800">
+                                    {props.userProfile.gender || "-"}
+                                </div>
+                            </div>
+                            <div className="flex flex-col gap-1.5">
+                                <div className="text-[1rem] font-medium text-gray-800">Address</div>
+                                <div className="text-[1rem] font-medium text-gray-800">
+                                    {props.userProfile.address || "-"}
+                                </div>
                             </div>
                         </div>
-                        <div className="flex flex-col gap-1.5">
-                            <div className="text-xl font-medium text-gray-800">Address</div>
-                            <div className="text-xl font-medium text-gray-800">
-                                {props.userProfile.address || "-"}
-                            </div>
-                        </div>
-                        <div className="flex flex-col gap-1.5">
-                            <div className="text-xl font-medium text-gray-800">User ID</div>
-                            <div className="text-xl font-medium text-gray-800">
-                                {props.userProfile._id || "-"}
-                            </div>
-                        </div>
-                        <div className="flex flex-col gap-1.5">
-                            <div className="text-xl font-medium text-gray-800">Username</div>
-                            <div className="text-xl font-medium text-gray-800">
-                                {props.userProfile.username || "-"}
-                            </div>
-                        </div>
-                        <div className="flex flex-col gap-1.5">
-                            <div className="text-xl font-medium text-gray-800">Gender</div>
-                            <div className="text-xl font-medium text-gray-800">
-                                {props.userProfile.gender || "-"}
-                            </div>
-                        </div>
-                    </div>
                 </div>
             )}
         </div>

@@ -19,6 +19,8 @@ export default function UserProfile() {
 
     const { currentUser, receiverUserProfile } = useUserProfileService({ setMessage: setMessage });
     const { detail, detailError, isDetailLoading } = receiverUserProfile;
+
+    console.log(detail?._id);
     
     useEffect(() => {
         if (message) {
@@ -70,7 +72,7 @@ export default function UserProfile() {
                                     <div className="w-full h-full rounded-full">
                                         <img
                                             alt={detail.profile_picture.public_id}
-                                            className="w-full h-full object-cover"
+                                            className="w-full h-full object-cover rounded-full"
                                             src={detail.profile_picture.url}
                                         />
                                     </div>

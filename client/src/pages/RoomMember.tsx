@@ -63,6 +63,7 @@ export default function RoomMember() {
                     </div>
                 ) : (
                     <UserList
+                        currentUserId={currentUser.user?.user_id!}
                         fetchNextUser={currentRoomMember.fetchNextRoomMember}
                         hasNextPage={currentRoomMember.roomMmeberHaveNextPage}
                         isInRoom={true}

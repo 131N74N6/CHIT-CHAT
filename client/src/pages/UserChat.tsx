@@ -120,7 +120,7 @@ export default function UserChat() {
                                 {receiverUserProfile.detail && receiverUserProfile.detail.profile_picture !== null ? (
                                     <div className="w-full h-full">
                                         <img 
-                                            className="w-full h-full object-cover" 
+                                            className="w-full h-full object-cover rounded-full" 
                                             src={receiverUserProfile.detail.profile_picture.url} 
                                             alt={receiverUserProfile.detail.profile_picture.public_id}
                                         />

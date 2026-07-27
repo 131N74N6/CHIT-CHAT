@@ -122,7 +122,7 @@ export default function RoomChat() {
                                 {currentRoomProfile.detail && currentRoomProfile.detail.profile_picture !== null ? (
                                     <div className="w-full h-full">
                                         <img 
-                                            className="w-full h-full object-cover" 
+                                            className="w-full h-full object-cover rounded-full" 
                                             src={currentRoomProfile.detail.profile_picture.url} 
                                             alt={currentRoomProfile.detail.profile_picture.public_id}
                                         />
