@@ -22,7 +22,7 @@ export default function UserData(props: UserItemIntrf) {
                                             className="w-full h-full object-cover rounded-full" 
                                             src={props.user.profile_picture.url} 
                                             alt={props.user.profile_picture.public_id}
-                                            />
+                                        />
                                     </div>
                                 ) : (
                                     <div className={cn( 
@@ -47,7 +47,7 @@ export default function UserData(props: UserItemIntrf) {
                                             className="w-full h-full object-cover rounded-full" 
                                             src={props.user.profile_picture.url} 
                                             alt={props.user.profile_picture.public_id}
-                                            />
+                                        />
                                     </div>
                                 ) : (
                                     <div className={cn( 
@@ -79,7 +79,7 @@ export default function UserData(props: UserItemIntrf) {
                                             className="w-full h-full object-cover rounded-full" 
                                             src={props.user.profile_picture.url} 
                                             alt={props.user.profile_picture.public_id}
-                                            />
+                                        />
                                     </div>
                                 ) : (
                                     <div className={cn(
@@ -108,7 +108,7 @@ export default function UserData(props: UserItemIntrf) {
                                             className="w-full h-full object-cover rounded-full" 
                                             src={props.user.profile_picture.url} 
                                             alt={props.user.profile_picture.public_id}
-                                            />
+                                        />
                                     </div>
                                 ) : (
                                     <div className={cn(
@@ -136,7 +136,7 @@ export default function UserData(props: UserItemIntrf) {
                                         className="w-full h-full object-cover rounded-full" 
                                         src={props.user.profile_picture.url} 
                                         alt={props.user.profile_picture.public_id}
-                                        />
+                                    />
                                 </div>
                             ) : (
                                 <div className={cn(
@@ -157,7 +157,7 @@ export default function UserData(props: UserItemIntrf) {
                             props.setReceiverId(props.user._id);
                             navigate(`/user/chat/${props.user._id}`);
                         }}
-                        >
+                    >
                         <div className="w-10 h-10 rounded-full">
                             {props.user.profile_picture !== null ? (
                                 <div className="w-full h-full">
@@ -165,7 +165,7 @@ export default function UserData(props: UserItemIntrf) {
                                         className="w-full h-full object-cover rounded-full" 
                                         src={props.user.profile_picture.url} 
                                         alt={props.user.profile_picture.public_id}
-                                        />
+                                    />
                                 </div>
                             ) : (
                                 <div className={cn(

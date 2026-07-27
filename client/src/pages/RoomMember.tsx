@@ -14,6 +14,7 @@ import { useChatStore } from "../stores/chat.store";
 
 export default function RoomMember() {
     const roomId = useRoomStore((state) => state.roomId);
+    const setRoomId = useRoomStore((state) => state.setRoomId);
     const setReceiverId = useChatStore((state) => state.setReceiverId);
     
     const message = useMessageStore((state) => state.message);
@@ -30,6 +31,19 @@ export default function RoomMember() {
             return () => clearTimeout(timer);
         }
     }, [message, setMessage]);
+
+    useEffect(() => {
+        const savedRoomId = localStorage.getItem("room_id");
+        if (savedRoomId && !roomId) setRoomId(savedRoomId);
+    }, []); 
+
+    useEffect(() => {
+        if (roomId) {
+            localStorage.setItem("room_id", roomId);
+        } else {
+            localStorage.removeItem("room_id");
+        }
+    }, [roomId]);
     
     useSocketIo({
         currentUserId: currentUser.user?.user_id!,

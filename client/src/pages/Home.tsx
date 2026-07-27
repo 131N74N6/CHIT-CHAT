@@ -63,6 +63,19 @@ export default function Home() {
     });
 
     useEffect(() => {
+        const savedReceiverId = localStorage.getItem("receiver_id");
+        if (savedReceiverId && !receiverId) setReceiverId(savedReceiverId);
+    }, []); 
+
+    useEffect(() => {
+        if (receiverId) {
+            localStorage.setItem("receiver_id", receiverId);
+        } else {
+            localStorage.removeItem("receiver_id");
+        }
+    }, [receiverId]);
+
+    useEffect(() => {
         if (message) {
             const timer = setTimeout(() => setMessage(null), 1500);
             return () => clearTimeout(timer);

@@ -16,6 +16,7 @@ import { useChatStore } from "../stores/chat.store";
 
 export default function UserChat() {
     const receiverId = useChatStore((state) => state.receiverId);
+    const setReceiverId = useChatStore((state) => state.setReceiverId);
     const navigate = useNavigate();
     
     const message = useMessageStore((state) => state.message);
@@ -53,6 +54,19 @@ export default function UserChat() {
         identifier: ["user-chat", "user-profile"],
         marks: { receiverId: receiverId }
     });
+
+    useEffect(() => {
+        const savedReceiverId = localStorage.getItem("receiver_id");
+        if (savedReceiverId && !receiverId) setReceiverId(savedReceiverId);
+    }, []); 
+
+    useEffect(() => {
+        if (receiverId) {
+            localStorage.setItem("receiver_id", receiverId);
+        } else {
+            localStorage.removeItem("receiver_id");
+        }
+    }, [receiverId]);
 
     useEffect(() => {
         if (message) {
@@ -185,7 +199,7 @@ export default function UserChat() {
                 >
                     <div className="flex gap-1.5">
                         <textarea
-                            className="focus:outline-0 w-[90%] resize-none"
+                            className="focus:outline-0 outline-0 w-[90%] resize-none"
                             id="message"
                             name="message"
                             onChange={(event) => setText(event.target.value)}

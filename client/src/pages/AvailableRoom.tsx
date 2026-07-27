@@ -74,6 +74,19 @@ export default function AvailableRoom() {
         }
     }, [message, setMessage]);
 
+    useEffect(() => {
+        const savedRoomId = localStorage.getItem("room_id");
+        if (savedRoomId && !roomId) setRoomId(savedRoomId);
+    }, []); 
+
+    useEffect(() => {
+        if (roomId) {
+            localStorage.setItem("room_id", roomId);
+        } else {
+            localStorage.removeItem("room_id");
+        }
+    }, [roomId]);
+
     useSocketIo({
         identifier: ["available-room", "room-chat", "room-profile", "room-member"],
         currentUserId: currentUser.user?.user_id!,

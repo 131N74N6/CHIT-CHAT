@@ -86,23 +86,29 @@ export const useRoomStore = create<RoomState>((set) => ({
     oldRoomPicture: null,
     setOldRoomPicture: (oldRoomPicture) => set({ oldRoomPicture }),
     
-    resetRoomState: () => set({
-        deleteRoomImage: null,
-        description: "",
-        editMode: false,
-        isSelectMode: false,
-        oldRoomPicture: null,
-        roomName: "",
-        selectedChatsIds: [],
-        selectedProfileRoom: null,
-        selectedProfileRoomUrl: null,
-        showDeleteOption1: false,
-        showDeleteOption2: false,
-        userChatsIdsToDelete: []
-    }),
+    resetRoomState: () => {
+        localStorage.removeItem("room_id");
+        set({
+            deleteRoomImage: null,
+            description: "",
+            editMode: false,
+            isSelectMode: false,
+            oldRoomPicture: null,
+            roomName: "",
+            selectedChatsIds: [],
+            selectedProfileRoom: null,
+            selectedProfileRoomUrl: null,
+            showDeleteOption1: false,
+            showDeleteOption2: false,
+            userChatsIdsToDelete: []
+        });
+    },
 
-    roomId: "",
-    setRoomId: (roomId) => set({ roomId }),
+    roomId: getRoomIdFromLocalStorage(),
+    setRoomId: (roomId) => {
+        localStorage.setItem("room_id", roomId);
+        set({ roomId });
+    },
 
     roomName: "",
     setRoomName: (roomName: string) => set({ roomName }),
@@ -138,3 +144,7 @@ export const useRoomStore = create<RoomState>((set) => ({
         userChatsIdsToDelete(state.userChatsIdsToDelete) : userChatsIdsToDelete
     })),
 }));
+
+function getRoomIdFromLocalStorage(): string {
+    return localStorage.getItem("room_id") || "";
+}

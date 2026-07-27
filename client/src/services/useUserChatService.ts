@@ -10,7 +10,6 @@ export default function useUserChatService(props?: IUserChatService) {
     const isSelectMode = useChatStore((state) => state.isSelectMode);
     const setIsSelectMode = useChatStore((state) => state.setIsSelectMode);
 
-    const resetChatState = useChatStore((state) => state.resetChatState);
     const receiverId = useChatStore((state) => state.receiverId);
 
     const media = useChatStore((state) => state.media);
@@ -50,7 +49,10 @@ export default function useUserChatService(props?: IUserChatService) {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: [`user-chat-${receiverId}`] });
-            resetChatState();
+            setText("");
+            setMedia([]);
+            clearSelection();
+            setShowDeleteOption1(false);
         }
     });
     
@@ -76,7 +78,10 @@ export default function useUserChatService(props?: IUserChatService) {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: [`user-chat-${receiverId}`] });
-            resetChatState();
+            setText("");
+            setMedia([]);
+            clearSelection();
+            setShowDeleteOption2(false);
         }
     });
 
@@ -101,7 +106,10 @@ export default function useUserChatService(props?: IUserChatService) {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: [`user-chat-${receiverId}`] });
-            resetChatState();
+            setText("");
+            setMedia([]);
+            clearSelection();
+            setShowDeleteOption1(false);
         }
     });
 
@@ -127,7 +135,10 @@ export default function useUserChatService(props?: IUserChatService) {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: [`user-chat-${receiverId}`] });
-            resetChatState();
+            setText("");
+            setMedia([]);
+            clearSelection();
+            setShowDeleteOption2(false);
         }
     });
 
@@ -153,7 +164,9 @@ export default function useUserChatService(props?: IUserChatService) {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: [`user-chat-${receiverId}`] });
-            resetChatState();
+            setText("");
+            setMedia([]);
+            clearSelection();
         }
     });
 
@@ -207,7 +220,10 @@ export default function useUserChatService(props?: IUserChatService) {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: [`user-chat-${receiverId}`] });
-            resetChatState();
+            setText("");
+            setMedia([]);
+            clearSelection();
+            setShowDeleteOption1(false);
         }
     });
 

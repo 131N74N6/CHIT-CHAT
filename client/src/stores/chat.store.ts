@@ -46,20 +46,26 @@ export const useChatStore = create<ChatState>((set) => ({
         media: typeof media === 'function' ? media(state.media) : media 
     })),
 
-    receiverId: "",
-    setReceiverId: (receiverId) => set({ receiverId }),
+    receiverId: getReceiverIdFromLocalStorage(),
+    setReceiverId: (receiverId) => {
+        localStorage.setItem("receiver_id", receiverId);
+        set({ receiverId });
+    },
 
-    resetChatState: () => set({
-        isSelectMode: false,
-        media: [], 
-        receiverId: "",
-        selectedIds: [],
-        showUserMedia: false,
-        showUserProfile: false,
-        text: "", 
-        showDeleteOption1: false,
-        showDeleteOption2: false,
-    }),
+    resetChatState: () => {
+        localStorage.removeItem("receiver_id");
+        set({
+            isSelectMode: false,
+            media: [], 
+            receiverId: "",
+            selectedIds: [],
+            showUserMedia: false,
+            showUserProfile: false,
+            text: "", 
+            showDeleteOption1: false,
+            showDeleteOption2: false,
+        })
+    },
 
     selectedIds: [],
 
@@ -83,3 +89,7 @@ export const useChatStore = create<ChatState>((set) => ({
         state.selectedIds.filter(itemId => itemId !== id) : [...state.selectedIds, id]
     })),
 }));
+
+function getReceiverIdFromLocalStorage(): string {
+    return localStorage.getItem("receiver_id") || "";
+}

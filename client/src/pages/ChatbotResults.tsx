@@ -56,9 +56,7 @@ export default function ChatbotResults() {
                         deleteResultMt.isPending || 
                         deleteAllResultsMt.isPending
                     }
-                    navigate={navigate}
                     results={allResults.paginatedResults}
-                    onDelete={deleteResultMt}
                 />
             </div>
         </section>

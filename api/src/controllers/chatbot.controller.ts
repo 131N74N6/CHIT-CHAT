@@ -10,19 +10,28 @@ export async function askAi(req: AuthRequest, res: Response) {
         const { question } = req.body;
 
         if (!question) return res.status(400).json({ message: "please insert your question" });
-
-        const response = await aiService(question);
-
-        const newResult = new ChatBot({
+        
+        const newQuestion = new ChatBot({
             created_at: createdAt,
-            response: response.result,
             question: question,
+            role: "user/human",
+            user_id: userId
+        });
+        
+        await newQuestion.save();
+        
+        const botAnswer = await aiService(question);
+        const newBotResponse = new ChatBot({
+            created_at: createdAt,
+            answer: botAnswer.result,
+            role: "ai/bot",
+            question_id: newQuestion._id,
             user_id: userId
         });
 
-        await newResult.save();
+        await newBotResponse.save();
 
-        res.status(200).json({ message: newResult.response });
+        res.status(200).json({ message: "question has been sent" });
     } catch (error) {
         console.log(error);
         res.status(500).json({ message: "something went wrong" });
@@ -39,17 +48,17 @@ export async function deleteAllChats(req: AuthRequest, res: Response) {
     }
 }
 
-export async function deleteChat(req: Request, res: Response) {
+export async function deleteChosenChats(req: Request, res: Response) {
     try {
-        const id = req.params._id;
-        await ChatBot.deleteOne({ _id: id });
+        const ids: string[] = req.body.selectedIds;
+        await ChatBot.deleteMany({ _id: { $in: ids } });
         res.status(200).json({ message: "chat with bot deleted" });
     } catch (error) {
         res.status(500).json({ message: "something went wrong" });
     }
 }
 
-export async function getAllResults(req: AuthRequest, res: Response) {
+export async function showAllResults(req: AuthRequest, res: Response) {
     try {
         const userId = req.user?.user_id;
         const page = parseInt(req.query.page as string) || 1;
@@ -63,7 +72,7 @@ export async function getAllResults(req: AuthRequest, res: Response) {
     }
 }
 
-export async function getResult(req: Request, res: Response) {
+export async function showDetailResult(req: Request, res: Response) {
     try {
         const id = req.params._id;
         const result = await ChatBot.findOne({ _id: id });

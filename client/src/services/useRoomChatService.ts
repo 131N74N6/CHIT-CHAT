@@ -98,7 +98,10 @@ export default function useRoomChatService(props?: IRoomChatService) {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: [`room-chat-${roomId}`] });
-            resetChatState();
+            setText("");
+            setMedia([]);
+            clearChatsIdsSelection();
+            setShowDeleteOption1(false);
         }
     });
 
@@ -124,7 +127,10 @@ export default function useRoomChatService(props?: IRoomChatService) {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: [`room-chat-${roomId}`] });
-            resetChatState();
+            setText("");
+            setMedia([]);
+            clearChatsIdsSelection();
+            setShowDeleteOption2(false);
         }
     });
 
@@ -149,7 +155,10 @@ export default function useRoomChatService(props?: IRoomChatService) {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: [`room-chat-${roomId}`] });
-            resetChatState();
+            setText("");
+            setMedia([]);
+            clearChatsIdsSelection();
+            setShowDeleteOption1(false);
         }
     });
 
@@ -175,7 +184,10 @@ export default function useRoomChatService(props?: IRoomChatService) {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: [`room-chat-${roomId}`] });
-            resetChatState();
+            setText("");
+            setMedia([]);
+            clearChatsIdsSelection();
+            setShowDeleteOption2(false);
         }
     });
 
@@ -201,7 +213,10 @@ export default function useRoomChatService(props?: IRoomChatService) {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: [`room-chat-${roomId}`] });
-            resetChatState();
+            setText("");
+            setMedia([]);
+            clearChatsIdsSelection();
+            setShowDeleteOption1(false);
         }
     });
 

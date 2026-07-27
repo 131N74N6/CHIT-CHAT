@@ -11,8 +11,9 @@ import useSocketIo from "../hooks/useSocketIo";
 import { useChatStore } from "../stores/chat.store";
 
 export default function UserProfile() {
-    const receiverId = useChatStore((state) => state.receiverId);
     const navigate = useNavigate();
+    const receiverId = useChatStore((state) => state.receiverId);
+    const setReceiverId = useChatStore((state) => state.setReceiverId);
 
     const message = useMessageStore((state) => state.message);
     const setMessage = useMessageStore((state) => state.setMessage);
@@ -28,6 +29,19 @@ export default function UserProfile() {
             return () => clearTimeout(timer);
         }
     }, [message, setMessage]);
+
+    useEffect(() => {
+        const savedReceiverId = localStorage.getItem("receiver_id");
+        if (savedReceiverId && !receiverId) setReceiverId(savedReceiverId);
+    }, []); 
+
+    useEffect(() => {
+        if (receiverId) {
+            localStorage.setItem("receiver_id", receiverId);
+        } else {
+            localStorage.removeItem("receiver_id");
+        }
+    }, [receiverId]);
 
     useSocketIo({
         currentUserId: currentUser.user ? currentUser.user.user_id : '',

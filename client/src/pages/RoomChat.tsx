@@ -19,6 +19,7 @@ import { useChatStore } from "../stores/chat.store";
 export default function RoomChat() {
     const navigate = useNavigate();
     const roomId = useRoomStore((state) => state.roomId);
+    const setRoomId = useRoomStore((state) => state.setRoomId);
 
     const message = useMessageStore((state) => state.message);
     const setMessage = useMessageStore((state) => state.setMessage);
@@ -53,6 +54,19 @@ export default function RoomChat() {
         identifier: ["room-chat", "room-profile"],
         marks: { roomId: roomId }
     });
+
+    useEffect(() => {
+        const savedRoomId = localStorage.getItem("room_id");
+        if (savedRoomId && !roomId) setRoomId(savedRoomId);
+    }, []); 
+
+    useEffect(() => {
+        if (roomId) {
+            localStorage.setItem("room_id", roomId);
+        } else {
+            localStorage.removeItem("room_id");
+        }
+    }, [roomId]);
 
     useEffect(() => {
         if (message) {

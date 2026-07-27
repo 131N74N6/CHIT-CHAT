@@ -1,5 +1,4 @@
 import type { IChatbotList } from "../models/chatbot.model";
-import cn from "../utils/cn";
 import ChatbotCard from "./ChatbotCard";
 import Loading from "./Loading";
 
@@ -16,17 +15,16 @@ export default function ChatbotList(props: IChatbotList) {
 
     return (
         <div className="overflow-y-auto flex flex-col p-y-2.5">
-            <div className={cn(
-                "xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 grid-cols-1 grid gap-2.5"
-            )}>
+            <div className="flex flex-col gap-2">
                 {props.results.map(result => {
                     return (
-                        <ChatbotCard
+                        <ChatbotCard 
                             isProcessing={props.isProcessing}
-                            key={result._id}
-                            navigate={props.navigate}
-                            onDelete={props.onDelete}
+                            isSelectMode={props.isSelectMode}
+                            key={result._id} 
                             result={result}
+                            selectedChatBotIds={props.selectedChatBotIds}
+                            toggleSelect={props.toggleSelect}
                         />
                     );
                 })}

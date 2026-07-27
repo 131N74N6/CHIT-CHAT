@@ -17,7 +17,9 @@ export default function RoomProfile() {
 
     const message = useMessageStore((state) => state.message);
     const setMessage = useMessageStore((state) => state.setMessage);
+
     const roomId = useRoomStore((state) => state.roomId);
+    const setRoomId = useRoomStore((state) => state.setRoomId);
     
     const { currentUser, isUserProfileProcessing } = useUserProfileService({ setMessage: setMessage });
     const { user } = currentUser;
@@ -56,6 +58,19 @@ export default function RoomProfile() {
             return () => clearTimeout(timer);
         }
     }, [message, setMessage]);
+
+    useEffect(() => {
+        const savedRoomId = localStorage.getItem("room_id");
+        if (savedRoomId && !roomId) setRoomId(savedRoomId);
+    }, []); 
+
+    useEffect(() => {
+        if (roomId) {
+            localStorage.setItem("room_id", roomId);
+        } else {
+            localStorage.removeItem("room_id");
+        }
+    }, [roomId]);
 
     useEffect(() => {
         if (editMode) {

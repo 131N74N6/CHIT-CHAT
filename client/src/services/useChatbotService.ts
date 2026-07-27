@@ -12,6 +12,15 @@ export default function useChatbotService(props?: IChatBotService) {
     const question = useChatbotStore((state) => state.question);
     const setQuestion = useChatbotStore((state) => state.setQuestion);
 
+    const clearChatBotState = useChatbotStore((state) => state.clearChatBotState);
+
+    const isSelectMode = useChatbotStore((state) => state.isSelectMode);
+    const setIsSelectMode = useChatbotStore((state) => state.setIsSelectMode);
+
+    const selectedChatBotIds = useChatbotStore((state) => state.selectedChatBotIds);
+
+    const toggleSelect = useChatbotStore((state) => state.toggleSelect);
+
     const askAiMt = useMutation({
         mutationFn: async () => {
             try {
@@ -148,10 +157,11 @@ export default function useChatbotService(props?: IChatBotService) {
         }
     });
 
-    const deleteResultMt = useMutation({
-        mutationFn: async (id: string) => {
+    const deleteChosenResultsMt = useMutation({
+        mutationFn: async () => {
             try {
-                const request = await fetch(`${baseUrl}/rm/${id}`, {
+                const request = await fetch(`${baseUrl}/rm-chosen`, {
+                    body: JSON.stringify({ selectedIds: selectedChatBotIds }),
                     credentials: "include",
                     headers: { 'Content-Type': 'application/json' },
                     method: "DELETE"
@@ -182,18 +192,23 @@ export default function useChatbotService(props?: IChatBotService) {
     });
 
     const isChatbotProcessing = allResults.isResultsLoading || askAiMt.isPending || currentResult.isResultLoading ||
-    deleteAllResultsMt.isPending || deleteResultMt.isPending;
+    deleteAllResultsMt.isPending || deleteChosenResultsMt.isPending;
 
     return { 
         allResults, 
         answer, 
         askAiMt, 
+        clearChatBotState,
         currentResult, 
         deleteAllResultsMt, 
-        deleteResultMt, 
+        deleteChosenResultsMt, 
         isChatbotProcessing, 
+        isSelectMode,
+        question, 
+        selectedChatBotIds,
         setAnswer, 
+        setIsSelectMode,
         setQuestion, 
-        question 
+        toggleSelect,
     }
 }
