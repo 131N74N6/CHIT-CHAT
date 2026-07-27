@@ -15,31 +15,38 @@ export async function createRoom(req: AuthRequest, res: Response) {
 
         const { description, name } = req.body;
         const selectedImage: Express.Multer.File | undefined = req.file;
-        
-        let picture;
-
         if (!name) return res.status(400).json({ message: "room name is required" });
 
         if (selectedImage) {
-            const cloudinary = await uploadTOCloudinary({
+            const newRoomImageProfile = await uploadTOCloudinary({
                 file_buffer: selectedImage.buffer,
                 folder_name: "room_profile",
                 original_name: selectedImage.filename
             });
 
-            picture = cloudinary;
+            const newRoom = new Rooms({
+                created_at: created_at,
+                creator_id: userId,
+                name: name,
+                description: description || null,
+                profile_picture: newRoomImageProfile
+            });
+    
+            await newRoom.save();
+            await User.updateOne({ _id: userId }, { $addToSet: { room_id: newRoom._id } });
+        } else {
+            const newRoom = new Rooms({
+                created_at: created_at,
+                creator_id: userId,
+                name: name,
+                description: description || null,
+                profile_picture: null
+            });
+    
+            await newRoom.save();
+            await User.updateOne({ _id: userId }, { $addToSet: { room_id: newRoom._id } });
         }
 
-        const newRoom = new Rooms({
-            created_at: created_at,
-            creator_id: userId,
-            name: name,
-            description: description || null,
-            profile_picture: picture || null
-        });
-
-        await newRoom.save();
-        await User.updateOne({ _id: userId }, { $addToSet: { room_id: newRoom._id } });
 
         res.status(200).json({ message: "new room created" });
     } catch (error) {
@@ -66,34 +73,41 @@ export async function changeRoom(req: AuthRequest, res: Response) {
 
         if (selectedImage) {
             if (room.profile_picture !== null) {
-                await v2.uploader.destroy(room.profile_picture.public_id, { resource_type: room.profile_picture.resource_type });
+                await v2.uploader.destroy(room.profile_picture.public_id, { 
+                    resource_type: room.profile_picture.resource_type 
+                });
 
-                const cloudinary = await uploadTOCloudinary({
+                const newImage = await uploadTOCloudinary({
                     file_buffer: selectedImage.buffer,
                     folder_name: "room_profile",
                     original_name: selectedImage.filename
                 });
 
-                newProfilePicture = cloudinary;
+                await Rooms.updateOne({ _id: roomId }, {
+                    $set: { 
+                        description: description || null,
+                        name: name, 
+                        profile_picture: newImage
+                    }
+                });
             }
+        } else {
+            await Rooms.updateOne({ _id: roomId }, {
+                $set: { 
+                    description: description || null,
+                    name: name, 
+                    profile_picture: room.profile_picture
+                }
+            });
         }
 
-        const updated = await Rooms.findOneAndUpdate({ _id: roomId }, {
-            $set: { 
-                description: description || null,
-                name: name, 
-                profile_picture: newProfilePicture || null
-            }
-        });
-
-        io.to(`room-profile:${updated?._id}`)
-        .to(`room-chat:${updated?._id}`)
+        io.to(`room-profile:${roomId}`)
+        .to(`room-chat:${roomId}`)
         .to(`available-room:${userId}`)
         .emit("room-profile:changed", {
-            _id: updated?._id,
-            description: updated?.description,
-            name: updated?.name,
-            profile_picture: updated?.profile_picture
+            _id: roomId,
+            description: description,
+            name: name,
         });
 
         res.status(200).json({ message: "room name changed" });

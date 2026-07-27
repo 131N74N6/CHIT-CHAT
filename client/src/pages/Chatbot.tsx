@@ -1,10 +1,11 @@
-import { MessageCircle } from "lucide-react";
+import { MessageCircle, SendIcon } from "lucide-react";
 import useChatbotService from "../services/useChatbotService";
 import cn from "../utils/cn";
 import Navbar from "../components/Navbar";
 
 export default function Chatbot() {
     const { answer, askAiMt, setQuestion, question } = useChatbotService();
+    console.log(answer);
 
     return (
         <section className="flex md:flex-row flex-col h-screen relative z-10 p-2.5 gap-2.5">
@@ -25,6 +26,13 @@ export default function Chatbot() {
                     type="text" 
                     value={question} 
                 />
+                <button
+                    className="text-blue-500 font-medium cursor-pointer disabled:cursor-not-allowed"
+                    disabled={askAiMt.isPending}
+                    type="submit"
+                >
+                    <SendIcon size={22}/>
+                </button>
             </form>
             <div 
                 className={cn(

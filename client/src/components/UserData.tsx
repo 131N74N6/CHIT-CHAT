@@ -9,63 +9,120 @@ export default function UserData(props: UserItemIntrf) {
         <>
             {props.isInRoom ? (
                 props.own ? (
-                    <div 
-                        className={cn(
-                            "border-b bg-white border-b-gray-600 p-1.5 flex items-center gap-1.5 md:hidden"
-                        )} 
-                    >
-                        <div className={cn("w-10 h-10 rounded-full")}>
-                            {props.user.profile_picture && props.user.profile_picture.public_id ? (
-                                <div className="w-full h-full">
-                                    <img 
-                                        className="w-full h-full object-cover rounded-full" 
-                                        src={props.user.profile_picture.url} 
-                                        alt={props.user.profile_picture.public_id}
-                                        />
-                                </div>
-                            ) : (
-                                <div className={cn( 
-                                    "w-full h-full rounded-full bg-purple-500 text-white", 
-                                    "font-medium text-lg flex items-center justify-center"
-                                )}>
-                                    {props.user.username[0]}
-                                </div>
-                            )}
+                    <>
+                        <div 
+                            className={cn(
+                                "border-b bg-white border-b-gray-600 p-1.5 items-center gap-1.5 md:flex hidden"
+                            )} 
+                        >
+                            <div className={cn("w-10 h-10 rounded-full")}>
+                                {props.user.profile_picture && props.user.profile_picture.public_id ? (
+                                    <div className="w-full h-full">
+                                        <img 
+                                            className="w-full h-full object-cover rounded-full" 
+                                            src={props.user.profile_picture.url} 
+                                            alt={props.user.profile_picture.public_id}
+                                            />
+                                    </div>
+                                ) : (
+                                    <div className={cn( 
+                                        "w-full h-full rounded-full bg-purple-500 text-white", 
+                                        "font-medium text-lg flex items-center justify-center"
+                                    )}>
+                                        {props.user.username[0]}
+                                    </div>
+                                )}
+                            </div>
+                            <div className="text-gray-950 font-medium">{props.user.username}</div>
                         </div>
-                        <div className="md:hidden block text-gray-950 font-medium">{props.user.username}</div>
-                    </div>
+                        <div 
+                            className={cn(
+                                "border-b bg-white border-b-gray-600 p-1.5 items-center gap-1.5 flex md:hidden"
+                            )} 
+                        >
+                            <div className={cn("w-10 h-10 rounded-full")}>
+                                {props.user.profile_picture && props.user.profile_picture.public_id ? (
+                                    <div className="w-full h-full">
+                                        <img 
+                                            className="w-full h-full object-cover rounded-full" 
+                                            src={props.user.profile_picture.url} 
+                                            alt={props.user.profile_picture.public_id}
+                                            />
+                                    </div>
+                                ) : (
+                                    <div className={cn( 
+                                        "w-full h-full rounded-full bg-purple-500 text-white", 
+                                        "font-medium text-lg flex items-center justify-center"
+                                    )}>
+                                        {props.user.username[0]}
+                                    </div>
+                                )}
+                            </div>
+                            <div className="text-gray-950 font-medium">{props.user.username}</div>
+                        </div>
+                    </>
                 ) : (
-                    <div 
-                        className={cn(
-                            "border-b bg-white border-b-gray-600 p-1.5 cursor-pointer flex items-center gap-1.5 md:hidden"
-                        )} 
-                        onClick={() => {
-                            props.setReceiverId(props.user._id);
-                            navigate(`/user/chat/${props.user._id}`);
-                        }}
-                    >
-                        <div className={cn("w-10 h-10 rounded-full")}>
-                            {props.user.profile_picture && props.user.profile_picture.public_id ? (
-                                <div className="w-full h-full">
-                                    <img 
-                                        className="w-full h-full object-cover rounded-full" 
-                                        src={props.user.profile_picture.url} 
-                                        alt={props.user.profile_picture.public_id}
-                                        />
-                                </div>
-                            ) : (
-                                <div className={cn(
-                                    "w-full h-full rounded-full bg-purple-500 text-white", 
-                                    "font-medium text-lg flex items-center justify-center"
-                                )}>
-                                    {props.user.username[0]}
-                                </div>
-                            )}
+                    <>
+                        <div 
+                            className={cn(
+                                "border-b bg-white border-b-gray-600 p-1.5 cursor-pointer items-center gap-1.5 md:flex hidden"
+                            )} 
+                            onClick={() => {
+                                props.setReceiverId(props.user._id);
+                                navigate(`/user/chat/${props.user._id}`);
+                            }}
+                        >
+                            <div className={cn("w-10 h-10 rounded-full")}>
+                                {props.user.profile_picture && props.user.profile_picture.public_id ? (
+                                    <div className="w-full h-full">
+                                        <img 
+                                            className="w-full h-full object-cover rounded-full" 
+                                            src={props.user.profile_picture.url} 
+                                            alt={props.user.profile_picture.public_id}
+                                            />
+                                    </div>
+                                ) : (
+                                    <div className={cn(
+                                        "w-full h-full rounded-full bg-purple-500 text-white", 
+                                        "font-medium text-lg flex items-center justify-center"
+                                    )}>
+                                        {props.user.username[0]}
+                                    </div>
+                                )}
+                            </div>
+                            <div className="text-gray-950 font-medium">{props.user.username}</div>
                         </div>
-                        <div className="md:hidden block text-gray-950 font-medium">{props.user.username}</div>
-                    </div>
+                        <div 
+                            className={cn(
+                                "border-b bg-white border-b-gray-600 p-1.5 cursor-pointer items-center gap-1.5 flex md:hidden"
+                            )} 
+                            onClick={() => {
+                                props.setReceiverId(props.user._id);
+                                navigate(`/user/chat/${props.user._id}`);
+                            }}
+                        >
+                            <div className={cn("w-10 h-10 rounded-full")}>
+                                {props.user.profile_picture && props.user.profile_picture.public_id ? (
+                                    <div className="w-full h-full">
+                                        <img 
+                                            className="w-full h-full object-cover rounded-full" 
+                                            src={props.user.profile_picture.url} 
+                                            alt={props.user.profile_picture.public_id}
+                                            />
+                                    </div>
+                                ) : (
+                                    <div className={cn(
+                                        "w-full h-full rounded-full bg-purple-500 text-white", 
+                                        "font-medium text-lg flex items-center justify-center"
+                                    )}>
+                                        {props.user.username[0]}
+                                    </div>
+                                )}
+                            </div>
+                            <div className="text-gray-950 font-medium">{props.user.username}</div>
+                        </div>
+                    </>
                 )
-                
             ) : (
                 <>
                     <div 
@@ -119,7 +176,7 @@ export default function UserData(props: UserItemIntrf) {
                                 </div>
                             )}
                         </div>
-                        <div className="md:hidden block text-gray-950 font-medium">{props.user.username}</div>
+                        <div className="text-gray-950 font-medium">{props.user.username}</div>
                     </div>
                 </>
             )}

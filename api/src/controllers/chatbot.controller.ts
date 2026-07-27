@@ -24,6 +24,7 @@ export async function askAi(req: AuthRequest, res: Response) {
 
         res.status(200).json({ message: newResult.response });
     } catch (error) {
+        console.log(error);
         res.status(500).json({ message: "something went wrong" });
     }
 }

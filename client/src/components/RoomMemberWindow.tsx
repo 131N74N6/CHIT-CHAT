@@ -6,19 +6,17 @@ import { ArrowLeft } from "lucide-react";
 
 export default function RoomMemberWindow(props: IRoomMemberWindow) {
     return (
-        <div className="flex flex-col h-full p-2.5">
+        <div className="flex flex-col h-full p-2.5 border border-gray-400 inset-shadow-sm inset-shadow-gray-400">
             <div className="flex">
                 <input
-                    className={cn(
-                        "focus:outline-none bg-gray-500 text-gray-900 font-medium p-1.5 text-[1.2rem] w-full"
-                    )}
+                    className="focus:outline-none bg-gray-200 text-gray-900 font-medium p-1.5 text-[1rem] w-full"
                     placeholder="find room member..."
                     type="text"
                 />
                 <button
                     className={cn(
                         "disabled:cursor-not-allowed cursor-pointer", 
-                        "hover:text-gray-500 transition-colors text-gray-800 font-medium"
+                        "hover:text-gray-500 transition-colors text-gray-500 font-medium"
                     )}
                     disabled={props.isRoomMemberLoading}
                     onClick={props.seeProfile}
@@ -46,7 +44,7 @@ export default function RoomMemberWindow(props: IRoomMemberWindow) {
                     isInRoom={true}
                     isProcessing={props.isRoomMemberLoading}
                     setReceiverId={props.setReceiverId}
-                    users={props.users}
+                    users={props?.users}
                 />
             )}
         </div>

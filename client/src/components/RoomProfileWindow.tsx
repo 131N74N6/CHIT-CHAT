@@ -5,7 +5,7 @@ import type { IRoomProfileWindow } from "../models/room.model";
 
 export default function RoomProfileWindow(props: IRoomProfileWindow) {
     return (
-        <div className="flex w-full flex-col h-full bg-gray-400 gap-2.5 p-1.5">
+        <div className="flex w-full flex-col h-full bg-white inset-shadow-sm inset-shadow-gray-400 border border-gray-400 gap-2.5 p-2.5">
             {props.isRoomProfileLoading ? (
                 <div className="flex justify-center items-center h-full">
                     <Loading/>
@@ -17,7 +17,7 @@ export default function RoomProfileWindow(props: IRoomProfileWindow) {
                     </div>
                 </div>
             ) : (
-                <div className="bg-white flex flex-col p-2.5 gap-2.5">
+                <div className="">
                     <div className="flex">
                         <button
                             className={cn(
@@ -37,7 +37,7 @@ export default function RoomProfileWindow(props: IRoomProfileWindow) {
                                 <div className="w-full h-full rounded-full">
                                     <img
                                         alt={props.roomProfile.profile_picture.public_id}
-                                        className="w-full h-full object-cover"
+                                        className="w-full h-full object-cover rounded-full"
                                         src={props.roomProfile.profile_picture.url}
                                     />
                                 </div>
@@ -53,31 +53,31 @@ export default function RoomProfileWindow(props: IRoomProfileWindow) {
                     </div>
                     <div className="flex flex-col gap-3">
                         <div className="flex flex-col gap-1.5">
-                            <div className="text-xl font-medium text-gray-800">Created At</div>
-                            <div className="text-xl font-medium text-gray-800">
+                            <div className="text-[1rem] font-medium text-gray-800">Created At</div>
+                            <div className="text-[1rem] font-medium text-gray-800">
                                 {props.roomProfile.created_at || "-"}
                             </div>
                         </div>
                         <div className="flex flex-col gap-1.5">
-                            <div className="text-xl font-medium text-gray-800">Room ID</div>
-                            <div className="text-xl font-medium text-gray-800">
+                            <div className="text-[1rem] font-medium text-gray-800">Room ID</div>
+                            <div className="text-[1rem] font-medium text-gray-800">
                                 {props.roomProfile._id || "-"}
                             </div>
                         </div>
                         <div className="flex flex-col gap-1.5">
-                            <div className="text-xl font-medium text-gray-800">Name</div>
-                            <div className="text-xl font-medium text-gray-800">
+                            <div className="text-[1rem] font-medium text-gray-800">Name</div>
+                            <div className="text-[1rem] font-medium text-gray-800">
                                 {props.roomProfile.name || "-"}
                             </div>
                         </div>
                         <div className="flex flex-col gap-1.5">
-                            <div className="text-xl font-medium text-gray-800">Description</div>
-                            <div className="text-xl font-medium text-gray-800">
+                            <div className="text-[1rem] font-medium text-gray-800">Description</div>
+                            <div className="text-[1rem] font-medium text-gray-800">
                                 {props.roomProfile.description || "-"}
                             </div>
                         </div>
                     </div>
-                    <div className="flex">
+                    <div className="flex gap-2.5">
                         {props.isRoomOwner ? (
                             <button
                                 className={cn(
@@ -93,7 +93,7 @@ export default function RoomProfileWindow(props: IRoomProfileWindow) {
                         ) : (
                             <button
                                 className={cn(
-                                    "bg-gray-400 cursor-pointer disabled:cursor-not-allowed text-red-600", 
+                                    "bg-gray-400 cursor-pointer disabled:cursor-not-allowed text-white", 
                                     "text-[0.8rem] hover:bg-gray-500 transition-colors font-medium p-1.5"
                                 )}
                                 disabled={props.isProcessing}
@@ -104,7 +104,7 @@ export default function RoomProfileWindow(props: IRoomProfileWindow) {
                         )}
                         <button
                             className={cn(
-                                "bg-gray-400 cursor-pointer disabled:cursor-not-allowed text-olive-600", 
+                                "bg-gray-400 cursor-pointer disabled:cursor-not-allowed text-white", 
                                 "text-[0.8rem] hover:bg-gray-500 transition-colors font-medium p-1.5"
                             )}
                             disabled={props.isProcessing}

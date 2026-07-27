@@ -4,10 +4,6 @@ import cn from "../utils/cn";
 
 export default function RoomItem(props: RoomItemIntrf) {
     const navigate = useNavigate();
-
-    const showWindowChat = () => {
-        props.setRoomId(props.room._id);
-    }
     
     return (
         <>
@@ -15,7 +11,9 @@ export default function RoomItem(props: RoomItemIntrf) {
                 className={cn(
                     "border-b bg-white border-gray-600 p-1.5 items-center cursor-pointer md:flex gap-1.5 hidden"
                 )} 
-                onClick={showWindowChat}
+                onClick={() => {
+                    props.setRoomId(props.room._id);
+                }}
             >
                 <div className="w-10 h-10 rounded-full">
                     {props.room.profile_picture && props.room.profile_picture.public_id ? (
@@ -39,6 +37,7 @@ export default function RoomItem(props: RoomItemIntrf) {
                 onClick={() => {
                     props.setRoomId(props.room._id);
                     navigate(`/rooms/chat/${props.room._id}`);
+                    localStorage.setItem("room id", props.room._id);
                 }}
             >
                 <div className="w-10 h-10 rounded-full">

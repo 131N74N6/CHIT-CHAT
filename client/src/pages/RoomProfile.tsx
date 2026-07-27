@@ -84,7 +84,17 @@ export default function RoomProfile() {
         <section className="flex md:flex-row p-2.5 gap-2.5 flex-col relative h-screen z-10">
             {message ? <Alert message={message}/> : null}
             <Navbar isProcessing={isUserProfileProcessing}/>
-            {editMode ? (
+            {isDetailLoading ? (
+                <div className="flex justify-center items-center h-full">
+                    <Loading/>
+                </div>
+            ) : errorDetail ? (
+                <div className="flex justify-center items-center h-full">
+                    <div className="text-center font-medium text-4xl text-gray-800">
+                        {errorDetail.message}
+                    </div>
+                </div>
+            ) : editMode ? (
                 <form 
                     className="flex flex-col h-full p-2.5 gap-3 overflow-y-auto" 
                     onSubmit={(event: React.SubmitEvent<HTMLFormElement>) => {
@@ -99,12 +109,12 @@ export default function RoomProfile() {
                         type="file"
                     />
                     <div className="flex justify-center">
-                        <div className="w-40 h-40 rounded-full">
+                        <div className="w-20 h-20 rounded-full">
                             {selectedProfileRoom && selectedProfileRoomUrl ? (
                                 <div className="w-full h-full relative group">
                                     <img
                                         alt={`room-img-${Date.now()}`}
-                                        className="w-full h-full object-cover" 
+                                        className="w-full h-full object-cover rounded-full" 
                                         src={selectedProfileRoomUrl}
                                     />
                                     <button
@@ -129,7 +139,7 @@ export default function RoomProfile() {
                                 <div className="w-full h-full relative group">
                                     <img
                                         alt={oldRoomPicture.public_id}
-                                        className="w-full h-full object-cover" 
+                                        className="w-full h-full object-cover rounded-full" 
                                         src={oldRoomPicture.url}
                                     />
                                     <button
@@ -163,9 +173,9 @@ export default function RoomProfile() {
                         </div>
                     </div>
                     <div className="flex flex-col gap-1.5">
-                        <label htmlFor="room_name" className="text-gray-900 font-medium text-[1.2rem]">Room name</label>
+                        <label htmlFor="room_name" className="text-gray-900 font-medium text-[1rem]">Room name</label>
                         <input
-                            className={cn("inline-0 bg-gray-400 text-gray-900 font-medium p-1.5 text-[1.2rem] w-full")}
+                            className={cn("outline-0 bg-gray-200 text-gray-900 font-medium p-1.5 text-[1rem] w-full")}
                             id="room_name"
                             name="room_name"
                             onChange={(event: React.ChangeEvent<HTMLInputElement, HTMLInputElement>) => setRoomName(event.target.value)}
@@ -174,10 +184,10 @@ export default function RoomProfile() {
                         />
                     </div>
                     <div className="flex flex-col gap-1.5">
-                        <label htmlFor="room_description" className="text-gray-900 font-medium text-[1.2rem]">Room name</label>
+                        <label htmlFor="room_description" className="text-gray-900 font-medium text-[1rem]">Room name</label>
                         <input
                             className={cn(
-                                "inline-0 bg-gray-400 text-gray-900 font-medium text-[1.2rem]", 
+                                "outline-0 bg-gray-200 text-gray-900 font-medium text-[1rem]", 
                                 "p-1.5 w-full max-h-80 overflow-y-auto"
                             )}
                             id="room_description"
@@ -189,7 +199,7 @@ export default function RoomProfile() {
                     </div>
                     <button
                         className={cn(
-                            "bg-blue-600 text-white font-medium cursor-pointer p-1.5 text-[1.2rem]",
+                            "bg-blue-600 text-white font-medium cursor-pointer p-1.5 text-[1rem]",
                             "hover:bg-blue-800 transition-colors disabled:cursor-not-allowed"
                         )}
                         disabled={isUserProfileProcessing || isRoomProfileProcessing}
@@ -199,7 +209,7 @@ export default function RoomProfile() {
                     </button>
                     <button
                         className={cn(
-                            "bg-blue-600 text-white font-medium cursor-pointer p-1.5 text-[1.2rem]",
+                            "bg-blue-600 text-white font-medium cursor-pointer p-1.5 text-[1rem]",
                             "hover:bg-blue-800 transition-colors disabled:cursor-not-allowed"
                         )}
                         disabled={isUserProfileProcessing || isRoomProfileProcessing}
@@ -211,128 +221,116 @@ export default function RoomProfile() {
                 </form>
             ) : (
                 <div className="flex w-full flex-col h-full gap-2.5 p-2.5 md:w-2/5 inset-shadow-sm inset-shadow-gray-400">
-                    {isDetailLoading ? (
-                        <div className="flex justify-center items-center h-full">
-                            <Loading/>
+                    <div className="bg-white flex flex-col p-2.5 gap-2.5">
+                        <div className="flex">
+                            <button
+                                className={cn(
+                                    "disabled:cursor-not-allowed cursor-pointer", 
+                                    "hover:text-gray-500 transition-colors text-gray-800 font-medium"
+                                )}
+                                onClick={() => navigate(`/rooms/chat/${roomId}`)}
+                                type="button"
+                            >
+                                <ArrowBigLeft size={24}/>
+                            </button>
                         </div>
-                    ) : errorDetail ? (
-                        <div className="flex justify-center items-center h-full">
-                            <div className="text-center font-medium text-4xl text-gray-800">
-                                {errorDetail.message}
-                            </div>
-                        </div>
-                    ) : (
-                        <div className="bg-white flex flex-col p-2.5 gap-2.5">
-                            <div className="flex">
-                                <button
-                                    className={cn(
-                                        "disabled:cursor-not-allowed cursor-pointer", 
-                                        "hover:text-gray-500 transition-colors text-gray-800 font-medium"
-                                    )}
-                                    onClick={() => navigate(`/rooms/chat/${roomId}`)}
-                                    type="button"
-                                >
-                                    <ArrowBigLeft size={24}/>
-                                </button>
-                            </div>
-                            <div className="flex justify-center">
-                                <div className="w-20 h-20 rounded-full">
-                                    {detail && detail.profile_picture !== null ? (
-                                        <div className="w-full h-full rounded-full">
-                                            <img
-                                                alt={detail.profile_picture.public_id}
-                                                className="w-full h-full object-cover"
-                                                src={detail.profile_picture.url}
-                                            />
-                                        </div>
-                                    ) : (
-                                        <div className={cn(
-                                            "bg-blue-600 text-white font-medium text-2xl",
-                                            "flex justify-center items-center w-full h-full rounded-full"
-                                        )}>
-                                            {detail?.name[0]}
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-                            <div className="flex flex-col gap-3">
-                                <div className="flex flex-col gap-1.5">
-                                    <div className="text-xl font-medium text-gray-800">Created At</div>
-                                    <div className="text-xl font-medium text-gray-800">
-                                        {detail && detail.created_at ? detail.created_at : "-"}
-                                    </div>
-                                </div>
-                                <div className="flex flex-col gap-1.5">
-                                    <div className="text-xl font-medium text-gray-800">Room ID</div>
-                                    <div className="text-xl font-medium text-gray-800">
-                                        {detail && detail._id ? detail._id : "-"}
-                                    </div>
-                                </div>
-                                <div className="flex flex-col gap-1.5">
-                                    <div className="text-xl font-medium text-gray-800">Username</div>
-                                    <div className="text-xl font-medium text-gray-800">
-                                        {detail && detail.name ? detail.name : "-"}
-                                    </div>
-                                </div>
-                                <div className="flex flex-col gap-1.5">
-                                    <div className="text-xl font-medium text-gray-800">Description</div>
-                                    <div className="text-xl font-medium text-gray-800">
-                                        {detail && detail.description !== null ? detail.description : "-"}
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="flex flex-col">
-                                {isRoomOwner ? (
-                                    <div className="grid grid-cols-2 gap-2">
-                                        <button
-                                            className={cn(
-                                                "bg-gray-400 cursor-pointer disabled:cursor-not-allowed text-amber-600", 
-                                                "text-[0.8rem] hover:bg-gray-500 transition-colors font-medium p-1.5"
-                                            )}
-                                            disabled={isUserProfileProcessing}
-                                            onClick={() => deleteRoomMt.mutate()}
-                                            type="button"
-                                        >
-                                            Delete room
-                                        </button>
-                                        <button
-                                            className={cn(
-                                                "bg-gray-400 cursor-pointer disabled:cursor-not-allowed text-amber-600", 
-                                                "text-[0.8rem] hover:bg-gray-500 transition-colors font-medium p-1.5"
-                                            )}
-                                            disabled={isUserProfileProcessing}
-                                            onClick={() => setEditMode(true)}
-                                            type="button"
-                                        >
-                                            Edit room profile
-                                        </button>
+                        <div className="flex justify-center">
+                            <div className="w-20 h-20 rounded-full">
+                                {detail && detail.profile_picture !== null ? (
+                                    <div className="w-full h-full rounded-full">
+                                        <img
+                                            alt={detail.profile_picture.public_id}
+                                            className="w-full h-full object-cover rounded-full"
+                                            src={detail.profile_picture.url}
+                                        />
                                     </div>
                                 ) : (
+                                    <div className={cn(
+                                        "bg-blue-600 text-white font-medium text-2xl",
+                                        "flex justify-center items-center w-full h-full rounded-full"
+                                    )}>
+                                        {detail?.name[0]}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                        <div className="flex flex-col gap-3">
+                            <div className="flex flex-col gap-1.5">
+                                <div className="text-[1rem] font-medium text-gray-800">Created At</div>
+                                <div className="text-[1rem] font-medium text-gray-800">
+                                    {detail && detail.created_at ? detail.created_at : "-"}
+                                </div>
+                            </div>
+                            <div className="flex flex-col gap-1.5">
+                                <div className="text-[1rem] font-medium text-gray-800">Room ID</div>
+                                <div className="text-[1rem] font-medium text-gray-800">
+                                    {detail && detail._id ? detail._id : "-"}
+                                </div>
+                            </div>
+                            <div className="flex flex-col gap-1.5">
+                                <div className="text-[1rem] font-medium text-gray-800">Username</div>
+                                <div className="text-[1rem] font-medium text-gray-800">
+                                    {detail && detail.name ? detail.name : "-"}
+                                </div>
+                            </div>
+                            <div className="flex flex-col gap-1.5">
+                                <div className="text-[1rem] font-medium text-gray-800">Description</div>
+                                <div className="text-[1rem] font-medium text-gray-800">
+                                    {detail && detail.description !== null ? detail.description : "-"}
+                                </div>
+                            </div>
+                        </div>
+                        <div className="flex flex-col">
+                            {isRoomOwner ? (
+                                <div className="grid grid-cols-2 gap-2">
                                     <button
                                         className={cn(
-                                            "bg-gray-400 cursor-pointer disabled:cursor-not-allowed text-red-600", 
+                                            "bg-gray-400 cursor-pointer disabled:cursor-not-allowed text-amber-600", 
                                             "text-[0.8rem] hover:bg-gray-500 transition-colors font-medium p-1.5"
                                         )}
                                         disabled={isUserProfileProcessing}
-                                        onClick={() => leftRoomMt.mutate()}
+                                        onClick={() => deleteRoomMt.mutate()}
+                                        type="button"
                                     >
-                                        Left room
+                                        Delete room
                                     </button>
-                                )}
+                                    <button
+                                        className={cn(
+                                            "bg-gray-400 cursor-pointer disabled:cursor-not-allowed text-amber-600", 
+                                            "text-[0.8rem] hover:bg-gray-500 transition-colors font-medium p-1.5"
+                                        )}
+                                        disabled={isUserProfileProcessing}
+                                        onClick={() => setEditMode(true)}
+                                        type="button"
+                                    >
+                                        Edit room profile
+                                    </button>
+                                </div>
+                            ) : (
                                 <button
                                     className={cn(
-                                        "bg-gray-400 cursor-pointer disabled:cursor-not-allowed text-olive-600", 
+                                        "bg-gray-400 cursor-pointer disabled:cursor-not-allowed text-red-600", 
                                         "text-[0.8rem] hover:bg-gray-500 transition-colors font-medium p-1.5"
                                     )}
                                     disabled={isUserProfileProcessing}
-                                    type="button"
-                                    onClick={() => navigate(`/rooms/member/${roomId}`)}
+                                    onClick={() => leftRoomMt.mutate()}
                                 >
-                                    See Room Member
+                                    Left room
                                 </button>
-                            </div>
+                            )}
+                            <button
+                                className={cn(
+                                    "bg-gray-400 cursor-pointer disabled:cursor-not-allowed text-olive-600", 
+                                    "text-[0.8rem] hover:bg-gray-500 transition-colors font-medium p-1.5"
+                                )}
+                                disabled={isUserProfileProcessing}
+                                type="button"
+                                onClick={() => navigate(`/rooms/member/${roomId}`)}
+                            >
+                                See Room Member
+                            </button>
                         </div>
-                    )}
+                    </div>
                 </div>
             )}
             <div 

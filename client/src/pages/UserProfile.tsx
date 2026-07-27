@@ -19,8 +19,6 @@ export default function UserProfile() {
 
     const { currentUser, receiverUserProfile } = useUserProfileService({ setMessage: setMessage });
     const { detail, detailError, isDetailLoading } = receiverUserProfile;
-
-    console.log(detail?._id);
     
     useEffect(() => {
         if (message) {
