@@ -103,6 +103,7 @@ export default function RoomChatWindow(props: IRoomChatWindow) {
                         hasNextPage={props.hasNextRoomChat}
                         isFetchingNextPage={props.isFetchingNextRoomChat}
                         isInRoom={true}
+                        place={{ name: "room-chat", setReceiverId: props.setReceiverId }}
                         isProcessing={props.isProcessing}
                         isSelectMode={props.isSelectMode}
                         selectedIds={props.selectedIds}

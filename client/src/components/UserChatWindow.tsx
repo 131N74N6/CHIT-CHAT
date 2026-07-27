@@ -108,6 +108,7 @@ export default function UserChatWindow(props: IUserChatWindow) {
                         isInRoom={false}
                         isProcessing={props.isProcessing}
                         isSelectMode={props.isSelectMode}
+                        place={{ name: "user-chat" }}
                         selectedIds={props.selectedIds}
                         toggleSelect={props.toggleSelect}
                     />

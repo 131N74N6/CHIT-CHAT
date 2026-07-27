@@ -170,6 +170,7 @@ export default function UserChat() {
                             isInRoom={false}
                             isProcessing={isUserChatProcessing || isUserProfileProcessing}
                             isSelectMode={isSelectMode}
+                            place={{ name: "user-chat" }}
                             selectedIds={selectedIds}
                             toggleSelect={toggleSelect}
                         />

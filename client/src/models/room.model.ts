@@ -100,6 +100,7 @@ export interface IRoomChatWindow {
     selectedIds: string[];
     sendChatToRoom: UseMutationResult<any, Error, void, unknown>;
     setIsSelectMode: (isSelectMode: boolean) => void;
+    setReceiverId: (receiverId: string) => void;
     setRoomId: (roomId: string) => void;
     setShowDeleteOption1: (showDeleteOption1: boolean) => void;
     setShowDeleteOption2: (showDeleteOption2: boolean) => void;
@@ -157,6 +158,7 @@ export interface IRoomWindow {
     sendChatToRoom: UseMutationResult<any, Error, void, unknown>;
     setIsSelectMode: (isSelectMode: boolean) => void;
     setRoomId: (roomId: string) => void;
+    setReceiverId: (receiverId: string) => void;
     setShowDeleteOption1: (showDeleteOption1: boolean) => void;
     setShowDeleteOption2: (showDeleteOption2: boolean) => void
     setShowProfile: (showProfile: boolean) => void;

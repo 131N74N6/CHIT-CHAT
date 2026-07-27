@@ -39,6 +39,7 @@ export interface IChatBubble {
     isInRoom: boolean;
     isSelectMode: boolean;
     own: boolean;
+    place: IRoomChat | IUserChat; 
     selectedIds: string[];
     toggleSelect: (id: string) => void;
 }
@@ -52,8 +53,19 @@ export interface IChatList {
     isInRoom: boolean;
     isProcessing: boolean;
     isSelectMode: boolean;
+    place: IRoomChat | IUserChat; 
     selectedIds: string[];
     toggleSelect: (id: string) => void;
+}
+
+export interface IRoomChat {
+    name: "room-chat";
+    setReceiverId: (receiverId: string) => void;
+}
+
+export interface IUserChat {
+    name: "user-chat";
+    setReceiverId?: never;
 }
 
 export interface IUserChatDeleteOption1 {

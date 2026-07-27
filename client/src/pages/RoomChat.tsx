@@ -14,6 +14,7 @@ import useSocketIo from "../hooks/useSocketIo";
 import RoomChatDeleteOption1 from "../components/RoomChatDeleteOption1";
 import RoomChatDeleteOption2 from "../components/RoomChatDeleteOption2";
 import { useRoomStore } from "../stores/room.store";
+import { useChatStore } from "../stores/chat.store";
 
 export default function RoomChat() {
     const navigate = useNavigate();
@@ -21,6 +22,7 @@ export default function RoomChat() {
 
     const message = useMessageStore((state) => state.message);
     const setMessage = useMessageStore((state) => state.setMessage);
+    const setReceiverId = useChatStore((state) => state.setReceiverId);
 
     const { currentUser, isUserProfileProcessing } = useUserProfileService({ setMessage: setMessage });
     const { currentRoomProfile } = useRoomProfileService({ setMessage: setMessage });
@@ -171,6 +173,7 @@ export default function RoomChat() {
                             isProcessing={isRoomChatProcessing || isUserProfileProcessing}
                             isSelectMode={isSelectMode}
                             selectedIds={selectedChatsIds}
+                            place={{ name: "room-chat", setReceiverId: setReceiverId }}
                             toggleSelect={toggleSelect}
                         />
                     )}

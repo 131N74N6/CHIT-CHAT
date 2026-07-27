@@ -15,10 +15,12 @@ import { useMessageStore } from "../stores/message.store";
 import Alert from "../components/Alert";
 import RoomChatDeleteOption1 from "../components/RoomChatDeleteOption1";
 import RoomChatDeleteOption2 from "../components/RoomChatDeleteOption2";
+import { useChatStore } from "../stores/chat.store";
 
 export default function AvailableRoom() {
     const roomId = useRoomStore((state) => state.roomId);
     const setRoomId = useRoomStore((state) => state.setRoomId);
+    const setReceiverId = useChatStore((state) => state.setReceiverId);
 
     const message = useMessageStore((state) => state.message);
     const setMessage = useMessageStore((state) => state.setMessage);
@@ -147,6 +149,7 @@ export default function AvailableRoom() {
                     roomMemberHaveNextPage={currentRoomMember.roomMmeberHaveNextPage}
                     roomProfileError={currentRoomProfile.errorDetail}
                     setIsSelectMode={setIsSelectMode}
+                    setReceiverId={setReceiverId}
                     setRoomId={setRoomId}
                     selectedChatsIds={selectedChatsIds}
                     sendChatToRoom={sendChatToRoomMt}

@@ -6,8 +6,6 @@ export default function ChatBubble(props: IChatBubble) {
     const navigate = useNavigate();
     const isSelected = props.selectedIds.includes(props.chat._id);
 
-    console.log(props.chat.sender_id);
-
     return (
         <div 
             onClick={() => props.isSelectMode && props.toggleSelect(props.chat._id)}
@@ -23,14 +21,17 @@ export default function ChatBubble(props: IChatBubble) {
                     [Media: {props.chat.media[0].url}]
                 </div>
             ) : null}
-            {props.isInRoom === true ? 
+            {props.place.name === "room-chat" ? 
                 props.own ? (
                     <div className="text-left font-medium text-[0.7rem]">{props.chat.sender_name}</div>
                 ) : (
                     <button 
                         className="text-left font-medium text-[0.7rem] cursor-pointer disabled:cursor-not-allowed" 
                         disabled={props.isProcessing}
-                        onClick={() => navigate(`/user/chat/${props.chat.sender_id}`)}
+                        onClick={() => {
+                            if (props.place.setReceiverId) props.place.setReceiverId(props.chat.sender_id);
+                            navigate(`/user/chat/${props.chat.sender_id}`);
+                        }}
                         type="button"
                     >
                         {props.chat.sender_name}
