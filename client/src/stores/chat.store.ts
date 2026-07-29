@@ -15,6 +15,8 @@ export interface ChatState {
 
     resetChatState: () => void;
 
+    remove: (fileName: string) => void;
+
     selectedIds: string[];
     
     showUserMedia: boolean;
@@ -51,6 +53,10 @@ export const useChatStore = create<ChatState>((set) => ({
         localStorage.setItem("receiver_id", receiverId);
         set({ receiverId });
     },
+
+    remove: (fileName) => set((state) => ({
+        media: state.media.filter(media => media.fileName !== fileName)
+    })),
 
     resetChatState: () => {
         localStorage.removeItem("receiver_id");

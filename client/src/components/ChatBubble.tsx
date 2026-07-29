@@ -10,8 +10,9 @@ export default function ChatBubble(props: IChatBubble) {
         <div 
             onClick={() => props.isSelectMode && props.toggleSelect(props.chat._id)}
             className={cn(
-                "flex flex-col gap-2 p-2 rounded-sm transition-all duration-200 w-[60%]",
-                props.own ? "ml-[50%] bg-blue-700 text-white" : "mr-[50%] bg-gray-200 text-gray-900",
+                "flex flex-col gap-2 p-2.5 transition-all duration-200 w-[60%]",
+                props.own ? "ml-[40%] bg-blue-700 text-white rounded-t-2xl rounded-bl-2xl" : 
+                "mr-[50%] bg-gray-200 text-gray-900 rounded-t-2xl rounded-br-2xl",
                 props.isSelectMode && "cursor-pointer hover:opacity-80",
                 isSelected && "ring-4 ring-orange-500 border-2 border-orange-600 bg-orange-50 text-gray-900"
             )}

@@ -4,7 +4,7 @@ import cn from "../utils/cn";
 
 export default function FileViewer(props: IFileViewer) {
     return (
-        <div className="flex flex-col gap-2.5">
+        <>
             {props.fileType.startsWith("image/") ? (
                 <img 
                     src={props.previewUrl} 
@@ -104,6 +104,6 @@ export default function FileViewer(props: IFileViewer) {
                     </div>
                 </div>
             )}
-        </div>
+        </>
     );
 }

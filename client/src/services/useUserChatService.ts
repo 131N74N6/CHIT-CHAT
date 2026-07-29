@@ -21,6 +21,7 @@ export default function useUserChatService(props?: IUserChatService) {
     const selectedIds = useChatStore((state) => state.selectedIds);
     const toggleSelect = useChatStore((state) => state.toggleSelect);
     const clearSelection = useChatStore((state) => state.clearSelection);
+    const removeOnePreviewFile = useChatStore((state) => state.remove);
 
     const showDeleteOption1 = useChatStore((state) => state.showDeleteOption1);
     const setShowDeleteOption1 = useChatStore((state) => state.setShowDeleteOption1);
@@ -195,7 +196,7 @@ export default function useUserChatService(props?: IUserChatService) {
                 const formData = new FormData();
                 formData.append("messages", text.trim());
                 formData.append("receiver_id", receiverId!);
-
+                
                 if (media && media.length > 0) {
                     for (let m = 0; m < media.length; m++) {
                         formData.append("media", media[m].file);
@@ -275,6 +276,7 @@ export default function useUserChatService(props?: IUserChatService) {
         isSelectMode,
         isUserChatProcessing, 
         media, 
+        removeOnePreviewFile,
         sendChatToUserMt, 
         selectedIds,
         setIsSelectMode,
