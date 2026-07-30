@@ -40,10 +40,26 @@ export default function AvailableRoom() {
     } = useRoomMemberService({ roomId: roomId, setMessage: setMessage });
 
     const { 
+        changeRoomMt,
         currentAvailableRooms,  
         currentRoomProfile, 
         deleteRoomMt, 
-        isRoomProfileProcessing 
+        description,
+        editMode,
+        fileInputRef,
+        handleImagePreview,
+        isRoomProfileProcessing, 
+        oldRoomPicture,
+        roomName,
+        selectedProfileRoom,
+        selectedProfileRoomUrl,
+        setDeleteRoomImage,
+        setDescription,
+        setEditMode,
+        setOldRoomPicture,
+        setRoomName,
+        setSelectedProfileRoom,
+        setSelectedProfileRoomUrl
     } = useRoomProfileService({ setMessage: setMessage });
 
     const { 
@@ -53,16 +69,22 @@ export default function AvailableRoom() {
         clearChatsIdsSelection,
         deleteAllChatsInRoomMt,
         deleteChosenChatsInRoomMt,
+        handleMediaPreview,
+        inputMediaRef,
         isRoomChatProcessing, 
         isSelectMode,
+        media,
+        removeOnePreviewFile,
         selectedChatsIds,
         setIsSelectMode,
         setShowDeleteOption1,
         setShowDeleteOption2,
+        setShowRoomMedia,
         setText,
         sendChatToRoomMt,
         showDeleteOption1, 
         showDeleteOption2,
+        showRoomMedia,
         text,
         toggleSelect
     } = useRoomChatService({ setMessage: setMessage });
@@ -87,6 +109,24 @@ export default function AvailableRoom() {
         }
     }, [roomId]);
 
+    useEffect(() => {
+        if (editMode) {
+            currentRoomProfile.detail && currentRoomProfile.detail.name ?
+            setRoomName(currentRoomProfile.detail.name) :
+            setRoomName("");
+            currentRoomProfile.detail && currentRoomProfile.detail.description ? 
+            setDescription(currentRoomProfile.detail.description) :
+            setDescription("-");
+            currentRoomProfile.detail && currentRoomProfile.detail.profile_picture !== null ? 
+            setOldRoomPicture(currentRoomProfile.detail.profile_picture) :
+            setOldRoomPicture(null);
+        } else {
+            setRoomName("");
+            setDescription("");
+            setOldRoomPicture(null);
+        }
+    }, [editMode, roomId, currentRoomProfile.detail]);
+
     useSocketIo({
         identifier: ["available-room", "room-chat", "room-profile", "room-member"],
         currentUserId: currentUser.user?.user_id!,
@@ -94,7 +134,7 @@ export default function AvailableRoom() {
     });
 
     return (
-        <section className="flex md:flex-row flex-col gap-2.5 p-2.5 h-screen relative z-10">
+        <section className="flex md:flex-row flex-col gap-2.5 p-2.5 h-dvh relative z-10">
             {message ? <Alert message={message}/> : null}
             <Navbar isProcessing={isRoomChatProcessing || isUserProfileProcessing}/>
             {showDeleteOption1 ? (
@@ -140,39 +180,62 @@ export default function AvailableRoom() {
             </div>
             {roomId ? (
                 <RoomWindow
+                    changeRoomMt={changeRoomMt}
                     currentUserId={currentUser.user ? currentUser.user.user_id : "-"}
                     clearChatsIdsSelection={clearChatsIdsSelection}
                     deleteRoomMt={deleteRoomMt}
+                    description={description}
+                    editMode={editMode}
                     fetchNextRoomChat={allChatsInRoom.fecthNextRoomChat}
                     fetchNextUser={currentRoomMember.fetchNextRoomMember}
+                    fileInputRef={fileInputRef}
+                    handleImagePreview={handleImagePreview}
+                    handleMediaPreview={handleMediaPreview}
                     hasNextRoomChat={allChatsInRoom.roomChatHasNextPage}
+                    inputMediaRef={inputMediaRef}
                     isFetchingNextRoomChat={allChatsInRoom.isRoomChatFetchNext}
                     isRoomChatLoading={allChatsInRoom.isRoomChatLoading}
+                    isRoomChatProcessing={isRoomChatProcessing}
                     isRoomMemberLoading={currentRoomMember.isRoomMemberLoading}
                     isRoomProfileLoading={currentRoomProfile.isDetailLoading}
-                    isProcessing={isRoomProfileProcessing || isRoomChatProcessing || isRoomMemberProcessing || isUserProfileProcessing}
+                    isRoomProfileProcessing={isRoomProfileProcessing}
                     isRoomMemberFetchNextPage={currentRoomMember.isRoomMemberFetchNextPage}
                     isSelectMode={isSelectMode}
                     leftRoomMt={leftRoomMt}
+                    media={media}
+                    oldRoomPicture={oldRoomPicture}
+                    removeOnePreviewFile={removeOnePreviewFile}
                     roomChats={allChatsInRoom.roomChats}
                     roomChatError={allChatsInRoom.roomChatsError}
                     roomId={roomId}
+                    roomName={roomName}
                     roomProfile={currentRoomProfile.detail!}
                     roomMemberError={currentRoomMember.roomMemberError}
                     roomMemberHaveNextPage={currentRoomMember.roomMmeberHaveNextPage}
                     roomProfileError={currentRoomProfile.errorDetail}
                     setIsSelectMode={setIsSelectMode}
+                    selectedProfileRoom={selectedProfileRoom}
+                    selectedProfileRoomUrl={selectedProfileRoomUrl}
                     setReceiverId={setReceiverId}
                     setRoomId={setRoomId}
                     selectedChatsIds={selectedChatsIds}
                     sendChatToRoom={sendChatToRoomMt}
+                    setDeleteRoomImage={setDeleteRoomImage}
+                    setDescription={setDescription}
+                    setEditMode={setEditMode}
+                    setOldRoomPicture={setOldRoomPicture}
+                    setRoomName={setRoomName}
+                    setSelectedProfileRoom={setSelectedProfileRoom}
+                    setSelectedProfileRoomUrl={setSelectedProfileRoomUrl}
                     setShowDeleteOption1={setShowDeleteOption1}
                     setShowDeleteOption2={setShowDeleteOption2}
                     setShowMember={setShowMember}
                     setShowProfile={setShowProfile}
+                    setShowRoomMedia={setShowRoomMedia}
                     setText={setText}
                     showMember={showMember}
                     showProfile={showProfile}
+                    showRoomMedia={showRoomMedia}
                     text={text}
                     toggleSelect={toggleSelect}
                     users={currentRoomMember.roomMember}

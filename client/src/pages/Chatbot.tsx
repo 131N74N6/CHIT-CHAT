@@ -40,7 +40,7 @@ export default function Chatbot() {
     }, [message, setMessage]);
 
     return (
-        <section className="flex md:flex-row flex-col h-screen relative z-10 p-2.5 gap-2.5">
+        <section className="flex md:flex-row flex-col h-dvh relative z-10 p-2.5 gap-2.5">
             {message ? <Alert message={message}/> : null}
             <Navbar isProcessing={askAiMt.isPending}/>
             <div className="md:w-2/5 w-full flex flex-col gap-2.5 h-full inset-shadow-sm inset-shadow-gray-400 border border-gray-400">

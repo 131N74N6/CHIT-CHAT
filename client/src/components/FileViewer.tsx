@@ -27,7 +27,7 @@ export default function FileViewer(props: IFileViewer) {
                 <div className="flex flex-col gap-2">
                     <div className={cn(
                         "flex justify-center items-center aspect-square", 
-                        "text-gray-500 border border-gray-500 text-[1.5rem] rounded"
+                        "text-gray-500 border border-gray-500 text-[0.9rem] rounded"
                     )}>
                         <Paperclip/>
                         <div className="line-clamp-1">{props.fileName}</div>
@@ -37,7 +37,7 @@ export default function FileViewer(props: IFileViewer) {
                 <div className="flex flex-col gap-2">
                     <div className={cn(
                         "flex justify-center items-center aspect-square", 
-                        "text-gray-500 border border-gray-500 text-[1.5rem] rounded"
+                        "text-gray-500 border border-gray-500 text-[0.9rem] rounded"
                     )}>
                         <FileTypeCorner/>
                         <div className="line-clamp-1">{props.fileName}</div>
@@ -47,7 +47,7 @@ export default function FileViewer(props: IFileViewer) {
                 <div className="flex flex-col gap-2">
                     <div className={cn(
                         "flex justify-center items-center aspect-square", 
-                        "text-gray-500 border border-gray-500 text-[1.5rem] rounded"
+                        "text-gray-500 border border-gray-500 text-[0.9rem] rounded"
                     )}>
                         <FolderArchive/>
                         <div className="line-clamp-1">{props.fileName}</div>
@@ -57,7 +57,7 @@ export default function FileViewer(props: IFileViewer) {
                 <div className="flex flex-col gap-2">
                     <div className={cn(
                         "flex justify-center items-center aspect-square", 
-                        "text-gray-500 border border-gray-500 text-[1.5rem] rounded"
+                        "text-gray-500 border border-gray-500 text-[0.9rem] rounded"
                     )}>
                         <Paperclip/>
                         <div className="line-clamp-1">{props.fileName}</div>
@@ -67,7 +67,7 @@ export default function FileViewer(props: IFileViewer) {
                 <div className="flex flex-col gap-2">
                     <div className={cn(
                         "flex justify-center items-center aspect-square", 
-                        "text-gray-500 border border-gray-500 text-[1.5rem] rounded"
+                        "text-gray-500 border border-gray-500 text-[0.9rem] rounded"
                     )}>
                         <Sheet/>
                         <div className="line-clamp-1">{props.fileName}</div>
@@ -77,7 +77,7 @@ export default function FileViewer(props: IFileViewer) {
                 <div className="flex flex-col gap-2">
                     <div className={cn(
                         "flex justify-center items-center aspect-square", 
-                        "text-gray-500 border border-gray-500 text-[1.5rem] rounded"
+                        "text-gray-500 border border-gray-500 text-[0.9rem] rounded"
                     )}>
                         <FileText/>
                         <div className="line-clamp-1">{props.fileName}</div>
@@ -87,7 +87,7 @@ export default function FileViewer(props: IFileViewer) {
                 <div className="flex flex-col gap-2">
                     <div className={cn(
                         "flex justify-center items-center aspect-square", 
-                        "text-gray-500 border border-gray-500 text-[1.5rem] rounded"
+                        "text-gray-500 border border-gray-500 text-[0.9rem] rounded"
                     )}>
                         <Paperclip/>
                         <div className="line-clamp-1">{props.fileName}</div>
@@ -97,7 +97,7 @@ export default function FileViewer(props: IFileViewer) {
                 <div className="flex flex-col gap-2">
                     <div className={cn(
                         "flex justify-center items-center aspect-square", 
-                        "text-gray-500 border border-gray-500 text-[1.5rem] rounded"
+                        "text-gray-500 border border-gray-500 text-[0.9rem] rounded"
                     )}>
                         <File/>
                         <div className="line-clamp-1">{props.fileName}</div>

@@ -1,6 +1,5 @@
 import type { FetchNextPageOptions, InfiniteData, InfiniteQueryObserverResult, UseMutationResult } from "@tanstack/react-query";
-import type { ChatIntrf } from "./chat.model";
-import type { NavigateFunction } from "react-router-dom";
+import type { ChatIntrf, IFileViewer } from "./chat.model";
 import type { IOtherUser } from "./user.model";
 
 export interface IAvailableRoomService {
@@ -89,14 +88,14 @@ export interface IRoomChatWindow {
     fetchNextRoomChat: (options?: FetchNextPageOptions | undefined) => Promise<InfiniteQueryObserverResult<InfiniteData<any, unknown>, Error>>
     hasNextRoomChat: boolean;
     isFetchingNextRoomChat: boolean;
-    isProcessing: boolean;
     isRoomChatLoading: boolean;
+    isRoomChatProcessing: boolean;
     isSelectMode: boolean;
-    navigate: NavigateFunction;
     roomChats: ChatIntrf[];
     roomChatError: Error | null;
     roomId: string;
     roomProfile: RoomIntrf;
+    seeMedia: () => void;
     selectedIds: string[];
     sendChatToRoom: UseMutationResult<any, Error, void, unknown>;
     setIsSelectMode: (isSelectMode: boolean) => void;
@@ -110,9 +109,22 @@ export interface IRoomChatWindow {
     toggleSelect: (id: string) => void;
 }
 
+export interface IRoomChatMedia {
+    handleMediaPreview: (event: React.ChangeEvent<HTMLInputElement, Element>) => void;
+    inputMediaRef: React.RefObject<HTMLInputElement | null>;
+    isRoomChatProcessing: boolean;
+    media: IFileViewer[];
+    removeOnePreviewFile: (fileName: string) => void;
+    seeChat: () => void;
+    sendChatToRoomMt: UseMutationResult<any, Error, void, unknown>;
+    setText: (text: string) => void;
+    text: string;
+}
+
 export interface IRoomMemberWindow {
     currentUserId: string;
     fetchNextUser: (options?: FetchNextPageOptions | undefined) => Promise<InfiniteQueryObserverResult<InfiniteData<any, unknown>, Error>>;
+    kickMemberMt: UseMutationResult<any, Error, string, unknown>;
     isRoomMemberFetchNextPage: boolean;
     isRoomMemberLoading: boolean;
     roomMemberError: Error | null;
@@ -123,49 +135,112 @@ export interface IRoomMemberWindow {
 }
 
 export interface IRoomProfileWindow {
+    changeRoomMt: UseMutationResult<any, Error, void, unknown>;
     deleteRoomMt: UseMutationResult<any, Error, void, unknown>;
-    isProcessing: boolean;
+    description: string;
+    editMode: boolean;
+    fileInputRef: React.RefObject<HTMLInputElement | null>;
+    handleImagePreview: (event: React.ChangeEvent<HTMLInputElement, Element>) => void;
     isRoomOwner: boolean;
     isRoomProfileLoading: boolean;
+    isRoomProfileProcessing: boolean;
     leftRoomMt: UseMutationResult<any, Error, void, unknown>;
+    oldRoomPicture: {
+        public_id: string;
+        resource_type: string;
+        url: string;
+    } | null;
+    roomName: string;
     roomProfile: RoomIntrf;
     roomProfileError: Error | null;
     seeMember: () => void;
     seeRoomChat: () => void;
+    selectedProfileRoom: File | null;
+    selectedProfileRoomUrl: string | null;
+    setDeleteRoomImage: (deleteRoomImage: {
+        public_id: string;
+        resource_type: string;
+        url: string;
+    } | null) => void;
+    setDescription: (description: string) => void;
+    setEditMode: (editMode: boolean) => void;
+    setOldRoomPicture: (oldRoomPicture: {
+        public_id: string;
+        resource_type: string;
+        url: string;
+    } | null) => void;
+    setRoomName: (roomName: string) => void;
+    setSelectedProfileRoom: (selectedProfileRoom: File | null) => void;
+    setSelectedProfileRoomUrl: (selectedProfileRoomUrl: string | null) => void;
 }
 
 export interface IRoomWindow {
+    changeRoomMt: UseMutationResult<any, Error, void, unknown>;
     clearChatsIdsSelection: () => void;
     currentUserId: string;
     deleteRoomMt: UseMutationResult<any, Error, void, unknown>;
+    description: string;
+    editMode: boolean;
     fetchNextUser: (options?: FetchNextPageOptions | undefined) => Promise<InfiniteQueryObserverResult<InfiniteData<any, unknown>, Error>>;
-    fetchNextRoomChat: (options?: FetchNextPageOptions | undefined) => Promise<InfiniteQueryObserverResult<InfiniteData<any, unknown>, Error>>
+    fetchNextRoomChat: (options?: FetchNextPageOptions | undefined) => Promise<InfiniteQueryObserverResult<InfiniteData<any, unknown>, Error>>;
+    fileInputRef: React.RefObject<HTMLInputElement | null>;
+    handleImagePreview: (event: React.ChangeEvent<HTMLInputElement, Element>) => void;
+    handleMediaPreview: (event: React.ChangeEvent<HTMLInputElement, Element>) => void;
     hasNextRoomChat: boolean;
+    inputMediaRef: React.RefObject<HTMLInputElement | null>;
     isRoomMemberFetchNextPage: boolean;
     isFetchingNextRoomChat: boolean;
-    isProcessing: boolean;
     isRoomChatLoading: boolean;
+    isRoomChatProcessing: boolean;
     isRoomMemberLoading: boolean;
     isRoomProfileLoading: boolean;
+    isRoomProfileProcessing: boolean;
     isSelectMode: boolean;
     leftRoomMt: UseMutationResult<any, Error, void, unknown>;
+    media: IFileViewer[];
+    oldRoomPicture: {
+        public_id: string;
+        resource_type: string;
+        url: string;
+    } | null;
+    removeOnePreviewFile: (fileName: string) => void;
     roomProfile: RoomIntrf;
     roomChats: ChatIntrf[];
     roomChatError: Error | null;
     roomId: string;
     roomMemberError: Error | null;
     roomMemberHaveNextPage: boolean;
+    roomName: string;
     roomProfileError: Error | null;
     selectedChatsIds: string[];
+    selectedProfileRoom: File | null;
+    selectedProfileRoomUrl: string | null;
     sendChatToRoom: UseMutationResult<any, Error, void, unknown>;
+    setDeleteRoomImage: (deleteRoomImage: {
+        public_id: string;
+        resource_type: string;
+        url: string;
+    } | null) => void;
+    setDescription: (description: string) => void;
+    setEditMode: (editMode: boolean) => void;
     setIsSelectMode: (isSelectMode: boolean) => void;
+    setOldRoomPicture: (oldRoomPicture: {
+        public_id: string;
+        resource_type: string;
+        url: string;
+    } | null) => void;
     setRoomId: (roomId: string) => void;
+    setRoomName: (roomName: string) => void;
     setReceiverId: (receiverId: string) => void;
+    setSelectedProfileRoom: (selectedProfileRoom: File | null) => void;
+    setSelectedProfileRoomUrl: (selectedProfileRoomUrl: string | null) => void;
     setShowDeleteOption1: (showDeleteOption1: boolean) => void;
-    setShowDeleteOption2: (showDeleteOption2: boolean) => void
+    setShowDeleteOption2: (showDeleteOption2: boolean) => void;
     setShowProfile: (showProfile: boolean) => void;
+    setShowRoomMedia: (showRoomMedia: boolean) => void;
     setText: (text: string) => void;
     showProfile: boolean;
+    showRoomMedia: boolean;
     setShowMember: (showMember: boolean) => void;
     showMember: boolean;
     text: string;

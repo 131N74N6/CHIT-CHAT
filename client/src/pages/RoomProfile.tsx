@@ -96,7 +96,7 @@ export default function RoomProfile() {
     const isRoomOwner = user && detail && user.user_id === detail.creator_id;
 
     return (
-        <section className="flex md:flex-row p-2.5 gap-2.5 flex-col relative h-screen z-10">
+        <section className="flex md:flex-row p-2.5 gap-2.5 flex-col relative h-dvh z-10">
             {message ? <Alert message={message}/> : null}
             <Navbar isProcessing={isUserProfileProcessing}/>
             {isDetailLoading ? (
@@ -199,7 +199,7 @@ export default function RoomProfile() {
                         />
                     </div>
                     <div className="flex flex-col gap-1.5">
-                        <label htmlFor="room_description" className="text-gray-900 font-medium text-[1rem]">Room name</label>
+                        <label htmlFor="room_description" className="text-gray-900 font-medium text-[1rem]">Description</label>
                         <input
                             className={cn(
                                 "outline-0 bg-gray-200 text-gray-900 font-medium text-[1rem]", 
@@ -300,8 +300,8 @@ export default function RoomProfile() {
                                 <div className="grid grid-cols-2 gap-2">
                                     <button
                                         className={cn(
-                                            "bg-gray-400 cursor-pointer disabled:cursor-not-allowed text-amber-600", 
-                                            "text-[0.8rem] hover:bg-gray-500 transition-colors font-medium p-1.5"
+                                            "bg-gray-200 cursor-pointer disabled:cursor-not-allowed text-amber-600", 
+                                            "text-[0.8rem] hover:bg-gray-500 hover:text-white transition-colors font-medium p-1.5"
                                         )}
                                         disabled={isUserProfileProcessing}
                                         onClick={() => deleteRoomMt.mutate()}
@@ -311,8 +311,8 @@ export default function RoomProfile() {
                                     </button>
                                     <button
                                         className={cn(
-                                            "bg-gray-400 cursor-pointer disabled:cursor-not-allowed text-amber-600", 
-                                            "text-[0.8rem] hover:bg-gray-500 transition-colors font-medium p-1.5"
+                                            "bg-gray-200 cursor-pointer disabled:cursor-not-allowed text-amber-600", 
+                                            "text-[0.8rem] hover:bg-gray-500 hover:text-white transition-colors font-medium p-1.5"
                                         )}
                                         disabled={isUserProfileProcessing}
                                         onClick={() => setEditMode(true)}
@@ -324,8 +324,8 @@ export default function RoomProfile() {
                             ) : (
                                 <button
                                     className={cn(
-                                        "bg-gray-400 cursor-pointer disabled:cursor-not-allowed text-red-600", 
-                                        "text-[0.8rem] hover:bg-gray-500 transition-colors font-medium p-1.5"
+                                        "bg-gray-200 cursor-pointer disabled:cursor-not-allowed text-red-600", 
+                                        "text-[0.8rem] hover:bg-gray-500 hover:text-white transition-colors font-medium p-1.5"
                                     )}
                                     disabled={isUserProfileProcessing}
                                     onClick={() => leftRoomMt.mutate()}
@@ -335,8 +335,8 @@ export default function RoomProfile() {
                             )}
                             <button
                                 className={cn(
-                                    "bg-gray-400 cursor-pointer disabled:cursor-not-allowed text-olive-600", 
-                                    "text-[0.8rem] hover:bg-gray-500 transition-colors font-medium p-1.5"
+                                    "bg-gray-200 cursor-pointer disabled:cursor-not-allowed text-olive-600", 
+                                    "text-[0.8rem] hover:bg-gray-500 hover:text-white transition-colors font-medium p-1.5"
                                 )}
                                 disabled={isUserProfileProcessing}
                                 type="button"

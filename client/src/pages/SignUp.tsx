@@ -2,7 +2,7 @@ import cn from "../utils/cn";
 import useAuthService from "../services/useAuthService";
 import useUserProfileService from "../services/useUserProfileService";
 import { Link, useNavigate } from "react-router-dom";
-import { MessageCircle } from "lucide-react";
+import { Eye, EyeClosed, MessageCircle } from "lucide-react";
 import { useEffect } from "react";
 import { useMessageStore } from "../stores/message.store";
 
@@ -17,8 +17,10 @@ export default function SignUp() {
         password, 
         setEmail,
         setPassword, 
+        setShowPassword, 
         setUserName, 
         signUpMt, 
+        showPassword, 
         username 
     } = useAuthService({ setMessage: setMessage });
 
@@ -32,10 +34,11 @@ export default function SignUp() {
             return () => clearTimeout(timeOut);
         }
     }, [message, setMessage]);
-
+    
+    const passwordToggle = () => setShowPassword(!showPassword);
 
     return (
-        <section className="bg-blue-200 flex justify-center items-center h-screen p-2">
+        <section className="bg-blue-200 flex justify-center items-center h-dvh p-2">
             <form
                 className="bg-white p-2.5 rounded-[10px] w-80 flex flex-col gap-4 border border-blue-700"
                 onSubmit={(event: React.SubmitEvent<HTMLFormElement>) => {
@@ -66,16 +69,29 @@ export default function SignUp() {
                         value={username}
                     />
                 </div>
-                <div className="flex flex-col gap-2 relative">
+                <div className="flex flex-col gap-2">
                     <label htmlFor="password" className="font-medium text-gray-900">Password</label>
-                    <input
-                        className="bg-blue-100 p-2 text-[0.85rem] font-medium w-full focus:outline-none text-black"
-                        id="password"
-                        name="password"
-                        onChange={(event) => setPassword(event.target.value)}
-                        type="password"
-                        value={password}
-                    />
+                    <div className="relative">
+                        <input
+                            className="bg-blue-100 p-2 text-[0.85rem] font-medium w-full focus:outline-none text-black"
+                            id="password"
+                            name="password"
+                            onChange={(event) => setPassword(event.target.value)}
+                            type="password"
+                            value={password}
+                        />
+                        <button
+                            className={cn(
+                                "text-black font-medium hover:text-gray-700 transition-colors px-3",
+                                "absolute inset-y-0 right-0 disabled:cursor-not-allowed cursor-pointer"
+                            )}
+                            disabled={signUpMt.isPending}
+                            onClick={passwordToggle}
+                            type="button"
+                        >
+                            {showPassword ? <Eye size={22}/> : <EyeClosed size={22}/>}
+                        </button>
+                    </div>
                 </div>
                 <button
                     className={cn(

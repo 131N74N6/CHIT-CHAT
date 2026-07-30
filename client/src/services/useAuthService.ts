@@ -16,6 +16,9 @@ export default function useAuthService(props?: IAuthService) {
     const password = useUserStore((state) => state.password);
     const setPassword = useUserStore((state) => state.setPassword);
 
+    const showPassword = useUserStore((state) => state.showPassword);
+    const setShowPassword = useUserStore((state) => state.setShowPassword);
+
     const username = useUserStore((state) => state.username);
     const setUserName = useUserStore((state) => state.setUserName);
     
@@ -118,6 +121,6 @@ export default function useAuthService(props?: IAuthService) {
     });
 
     return {
-        email, password, setEmail, setPassword, setUserName, signInMt, signOutMt, signUpMt, username
+        email, password, setEmail, setPassword, setUserName, setShowPassword, signInMt, signOutMt, signUpMt, showPassword, username
     }
 }

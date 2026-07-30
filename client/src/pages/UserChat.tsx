@@ -76,7 +76,7 @@ export default function UserChat() {
     }, [message, setMessage]);
 
     return (
-        <section className="flex md:flex-row flex-col h-screen relative z-10 p-2.5 gap-2.5">
+        <section className="flex md:flex-row flex-col h-dvh relative z-10 p-2.5 gap-2.5">
             <Navbar isProcessing={isUserChatProcessing || isUserProfileProcessing || receiverUserProfile.isDetailLoading}/>
             {message ? <Alert message={message}/> : null}
             {showDeleteOption1 ? (

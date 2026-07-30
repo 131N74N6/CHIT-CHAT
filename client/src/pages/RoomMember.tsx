@@ -21,7 +21,7 @@ export default function RoomMember() {
     const setMessage = useMessageStore((state) => state.setMessage);
     
     const { currentUser } = useUserProfileService({ setMessage: setMessage });
-    const { currentRoomMember } = useRoomMemberService({ setMessage: setMessage });
+    const { currentRoomMember, kickMemberMt } = useRoomMemberService({ setMessage: setMessage });
     
     useEffect(() => {
         if (message) {
@@ -52,7 +52,7 @@ export default function RoomMember() {
     });
 
     return (
-        <section className="flex flex-col md:flex-row gap-2.5 p-2.5 h-screen relative z-10">
+        <section className="flex flex-col md:flex-row gap-2.5 p-2.5 h-dvh relative z-10">
             <Navbar isProcessing={currentRoomMember.isRoomMemberLoading}/>
             {message ? <Alert message={message}/> : null}
             <div className="flex flex-col h-full w-full md:w-2/5 p-2.5 border border-gray-400">
@@ -80,7 +80,7 @@ export default function RoomMember() {
                         currentUserId={currentUser.user?.user_id!}
                         fetchNextUser={currentRoomMember.fetchNextRoomMember}
                         hasNextPage={currentRoomMember.roomMmeberHaveNextPage}
-                        isInRoom={true}
+                        place={{ name: "room-member", kickMemberMt: kickMemberMt }}
                         isFetchingNextPage={currentRoomMember.isRoomMemberFetchNextPage}
                         isProcessing={currentRoomMember.isRoomMemberLoading}
                         users={currentRoomMember.roomMember}

@@ -1,4 +1,5 @@
 import type { FetchNextPageOptions, InfiniteData, InfiniteQueryObserverResult, UseMutationResult } from "@tanstack/react-query";
+import type { IOtherUser } from "./user.model";
 
 export interface IChatService {
     receiverId?: string;
@@ -66,6 +67,44 @@ export interface IRoomChat {
 export interface IUserChat {
     name: "user-chat";
     setReceiverId?: never;
+}
+
+export interface IUserChatMedia {
+    handleMediaPreview: (event: React.ChangeEvent<HTMLInputElement, Element>) => void;
+    inputMediaRef: React.RefObject<HTMLInputElement | null>;
+    isUserChatProcessing: boolean;
+    media: IFileViewer[];
+    removeOnePreviewFile: (fileName: string) => void;
+    seeChat: () => void;
+    sendChatToUserMt: UseMutationResult<any, Error, void, unknown>;
+    setText: (text: string) => void;
+    text: string;
+}
+
+export interface IUserChatWindow {
+    clearSelection: () => void;
+    currentUserId: string;
+    fetchNextUserChat: (options?: FetchNextPageOptions | undefined) => Promise<InfiniteQueryObserverResult<InfiniteData<any, unknown>, Error>>;
+    hasNextUserChat: boolean;
+    isFetchingNextUserChats: boolean;
+    isUserChatProcessing: boolean;
+    isProcessing: boolean;
+    isSelectMode: boolean;
+    receiverId: string;
+    text: string;
+    seeMedia: () => void;
+    seeProfile: () => void;
+    selectedIds: string[];
+    sendChatToUser: UseMutationResult<any, Error, void, unknown>;
+    setIsSelectMode: (isSelectMode: boolean) => void;
+    setReceiverId: (receiverId: string) => void;
+    setShowDeleteOption1: (showDeleteOption1: boolean) => void;
+    setShowDeleteOption2: (showDeleteOption2: boolean) => void;
+    setText: (text: string) => void;
+    toggleSelect: (id: string) => void;
+    userChats: ChatIntrf[];
+    userChatError: Error | null;
+    userProfile: IOtherUser;
 }
 
 export interface IUserChatDeleteOption1 {

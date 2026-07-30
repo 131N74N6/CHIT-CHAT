@@ -22,7 +22,7 @@ export default function JoinRoom() {
     }, [message, setMessage]);
 
     return (
-        <section className="flex md:flex-row flex-col gap-2.5 p-2.5 h-screen relative z-10">
+        <section className="flex md:flex-row flex-col gap-2.5 p-2.5 h-dvh relative z-10">
             <Navbar isProcessing={isUserProfileProcessing}/>
             {message ? <Alert message={message}/> : null}
             <div 

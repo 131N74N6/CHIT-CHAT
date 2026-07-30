@@ -1,7 +1,5 @@
 import AvailableRoom from "./pages/AvailableRoom";
 import Chatbot from "./pages/Chatbot";
-import ChatbotDetail from "./pages/ChatbotDetail";
-import ChatbotResults from "./pages/ChatbotResults";
 import CreateRoom from "./pages/CreateRoom";
 import Home from "./pages/Home";
 import JoinRoom from "./pages/JoinRoom";
@@ -53,8 +51,6 @@ export default function App() {
                     <Route element={<ProtectedRoute><RoomProfile/></ProtectedRoute>} path="/rooms/profile/:room_id"/>
                     <Route element={<ProtectedRoute><RoomMember/></ProtectedRoute>} path="/rooms/member/:room_id"/>
                     <Route element={<ProtectedRoute><Chatbot/></ProtectedRoute>} path="/chatbot"/>
-                    <Route element={<ProtectedRoute><ChatbotResults/></ProtectedRoute>} path="/chatbot/histories"/>
-                    <Route element={<ProtectedRoute><ChatbotDetail/></ProtectedRoute>} path="/chatbot/detail/:_id"/>
                     <Route path="*" element={<Navigate to="/sign-in" replace/>}/>
                 </Routes>
             </BrowserRouter>

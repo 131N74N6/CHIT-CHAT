@@ -47,6 +47,9 @@ export interface UserState {
         url: string;
     } | null) => void;
 
+    showPassword: boolean;
+    setShowPassword: (showPassword: boolean) => void;
+
     resetSignIn: () => void;
     resetUserState: () => void;
     resetSignUp: () => void;
@@ -103,8 +106,9 @@ export const useUserStore = create<UserState>((set) => ({
         profilePicture: null,
         profilePictureUrl: null,
         roomCode: "",
-        visiblepassword: false,
+        showPassword: false,
         username: "",
+        visiblepassword: false,
     }),
 
     resetSignIn: () => set({ username: "", password: "" }),
@@ -113,6 +117,9 @@ export const useUserStore = create<UserState>((set) => ({
     
     roomCode: "",
     setRoomCode: (roomCode) => set({ roomCode }),
+
+    showPassword: false,
+    setShowPassword: (showPassword) => set({ showPassword }),
 
     username: "",
     setUserName: (username) => set({ username }),

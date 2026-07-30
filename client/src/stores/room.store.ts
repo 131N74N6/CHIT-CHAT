@@ -58,6 +58,9 @@ export interface RoomState {
 
     showMember: boolean;
     setShowMember: (showMember: boolean) => void;
+    
+    showRoomMedia: boolean;
+    setShowRoomMedia: (showRoomMedia: boolean) => void;
 
     showProfile: boolean;
     setShowProfile: (showProfile: boolean) => void;
@@ -100,6 +103,7 @@ export const useRoomStore = create<RoomState>((set) => ({
             selectedProfileRoomUrl: null,
             showDeleteOption1: false,
             showDeleteOption2: false,
+            showRoomMedia: false,
             userChatsIdsToDelete: []
         });
     },
@@ -137,6 +141,9 @@ export const useRoomStore = create<RoomState>((set) => ({
         selectedChatsIds: state.selectedChatsIds.includes(id) ?
         state.selectedChatsIds.filter(chatId => chatId !== id) : [...state.selectedChatsIds, id]
     })),
+
+    showRoomMedia: false,
+    setShowRoomMedia:(showRoomMedia) => set({ showRoomMedia }),
 
     userChatsIdsToDelete: [],
     setUserChatsIdsToDelete: (userChatsIdsToDelete) => set((state) => ({

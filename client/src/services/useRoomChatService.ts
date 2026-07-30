@@ -29,7 +29,11 @@ export default function useRoomChatService(props?: IRoomChatService) {
     const setShowDeleteOption2 = useRoomStore((state) => state.setShowDeleteOption2);
 
     const toggleSelect = useRoomStore((state) => state.toggleSelect);
+    const removeOnePreviewFile = useChatStore((state) => state.remove);
     
+    const showRoomMedia = useRoomStore((state) => state.showRoomMedia);
+    const setShowRoomMedia = useRoomStore((state) => state.setShowRoomMedia);
+
     const selectedChatsIds = useRoomStore((state) => state.selectedChatsIds);
     const clearChatsIdsSelection = useRoomStore((state) => state.clearChatsIdsSelection);
 
@@ -220,7 +224,7 @@ export default function useRoomChatService(props?: IRoomChatService) {
         }
     });
 
-    const handleImagePreview = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleMediaPreview = (event: React.ChangeEvent<HTMLInputElement>) => {
         const files = event.target.files;
         const temp: IFileViewer[] = [];
 
@@ -287,18 +291,21 @@ export default function useRoomChatService(props?: IRoomChatService) {
         deleteAllChatsInRoomMt,
         deleteChosenChatsInRoomMt,
         editSelectedChatMt,
-        handleImagePreview,
+        handleMediaPreview,
         inputMediaRef,
         isRoomChatProcessing,
         isSelectMode,
         media,
+        removeOnePreviewFile,
         selectedChatsIds,
         sendChatToRoomMt,
         setIsSelectMode,
         setShowDeleteOption1,
         setShowDeleteOption2,
+        setShowRoomMedia,
         showDeleteOption1,
         showDeleteOption2,
+        showRoomMedia,
         setMedia,
         setText,
         text, 

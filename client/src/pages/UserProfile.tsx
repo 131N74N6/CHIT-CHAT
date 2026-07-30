@@ -50,7 +50,7 @@ export default function UserProfile() {
     });
 
     return (
-        <section className="flex md:flex-row gap-2.5 p-2.5 flex-col relative h-screen z-10">
+        <section className="flex md:flex-row gap-2.5 p-2.5 flex-col relative h-dvh z-10">
             {message ? <Alert message={message}/> : null}
             <Navbar isProcessing={isDetailLoading}/>
             <div className="flex md:w-2/5 w-full flex-col h-full border border-gray-400">

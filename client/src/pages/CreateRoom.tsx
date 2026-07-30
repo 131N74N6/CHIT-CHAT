@@ -41,7 +41,7 @@ export default function CreateRoom() {
     });
 
     return (
-        <section className="flex md:flex-row p-2.5 gap-2.5 flex-col h-screen relative z-10">
+        <section className="flex md:flex-row p-2.5 gap-2.5 flex-col h-dvh relative z-10">
             <Navbar isProcessing={isUserProfileProcessing}/>
             {message ? <Alert message={message}/> : null}
             <form 

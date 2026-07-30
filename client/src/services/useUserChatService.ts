@@ -171,7 +171,7 @@ export default function useUserChatService(props?: IUserChatService) {
         }
     });
 
-    const handleImagePreview = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleMediaPreview = (event: React.ChangeEvent<HTMLInputElement>) => {
         const files = event.target.files;
         const tempt: IFileViewer[] = [];
         
@@ -271,7 +271,7 @@ export default function useUserChatService(props?: IUserChatService) {
         deleteAllUserChatsMt,
         deleteChosenUsersChatMt,
         editSelectedChatMt,
-        handleImagePreview, 
+        handleMediaPreview, 
         inputMediaRef, 
         isSelectMode,
         isUserChatProcessing, 

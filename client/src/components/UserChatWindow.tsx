@@ -1,6 +1,6 @@
 import { File, Menu, MenuSquare, SendIcon, X } from "lucide-react";
 import cn from "../utils/cn"
-import type { IUserChatWindow } from "../models/user.model";
+import type { IUserChatWindow } from "../models/chat.model";
 import ChatList from "./ChatList";
 import Loading from "./Loading";
 
@@ -84,8 +84,8 @@ export default function UserChatWindow(props: IUserChatWindow) {
                     </div>
                 </div>
             )}
-            <div className="flex flex-col gap-2.5 px-2.5 h-full border-x border-gray-400">
-                {props.isUserChatLoading ? (
+            <div className="flex flex-col gap-2.5 px-2.5 h-[80%] border-x border-gray-400">
+                {props.isUserChatProcessing ? (
                     <div className="flex justify-center items-center bg-white h-full">
                         <Loading/>
                     </div>
@@ -112,21 +112,21 @@ export default function UserChatWindow(props: IUserChatWindow) {
                 )}
             </div>
             <form 
-                className="bg-white inset-shadow-gray-200 p-1.5 flex flex-col gap-1.5 border border-gray-400"
+                className="bg-white relative h-[20%] inset-shadow-gray-200 p-1.5 flex flex-col gap-1.5 border border-gray-400"
                 onSubmit={(event: React.SubmitEvent<HTMLFormElement>) => {
                     event.preventDefault();
                     props.sendChatToUser.mutate();
                 }}
             >
-                <div className="flex gap-1.5">
-                    <textarea
-                        className="focus:outline-0 w-[90%] resize-none"
-                        id="message"
-                        name="message"
-                        onChange={(event) => props.setText(event.target.value)}
-                        value={props.text}
-                    />
-                    <div className="flex flex-col gap-2 justify-center">
+                <textarea
+                    className="focus:outline-0 w-[90%] resize-none"
+                    id="message"
+                    name="message"
+                    onChange={(event) => props.setText(event.target.value)}
+                    value={props.text}
+                />
+                <div className="absolute bottom-2 right-2 top-2 flex items-center bg-white">
+                    <div className="flex flex-col gap-2.5">
                         <button
                             className="text-blue-500 font-medium cursor-pointer disabled:cursor-not-allowed"
                             disabled={props.isProcessing}

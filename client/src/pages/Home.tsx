@@ -43,8 +43,12 @@ export default function Home() {
         clearSelection, 
         deleteAllUserChatsMt, 
         deleteChosenUsersChatMt,
+        handleMediaPreview,
+        inputMediaRef,
         isSelectMode,
         isUserChatProcessing, 
+        media,
+        removeOnePreviewFile,
         selectedIds,
         sendChatToUserMt,
         setIsSelectMode,
@@ -83,7 +87,7 @@ export default function Home() {
     }, [message, setMessage]);
 
     return (
-        <section className="flex md:flex-row p-2.5 gap-2.5 flex-col h-screen relative z-10">
+        <section className="flex md:flex-row p-2.5 gap-2.5 flex-col h-dvh relative z-10">
             {message ? <Alert message={message}/> : null}
             <Navbar isProcessing={isUserChatProcessing || isUserProfileProcessing}/>
             {showDeleteOption1 ? (
@@ -122,8 +126,8 @@ export default function Home() {
                         fetchNextUser={allUsers.fetchNextUser}
                         hasNextPage={allUsers.usersHaveNextPage}
                         isProcessing={isUserChatProcessing || isUserProfileProcessing}
-                        isInRoom={false}
                         isFetchingNextPage={allUsers.isFetchNextUser}
+                        place={{ name: "user-list-home" }}
                         setReceiverId={setReceiverId}
                         users={allUsers.users}
                     />
@@ -135,13 +139,17 @@ export default function Home() {
                     currentUserId={currentUser.user ? currentUser.user.user_id : ""}
                     errorProfile={receiverUserProfile.detailError}
                     fetchNextUserChat={userChats.fetchNextPage}
+                    handleMediaPreview={handleMediaPreview}
                     hasNextUserChat={userChats.hasNextPage}
+                    inputMediaRef={inputMediaRef}
+                    media={media}
                     isFetchingNextUserChats={userChats.isFetchingNextPage}
                     isProcessing={userChats.isLoading || isUserChatProcessing || isUserProfileProcessing}
                     isProfileLoading={receiverUserProfile.isDetailLoading}
-                    isUserChatLoading={userChats.isLoading}
+                    isUserChatProcessing={isUserChatProcessing}
                     isSelectMode={isSelectMode}
                     receiverId={receiverId}
+                    removeOnePreviewFile={removeOnePreviewFile}
                     selectedIds={selectedIds}
                     sendChatToUser={sendChatToUserMt}
                     setIsSelectMode={setIsSelectMode}

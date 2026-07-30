@@ -1,23 +1,30 @@
 import type { IRoomWindow } from "../models/room.model";
-import { useNavigate } from "react-router-dom";
 import RoomProfileWindow from "./RoomProfileWindow";
 import RoomMemberWindow from "./RoomMemberWindow";
 import RoomChatWindow from "./RoomChatWindow";
+import RoomMediaPreviewWindow from "./RoomMediaPreviewWindow";
 
 export default function RoomWindow(props: IRoomWindow) {
-    const navigate = useNavigate();
-
     const seeProfile = () => {
+        props.setShowRoomMedia(false);
         props.setShowProfile(true);
+        props.setShowMember(false);
+    }
+
+    const seeMedia = () => {
+        props.setShowRoomMedia(true);
+        props.setShowProfile(false);
         props.setShowMember(false);
     }
 
     const seeMember = () => {
         props.setShowProfile(false);
+        props.setShowRoomMedia(false);
         props.setShowMember(true);
     }
 
     const seeRoomChat = () => {
+        props.setShowRoomMedia(false);
         props.setShowProfile(false);
         props.setShowMember(false);
     }
@@ -26,14 +33,30 @@ export default function RoomWindow(props: IRoomWindow) {
         <div className="h-full flex-col gap-2.5 md:w-2/5 md:flex md:flex-col hidden">
             {props.showProfile ? (
                 <RoomProfileWindow
+                    changeRoomMt={props.changeRoomMt}
                     deleteRoomMt={props.deleteRoomMt}
-                    isProcessing={props.isProcessing}
-                    isRoomOwner={props.currentUserId === props.roomProfile._id}
+                    description={props.description}
+                    editMode={props.editMode}
+                    fileInputRef={props.fileInputRef}
+                    handleImagePreview={props.handleImagePreview}
+                    isRoomProfileProcessing={props.isRoomProfileProcessing}
+                    isRoomOwner={props.currentUserId === props.roomProfile.creator_id}
                     isRoomProfileLoading={props.isRoomProfileLoading}
                     leftRoomMt={props.leftRoomMt}
+                    oldRoomPicture={props.oldRoomPicture}
+                    roomName={props.roomName}
                     roomProfileError={props.roomProfileError}
                     seeMember={seeMember}
                     seeRoomChat={seeRoomChat}
+                    selectedProfileRoom={props.selectedProfileRoom}
+                    selectedProfileRoomUrl={props.selectedProfileRoomUrl}
+                    setDeleteRoomImage={props.setDeleteRoomImage}
+                    setDescription={props.setDescription}
+                    setEditMode={props.setEditMode}
+                    setOldRoomPicture={props.setOldRoomPicture}
+                    setRoomName={props.setRoomName}
+                    setSelectedProfileRoom={props.setSelectedProfileRoom}
+                    setSelectedProfileRoomUrl={props.setSelectedProfileRoomUrl}
                     roomProfile={props.roomProfile}
                 />
             ) : props.showMember ? (
@@ -48,6 +71,18 @@ export default function RoomWindow(props: IRoomWindow) {
                     setReceiverId={props.setReceiverId}
                     users={props.users}
                 />
+            ) : props.showRoomMedia ? (
+                <RoomMediaPreviewWindow
+                    handleMediaPreview={props.handleMediaPreview}
+                    inputMediaRef={props.inputMediaRef}
+                    isRoomChatProcessing={props.isRoomChatProcessing}
+                    media={props.media}
+                    removeOnePreviewFile={props.removeOnePreviewFile}
+                    seeChat={seeRoomChat}
+                    sendChatToRoomMt={props.sendChatToRoom}
+                    setText={props.setText}
+                    text={props.text}
+                />
             ) : (
                 <RoomChatWindow
                     clearChatsIdsSelection={props.clearChatsIdsSelection}
@@ -55,10 +90,10 @@ export default function RoomWindow(props: IRoomWindow) {
                     fetchNextRoomChat={props.fetchNextRoomChat}
                     hasNextRoomChat={props.hasNextRoomChat}
                     isFetchingNextRoomChat={props.isFetchingNextRoomChat}
-                    isProcessing={props.isProcessing}
                     isRoomChatLoading={props.isRoomChatLoading}
+                    isRoomChatProcessing={props.isRoomChatProcessing}
                     isSelectMode={props.isSelectMode}
-                    navigate={navigate}
+                    seeMedia={seeMedia}
                     selectedIds={props.selectedChatsIds}
                     roomChatError={props.roomChatError}
                     roomChats={props.roomChats}

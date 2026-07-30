@@ -18,7 +18,7 @@ export default function UserMediaPreview() {
     const setMessage = useMessageStore((state) => state.setMessage);
 
     const { 
-        handleImagePreview, 
+        handleMediaPreview, 
         inputMediaRef, 
         isUserChatProcessing,
         media,
@@ -43,16 +43,13 @@ export default function UserMediaPreview() {
 
     useEffect(() => {
         if (message) {
-            const timer = setTimeout(() => {
-                setMessage(null);
-            }, 1500);
-
+            const timer = setTimeout(() => setMessage(null), 1500);
             return () => clearTimeout(timer);
         }
     }, [message, setMessage]);
 
     return (
-        <section className="flex md:flex-row flex-col h-screen gap-2.5 p-2.5 relative z-10">
+        <section className="flex md:flex-row flex-col h-dvh gap-2.5 p-2.5 relative z-10">
             {message ? <Alert message={message}/> : null}
             <Navbar isProcessing={isUserChatProcessing}/>
             <form 
@@ -67,7 +64,7 @@ export default function UserMediaPreview() {
                     id="room-file"
                     multiple
                     name="room-file"
-                    onChange={handleImagePreview}
+                    onChange={handleMediaPreview}
                     ref={inputMediaRef}
                     type="file"
                 />
