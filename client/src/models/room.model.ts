@@ -1,4 +1,4 @@
-import type { FetchNextPageOptions, InfiniteData, InfiniteQueryObserverResult, UseMutationResult } from "@tanstack/react-query";
+import type { FetchNextPageOptions, InfiniteData, InfiniteQueryObserverResult, UseMutationResult, UseQueryResult } from "@tanstack/react-query";
 import type { ChatIntrf, IFileViewer } from "./chat.model";
 import type { IOtherUser } from "./user.model";
 
@@ -125,6 +125,7 @@ export interface IRoomMemberWindow {
     currentUserId: string;
     fetchNextUser: (options?: FetchNextPageOptions | undefined) => Promise<InfiniteQueryObserverResult<InfiniteData<any, unknown>, Error>>;
     kickMemberMt: UseMutationResult<any, Error, string, unknown>;
+    isOwnData: UseQueryResult<boolean, Error>;
     isRoomMemberFetchNextPage: boolean;
     isRoomMemberLoading: boolean;
     roomMemberError: Error | null;
@@ -188,6 +189,7 @@ export interface IRoomWindow {
     handleMediaPreview: (event: React.ChangeEvent<HTMLInputElement, Element>) => void;
     hasNextRoomChat: boolean;
     inputMediaRef: React.RefObject<HTMLInputElement | null>;
+    isOwnData: UseQueryResult<boolean, Error>;
     isRoomMemberFetchNextPage: boolean;
     isFetchingNextRoomChat: boolean;
     isRoomChatLoading: boolean;
@@ -196,6 +198,7 @@ export interface IRoomWindow {
     isRoomProfileLoading: boolean;
     isRoomProfileProcessing: boolean;
     isSelectMode: boolean;
+    kickMemberMt: UseMutationResult<any, Error, string, unknown>;
     leftRoomMt: UseMutationResult<any, Error, void, unknown>;
     media: IFileViewer[];
     oldRoomPicture: {

@@ -35,7 +35,9 @@ export default function AvailableRoom() {
 
     const { 
         currentRoomMember, 
+        isOwnData,
         isRoomMemberProcessing, 
+        kickMemberMt,
         leftRoomMt 
     } = useRoomMemberService({ roomId: roomId, setMessage: setMessage });
 
@@ -194,6 +196,7 @@ export default function AvailableRoom() {
                     hasNextRoomChat={allChatsInRoom.roomChatHasNextPage}
                     inputMediaRef={inputMediaRef}
                     isFetchingNextRoomChat={allChatsInRoom.isRoomChatFetchNext}
+                    isOwnData={isOwnData}
                     isRoomChatLoading={allChatsInRoom.isRoomChatLoading}
                     isRoomChatProcessing={isRoomChatProcessing}
                     isRoomMemberLoading={currentRoomMember.isRoomMemberLoading}
@@ -201,6 +204,7 @@ export default function AvailableRoom() {
                     isRoomProfileProcessing={isRoomProfileProcessing}
                     isRoomMemberFetchNextPage={currentRoomMember.isRoomMemberFetchNextPage}
                     isSelectMode={isSelectMode}
+                    kickMemberMt={kickMemberMt}
                     leftRoomMt={leftRoomMt}
                     media={media}
                     oldRoomPicture={oldRoomPicture}

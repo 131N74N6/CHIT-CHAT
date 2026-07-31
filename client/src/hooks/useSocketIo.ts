@@ -1,6 +1,9 @@
 import { useEffect } from "react";
 import useSocketIoService from "../services/useSocketIoService";
 import { Query, useQueryClient } from "@tanstack/react-query";
+import { useUserStore } from "../stores/user.store";
+import { useChatStore } from "../stores/chat.store";
+import { useRoomStore } from "../stores/room.store";
 
 interface ChatSocketIntrf {
     currentUserId: string;
@@ -10,6 +13,9 @@ interface ChatSocketIntrf {
 
 export default function useSocketIo(props: ChatSocketIntrf) {
     const queryClient = useQueryClient();
+    const currentUserId = useUserStore((state) => state.currentUserId);
+    const receiverId = useChatStore((state) => state.receiverId);
+    const roomId = useRoomStore((state) => state.roomId);
 
     const {
         connect,
@@ -37,30 +43,30 @@ export default function useSocketIo(props: ChatSocketIntrf) {
     } = useSocketIoService();
 
     useEffect(() => {
-        if (!props.currentUserId) return;
-        connect(props.currentUserId);
+        if (!currentUserId) return;
+        connect(currentUserId);
 
         if (props.identifier.includes("available-room")) {
-            onAvailableRoomJoin(props.currentUserId);
+            onAvailableRoomJoin(currentUserId);
         } else if (props.identifier.includes("available-user")) {
-            onAvailableUserJoin(props.currentUserId);
+            onAvailableUserJoin(currentUserId);
         } else if (props.identifier.includes("room-chat")) {
-            onRoomChatJoin(props.marks?.roomId!);
+            onRoomChatJoin(roomId);
         } else if (props.identifier.includes("room-member")) {
-            onRoomMemberJoin(props.marks?.roomId!);
+            onRoomMemberJoin(roomId);
         } else if (props.identifier.includes("room-profile")) {
-            onRoomProfileJoin(props.marks?.roomId!);
+            onRoomProfileJoin(roomId);
         } else if (props.identifier.includes("user-chat")) {
-            onUserChatJoin(props.currentUserId);
+            onUserChatJoin(currentUserId);
         } else {
-            onUserProfileJoin(props.marks?.receiverId!);
+            onUserProfileJoin(receiverId!);
         }
 
         if (props.identifier.includes("user-profile")) {
-            onUserProfileJoin(props.currentUserId);
+            onUserProfileJoin(currentUserId);
             
-            if (props.marks?.receiverId) {
-                onUserProfileJoin(props.marks.receiverId);
+            if (receiverId) {
+                onUserProfileJoin(receiverId);
             }
         }
 
@@ -140,5 +146,5 @@ export default function useSocketIo(props: ChatSocketIntrf) {
             }
         }
         
-    }, [props.identifier, props.currentUserId, props.marks, queryClient]);
+    }, [props.identifier, currentUserId, props.marks, queryClient]);
 }

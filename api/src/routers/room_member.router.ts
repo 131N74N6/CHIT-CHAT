@@ -1,9 +1,10 @@
 import { Router } from "express";
-import { kickMember, leftRoom, showRoomMember } from "../controllers/room_member.controller";
+import { isOwnData, kickMember, leftRoom, showRoomMember } from "../controllers/room_member.controller";
 import { verifyToken } from "../middlewares/auth.middleware";
 
 const roomMembersRouters = Router();
 
+roomMembersRouters.get("/is-own-data", verifyToken, isOwnData);
 roomMembersRouters.get("/show-all/:room_id", verifyToken, showRoomMember);
 
 roomMembersRouters.put("/kick/:user_id", verifyToken, kickMember);

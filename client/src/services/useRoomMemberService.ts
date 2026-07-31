@@ -1,4 +1,4 @@
-import { Query, useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { Query, useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { IRoomMemberService } from "../models/room.model";
 import type { IOtherUser } from "../models/user.model";
 import { useUserStore } from "../stores/user.store";
@@ -53,6 +53,27 @@ export default function useRoomMemberService(props?: IRoomMemberService) {
         isRoomMemberFetchNextPage, 
         isRoomMemberLoading 
     }
+
+    const isOwnData = useQuery<boolean>({
+        enabled: !!currentUserId,
+        queryKey: [`is-own-data-${currentUserId}`],
+        queryFn: async () => {
+            try {
+                const request = await fetch(`${import.meta.env.VITE_BASE_API_URL}/rooms/members/is-own-data`, {
+                    credentials: "include",
+                    headers: { 'Content-Type': 'application/json' },
+                    method: "GET"
+                });
+
+                const response = await request.json();
+                if (!request.ok) throw new Error(response.message);
+                return response;
+            } catch (error) {
+                throw error;
+            }
+        },
+        staleTime: Infinity
+    });
 
     const kickMemberMt = useMutation({
         mutationFn: async (userId: string) => {
@@ -124,7 +145,7 @@ export default function useRoomMemberService(props?: IRoomMemberService) {
     });
 
     const isRoomMemberProcessing = currentRoomMember.isRoomMemberLoading || 
-    kickMemberMt.isPending || leftRoomMt.isPending;
+    kickMemberMt.isPending || leftRoomMt.isPending || isOwnData.isLoading;
 
-    return { currentRoomMember, kickMemberMt, isRoomMemberProcessing, leftRoomMt }
+    return { currentRoomMember, isOwnData, isRoomMemberProcessing, kickMemberMt, leftRoomMt }
 }

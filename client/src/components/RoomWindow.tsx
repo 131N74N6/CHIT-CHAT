@@ -65,7 +65,9 @@ export default function RoomWindow(props: IRoomWindow) {
                     fetchNextUser={props.fetchNextUser}
                     isRoomMemberFetchNextPage={props.isRoomMemberFetchNextPage}
                     isRoomMemberLoading={props.isRoomMemberLoading}
+                    isOwnData={props.isOwnData}
                     roomMemberError={props.roomMemberError}
+                    kickMemberMt={props.kickMemberMt}
                     roomMemberHaveNextPage={props.roomMemberHaveNextPage}
                     seeProfile={seeProfile}
                     setReceiverId={props.setReceiverId}

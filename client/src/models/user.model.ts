@@ -1,4 +1,4 @@
-import type { FetchNextPageOptions, InfiniteData, InfiniteQueryObserverResult, UseMutationResult } from "@tanstack/react-query";
+import type { FetchNextPageOptions, InfiniteData, InfiniteQueryObserverResult, UseMutationResult, UseQueryResult } from "@tanstack/react-query";
 import type { ChatIntrf, IFileViewer } from "./chat.model";
 
 export interface IAuthService {
@@ -92,17 +92,18 @@ export interface UserListIntrf {
 export interface UserItemIntrf {
     isProcessing: boolean;
     place: IRoomMember | IListOfUsers;
-    own: boolean;
     setReceiverId: (receiverId: string) => void;
     user: IOtherUser;
 }
 
 export interface IRoomMember {
+    isOwnData: UseQueryResult<boolean, Error>;
     kickMemberMt: UseMutationResult<any, Error, string, unknown>;
     name: "room-member";
 }
 
 export interface IListOfUsers {
+    isOwnData?: never;
     kickMemberMt?: never;
     name: "user-list-home";
 }

@@ -41,7 +41,7 @@ export default function RoomMemberWindow(props: IRoomMemberWindow) {
                     fetchNextUser={props.fetchNextUser}
                     hasNextPage={props.roomMemberHaveNextPage}
                     isFetchingNextPage={props.isRoomMemberFetchNextPage}
-                    place={{ name: "room-member", kickMemberMt: props.kickMemberMt }}
+                    place={{ name: "room-member", isOwnData: props.isOwnData, kickMemberMt: props.kickMemberMt }}
                     isProcessing={props.isRoomMemberLoading}
                     setReceiverId={props.setReceiverId}
                     users={props?.users}
