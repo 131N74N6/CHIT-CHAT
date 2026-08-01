@@ -57,9 +57,30 @@ export default function ChatbotBubble(props: IChatbotBubble) {
                             h3: ({ node, ...props }) => <h3 className="text-base font-medium text-gray-900 mt-2 mb-1" { ...props }></h3>,
 
                             hr: ({ node, ...props }) => <hr className="border-gray-400 my-3" { ...props } />,
-                            table: ({ node, ...props }) => <table className="w-full border-collapse my-3 overflow-x-auto" { ...props }></table>,
-                            th: ({ node, ...props }) => <th className="border border-gray-400 px-2 py-1 bg-gray-300" { ...props }></th>,
-                            td: ({ node, ...props }) => <td className="border border-gray-400 px-2 py-1" { ...props }></td>
+                            table: ({ node, ...props }) => (
+                                <div className="my-3 w-full overflow-x-auto rounded-lg border border-gray-300 shadow-sm relative group">
+                                    <table 
+                                        className="w-full min-w-100 sm:min-w-125 border-collapse text-xs sm:text-sm" 
+                                        {...props}
+                                    ></table>
+                                    <div className="absolute top-0 right-0 bottom-0 w-8 bg-linear-to-l from-gray-200/80 to-transparent pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity sm:hidden"></div>
+                                </div>
+                            ),
+                            thead: ({ node, ...props }) => <thead className="bg-gray-100" { ...props }></thead>,
+                            tbody: ({ node, ...props }) => <tbody className="bg-white" { ...props }></tbody>,
+                            tr: ({ node, ...props }) => <tr className="hover:bg-gray-50 transition-colors" { ...props }></tr>,
+                            th: ({ node, ...props }) => (
+                                <th 
+                                    className="border border-gray-300 px-2 py-2 sm:px-3 sm:py-2.5 bg-gray-200 text-gray-800 font-semibold whitespace-nowrap text-left" 
+                                    { ...props }
+                                ></th>
+                            ),
+                            td: ({ node, ...props }) => (
+                                <td 
+                                    className="border border-gray-300 px-2 py-2 sm:px-3 sm:py-2 text-gray-700 whitespace-nowrap" 
+                                    { ...props }
+                                ></td>
+                            )
                         }}
                     >
                         {sanitizedAnswer()}
