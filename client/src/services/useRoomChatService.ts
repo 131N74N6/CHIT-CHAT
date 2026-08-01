@@ -1,16 +1,17 @@
 import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useRef } from 'react'
-import type { IRoomChatService } from '../models/room.model';
+import { useRef } from 'react';
 import { useChatStore } from '../stores/chat.store';
 import type { ChatIntrf, IFileViewer } from '../models/chat.model';
 import { useRoomStore } from '../stores/room.store';
+import { useMessageStore } from '../stores/message.store';
 
-export default function useRoomChatService(props?: IRoomChatService) {
+export default function useRoomChatService() {
     const queryClient = useQueryClient();
     const baseUrl = `${import.meta.env.VITE_BASE_API_URL}/rooms/chats`;
     const roomId = useRoomStore((state) => state.roomId);
     
     const inputMediaRef = useRef<HTMLInputElement>(null);
+    const setMessage = useMessageStore((state) => state.setMessage);
     const resetChatState = useChatStore((state) => state.resetChatState);
 
     const media = useChatStore((state) => state.media);
@@ -98,7 +99,7 @@ export default function useRoomChatService(props?: IRoomChatService) {
             }
         },
         onError: (error) => {
-            props?.setMessage!(error.message);
+            setMessage(error.message);
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: [`room-chat-${roomId}`] });
@@ -127,7 +128,7 @@ export default function useRoomChatService(props?: IRoomChatService) {
             }
         },
         onError: (error) => {
-            props?.setMessage!(error.message);
+            setMessage(error.message);
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: [`room-chat-${roomId}`] });
@@ -155,7 +156,7 @@ export default function useRoomChatService(props?: IRoomChatService) {
             }
         },
         onError: (error) => {
-            props?.setMessage!(error.message);
+            setMessage(error.message);
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: [`room-chat-${roomId}`] });
@@ -184,7 +185,7 @@ export default function useRoomChatService(props?: IRoomChatService) {
             }
         },
         onError: (error) => {
-            props?.setMessage!(error.message);
+            setMessage(error.message);
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: [`room-chat-${roomId}`] });
@@ -213,7 +214,7 @@ export default function useRoomChatService(props?: IRoomChatService) {
             }
         },
         onError: (error) => {
-            props?.setMessage!(error.message);
+            setMessage(error.message);
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: [`room-chat-${roomId}`] });
@@ -271,7 +272,7 @@ export default function useRoomChatService(props?: IRoomChatService) {
             }
         },
         onError: (error) => {
-            props?.setMessage!(error.message);
+            setMessage(error.message);
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: [`room-chat-${roomId}`] });

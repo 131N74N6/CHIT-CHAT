@@ -20,8 +20,8 @@ export default function RoomMember() {
     const message = useMessageStore((state) => state.message);
     const setMessage = useMessageStore((state) => state.setMessage);
     
-    const { currentUser } = useUserProfileService({ setMessage: setMessage });
-    const { currentRoomMember, isOwnData, kickMemberMt } = useRoomMemberService({ setMessage: setMessage });
+    const { currentUser } = useUserProfileService();
+    const { currentRoomMember, isOwnData, isRoomOwner, kickMemberMt } = useRoomMemberService();
     
     useEffect(() => {
         if (message) {
@@ -78,7 +78,12 @@ export default function RoomMember() {
                         currentUserId={currentUser.user?.user_id!}
                         fetchNextUser={currentRoomMember.fetchNextRoomMember}
                         hasNextPage={currentRoomMember.roomMmeberHaveNextPage}
-                        place={{ name: "room-member", isOwnData: isOwnData, kickMemberMt: kickMemberMt }}
+                        place={{ 
+                            name: "room-member", 
+                            isOwnData: isOwnData, 
+                            isRoomOwner: isRoomOwner, 
+                            kickMemberMt: kickMemberMt 
+                        }}
                         isFetchingNextPage={currentRoomMember.isRoomMemberFetchNextPage}
                         isProcessing={currentRoomMember.isRoomMemberLoading}
                         users={currentRoomMember.roomMember}

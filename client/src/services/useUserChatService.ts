@@ -1,9 +1,10 @@
 import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import type { ChatIntrf, IFileViewer, IUserChatService } from "../models/chat.model";
+import type { ChatIntrf, IFileViewer } from "../models/chat.model";
 import { useRef } from "react";
 import { useChatStore } from "../stores/chat.store";
+import { useMessageStore } from "../stores/message.store";
 
-export default function useUserChatService(props?: IUserChatService) {
+export default function useUserChatService() {
     const queryClient = useQueryClient();
     const inputMediaRef = useRef<HTMLInputElement>(null);
 
@@ -11,6 +12,7 @@ export default function useUserChatService(props?: IUserChatService) {
     const setIsSelectMode = useChatStore((state) => state.setIsSelectMode);
 
     const receiverId = useChatStore((state) => state.receiverId);
+    const setMessage = useMessageStore((state) => state.setMessage);
 
     const media = useChatStore((state) => state.media);
     const setMedia = useChatStore((state) => state.setMedia);
@@ -46,7 +48,7 @@ export default function useUserChatService(props?: IUserChatService) {
             }
         },
         onError: (error) => {
-            props?.setMessage!(error.message);
+            setMessage(error.message);
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: [`user-chat-${receiverId}`] });
@@ -75,7 +77,7 @@ export default function useUserChatService(props?: IUserChatService) {
             }
         },
         onError: (error) => {
-            props?.setMessage!(error.message);
+            setMessage(error.message);
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: [`user-chat-${receiverId}`] });
@@ -103,7 +105,7 @@ export default function useUserChatService(props?: IUserChatService) {
             }
         },
         onError: (error) => {
-            props?.setMessage!(error.message);
+            setMessage(error.message);
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: [`user-chat-${receiverId}`] });
@@ -132,7 +134,7 @@ export default function useUserChatService(props?: IUserChatService) {
             }
         },
         onError: (error) => {
-            props?.setMessage!(error.message);
+            setMessage(error.message);
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: [`user-chat-${receiverId}`] });
@@ -161,7 +163,7 @@ export default function useUserChatService(props?: IUserChatService) {
             }
         },
         onError: (error) => {
-            props?.setMessage!(error.message);
+            setMessage(error.message);
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: [`user-chat-${receiverId}`] });
@@ -217,7 +219,7 @@ export default function useUserChatService(props?: IUserChatService) {
             }
         },
         onError: (error) => {
-            props?.setMessage!(error.message);
+            setMessage(error.message);
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: [`user-chat-${receiverId}`] });

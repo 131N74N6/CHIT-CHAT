@@ -25,8 +25,8 @@ export default function RoomChat() {
     const setMessage = useMessageStore((state) => state.setMessage);
     const setReceiverId = useChatStore((state) => state.setReceiverId);
 
-    const { currentUser, isUserProfileProcessing } = useUserProfileService({ setMessage: setMessage });
-    const { currentRoomProfile } = useRoomProfileService({ setMessage: setMessage });
+    const { currentUser, isUserProfileProcessing } = useUserProfileService();
+    const { currentRoomProfile } = useRoomProfileService();
     
     const { 
         allChatsInRoom, 
@@ -47,7 +47,7 @@ export default function RoomChat() {
         showDeleteOption2,
         text,
         toggleSelect
-    } = useRoomChatService({ setMessage: setMessage });
+    } = useRoomChatService();
         
     useSocketIo({
         identifier: ["room-chat", "room-profile"]

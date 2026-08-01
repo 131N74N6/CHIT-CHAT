@@ -21,11 +21,6 @@ export interface IJoinRoom {
     setMessage?: (message: string | null) => void;
 }
 
-export interface IRoomChatService {
-    roomId?: string;
-    setMessage?: (message:  string | null) => void;
-}
-
 export interface IRoomChatDeleteOption1 {
     clearAllRoomChatsForMeMt: UseMutationResult<any, Error, void, unknown>;
     deleteAllChatsInRoomMt: UseMutationResult<any, Error, void, unknown>;
@@ -41,17 +36,6 @@ export interface IRoomChatDeleteOption2 {
     isProcessing: boolean;
     setIsSelectMode: (isSelectMode: boolean) => void;
     setShowDeleteOption2: (showDeleteOption: boolean) => void;
-}
-
-export interface IRoomMemberService {
-    roomId?: string;
-    setMessage?: (message: string) => void;
-}
-
-export interface IRoomProfileService {
-    currentUserId?: string;
-    setMessage?: (message: string) => void;
-    roomId?: string;
 }
 
 export interface RoomIntrf {
@@ -128,6 +112,7 @@ export interface IRoomMemberWindow {
     isOwnData: UseQueryResult<boolean, Error>;
     isRoomMemberFetchNextPage: boolean;
     isRoomMemberLoading: boolean;
+    isRoomOwner: UseQueryResult<boolean, Error>;
     roomMemberError: Error | null;
     roomMemberHaveNextPage: boolean;
     seeProfile: () => void;
@@ -195,6 +180,7 @@ export interface IRoomWindow {
     isRoomChatLoading: boolean;
     isRoomChatProcessing: boolean;
     isRoomMemberLoading: boolean;
+    isRoomOwner: UseQueryResult<boolean, Error>;
     isRoomProfileLoading: boolean;
     isRoomProfileProcessing: boolean;
     isSelectMode: boolean;

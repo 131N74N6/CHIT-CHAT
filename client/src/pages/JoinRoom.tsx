@@ -10,7 +10,7 @@ export default function JoinRoom() {
     const message = useMessageStore((state) => state.message);
     const setMessage = useMessageStore((state) => state.setMessage);
 
-    const { isUserProfileProcessing, joinRoomMt, roomCode, setRoomCode } = useUserProfileService({ setMessage: setMessage });
+    const { isUserProfileProcessing, joinRoomMt, roomCode, setRoomCode } = useUserProfileService();
     
     useEffect(() => {
         if (message) {

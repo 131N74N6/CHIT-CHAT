@@ -1,13 +1,15 @@
-import type { IRoomProfileService, RoomIntrf } from '../models/room.model';
+import type { RoomIntrf } from '../models/room.model';
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { useRef } from 'react';
 import { useRoomStore } from '../stores/room.store';
 import { useUserStore } from '../stores/user.store';
+import { useMessageStore } from '../stores/message.store';
 
-export default function useRoomProfileService(props?: IRoomProfileService) {
+export default function useRoomProfileService() {
     const navigate = useNavigate();
     const queryClient = useQueryClient();
+    const setMessage = useMessageStore((state) => state.setMessage);
 
     const currentUserId = useUserStore((state) => state.currentUserId);
     const roomId = useRoomStore((state) => state.roomId);
@@ -138,7 +140,7 @@ export default function useRoomProfileService(props?: IRoomProfileService) {
             }
         },
         onError: (error) => {
-            props?.setMessage!(error.message);
+            setMessage(error.message);
         },
         onSuccess: () => {
             queryClient.invalidateQueries({
@@ -172,7 +174,7 @@ export default function useRoomProfileService(props?: IRoomProfileService) {
             }
         },
         onError: (error) => {
-            props?.setMessage!(error.message);
+            setMessage(error.message);
         },
         onSuccess: () => {
             queryClient.invalidateQueries({
@@ -220,7 +222,7 @@ export default function useRoomProfileService(props?: IRoomProfileService) {
             }
         },
         onError: (error) => {
-            props?.setMessage!(error.message);
+            setMessage(error.message);
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: [`available-room-${currentUserId}`] });

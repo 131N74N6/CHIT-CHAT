@@ -26,7 +26,7 @@ export default function UserChat() {
         currentUser, 
         isUserProfileProcessing, 
         receiverUserProfile 
-    } = useUserProfileService({ setMessage: setMessage });
+    } = useUserProfileService();
 
     const { 
         clearAllUserChatsForMeMt,
@@ -47,7 +47,7 @@ export default function UserChat() {
         text,
         toggleSelect,
         userChats 
-    } = useUserChatService({ setMessage: setMessage });
+    } = useUserChatService();
 
     useSocketIo({
         identifier: ["user-chat", "user-profile"]

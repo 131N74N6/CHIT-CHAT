@@ -2,6 +2,7 @@ import { AuthRequest } from "../middlewares/auth.middleware";
 import { io } from "../services/socket_io.service";
 import { Request, Response } from "express";
 import { User } from "../models/user.model";
+import { Rooms } from "../models/room.model";
 
 export async function isOwnData(req: AuthRequest, res: Response) {
     try {
@@ -11,6 +12,21 @@ export async function isOwnData(req: AuthRequest, res: Response) {
 
         const isMe = user._id.toString() === currentUserId;
         res.status(200).json(isMe);
+    } catch (error) {
+        res.status(500).json({ message: "something went wrong" });
+    }
+}
+
+export async function isRoomOwner(req: AuthRequest, res: Response) {
+    try {
+        const currentUserId = req.user?.user_id;
+        const roomId = req.params.room_id;
+
+        const room = await Rooms.findOne({ _id: roomId });
+        if (!room) return res.status(404).json({ message: "room not found" });
+
+        const isOwner = room.creator_id.toString() === currentUserId;
+        res.status(200).json(isOwner);
     } catch (error) {
         res.status(500).json({ message: "something went wrong" });
     }

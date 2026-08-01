@@ -31,15 +31,16 @@ export default function AvailableRoom() {
     const showProfile = useRoomStore((state) => state.showProfile);
     const setShowProfile = useRoomStore((state) => state.setShowProfile);
 
-    const { currentUser, isUserProfileProcessing } = useUserProfileService({ setMessage: setMessage });
+    const { currentUser, isUserProfileProcessing } = useUserProfileService();
 
     const { 
         currentRoomMember, 
         isOwnData,
+        isRoomOwner,
         isRoomMemberProcessing, 
         kickMemberMt,
         leftRoomMt 
-    } = useRoomMemberService({ roomId: roomId, setMessage: setMessage });
+    } = useRoomMemberService();
 
     const { 
         changeRoomMt,
@@ -62,7 +63,7 @@ export default function AvailableRoom() {
         setRoomName,
         setSelectedProfileRoom,
         setSelectedProfileRoomUrl
-    } = useRoomProfileService({ setMessage: setMessage });
+    } = useRoomProfileService();
 
     const { 
         allChatsInRoom, 
@@ -89,7 +90,7 @@ export default function AvailableRoom() {
         showRoomMedia,
         text,
         toggleSelect
-    } = useRoomChatService({ setMessage: setMessage });
+    } = useRoomChatService();
 
     useEffect(() => {
         if (message) {
@@ -198,6 +199,7 @@ export default function AvailableRoom() {
                     isRoomChatLoading={allChatsInRoom.isRoomChatLoading}
                     isRoomChatProcessing={isRoomChatProcessing}
                     isRoomMemberLoading={currentRoomMember.isRoomMemberLoading}
+                    isRoomOwner={isRoomOwner}
                     isRoomProfileLoading={currentRoomProfile.isDetailLoading}
                     isRoomProfileProcessing={isRoomProfileProcessing}
                     isRoomMemberFetchNextPage={currentRoomMember.isRoomMemberFetchNextPage}

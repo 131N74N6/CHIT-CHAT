@@ -12,7 +12,7 @@ export default function UserData(props: UserItemIntrf) {
                 <div 
                     className="bg-white justify-between items-center flex cursor-pointer"
                     onClick={() => {
-                        if (props.place.isOwnData) {
+                        if (props.place.isOwnData && !props.place.isOwnData.isLoading && props.place.isOwnData.data) {
                             navigate("/profile");
                         } else {
                             props.setReceiverId(props.user._id);
@@ -41,23 +41,21 @@ export default function UserData(props: UserItemIntrf) {
                         </div>
                         <div className="text-gray-950 font-medium">{props.user.username}</div>
                     </div>
-                    {props.place.isOwnData ? null : (
-                        <div className="flex">
-                            <button
-                                className={cn(
-                                    "font-medium text-gray-700 hover:text-gray-400 transition-colors", 
-                                    "cursor-pointer disabled:cursor-not-allowed"
-                                )}
-                                disabled={props.isProcessing}
-                                onClick={() => {
-                                    if (props.place.kickMemberMt) props.place.kickMemberMt.mutate(props.user._id);
-                                }}
-                                type="button"
-                            >
-                                <UserMinus2 size={22}/>
-                            </button>
-                        </div>
-                    )}
+                    {!props.place.isRoomOwner.isLoading && props.place.isRoomOwner.data ? (
+                        <button
+                            className={cn(
+                                "font-medium text-gray-700 hover:text-gray-400 transition-colors", 
+                                "cursor-pointer disabled:cursor-not-allowed"
+                            )}
+                            disabled={props.isProcessing}
+                            onClick={() => {
+                                if (props.place.kickMemberMt) props.place.kickMemberMt.mutate(props.user._id);
+                            }}
+                            type="button"
+                        >
+                            <UserMinus2 size={22}/>
+                        </button>
+                    ) : null}
                 </div>
             ) : (
                 <div className="bg-white items-center cursor-pointer">
@@ -93,7 +91,7 @@ export default function UserData(props: UserItemIntrf) {
                         }}
                     >
                         <div className="w-10 h-10 rounded-full">
-                            {props.user.profile_picture !== null ? (
+                            {props.user.profile_picture !== null && props.user.profile_picture.public_id !== null ? (
                                 <div className="w-full h-full">
                                     <img 
                                         className="w-full h-full object-cover rounded-full" 

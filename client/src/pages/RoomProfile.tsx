@@ -21,7 +21,7 @@ export default function RoomProfile() {
     const roomId = useRoomStore((state) => state.roomId);
     const setRoomId = useRoomStore((state) => state.setRoomId);
     
-    const { currentUser, isUserProfileProcessing } = useUserProfileService({ setMessage: setMessage });
+    const { currentUser, isUserProfileProcessing } = useUserProfileService();
     const { user } = currentUser;
 
     const { 
@@ -44,11 +44,11 @@ export default function RoomProfile() {
         setRoomName, 
         setSelectedProfileRoom, 
         setSelectedProfileRoomUrl
-    } = useRoomProfileService({ setMessage: setMessage });
+    } = useRoomProfileService();
 
     const { detail, errorDetail, isDetailLoading } = currentRoomProfile;
 
-    const { leftRoomMt } = useRoomMemberService({ setMessage: setMessage });
+    const { leftRoomMt } = useRoomMemberService();
 
     useEffect(() => {
         if (message) {

@@ -18,7 +18,7 @@ export default function UserProfile() {
     const message = useMessageStore((state) => state.message);
     const setMessage = useMessageStore((state) => state.setMessage);
 
-    const { receiverUserProfile } = useUserProfileService({ setMessage: setMessage });
+    const { receiverUserProfile } = useUserProfileService();
     const { detail, detailError, isDetailLoading } = receiverUserProfile;
     
     useEffect(() => {

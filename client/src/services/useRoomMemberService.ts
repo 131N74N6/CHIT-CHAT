@@ -1,13 +1,14 @@
 import { Query, useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import type { IRoomMemberService } from "../models/room.model";
 import type { IOtherUser } from "../models/user.model";
 import { useUserStore } from "../stores/user.store";
 import { useRoomStore } from "../stores/room.store";
+import { useMessageStore } from "../stores/message.store";
 
-export default function useRoomMemberService(props?: IRoomMemberService) {
+export default function useRoomMemberService() {
+    const queryClient = useQueryClient();
     const currentUserId = useUserStore((state) => state.currentUserId);
     const roomId = useRoomStore((state) => state.roomId);
-    const queryClient = useQueryClient();
+    const setMessage = useMessageStore((state) => state.setMessage);
     
     const { 
         data: paginatedRoomMember, 
@@ -75,6 +76,27 @@ export default function useRoomMemberService(props?: IRoomMemberService) {
         staleTime: Infinity
     });
 
+    const isRoomOwner = useQuery<boolean>({
+        enabled: !!roomId && !!currentUserId,
+        queryKey: [`is-room-owner-${currentUserId}-${roomId}`],
+        queryFn: async () => {
+            try {
+                const request = await fetch(`${import.meta.env.VITE_BASE_API_URL}/rooms/members/is-room-owner/${roomId}`, {
+                    credentials: "include",
+                    headers: { 'Content-Type': 'application/json' },
+                    method: "GET"
+                });
+
+                const response = await request.json();
+                if (!request.ok) throw new Error(response.message);
+                return response;
+            } catch (error) {
+                throw error;
+            }
+        },
+        staleTime: Infinity
+    });
+
     const kickMemberMt = useMutation({
         mutationFn: async (userId: string) => {
             try {
@@ -92,7 +114,7 @@ export default function useRoomMemberService(props?: IRoomMemberService) {
             }
         },
         onError: (error) => {
-            props?.setMessage!(error.message);
+            setMessage(error.message);
         },
         onSuccess: () => {
             queryClient.invalidateQueries({
@@ -126,7 +148,7 @@ export default function useRoomMemberService(props?: IRoomMemberService) {
             }
         },
         onError: (error) => {
-            props?.setMessage!(error.message);
+            setMessage(error.message);
         },
         onSuccess: () => {
             queryClient.invalidateQueries({
@@ -144,7 +166,7 @@ export default function useRoomMemberService(props?: IRoomMemberService) {
     });
 
     const isRoomMemberProcessing = currentRoomMember.isRoomMemberLoading || 
-    kickMemberMt.isPending || leftRoomMt.isPending || isOwnData.isLoading;
+    kickMemberMt.isPending || leftRoomMt.isPending || isOwnData.isLoading || isRoomOwner.isLoading;
 
-    return { currentRoomMember, isOwnData, isRoomMemberProcessing, kickMemberMt, leftRoomMt }
+    return { currentRoomMember, isOwnData, isRoomOwner, isRoomMemberProcessing, kickMemberMt, leftRoomMt }
 }

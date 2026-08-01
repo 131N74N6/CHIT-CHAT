@@ -1,14 +1,6 @@
 import type { FetchNextPageOptions, InfiniteData, InfiniteQueryObserverResult, UseMutationResult, UseQueryResult } from "@tanstack/react-query";
 import type { ChatIntrf, IFileViewer } from "./chat.model";
 
-export interface IAuthService {
-    setMessage?: (message: string | null) => void;
-}
-
-export interface IUserProfileService extends IAuthService {
-    receiverId?: string;
-}
-
 export interface IUserProfileWindow {
     isProfileLoading: boolean;
     isSelectMode: boolean;
@@ -97,12 +89,14 @@ export interface UserItemIntrf {
 }
 
 export interface IRoomMember {
+    isRoomOwner: UseQueryResult<boolean, Error>;
     isOwnData: UseQueryResult<boolean, Error>;
     kickMemberMt: UseMutationResult<any, Error, string, unknown>;
     name: "room-member";
 }
 
 export interface IListOfUsers {
+    isRoomOwner?: never;
     isOwnData?: never;
     kickMemberMt?: never;
     name: "user-list-home";

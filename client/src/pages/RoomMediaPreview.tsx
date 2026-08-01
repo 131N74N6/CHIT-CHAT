@@ -26,7 +26,7 @@ export default function RoomMediaPreview() {
         sendChatToRoomMt,
         setText,
         text 
-    } = useRoomChatService({ setMessage: setMessage });
+    } = useRoomChatService();
 
     useEffect(() => {
         if (message) {

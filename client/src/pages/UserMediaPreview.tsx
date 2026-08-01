@@ -26,7 +26,7 @@ export default function UserMediaPreview() {
         removeOnePreviewFile,
         setText,
         text 
-    } = useUserChatService({ setMessage: setMessage });
+    } = useUserChatService();
 
     useEffect(() => {
         const savedReceiverId = localStorage.getItem("receiver_id");

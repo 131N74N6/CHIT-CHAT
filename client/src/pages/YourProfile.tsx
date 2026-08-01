@@ -32,7 +32,7 @@ export default function YourProfile() {
         setProfilePictureUrl,
         setUserName,
         username, 
-    } = useUserProfileService({ setMessage: setMessage });
+    } = useUserProfileService();
 
     const { isUserLoading, user, userError } = currentUser;
 

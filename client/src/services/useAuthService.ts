@@ -1,15 +1,16 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useUserStore } from "../stores/user.store";
 import { useNavigate } from "react-router-dom";
-import type { IAuthService } from "../models/user.model";
 import { useRoomStore } from "../stores/room.store";
 import { useChatStore } from "../stores/chat.store";
 import { useNavbarStore } from "../stores/navbar.store";
 import { useChatbotStore } from "../stores/chatbot.store";
+import { useMessageStore } from "../stores/message.store";
 
-export default function useAuthService(props?: IAuthService) {
+export default function useAuthService() {
     const navigate = useNavigate();
     const queryClient = useQueryClient();
+    const setMessage = useMessageStore((state) => state.setMessage);
 
     const email = useUserStore((state) => state.email);
     const setEmail = useUserStore((state) => state.setEmail);
@@ -53,7 +54,7 @@ export default function useAuthService(props?: IAuthService) {
             }
         },
         onError: (response) => {
-            props?.setMessage!(response.message);
+            setMessage(response.message);
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["current-user"] });
@@ -79,7 +80,7 @@ export default function useAuthService(props?: IAuthService) {
             }
         },
         onError: (response) => {
-            props?.setMessage!(response.message);
+            setMessage(response.message);
         },
         onSuccess: () => {
             queryClient.setQueryData(['current-user'], null);
@@ -115,7 +116,7 @@ export default function useAuthService(props?: IAuthService) {
             }
         },
         onError: (response) => {
-            props?.setMessage!(response.message);
+            setMessage(response.message);
         },
         onSuccess: () => {
             navigate("/sign-in");

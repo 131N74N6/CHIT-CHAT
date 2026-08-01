@@ -1,16 +1,19 @@
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import type { IOtherUser, IUserProfileService, IUserProfile } from "../models/user.model";
+import type { IOtherUser, IUserProfile } from "../models/user.model";
 import { useNavigate } from "react-router-dom";
 import { useRoomStore } from "../stores/room.store";
 import { useChatStore } from "../stores/chat.store";
 import { useUserStore } from "../stores/user.store";
 import { useNavbarStore } from "../stores/navbar.store";
 import { useEffect, useRef } from "react";
+import { useMessageStore } from "../stores/message.store";
 
-export default function useUserProfileService(props?: IUserProfileService) {
+export default function useUserProfileService() {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const navigate = useNavigate();
     const queryClient = useQueryClient();
+    
+    const setMessage = useMessageStore((state) => state.setMessage);
 
     const address = useUserStore((state) => state.address);
     const setAddress = useUserStore((state) => state.setAddress);
@@ -185,7 +188,7 @@ export default function useUserProfileService(props?: IUserProfileService) {
             }
         },
         onError: (error) => {
-            props?.setMessage!(error.message);
+            setMessage(error.message);
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['all-users'] });
@@ -227,7 +230,7 @@ export default function useUserProfileService(props?: IUserProfileService) {
             }
         },
         onError: (error) => {
-            props?.setMessage!(error.message);
+            setMessage(error.message);
         },
         onSuccess: () => {
             queryClient.setQueryData(['current-user'], null);
@@ -266,7 +269,7 @@ export default function useUserProfileService(props?: IUserProfileService) {
             }
         },
         onError: (error) => {
-            props?.setMessage!(error.message);
+            setMessage(error.message);
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['current-user'] });

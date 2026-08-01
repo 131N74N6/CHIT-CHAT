@@ -14,11 +14,6 @@ export interface IFileViewer {
     previewUrl: string;
 }
 
-export interface IUserChatService {
-    receiverId?: string;
-    setMessage?: (message: string | null) => void;
-}
-
 export interface ChatIntrf {
     _id: string;
     created_at: string;

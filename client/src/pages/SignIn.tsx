@@ -19,9 +19,9 @@ export default function SignIn() {
         signInMt, 
         showPassword, 
         username 
-    } = useAuthService({ setMessage: setMessage });
+    } = useAuthService();
 
-    const { currentUser } = useUserProfileService({ setMessage: setMessage });
+    const { currentUser } = useUserProfileService();
 
     useEffect(() => {
         if (currentUser.user && !currentUser.isUserLoading) navigate("/home", { replace: true });

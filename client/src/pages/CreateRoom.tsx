@@ -11,16 +11,7 @@ export default function CreateRoom() {
     const message = useMessageStore((state) => state.message);
     const setMessage = useMessageStore((state) => state.setMessage);
 
-    useEffect(() => {
-        if (message) {
-            const timer = setTimeout(() => {
-                setMessage(null);
-            }, 1500);
-            return () => clearTimeout(timer);
-        }
-    }, [message, setMessage]);
-
-    const { currentUser, isUserProfileProcessing } = useUserProfileService();
+    const { isUserProfileProcessing } = useUserProfileService();
 
     const { 
         description,
@@ -35,10 +26,16 @@ export default function CreateRoom() {
         setRoomName, 
         setSelectedProfileRoom, 
         setSelectedProfileRoomUrl 
-    } = useRoomProfileService({ 
-        currentUserId: currentUser.user?.user_id,
-        setMessage: setMessage 
-    });
+    } = useRoomProfileService();
+
+    useEffect(() => {
+        if (message) {
+            const timer = setTimeout(() => {
+                setMessage(null);
+            }, 1500);
+            return () => clearTimeout(timer);
+        }
+    }, [message, setMessage]);
 
     return (
         <section className="flex md:flex-row p-2.5 gap-2.5 flex-col h-dvh relative z-10">

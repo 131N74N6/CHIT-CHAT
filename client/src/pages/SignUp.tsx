@@ -11,7 +11,7 @@ export default function SignUp() {
     const message = useMessageStore((state) => state.message);
     const setMessage = useMessageStore((state) => state.setMessage);
 
-    const { currentUser } = useUserProfileService({ setMessage: setMessage });
+    const { currentUser } = useUserProfileService();
     const { 
         email, 
         password, 
@@ -22,7 +22,7 @@ export default function SignUp() {
         signUpMt, 
         showPassword, 
         username 
-    } = useAuthService({ setMessage: setMessage });
+    } = useAuthService();
 
     useEffect(() => {
         if (currentUser.user && !currentUser.isUserLoading) navigate("/home", { replace: true });
