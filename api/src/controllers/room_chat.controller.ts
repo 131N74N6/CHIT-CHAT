@@ -339,7 +339,7 @@ export async function sendToOtherRoom(req: AuthRequest, res: Response) {
                 const cloudinary = await uploadTOCloudinary({ 
                     file_buffer: media[x].buffer,
                     folder_name: "chat_media",
-                    original_name: media[x].filename
+                    original_name: media[x].originalname
                 });
 
                 selectedMedia.push(cloudinary);

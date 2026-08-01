@@ -18,7 +18,7 @@ export default function UserProfile() {
     const message = useMessageStore((state) => state.message);
     const setMessage = useMessageStore((state) => state.setMessage);
 
-    const { currentUser, receiverUserProfile } = useUserProfileService({ setMessage: setMessage });
+    const { receiverUserProfile } = useUserProfileService({ setMessage: setMessage });
     const { detail, detailError, isDetailLoading } = receiverUserProfile;
     
     useEffect(() => {
@@ -44,9 +44,7 @@ export default function UserProfile() {
     }, [receiverId]);
 
     useSocketIo({
-        currentUserId: currentUser.user ? currentUser.user.user_id : '',
-        identifier: ["user-profile"],
-        marks: { receiverId: receiverId }
+        identifier: ["user-profile"]
     });
 
     return (

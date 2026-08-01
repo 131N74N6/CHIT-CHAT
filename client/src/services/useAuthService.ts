@@ -5,6 +5,7 @@ import type { IAuthService } from "../models/user.model";
 import { useRoomStore } from "../stores/room.store";
 import { useChatStore } from "../stores/chat.store";
 import { useNavbarStore } from "../stores/navbar.store";
+import { useChatbotStore } from "../stores/chatbot.store";
 
 export default function useAuthService(props?: IAuthService) {
     const navigate = useNavigate();
@@ -27,6 +28,7 @@ export default function useAuthService(props?: IAuthService) {
 
     const resetRoomState = useRoomStore((state) => state.resetRoomState);
     const resetChatState = useChatStore((state) => state.resetChatState);
+    const clearChatBotState = useChatbotStore((state) => state.clearChatBotState);
     const resetUserState = useUserStore((state) => state.resetUserState);
     const resetNavbarState = useNavbarStore((state) => state.resetNavbarState);
 
@@ -82,6 +84,7 @@ export default function useAuthService(props?: IAuthService) {
         onSuccess: () => {
             queryClient.setQueryData(['current-user'], null);
             queryClient.clear();
+            clearChatBotState();
             resetChatState();
             resetRoomState();
             resetUserState();

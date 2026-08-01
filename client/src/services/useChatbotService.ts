@@ -1,10 +1,14 @@
-import type { IChatbot, IChatBotService } from "../models/chatbot.model";
-import { Query, useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useChatbotStore } from "../stores/chatbot.store";
+import { useUserStore } from "../stores/user.store";
+import { useMessageStore } from "../stores/message.store";
 
-export default function useChatbotService(props?: IChatBotService) {
+export default function useChatbotService() {
     const queryClient = useQueryClient();
     const baseUrl = `${import.meta.env.VITE_BASE_API_URL}/chatbots`;
+    
+    const currentUserId = useUserStore((state) => state.currentUserId);
+    const setMessage = useMessageStore((state) => state.setMessage);
     
     const answer = useChatbotStore((state) => state.answer);
     const setAnswer = useChatbotStore((state) => state.setAnswer);
@@ -12,7 +16,7 @@ export default function useChatbotService(props?: IChatBotService) {
     const question = useChatbotStore((state) => state.question);
     const setQuestion = useChatbotStore((state) => state.setQuestion);
 
-    const clearChatBotState = useChatbotStore((state) => state.clearChatBotState);
+    const clearSelectedResults = useChatbotStore((state) => state.clearSelectedResults);
 
     const isSelectMode = useChatbotStore((state) => state.isSelectMode);
     const setIsSelectMode = useChatbotStore((state) => state.setIsSelectMode);
@@ -20,41 +24,6 @@ export default function useChatbotService(props?: IChatBotService) {
     const selectedChatBotIds = useChatbotStore((state) => state.selectedChatBotIds);
 
     const toggleSelect = useChatbotStore((state) => state.toggleSelect);
-
-    const askAiMt = useMutation({
-        mutationFn: async () => {
-            try {
-                const request = await fetch(`${baseUrl}/ask-ai`, {
-                    body: JSON.stringify({ question: question.trim() }),
-                    credentials: "include",
-                    headers: { 'Content-Type': 'application/json' },
-                    method: "POST"
-                });
-
-                const response = await request.json();
-                if (!request.ok) throw new Error(response.message);
-                return response;
-            } catch (error) {
-                throw error;
-            }
-        },
-        onError: (response) => {
-            props?.setMessage!(response.message);
-        },
-        onSuccess: (response) => {
-            queryClient.invalidateQueries({
-                predicate: (query: Query<unknown, Error, unknown, readonly unknown[]>) => {
-                    const queryKey = query.queryKey;
-                    if (Array.isArray(queryKey) && queryKey.length > 0 && typeof queryKey[0] === "string") {
-                        return queryKey[0].startsWith(`result-${props?._id}`) ||
-                        queryKey[0].startsWith(`all-results-${props?.currentUserId}`);
-                    }
-                    return false;
-                }
-            });
-            setAnswer(response.message);
-        }
-    });
     
     const {
         data: results,
@@ -64,12 +33,12 @@ export default function useChatbotService(props?: IChatBotService) {
         isFetchingNextPage: resultsFetchNextPage,
         isLoading: isResultsLoading
     } = useInfiniteQuery({
-        enabled: !!props?.currentUserId,
+        enabled: !!currentUserId,
         getNextPageParam: (lastPage, allPages) => {
             if (lastPage.length <= 14) return;
             return allPages.length + 1;
         },
-        queryKey: [`all-results-${props?.currentUserId}`],
+        queryKey: [`all-results-${currentUserId}`],
         queryFn: async ({ pageParam = 1}: { pageParam?: number }) => {
             try {
                 const request = await fetch(`${baseUrl}/show-all?page=${pageParam}&limit=${14}`, {
@@ -100,14 +69,15 @@ export default function useChatbotService(props?: IChatBotService) {
         resultsFetchNextPage, 
         isResultsLoading 
     }
-    const { data: result, error: resultError, isLoading: isResultLoading } = useQuery<IChatbot>({
-        enabled: !!props?._id,
-        queryFn: async () => {
+
+    const askAiMt = useMutation({
+        mutationFn: async () => {
             try {
-                const request = await fetch(`${baseUrl}/show/${props?._id}`, {
+                const request = await fetch(`${baseUrl}/ask-ai`, {
+                    body: JSON.stringify({ question: question.trim() }),
                     credentials: "include",
                     headers: { 'Content-Type': 'application/json' },
-                    method: "GET"
+                    method: "POST"
                 });
 
                 const response = await request.json();
@@ -117,12 +87,14 @@ export default function useChatbotService(props?: IChatBotService) {
                 throw error;
             }
         },
-        queryKey: [`result-${props?._id}`],
-        refetchOnReconnect: true,
-        staleTime: Infinity
+        onError: (response) => {
+            setMessage(response.message);
+        },
+        onSuccess: (response) => {
+            queryClient.invalidateQueries({ queryKey: [`all-results-${currentUserId}`] });
+            setAnswer(response.message);
+        }
     });
-
-    const currentResult = { result, resultError, isResultLoading }
 
     const deleteAllResultsMt = useMutation({
         mutationFn: async () => {
@@ -141,19 +113,10 @@ export default function useChatbotService(props?: IChatBotService) {
             }
         },
         onError: (response) => {
-            props?.setMessage!(response.message);
+            setMessage(response.message);
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({
-                predicate: (query: Query<unknown, Error, unknown, readonly unknown[]>) => {
-                    const queryKey = query.queryKey;
-                    if (Array.isArray(queryKey) && queryKey.length > 0 && typeof queryKey[0] === "string") {
-                        return queryKey[0].startsWith(`result-${props?._id}`) ||
-                        queryKey[0].startsWith(`all-results-${props?.currentUserId}`);
-                    }
-                    return false;
-                }
-            });
+            queryClient.invalidateQueries({ queryKey: [`all-results-${currentUserId}`] });
         }
     });
 
@@ -175,31 +138,21 @@ export default function useChatbotService(props?: IChatBotService) {
             }
         },
         onError: (response) => {
-            props?.setMessage!(response.message);
+            setMessage(response.message);
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({
-                predicate: (query: Query<unknown, Error, unknown, readonly unknown[]>) => {
-                    const queryKey = query.queryKey;
-                    if (Array.isArray(queryKey) && queryKey.length > 0 && typeof queryKey[0] === "string") {
-                        return queryKey[0].startsWith(`result-${props?._id}`) ||
-                        queryKey[0].startsWith(`all-results-${props?.currentUserId}`);
-                    }
-                    return false;
-                }
-            });
+            queryClient.invalidateQueries({ queryKey: [`all-results-${currentUserId}`] });
         }
     });
 
-    const isChatbotProcessing = allResults.isResultsLoading || askAiMt.isPending || currentResult.isResultLoading ||
+    const isChatbotProcessing = allResults.isResultsLoading || askAiMt.isPending ||
     deleteAllResultsMt.isPending || deleteChosenResultsMt.isPending;
 
     return { 
         allResults, 
         answer, 
         askAiMt, 
-        clearChatBotState,
-        currentResult, 
+        clearSelectedResults,
         deleteAllResultsMt, 
         deleteChosenResultsMt, 
         isChatbotProcessing, 

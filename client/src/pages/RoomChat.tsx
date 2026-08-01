@@ -50,9 +50,7 @@ export default function RoomChat() {
     } = useRoomChatService({ setMessage: setMessage });
         
     useSocketIo({
-        currentUserId: currentUser.user ? currentUser.user.user_id : '',
-        identifier: ["room-chat", "room-profile"],
-        marks: { roomId: roomId }
+        identifier: ["room-chat", "room-profile"]
     });
 
     useEffect(() => {

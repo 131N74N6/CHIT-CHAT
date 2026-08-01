@@ -5,6 +5,7 @@ export interface ChatbotState {
     setAnswer: (answer: string) => void;
 
     clearChatBotState: () => void;
+    clearSelectedResults: () => void;
     
     isSelectMode: boolean;
     setIsSelectMode: (isSelectMode: boolean) => void;
@@ -24,6 +25,10 @@ export const useChatbotStore = create<ChatbotState>((set) => ({
     clearChatBotState: () => set({
         question: "",
         selectedChatBotIds: [],
+    }),
+
+    clearSelectedResults: () => set({
+        selectedChatBotIds: []
     }),
     
     isSelectMode: false,

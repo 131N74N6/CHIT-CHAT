@@ -25,8 +25,7 @@ export async function kickMember(req: Request, res: Response) {
             $pull: { room_id: roomId }
         });
 
-        io.to(`room-chat:${roomId}`)
-        .to(`room-member:${roomId}`)
+        io.to(`room-member:${roomId}`)
         .to(`available-room:${userId}`)
         .emit("room:member-kicked", {
             _id: updated?._id,

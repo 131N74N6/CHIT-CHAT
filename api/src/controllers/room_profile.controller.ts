@@ -80,13 +80,13 @@ export async function changeRoom(req: AuthRequest, res: Response) {
                 const newImage = await uploadTOCloudinary({
                     file_buffer: selectedImage.buffer,
                     folder_name: "room_profile",
-                    original_name: selectedImage.filename
+                    original_name: selectedImage.originalname
                 });
 
                 await Rooms.updateOne({ _id: roomId }, {
                     $set: { 
-                        description: description || null,
-                        name: name, 
+                        description: description || room.description,
+                        name: name || room.name, 
                         profile_picture: newImage
                     }
                 });
@@ -94,8 +94,8 @@ export async function changeRoom(req: AuthRequest, res: Response) {
         } else {
             await Rooms.updateOne({ _id: roomId }, {
                 $set: { 
-                    description: description || null,
-                    name: name, 
+                    description: description || room.description,
+                    name: name || room.name, 
                     profile_picture: room.profile_picture
                 }
             });

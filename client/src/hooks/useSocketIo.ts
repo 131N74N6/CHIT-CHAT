@@ -1,19 +1,18 @@
 import { useEffect } from "react";
 import useSocketIoService from "../services/useSocketIoService";
-import { Query, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { useUserStore } from "../stores/user.store";
 import { useChatStore } from "../stores/chat.store";
 import { useRoomStore } from "../stores/room.store";
 
 interface ChatSocketIntrf {
-    currentUserId: string;
     identifier: string[];
-    marks?: { receiverId?: string; roomId?: string };
 }
 
 export default function useSocketIo(props: ChatSocketIntrf) {
     const queryClient = useQueryClient();
     const currentUserId = useUserStore((state) => state.currentUserId);
+    const currentUserRoomIds = useUserStore((state) => state.currentUserRoomIds);
     const receiverId = useChatStore((state) => state.receiverId);
     const roomId = useRoomStore((state) => state.roomId);
 
@@ -50,11 +49,11 @@ export default function useSocketIo(props: ChatSocketIntrf) {
             onAvailableRoomJoin(currentUserId);
         } else if (props.identifier.includes("available-user")) {
             onAvailableUserJoin(currentUserId);
-        } else if (props.identifier.includes("room-chat")) {
+        } else if (props.identifier.includes("room-chat") && roomId !== "") {
             onRoomChatJoin(roomId);
-        } else if (props.identifier.includes("room-member")) {
+        } else if (props.identifier.includes("room-member") && roomId !== "") {
             onRoomMemberJoin(roomId);
-        } else if (props.identifier.includes("room-profile")) {
+        } else if (props.identifier.includes("room-profile") && roomId !== "") {
             onRoomProfileJoin(roomId);
         } else if (props.identifier.includes("user-chat")) {
             onUserChatJoin(currentUserId);
@@ -65,86 +64,154 @@ export default function useSocketIo(props: ChatSocketIntrf) {
         if (props.identifier.includes("user-profile")) {
             onUserProfileJoin(currentUserId);
             
-            if (receiverId) {
+            if (receiverId && receiverId !== "") {
                 onUserProfileJoin(receiverId);
             }
         }
 
         const socket = getSocket();
 
-        function invalidations(queryNames: string[]) {
-            queryClient.invalidateQueries({
-                predicate: (query: Query<unknown, Error, unknown, readonly unknown[]>) => {
-                    const queryKey = query.queryKey;
-                    if (Array.isArray(queryKey) && queryKey.length > 0 && typeof queryKey[0] === 'string') {
-                        return queryNames.some(queryName => queryKey[0].startsWith(queryName));
-                    }
-                    return false;
-                }
-            });
+        const changeRoomValidations = () => {
+            queryClient.invalidateQueries({ queryKey: [`room-profile-${roomId}`] });
+            queryClient.invalidateQueries({ queryKey: [`available-room-${currentUserId}`] });
+        }
+
+        const deleteRoomValidations = () => {
+            queryClient.invalidateQueries({ queryKey: [`room-chat-${roomId}`] });
+            queryClient.invalidateQueries({ queryKey: [`room-member-${roomId}`] });
+            queryClient.invalidateQueries({ queryKey: [`room-profile-${roomId}`] });
+            queryClient.invalidateQueries({ queryKey: [`available-room-${currentUserId}`] });
+        }
+
+        const changeUserValidations = () => {
+            queryClient.invalidateQueries({ queryKey: ['all-users'] });
+            queryClient.invalidateQueries({ queryKey: ['current-user'] });
+
+            if (receiverId) {
+                queryClient.invalidateQueries({ queryKey: [`receiver-${receiverId}`] });
+            }
+
+            if (currentUserId) {
+                queryClient.invalidateQueries({ queryKey: [`receiver-${currentUserId}`] });
+            }
+
+            if (currentUserRoomIds && currentUserRoomIds.length > 0) {
+                currentUserRoomIds.forEach((currentUserRoomId) => {
+                    queryClient.invalidateQueries({ queryKey: [`room-chat-${currentUserRoomId}`] });
+                    queryClient.invalidateQueries({ queryKey: [`room-member-${currentUserRoomId}`] });
+                });
+            }
+        }
+
+
+        const deleteUserValidations = () => {
+            queryClient.invalidateQueries({ queryKey: ['all-users'] });
+            queryClient.invalidateQueries({ queryKey: ['current-user'] });
+
+            if (receiverId) {
+                queryClient.invalidateQueries({ queryKey: [`receiver-${receiverId}`] });
+            }
+
+            if (currentUserId) {
+                queryClient.invalidateQueries({ queryKey: [`receiver-${currentUserId}`] });
+            }
+
+            if (currentUserRoomIds && currentUserRoomIds.length > 0) {
+                currentUserRoomIds.forEach((currentUserRoomId) => {
+                    queryClient.invalidateQueries({ queryKey: [`room-chat-${currentUserRoomId}`] });
+                    queryClient.invalidateQueries({ queryKey: [`room-member-${currentUserRoomId}`] });
+                });
+            }
+        }
+
+        const joinRoomValidations = () => {
+            queryClient.invalidateQueries({ queryKey: ['current-user'] });
+            queryClient.invalidateQueries({ queryKey: [`available-room-${currentUserId}`] });
+            queryClient.invalidateQueries({ queryKey: [`room-member-${roomId}`] });
+        }
+
+        const kickMemberFromRoomValidations = () => {
+            queryClient.invalidateQueries({ queryKey: ['current-user'] });
+            queryClient.invalidateQueries({ queryKey: [`available-room-${currentUserId}`] });
+            queryClient.invalidateQueries({ queryKey: [`room-member-${roomId}`] });
+        }
+
+        const leftRoomValidations = () => {
+            queryClient.invalidateQueries({ queryKey: ['current-user'] });
+            queryClient.invalidateQueries({ queryKey: [`available-room-${currentUserId}`] });
+            queryClient.invalidateQueries({ queryKey: [`room-member-${roomId}`] });
+        }
+        
+        const roomChatValidations = () => {
+            queryClient.invalidateQueries({ queryKey: [`room-chat-${roomId}`] });
+        }
+
+
+        const userChatValidations = () => {
+            queryClient.invalidateQueries({ queryKey: [`user-chat-${receiverId}`] });
         }
 
         if (props.identifier.includes("available-rooms")) {
-            onChangeRoom(() => invalidations(["room-profile", "available-room"]));
-            onDeleteRoom(() => invalidations(["available-room", "room-profile", "room-chat", "room-member"]));
+            onChangeRoom(() => changeRoomValidations());
+            onDeleteRoom(() => deleteRoomValidations());
         }
 
         if (props.identifier.includes("available-users")) {
-            onChangeUser(() => invalidations(["all-users", "current-user", "receiver", "room-member"]));
-            onDeleteUser(() => invalidations(["all-users", "current-user", "user-chat", "receiver", "room-member"]));
+            onChangeUser(() => changeUserValidations());
+            onDeleteUser(() => deleteUserValidations());
         }
 
         if (props.identifier.includes("room-chat")) {
-            onChangeRoom(() => invalidations(["room-profile", "available-room"]));
-            onDeleteAllChatsInRoom(() => invalidations(["room-chat"]));
-            onDeleteChatInRoom(() => invalidations(["room-chat"]));
-            onSendToRoom(() => invalidations(["room-chat"]));
+            onChangeRoom(() => changeRoomValidations());
+            onDeleteAllChatsInRoom(() => roomChatValidations());
+            onDeleteChatInRoom(() => roomChatValidations());
+            onSendToRoom(() => roomChatValidations());
         }
 
         if (props.identifier.includes("room-member")) {
-            onChangeUser(() => invalidations(["all-users", "current-user", "room-member"]));
-            onDeleteRoom(() => invalidations(["available-room", "room-profile", "room-chat", "room-member"]));
-            onDeleteUser(() => invalidations(["current-user", "room-member", "user-chat"]));
-            onJoinNewMember(() => invalidations(["available-room", "room-member"]));
-            onKickMember(() => invalidations(["available-room", "room-member"]));
-            onLeftTheRoom(() => invalidations(["available-room", "current-user", "receiver", "room-member"]));
+            onChangeUser(() => changeUserValidations());
+            onDeleteRoom(() => deleteRoomValidations());
+            onDeleteUser(() => deleteUserValidations());
+            onJoinNewMember(() => joinRoomValidations());
+            onKickMember(() => kickMemberFromRoomValidations());
+            onLeftTheRoom(() => leftRoomValidations());
         }
 
         if (props.identifier.includes("room-profile")) {
-            onChangeRoom(() => invalidations(["room-profile", "available-room"]));
-            onDeleteRoom(() => invalidations(["available-room", "room-profile", "room-chat", "room-member"]));
+            onChangeRoom(() => changeRoomValidations());
+            onDeleteRoom(() => deleteRoomValidations());
         }
 
         if (props.identifier.includes("user-chat")) {
-            onChangeUser(() => invalidations(["all-users", "current-user", "receiver", "room-member"]));
-            onDeleteAllChats(() => invalidations(["user-chat"]));
-            onDeleteChat(() => invalidations(["user-chat"]));
-            onDeleteUser(() => invalidations(["current-user", "user-chat"]));
-            onSendToUser(() => invalidations(["user-chat"]));
+            onChangeUser(() => changeUserValidations());
+            onDeleteAllChats(() => userChatValidations());
+            onDeleteChat(() => userChatValidations());
+            onDeleteUser(() => deleteUserValidations());
+            onSendToUser(() => userChatValidations());
         }
 
         if (props.identifier.includes("user-profile")) {
-            onChangeUser(() => invalidations(["all-users", "current-user", "receiver", "room-member"]));
-            onDeleteUser(() => invalidations(["all-users", "current-user", "receiver", "user-chat", "room-member"]));
+            onChangeUser(() => changeUserValidations());
+            onDeleteUser(() => deleteUserValidations());
         }
 
         return () => {
             if (socket) {
-                socket.off("room-chat:send-new-chat", () => invalidations(["room-chat"]));
-                socket.off("room-chat:all-deleted", () => invalidations(["room-chat"]));
-                socket.off("room-chat:deleted", () => invalidations(["room-chat"]));
-                socket.off("room-profile:changed", () => invalidations(["available-room", "room-profile"]));
-                socket.off("room:deleted", () => invalidations(["available-room", "room-profile", "room-chat", "room-member"]));
-                socket.off("room:member-kicked", () => invalidations(["available-room", "room-member"]));
-                socket.off("user-chat:send-new-chat", () => invalidations(["user-chat"]));
-                socket.off("user-chat:all-deleted", () => invalidations(["user-chat"]));
-                socket.off("user-chat:deleted", () => invalidations(["user-chat"]));
-                socket.off("user-profile:changed", () => invalidations(["all-users", "current-user", "receiver", "room-member"]));
-                socket.off("user:deleted", () => invalidations(["all-users", "current-user", "receiver", "user-chat", "room-member"]));
-                socket.off("user:join-room-successfully", () => invalidations(["available-room", "room-member"]));
-                socket.off("user:left-room-successfully", () => invalidations(["current-user", "receiver", "room-member"]));
+                socket.off("room-chat:send-new-chat", () => roomChatValidations());
+                socket.off("room-chat:all-deleted", () => roomChatValidations());
+                socket.off("room-chat:deleted", () => roomChatValidations());
+                socket.off("room-profile:changed", () => changeRoomValidations());
+                socket.off("room:deleted", () => deleteRoomValidations());
+                socket.off("room:member-kicked", () => kickMemberFromRoomValidations());
+                socket.off("user-chat:send-new-chat", () => userChatValidations());
+                socket.off("user-chat:all-deleted", () => userChatValidations());
+                socket.off("user-chat:deleted", () => userChatValidations());
+                socket.off("user-profile:changed", () => changeUserValidations());
+                socket.off("user:deleted", () => deleteUserValidations());
+                socket.off("user:join-room-successfully", () => joinRoomValidations());
+                socket.off("user:left-room-successfully", () => leftRoomValidations());
             }
         }
         
-    }, [props.identifier, currentUserId, props.marks, queryClient]);
+    }, [props.identifier, currentUserId, roomId, receiverId, queryClient]);
 }

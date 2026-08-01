@@ -130,9 +130,7 @@ export default function AvailableRoom() {
     }, [editMode, roomId, currentRoomProfile.detail]);
 
     useSocketIo({
-        identifier: ["available-room", "room-chat", "room-profile", "room-member"],
-        currentUserId: currentUser.user?.user_id!,
-        marks: { roomId: roomId }
+        identifier: ["available-room", "room-chat", "room-profile", "room-member"]
     });
 
     return (

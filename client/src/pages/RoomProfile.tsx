@@ -88,9 +88,7 @@ export default function RoomProfile() {
 
 
     useSocketIo({
-        currentUserId: currentUser.user?.user_id!,
-        identifier: ["room-profile"],
-        marks: { roomId: roomId }
+        identifier: ["room-profile"]
     });
 
     const isRoomOwner = user && detail && user.user_id === detail.creator_id;

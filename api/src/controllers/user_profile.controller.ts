@@ -95,7 +95,9 @@ export async function deleteUser(req: AuthRequest, res: Response) {
         const currentUserId = req.user?.user_id;
         const selectedMedia: CloudinaryUploadResult[] = [];
 
-        const chats = await Chats.find({ sender_id: currentUserId });
+        const chats = await Chats.find({ $or: [{ sender_id: currentUserId }, { receiver_id: currentUserId }] });
+        const chatsIds = chats.map(chat => chat._id);
+
         const user = await User.findOne({ _id: currentUserId });
         if (!user) return res.status(404).json({ message: "user not found" });
 
@@ -113,7 +115,7 @@ export async function deleteUser(req: AuthRequest, res: Response) {
             ...deleteFromCloudinary,
             v2.uploader.destroy(user.profile_picture.public_id, { resource_type: user.profile_picture.resource_type }),
             Rooms.deleteMany({ creator_id: currentUserId }),
-            Chats.deleteMany({ sender_id: currentUserId }),
+            Chats.deleteMany({ _id: { $in: chatsIds } }),
             User.deleteOne({ _id: currentUserId })
         ]);
 

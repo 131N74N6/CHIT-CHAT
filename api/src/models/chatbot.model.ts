@@ -18,4 +18,4 @@ const chatBotSchema = new Schema<ChatBotIntrf>({
     user_id: { type: Schema.Types.ObjectId }
 });
 
-export const ChatBot = mongoose.model("chatbot", chatBotSchema, "chatbot");
+export const ChatBot = mongoose.model("chatbots", chatBotSchema, "chatbots");

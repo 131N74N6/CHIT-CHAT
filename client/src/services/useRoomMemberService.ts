@@ -101,7 +101,6 @@ export default function useRoomMemberService(props?: IRoomMemberService) {
                     if (Array.isArray(queryKey) && queryKey.length > 0 && typeof queryKey[0] === "string") {
                         return queryKey[0].startsWith(`current-user`) ||
                         queryKey[0].startsWith(`available-room-${currentUserId}`) ||
-                        queryKey[0].startsWith(`room-chat-${roomId}`) ||
                         queryKey[0].startsWith(`room-member-${roomId}`);
                     }
                     return false;

@@ -14,8 +14,8 @@ export default function Chatbot() {
 
     const { 
         allResults, 
-        answer, 
         askAiMt, 
+        clearSelectedResults,
         deleteAllResultsMt, 
         deleteChosenResultsMt,
         isChatbotProcessing, 
@@ -25,9 +25,7 @@ export default function Chatbot() {
         setIsSelectMode,
         setQuestion, 
         toggleSelect
-    } = useChatbotService({ setMessage: setMessage });
-
-    console.log(answer);
+    } = useChatbotService();
     
     useEffect(() => {
         if (message) {
@@ -43,7 +41,7 @@ export default function Chatbot() {
         <section className="flex md:flex-row flex-col h-dvh relative z-10 p-2.5 gap-2.5">
             {message ? <Alert message={message}/> : null}
             <Navbar isProcessing={askAiMt.isPending}/>
-            <div className="md:w-2/5 w-full flex flex-col gap-2.5 h-full inset-shadow-sm inset-shadow-gray-400 border border-gray-400">
+            <div className="md:w-2/5 w-full flex flex-col h-full inset-shadow-sm inset-shadow-gray-400 border border-gray-400">
                 {isSelectMode ? (
                     <div className="bg-gray-200 gap-2 p-2.5 flex items-center">
                         <button
@@ -57,7 +55,10 @@ export default function Chatbot() {
                         <button
                             className="disabled:cursor-not-allowed cursor-pointer text-gray-500 hover:text-gray-700 transition-colors font-medium"
                             disabled={isChatbotProcessing}
-                            onClick={() => setIsSelectMode(false)}
+                            onClick={() => {
+                                setIsSelectMode(false);
+                                if (selectedChatBotIds.length > 0) clearSelectedResults();
+                            }}
                             type="button"
                         >
                             <X size={20}/>

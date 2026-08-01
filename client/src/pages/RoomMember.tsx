@@ -46,9 +46,7 @@ export default function RoomMember() {
     }, [roomId]);
     
     useSocketIo({
-        currentUserId: currentUser.user?.user_id!,
-        identifier: ["room-member"],
-        marks: { roomId: roomId }
+        identifier: ["room-member"]
     });
 
     return (

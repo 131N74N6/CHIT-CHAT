@@ -16,6 +16,7 @@ export default function useUserProfileService(props?: IUserProfileService) {
     const setAddress = useUserStore((state) => state.setAddress);
 
     const setCurrentUserId = useUserStore((state) => state.setCurrentUserId);
+    const setCurrentUserRoomIds = useUserStore((state) => state.setCurrentUserRoomIds);
 
     const editMode = useUserStore((state) => state.editMode);
     const setEditMode = useUserStore((state) => state.setEditMode);
@@ -74,7 +75,10 @@ export default function useUserProfileService(props?: IUserProfileService) {
     const currentUser = { isUserLoading, user, userError }
 
     useEffect(() => {
-        if (currentUser.user && currentUser.user.user_id && !isUserLoading) setCurrentUserId(currentUser.user.user_id);
+        if (currentUser.user && currentUser.user.user_id && !isUserLoading) {
+            setCurrentUserId(currentUser.user.user_id);
+            setCurrentUserRoomIds(currentUser.user.room_id);
+        }
     }, [currentUser.user, setCurrentUserId]);
 
     const { 
