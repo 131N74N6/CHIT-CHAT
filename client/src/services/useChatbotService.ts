@@ -93,6 +93,7 @@ export default function useChatbotService() {
         onSuccess: (response) => {
             queryClient.invalidateQueries({ queryKey: [`all-results-${currentUserId}`] });
             setAnswer(response.message);
+            setQuestion("");
         }
     });
 
@@ -117,6 +118,7 @@ export default function useChatbotService() {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: [`all-results-${currentUserId}`] });
+            setQuestion("");
         }
     });
 
@@ -142,6 +144,7 @@ export default function useChatbotService() {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: [`all-results-${currentUserId}`] });
+            setQuestion("");
         }
     });
 

@@ -96,7 +96,7 @@ export default function UserChat() {
                     setShowDeleteOption2={setShowDeleteOption2}
                 />
             ) : null}
-            <div className="md:w-2/5 w-full h-full flex flex-col">
+            <div className="md:w-2/5 w-full h-full flex flex-col overflow-y-auto">
                 {isSelectMode ? (
                     <div className="bg-gray-200 p-2 flex gap-1.5 cursor-pointer justify-end border border-gray-400">
                         <button

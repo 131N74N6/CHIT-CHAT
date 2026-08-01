@@ -156,7 +156,7 @@ export default function AvailableRoom() {
                     setShowDeleteOption2={setShowDeleteOption2}
                 />
             ) : null}
-            <div className="flex flex-col md:w-2/5 h-full px-2.5 w-full inset-shadow-sm inset-shadow-gray-400 border border-gray-400">
+            <div className="flex flex-col md:w-2/5 h-full px-2.5 w-full inset-shadow-sm inset-shadow-gray-400 border border-gray-400 overflow-y-auto">
                 {currentAvailableRooms.isAvailableRoomLoading ? (
                     <div className="flex justify-center items-center h-full">
                         <Loading/>

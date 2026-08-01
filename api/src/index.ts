@@ -20,6 +20,7 @@ import chatBotRouters from "./routers/chatbot.router";
 import roomChatsRouters from "./routers/room_chat.router";
 import roomProfileRouters from "./routers/room_profile.router";
 import roomMembersRouters from "./routers/room_member.router";
+import { authRateLimiter } from "./middlewares/auth.middleware";
 
 v2.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -36,7 +37,7 @@ app.use(cors({
         "http://localhost:5173"
     ]
 }));
-app.use("/api/auths", authRouters);
+app.use("/api/auths", authRateLimiter, authRouters);
 app.use("/api/chatbots", chatBotRouters);
 app.use("/api/rooms/chats", roomChatsRouters);
 app.use("/api/rooms/members", roomMembersRouters);

@@ -31,7 +31,7 @@ export async function askAi(req: AuthRequest, res: Response) {
 
         await newBotResponse.save();
 
-        res.status(200).json({ message: "question has been sent" });
+        res.status(200).json({ message: newQuestion.question });
     } catch (error) {
         console.log(error);
         res.status(500).json({ message: "something went wrong" });

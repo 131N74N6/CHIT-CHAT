@@ -53,7 +53,7 @@ export default function RoomMember() {
         <section className="flex flex-col md:flex-row gap-2.5 p-2.5 h-dvh relative z-10">
             <Navbar isProcessing={currentRoomMember.isRoomMemberLoading}/>
             {message ? <Alert message={message}/> : null}
-            <div className="flex flex-col h-full w-full md:w-2/5 p-2.5 border border-gray-400">
+            <div className="flex flex-col h-full w-full md:w-2/5 p-2.5 border border-gray-400 overflow-y-auto">
                 <div className="flex">
                     <input
                         className={cn(

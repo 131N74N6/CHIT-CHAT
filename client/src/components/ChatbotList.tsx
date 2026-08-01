@@ -14,7 +14,7 @@ export default function ChatbotList(props: IChatbotList) {
     }
 
     return (
-        <div className="overflow-y-auto flex flex-col gap-2 p-2.5">
+        <div className="overflow-y-auto flex flex-col gap-2 py-2.5">
             <div className="flex flex-col gap-2">
                 {props.results.map(result => {
                     return (

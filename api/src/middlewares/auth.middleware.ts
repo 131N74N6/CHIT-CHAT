@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from "express";
+import rateLimit from "express-rate-limit";
 import jwt, { JwtPayload } from "jsonwebtoken";
 
 export interface AuthRequest extends Request {
@@ -12,6 +13,12 @@ export interface CustomJwtPayload extends JwtPayload {
     user_id: string;
     username: string;
 }
+
+export const authRateLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 5, // limit each IP to 5 requests per windowMs
+    message: { error: 'Too many login/register request from this IP.' },
+});
 
 export function verifyToken(req: AuthRequest, res: Response, next: NextFunction) {
     const token = req.cookies?.token;

@@ -41,7 +41,7 @@ export default function Chatbot() {
         <section className="flex md:flex-row flex-col h-dvh relative z-10 p-2.5 gap-2.5">
             {message ? <Alert message={message}/> : null}
             <Navbar isProcessing={askAiMt.isPending}/>
-            <div className="md:w-2/5 w-full flex flex-col h-full inset-shadow-sm inset-shadow-gray-400 border border-gray-400">
+            <div className="md:w-2/5 w-full flex flex-col h-full inset-shadow-sm inset-shadow-gray-400 border border-gray-400 overflow-y-auto">
                 {isSelectMode ? (
                     <div className="bg-gray-200 gap-2 p-2.5 flex items-center">
                         <button
@@ -84,48 +84,69 @@ export default function Chatbot() {
                         </button>
                     </div>
                 )}
-                {allResults.isResultsLoading ? (
-                    <div className="flex justify-center items-center h-full">
-                        <Loading/>
-                    </div>
-                ) : allResults.resultsError ? (
-                    <div className="flex justify-center items-center h-full">
-                        <div className="text-3xl font-medium text-gray-700">{allResults.resultsError.message}</div>
-                    </div>
-                ) : (
-                    <ChatbotList
-                        fetchNextPage={allResults.fetchNextResults}
-                        hasNextPage={allResults.resultsHaveNext}
-                        isFetchingNextPage={allResults.resultsFetchNextPage}
-                        isProcessing={isChatbotProcessing}
-                        isSelectMode={isSelectMode}
-                        results={allResults.paginatedResults}
-                        selectedChatBotIds={selectedChatBotIds}
-                        toggleSelect={toggleSelect}
-                    />
-                )}
+                <div className="flex flex-col gap-2.5 px-2.5 h-[80%]">
+                    {allResults.isResultsLoading ? (
+                        <div className="flex justify-center items-center h-full">
+                            <Loading/>
+                        </div>
+                    ) : allResults.resultsError ? (
+                        <div className="flex justify-center items-center h-full">
+                            <div className="text-3xl font-medium text-gray-700">{allResults.resultsError.message}</div>
+                        </div>
+                    ) : askAiMt.isPending ? (
+                        <div className="flex flex-col gap-2">
+                            <div className="w-[60%] ml-[40%] bg-blue-700 text-white rounded-sm p-2.5">
+                                <div className="wrap-break-word font-medium text-[0.9rem]">
+                                    {question}
+                                </div>
+                            </div>
+                            <div className="w-full bg-gray-200 text-gray-900 rounded-sm justify-center p-2.5 flex items-center gap-2">
+                                <Loading/>
+                                <div className="font-medium text-[0.9rem] text-gray-700">
+                                    AI is thinking...
+                                </div>
+                            </div>
+                        </div>
+                    ) : (
+                        <ChatbotList
+                            fetchNextPage={allResults.fetchNextResults}
+                            hasNextPage={allResults.resultsHaveNext}
+                            isFetchingNextPage={allResults.resultsFetchNextPage}
+                            isProcessing={isChatbotProcessing}
+                            isSelectMode={isSelectMode}
+                            results={allResults.paginatedResults}
+                            selectedChatBotIds={selectedChatBotIds}
+                            toggleSelect={toggleSelect}
+                        />
+                    )}
+                </div>
                 <form 
-                    className="border-t border-gray-400 px-2.5 pt-2.5 pb-1.5 h-[15%]"
+                    className="border-t border-gray-400 px-2.5 pt-2.5 pb-1.5 h-[20%] relative flex flex-col gap-1.5"
                     onSubmit={(event: React.SubmitEvent<HTMLFormElement>) => {
                         event.preventDefault();
                         askAiMt.mutate();
                     }}
                 >
                     <textarea 
-                        className="focus:outline-0 outline-0 font-medium text-gray-700 text-[1rem] w-[95%] resize-none"
+                        className="focus:outline-0 outline-0 w-full h-full resize-none pr-12"
+                        disabled={isSelectMode || isChatbotProcessing}
                         id="question"
                         name="question"
                         placeholder="insert question here"
                         onChange={(event) => setQuestion(event.target.value)}
                         value={question} 
                     />
-                    <button
-                        className="text-blue-500 font-medium cursor-pointer disabled:cursor-not-allowed w-[5%]"
-                        disabled={askAiMt.isPending}
-                        type="submit"
-                    >
-                        <SendIcon size={22}/>
-                    </button>
+                    {isSelectMode ? null : (
+                        <div className="absolute bottom-2 right-2 top-2 flex items-center bg-white">
+                            <button
+                                className="text-blue-500 font-medium cursor-pointer disabled:cursor-not-allowed "
+                                disabled={askAiMt.isPending}
+                                type="submit"
+                            >
+                                <SendIcon size={22}/>
+                            </button>
+                        </div>
+                    )}
                 </form>
             </div>
             <div 
