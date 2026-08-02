@@ -6,14 +6,10 @@ export default function RoomItem(props: RoomItemIntrf) {
     const navigate = useNavigate();
     
     return (
-        <>
+        <div className="border-b bg-white border-gray-600">
             <div 
-                className={cn(
-                    "border-b bg-white border-gray-600 p-1.5 items-center cursor-pointer md:flex gap-1.5 hidden"
-                )} 
-                onClick={() => {
-                    props.setRoomId(props.room._id);
-                }}
+                className="p-1.5 items-center cursor-pointer md:flex gap-1.5 hidden"
+                onClick={() => props.setRoomId(props.room._id)}
             >
                 <div className="w-10 h-10 rounded-full">
                     {props.room.profile_picture && props.room.profile_picture.public_id ? (
@@ -33,7 +29,7 @@ export default function RoomItem(props: RoomItemIntrf) {
                 <div className="text-gray-950 font-medium">{props.room.name}</div>
             </div>
             <div 
-                className="border-b bg-white border-gray-600 p-1.5 items-center cursor-pointer md:hidden flex gap-1.5" 
+                className="p-1.5 items-center cursor-pointer md:hidden flex gap-1.5" 
                 onClick={() => {
                     props.setRoomId(props.room._id);
                     navigate(`/rooms/chat/${props.room._id}`);
@@ -60,6 +56,6 @@ export default function RoomItem(props: RoomItemIntrf) {
                 </div>
                 <div className="md:hidden block text-gray-950 font-medium">{props.room.name}</div>
             </div>
-        </>
+        </div>
     );
 }
