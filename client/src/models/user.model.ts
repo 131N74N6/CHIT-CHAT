@@ -27,6 +27,7 @@ export interface IUserWindow {
     removeOnePreviewFile: (fileName: string) => void;
     sendChatToUser: UseMutationResult<any, Error, void, unknown>;
     selectedIds: string[];
+    setChatId: (chatId: string) => void;
     setIsSelectMode: (isSelectMode: boolean) => void;
     setReceiverId: (receiverId: string) => void;
     setShowDeleteOption1: (showDeleteOption1: boolean) => void;

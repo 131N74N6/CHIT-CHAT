@@ -1,4 +1,4 @@
-import { Response } from "express";
+import { Request, Response } from "express";
 import { AuthRequest } from "../middlewares/auth.middleware";
 import { Chats } from "../models/chat.model";
 import { CloudinaryUploadResult, uploadTOCloudinary } from "../services/cloudinary.service";
@@ -359,14 +359,15 @@ export async function sendToOtherUser(req: AuthRequest, res: Response) {
         const user = await User.findOne({ _id: user_id });
         if (!user) return res.status(404).json({ message: "user not found" });
 
-        if (!messages || !media) return res.status(400).json({ message: "please provide messages" });
+        if (!messages && !media) return res.status(400).json({ message: "please provide messages or media" });
 
         if (media && media.length > 0) {
             for (let x = 0; x < media.length; x++) {
                 const cloudinary = await uploadTOCloudinary({ 
                     file_buffer: media[x].buffer,
+                    file_type: media[x].mimetype,
                     folder_name: "chat_media",
-                    original_name: media[x].originalname
+                    original_name: media[x].originalname,
                 });
 
                 selectedMedia.push(cloudinary);
@@ -419,6 +420,18 @@ export async function showAllChats(req: AuthRequest, res: Response) {
         .skip(skip);
 
         res.status(200).json(chats);
+    } catch (error) {
+        res.status(500).json({ message: "something went wrong" });
+    }
+}
+
+export async function showAllMediaInClickedChat(req: Request, res: Response) {
+    try {
+        const chatId = req.params.chat_id;
+        const chat = await Chats.findOne({ _id: chatId });
+        
+        const media = chat?.media;
+        res.status(200).json(media);
     } catch (error) {
         res.status(500).json({ message: "something went wrong" });
     }

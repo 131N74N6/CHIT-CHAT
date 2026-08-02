@@ -29,6 +29,7 @@ export default function Home() {
     
     const receiverId = useChatStore((state) => state.receiverId);
     const setReceiverId = useChatStore((state) => state.setReceiverId);
+    const setChatId = useChatStore((state) => state.setChatId);
 
     const { 
         allUsers, 
@@ -150,6 +151,7 @@ export default function Home() {
                     removeOnePreviewFile={removeOnePreviewFile}
                     selectedIds={selectedIds}
                     sendChatToUser={sendChatToUserMt}
+                    setChatId={setChatId}
                     setIsSelectMode={setIsSelectMode}
                     setReceiverId={setReceiverId}
                     setShowDeleteOption1={setShowDeleteOption1}

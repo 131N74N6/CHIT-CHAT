@@ -104,6 +104,7 @@ export default function RoomWindow(props: IRoomWindow) {
                     seeProfile={seeProfile}
                     setText={props.setText}
                     sendChatToRoom={props.sendChatToRoom}
+                    setChatId={props.setChatId}
                     setIsSelectMode={props.setIsSelectMode}
                     setReceiverId={props.setReceiverId}
                     setRoomId={props.setRoomId}

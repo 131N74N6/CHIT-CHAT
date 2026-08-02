@@ -23,7 +23,9 @@ export default function RoomChat() {
 
     const message = useMessageStore((state) => state.message);
     const setMessage = useMessageStore((state) => state.setMessage);
+
     const setReceiverId = useChatStore((state) => state.setReceiverId);
+    const setChatId = useChatStore((state) => state.setChatId);
 
     const { currentUser, isUserProfileProcessing } = useUserProfileService();
     const { currentRoomProfile } = useRoomProfileService();
@@ -185,6 +187,7 @@ export default function RoomChat() {
                             isProcessing={isRoomChatProcessing || isUserProfileProcessing}
                             isSelectMode={isSelectMode}
                             selectedIds={selectedChatsIds}
+                            setChatId={setChatId}
                             place={{ name: "room-chat", setReceiverId: setReceiverId }}
                             toggleSelect={toggleSelect}
                         />

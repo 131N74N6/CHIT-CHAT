@@ -2,6 +2,9 @@ import { create } from "zustand";
 import type { IFileViewer } from "../models/chat.model";
 
 export interface ChatState {
+    chatId: string;
+    setChatId: (chatId: string) => void;
+
     clearSelection: () => void;
     
     isSelectMode: boolean;
@@ -38,6 +41,12 @@ export interface ChatState {
 }
 
 export const useChatStore = create<ChatState>((set) => ({
+    chatId: getUserChatIdFromLocalStorage(),
+    setChatId: (chatId) => {
+        localStorage.setItem("chat_id", chatId);
+        set({ chatId });
+    },
+
     clearSelection: () => set({ selectedIds: [] }),
     
     isSelectMode: false,
@@ -61,6 +70,7 @@ export const useChatStore = create<ChatState>((set) => ({
     resetChatState: () => {
         localStorage.removeItem("receiver_id");
         set({
+            chatId: "",
             isSelectMode: false,
             media: [], 
             receiverId: "",
@@ -98,4 +108,8 @@ export const useChatStore = create<ChatState>((set) => ({
 
 function getReceiverIdFromLocalStorage(): string {
     return localStorage.getItem("receiver_id") || "";
+}
+
+function getUserChatIdFromLocalStorage(): string {
+    return localStorage.getItem("chat_id") || "";
 }

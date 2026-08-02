@@ -1,4 +1,4 @@
-import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRef } from 'react';
 import { useChatStore } from '../stores/chat.store';
 import type { ChatIntrf, IFileViewer } from '../models/chat.model';
@@ -9,6 +9,7 @@ export default function useRoomChatService() {
     const queryClient = useQueryClient();
     const baseUrl = `${import.meta.env.VITE_BASE_API_URL}/rooms/chats`;
     const roomId = useRoomStore((state) => state.roomId);
+    const chatId = useChatStore((state) => state.chatId);
     
     const inputMediaRef = useRef<HTMLInputElement>(null);
     const setMessage = useMessageStore((state) => state.setMessage);
@@ -244,13 +245,35 @@ export default function useRoomChatService() {
         
         if (inputMediaRef.current) inputMediaRef.current.value = "";
     }
+
+    const roomChatMedia = useQuery({
+        enabled: !!chatId && !!roomId && chatId !== "",
+        queryFn: async () => {
+            try {
+                const request = await fetch(`${baseUrl}/show-all/media/${chatId}`, {
+                    credentials: "include",
+                    headers: { "Content-Type": "application/json" },
+                    method: "GET"
+                });
+
+                const response = await request.json();
+                if (!request.ok) throw new Error(response.message);
+                return response;
+            } catch (error) {
+                throw error;
+            }
+        },
+        queryKey: [`room-chat-media-${chatId}`],
+        staleTime: Infinity
+    });
     
     const sendChatToRoomMt = useMutation({
         mutationFn: async () => {
             try {
                 const formData = new FormData();
-                formData.append("messages", text.trim());
-                formData.append("room_id", roomId!);
+                formData.append("room_id", roomId);
+
+                if (text.trim()) formData.append("messages", text.trim());
 
                 if (media && media.length > 0) {
                     for (let t = 0; t < media.length; t++) {
@@ -298,6 +321,7 @@ export default function useRoomChatService() {
         isSelectMode,
         media,
         removeOnePreviewFile,
+        roomChatMedia,
         selectedChatsIds,
         sendChatToRoomMt,
         setIsSelectMode,

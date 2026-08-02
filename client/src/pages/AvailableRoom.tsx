@@ -20,7 +20,9 @@ import { useChatStore } from "../stores/chat.store";
 export default function AvailableRoom() {
     const roomId = useRoomStore((state) => state.roomId);
     const setRoomId = useRoomStore((state) => state.setRoomId);
+
     const setReceiverId = useChatStore((state) => state.setReceiverId);
+    const setChatId = useChatStore((state) => state.setChatId);
 
     const message = useMessageStore((state) => state.message);
     const setMessage = useMessageStore((state) => state.setMessage);
@@ -222,6 +224,7 @@ export default function AvailableRoom() {
                     setRoomId={setRoomId}
                     selectedChatsIds={selectedChatsIds}
                     sendChatToRoom={sendChatToRoomMt}
+                    setChatId={setChatId}
                     setDeleteRoomImage={setDeleteRoomImage}
                     setDescription={setDescription}
                     setEditMode={setEditMode}

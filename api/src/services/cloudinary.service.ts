@@ -11,6 +11,7 @@ export interface CloudinaryUploadResult {
 
 export interface CloudinaryUploadOption {
     file_buffer: Buffer;
+    file_type: string;
     folder_name: string;
     original_name: string;
 }
@@ -32,8 +33,8 @@ export async function uploadTOCloudinary(props: CloudinaryUploadOption): Promise
                 return;
             }
             resolve({
-                file_name: result.original_filename,
-                file_type: result.type,
+                file_name: props.original_name,
+                file_type: props.file_type,
                 public_id: result.public_id,
                 resource_type: result.resource_type,
                 url: result.url

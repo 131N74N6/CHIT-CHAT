@@ -17,6 +17,8 @@ import { useChatStore } from "../stores/chat.store";
 export default function UserChat() {
     const receiverId = useChatStore((state) => state.receiverId);
     const setReceiverId = useChatStore((state) => state.setReceiverId);
+    
+    const setChatId = useChatStore((state) => state.setChatId);
     const navigate = useNavigate();
     
     const message = useMessageStore((state) => state.message);
@@ -184,6 +186,7 @@ export default function UserChat() {
                             isSelectMode={isSelectMode}
                             place={{ name: "user-chat" }}
                             selectedIds={selectedIds}
+                            setChatId={setChatId}
                             toggleSelect={toggleSelect}
                         />
                     )}

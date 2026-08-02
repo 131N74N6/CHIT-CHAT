@@ -5,11 +5,32 @@ import useUserChatService from "../services/useUserChatService";
 import FileDetail from "../components/FileDetail";
 import { useNavigate } from "react-router-dom";
 import { useChatStore } from "../stores/chat.store";
+import { useEffect } from "react";
+import Loading from "../components/Loading";
 
 export default function UserMediaDetail() {
     const navigate = useNavigate();
+    const { isUserChatProcessing, userChatMedia } = useUserChatService();
+
     const receiverId = useChatStore((state) => state.receiverId);
-    const { isUserChatProcessing, userChats } = useUserChatService();
+    
+    const chatId = useChatStore((state) => state.chatId);
+    const setChatId = useChatStore((state) => state.setChatId);
+
+    useEffect(() => {
+        const savedUserChatId = localStorage.getItem("chat_id");
+        if (savedUserChatId && !chatId) setChatId(savedUserChatId);
+    }, []); 
+
+    useEffect(() => {
+        if (chatId) {
+            localStorage.setItem("chat_id", chatId);
+        } else {
+            localStorage.removeItem("chat_id");
+        }
+    }, [chatId]);
+
+    console.log(userChatMedia.data);
 
     return (
         <section className="h-dvh flex md:flex-row flex-col p-2.5 gap-2.5 relative z-10">
@@ -25,7 +46,17 @@ export default function UserMediaDetail() {
                         <MessageCircle size={22}/>
                     </button>
                 </div>
-                <FileDetail files={userChats.getUserChats[0].media} is_processing={isUserChatProcessing}/>
+                {userChatMedia.isLoading ? (
+                    <div className="flex justify-center items-center h-full">
+                        <Loading/>
+                    </div>
+                ) : userChatMedia.error ? (
+                    <div className="flex justify-center items-center h-full">
+                        <div className="text-gray-700 text-2xl font-medium text-center">{userChatMedia.error.message}</div>
+                    </div>
+                ) : (
+                    <FileDetail files={userChatMedia.data} is_processing={isUserChatProcessing}/>
+                )}
             </div>
             <div 
                 className={cn(

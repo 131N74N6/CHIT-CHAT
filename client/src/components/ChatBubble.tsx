@@ -10,7 +10,7 @@ export default function ChatBubble(props: IChatBubble) {
     return (
         <div 
             className={cn(
-                "flex flex-col gap-2 p-2.5 transition-all duration-200 w-[60%]",
+                "flex flex-col gap-1 p-2.5 transition-all duration-200 w-[60%]",
                 props.own ? "ml-[40%] bg-blue-700 text-white rounded-t-2xl rounded-bl-2xl" : 
                 "mr-[50%] bg-gray-200 text-gray-900 rounded-t-2xl rounded-br-2xl",
                 props.isSelectMode ? "cursor-pointer hover:opacity-80" : "",
@@ -19,16 +19,34 @@ export default function ChatBubble(props: IChatBubble) {
             onClick={() => props.isSelectMode && props.toggleSelect(props.chat._id)}
         >
             {props.chat.media.length > 0 ? (
-                <div 
-                    className="flex gap-2.5" 
-                    onClick={() => {
-                        if (props.place.name === "room-chat") navigate(`/room/media/detail/${props.chat._id}`);
-                        if (props.place.name === "user-chat") navigate(`/user/media/detail/${props.chat._id}`)
-                    }}
-                >
-                    <FileIcon size={16}/>
-                    <div>+ {props.chat.media.length} files</div>
-                </div>
+                <>
+                    <div 
+                        className="items-center gap-2.5 cursor-pointer bg-gray-100 p-2 rounded-md md:flex hidden" 
+                        onClick={() => {
+                            if (props.place.name === "room-chat") props.setChatId(props.chat._id);
+                            if (props.place.name === "user-chat") props.setChatId(props.chat._id);
+                        }}
+                    >
+                        <FileIcon size={16}/>
+                        <div>+ {props.chat.media.length} files</div>
+                    </div>
+                    <div 
+                        className="items-center gap-2.5 cursor-pointer bg-gray-100 p-2 rounded-md md:hidden flex" 
+                        onClick={() => {
+                            if (props.place.name === "room-chat") {
+                                props.setChatId(props.chat._id);
+                                navigate(`/room/media/detail/${props.chat._id}`);
+                            }
+                            if (props.place.name === "user-chat") {
+                                props.setChatId(props.chat._id);
+                                navigate(`/user/media/detail/${props.chat._id}`);
+                            }
+                        }}
+                    >
+                        <FileIcon size={16}/>
+                        <div>+ {props.chat.media.length} files</div>
+                    </div>
+                </>
             ) : null}
             {props.place.name === "room-chat" ? 
                 props.own ? (

@@ -21,6 +21,8 @@ const chatSchema = new Schema<ChatIntrf>({
     created_at: { type: String, required: true },
     hidden_for: [{ type: Schema.Types.ObjectId }],
     media: [{
+        file_name: { type: String },
+        file_type: { type: String },
         public_id: { type: String },
         resource_type: { type: String },
         url: { type: String }

@@ -26,8 +26,9 @@ export default function ChatList(props: IChatList) {
                             isProcessing={props.isProcessing} 
                             isSelectMode={props.isSelectMode}
                             own={props.currentUserId === chat.sender_id}
-                            selectedIds={props.selectedIds}
                             place={props.place}
+                            selectedIds={props.selectedIds}
+                            setChatId={props.setChatId}
                             toggleSelect={props.toggleSelect}
                         />
                     );

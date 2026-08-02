@@ -107,6 +107,7 @@ export default function UserChatWindow(props: IUserChatWindow) {
                         isSelectMode={props.isSelectMode}
                         place={{ name: "user-chat" }}
                         selectedIds={props.selectedIds}
+                        setChatId={props.setChatId}
                         toggleSelect={props.toggleSelect}
                     />
                 )}

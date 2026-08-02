@@ -7,6 +7,7 @@ import {
     deleteChosenChatsInRoom, 
     editSelectedChat, 
     sendToOtherRoom, 
+    showAllMediaInClickedChat, 
     showwAllChatsForRoom
 } from "../controllers/room_chat.controller";
 import { uploadMedia } from "../middlewares/upload.middleware";
@@ -22,6 +23,8 @@ roomChatsRouters.delete("/rm-all/:room_id", verifyToken, deleteAllChatsInRoom);
 roomChatsRouters.delete("/rm/:room_id", verifyToken, deleteChosenChatsInRoom);
 
 roomChatsRouters.get("/show-all/:room_id", verifyToken, showwAllChatsForRoom);
+
+roomChatsRouters.get("/show-all/media/:chat_id", verifyToken, showAllMediaInClickedChat);
 
 roomChatsRouters.post("/send", verifyToken, uploadMedia, sendToOtherRoom);
 

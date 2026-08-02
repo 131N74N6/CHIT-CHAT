@@ -8,6 +8,7 @@ import {
     editSelectedChat, 
     sendToOtherUser, 
     showAllChats,
+    showAllMediaInClickedChat,
 } from "../controllers/user_chat.controller";
 import { uploadMedia } from "../middlewares/upload.middleware";
 
@@ -22,6 +23,8 @@ userChatsRouters.delete("/rm-all/:receiver_id", verifyToken, deleteAllUserChats)
 userChatsRouters.delete("/rm/:receiver_id", verifyToken, deleteChosenUsersChat);
 
 userChatsRouters.get("/show-all/:receiver_id", verifyToken, showAllChats);
+
+userChatsRouters.get("/show-all/media/:chat_id", verifyToken, showAllMediaInClickedChat);
 
 userChatsRouters.post("/send", verifyToken, uploadMedia, sendToOtherUser);
 

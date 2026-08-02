@@ -1,4 +1,4 @@
-import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { ChatIntrf, IFileViewer } from "../models/chat.model";
 import { useRef } from "react";
 import { useChatStore } from "../stores/chat.store";
@@ -10,6 +10,8 @@ export default function useUserChatService() {
 
     const isSelectMode = useChatStore((state) => state.isSelectMode);
     const setIsSelectMode = useChatStore((state) => state.setIsSelectMode);
+
+    const chatId = useChatStore((state) => state.chatId);
 
     const receiverId = useChatStore((state) => state.receiverId);
     const setMessage = useMessageStore((state) => state.setMessage);
@@ -196,8 +198,9 @@ export default function useUserChatService() {
         mutationFn: async () => {
             try {
                 const formData = new FormData();
-                formData.append("messages", text.trim());
                 formData.append("receiver_id", receiverId!);
+                
+                if (text.trim()) formData.append("messages", text.trim());
                 
                 if (media && media.length > 0) {
                     for (let m = 0; m < media.length; m++) {
@@ -262,6 +265,27 @@ export default function useUserChatService() {
     const getUserChats: ChatIntrf[] = data ? data.pages.flat() : [];
     const userChats = { error, fetchNextPage, getUserChats, isFetchingNextPage, isLoading, hasNextPage }
 
+    const userChatMedia = useQuery({
+        enabled: !!chatId && chatId !== "",
+        queryFn: async () => {
+            try {
+                const request = await fetch(`${import.meta.env.VITE_BASE_API_URL}/users/chats/show-all/media/${chatId}`, {
+                    credentials: "include",
+                    headers: { "Content-Type": "application/json" },
+                    method: "GET"
+                });
+
+                const response = await request.json();
+                if (!request.ok) throw new Error(response.message);
+                return response;
+            } catch (error) {
+                throw error;
+            }
+        },
+        queryKey: [`user-chat-media-${chatId}`],
+        staleTime: Infinity
+    });
+
     const isUserChatProcessing = clearChosenUserChatForMeMt.isPending || clearAllUserChatsForMeMt.isPending || 
     deleteAllUserChatsMt.isPending || deleteChosenUsersChatMt.isPending || editSelectedChatMt.isPending || 
     sendChatToUserMt.isPending;
@@ -290,6 +314,7 @@ export default function useUserChatService() {
         showDeleteOption2,
         text, 
         toggleSelect,
-        userChats 
+        userChats, 
+        userChatMedia
     }
 }

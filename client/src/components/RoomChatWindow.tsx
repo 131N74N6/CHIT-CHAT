@@ -107,6 +107,7 @@ export default function RoomChatWindow(props: IRoomChatWindow) {
                         isProcessing={props.isRoomChatProcessing}
                         isSelectMode={props.isSelectMode}
                         selectedIds={props.selectedIds}
+                        setChatId={props.setChatId}
                         toggleSelect={props.toggleSelect}
                     />
                 )}

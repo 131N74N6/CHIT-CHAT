@@ -39,6 +39,7 @@ export interface IChatBubble {
     own: boolean;
     place: IRoomChat | IUserChat; 
     selectedIds: string[];
+    setChatId: (chatId: string) => void;
     toggleSelect: (id: string) => void;
 }
 
@@ -53,6 +54,7 @@ export interface IChatList {
     isSelectMode: boolean;
     place: IRoomChat | IUserChat; 
     selectedIds: string[];
+    setChatId: (chatId: string) => void;
     toggleSelect: (id: string) => void;
 }
 
@@ -117,6 +119,7 @@ export interface IUserChatWindow {
     seeProfile: () => void;
     selectedIds: string[];
     sendChatToUser: UseMutationResult<any, Error, void, unknown>;
+    setChatId: (chatId: string) => void;
     setIsSelectMode: (isSelectMode: boolean) => void;
     setReceiverId: (receiverId: string) => void;
     setShowDeleteOption1: (showDeleteOption1: boolean) => void;

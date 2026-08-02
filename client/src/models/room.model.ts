@@ -82,6 +82,7 @@ export interface IRoomChatWindow {
     seeMedia: () => void;
     selectedIds: string[];
     sendChatToRoom: UseMutationResult<any, Error, void, unknown>;
+    setChatId: (chatId: string) => void;
     setIsSelectMode: (isSelectMode: boolean) => void;
     setReceiverId: (receiverId: string) => void;
     setRoomId: (roomId: string) => void;
@@ -203,6 +204,7 @@ export interface IRoomWindow {
     selectedProfileRoom: File | null;
     selectedProfileRoomUrl: string | null;
     sendChatToRoom: UseMutationResult<any, Error, void, unknown>;
+    setChatId: (chatId: string) => void;
     setDeleteRoomImage: (deleteRoomImage: {
         public_id: string;
         resource_type: string;

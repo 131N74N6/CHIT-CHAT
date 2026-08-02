@@ -56,6 +56,7 @@ export default function UserWindow(props: IUserWindow) {
                     seeMedia={seeMedia}
                     seeProfile={seeProfile}
                     sendChatToUser={props.sendChatToUser}
+                    setChatId={props.setChatId}
                     setIsSelectMode={props.setIsSelectMode}
                     setReceiverId={props.setReceiverId}
                     setShowDeleteOption1={props.setShowDeleteOption1}

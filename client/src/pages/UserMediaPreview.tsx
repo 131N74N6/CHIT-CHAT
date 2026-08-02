@@ -53,7 +53,7 @@ export default function UserMediaPreview() {
             {message ? <Alert message={message}/> : null}
             <Navbar isProcessing={isUserChatProcessing}/>
             <form 
-                className="flex flex-col h-full gap-2.5 p-2.5 md:w-2/5 w-full inset-shadow-sm inset-shadow-gray-400 border border-gray-400"
+                className="flex flex-col h-full gap-2.5 p-2.5 md:w-2/5 w-full inset-shadow-sm inset-shadow-gray-400 border border-gray-400 overflow-y-auto"
                 onSubmit={(event: React.SubmitEvent<HTMLFormElement>) => {
                     event.preventDefault();
                     sendChatToUserMt.mutate();
