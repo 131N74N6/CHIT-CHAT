@@ -21,7 +21,7 @@ export default function RoomMember() {
     const setMessage = useMessageStore((state) => state.setMessage);
     
     const { currentUser } = useUserProfileService();
-    const { currentRoomMember, isOwnData, isRoomOwner, kickMemberMt } = useRoomMemberService();
+    const { currentRoomMember, isRoomOwner, kickMemberMt } = useRoomMemberService();
     
     useEffect(() => {
         if (message) {
@@ -80,7 +80,6 @@ export default function RoomMember() {
                         hasNextPage={currentRoomMember.roomMmeberHaveNextPage}
                         place={{ 
                             name: "room-member", 
-                            isOwnData: isOwnData, 
                             isRoomOwner: isRoomOwner, 
                             kickMemberMt: kickMemberMt 
                         }}

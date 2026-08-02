@@ -55,27 +55,6 @@ export default function useRoomMemberService() {
         isRoomMemberLoading 
     }
 
-    const isOwnData = useQuery<boolean>({
-        enabled: !!currentUserId,
-        queryKey: [`is-own-data-${currentUserId}`],
-        queryFn: async () => {
-            try {
-                const request = await fetch(`${import.meta.env.VITE_BASE_API_URL}/rooms/members/is-own-data`, {
-                    credentials: "include",
-                    headers: { 'Content-Type': 'application/json' },
-                    method: "GET"
-                });
-
-                const response = await request.json();
-                if (!request.ok) throw new Error(response.message);
-                return response;
-            } catch (error) {
-                throw error;
-            }
-        },
-        staleTime: Infinity
-    });
-
     const isRoomOwner = useQuery<boolean>({
         enabled: !!roomId && !!currentUserId,
         queryKey: [`is-room-owner-${currentUserId}-${roomId}`],
@@ -166,7 +145,7 @@ export default function useRoomMemberService() {
     });
 
     const isRoomMemberProcessing = currentRoomMember.isRoomMemberLoading || 
-    kickMemberMt.isPending || leftRoomMt.isPending || isOwnData.isLoading || isRoomOwner.isLoading;
+    kickMemberMt.isPending || leftRoomMt.isPending || isRoomOwner.isLoading;
 
-    return { currentRoomMember, isOwnData, isRoomOwner, isRoomMemberProcessing, kickMemberMt, leftRoomMt }
+    return { currentRoomMember, isRoomOwner, isRoomMemberProcessing, kickMemberMt, leftRoomMt }
 }

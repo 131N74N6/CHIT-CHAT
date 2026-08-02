@@ -21,6 +21,7 @@ export default function UserList(props: UserListIntrf) {
                     return (
                         <UserData 
                             isProcessing={props.isProcessing}
+                            isOwnData={props.currentUserId === user._id}
                             key={`user-${user._id}`}
                             place={props.place}
                             setReceiverId={props.setReceiverId} 

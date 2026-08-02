@@ -83,6 +83,7 @@ export interface UserListIntrf {
 
 export interface UserItemIntrf {
     isProcessing: boolean;
+    isOwnData: boolean;
     place: IRoomMember | IListOfUsers;
     setReceiverId: (receiverId: string) => void;
     user: IOtherUser;
@@ -90,14 +91,12 @@ export interface UserItemIntrf {
 
 export interface IRoomMember {
     isRoomOwner: UseQueryResult<boolean, Error>;
-    isOwnData: UseQueryResult<boolean, Error>;
     kickMemberMt: UseMutationResult<any, Error, string, unknown>;
     name: "room-member";
 }
 
 export interface IListOfUsers {
     isRoomOwner?: never;
-    isOwnData?: never;
     kickMemberMt?: never;
     name: "user-list-home";
 }

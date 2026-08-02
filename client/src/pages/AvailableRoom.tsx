@@ -35,7 +35,6 @@ export default function AvailableRoom() {
 
     const { 
         currentRoomMember, 
-        isOwnData,
         isRoomOwner,
         isRoomMemberProcessing, 
         kickMemberMt,
@@ -195,7 +194,6 @@ export default function AvailableRoom() {
                     hasNextRoomChat={allChatsInRoom.roomChatHasNextPage}
                     inputMediaRef={inputMediaRef}
                     isFetchingNextRoomChat={allChatsInRoom.isRoomChatFetchNext}
-                    isOwnData={isOwnData}
                     isRoomChatLoading={allChatsInRoom.isRoomChatLoading}
                     isRoomChatProcessing={isRoomChatProcessing}
                     isRoomMemberLoading={currentRoomMember.isRoomMemberLoading}

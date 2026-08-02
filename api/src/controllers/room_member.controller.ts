@@ -4,19 +4,6 @@ import { Request, Response } from "express";
 import { User } from "../models/user.model";
 import { Rooms } from "../models/room.model";
 
-export async function isOwnData(req: AuthRequest, res: Response) {
-    try {
-        const currentUserId = req.user?.user_id;
-        const user = await User.findOne({ _id: currentUserId });
-        if (!user) return res.status(404).json({ message: "usernot found" });
-
-        const isMe = user._id.toString() === currentUserId;
-        res.status(200).json(isMe);
-    } catch (error) {
-        res.status(500).json({ message: "something went wrong" });
-    }
-}
-
 export async function isRoomOwner(req: AuthRequest, res: Response) {
     try {
         const currentUserId = req.user?.user_id;

@@ -1,6 +1,7 @@
 import type { IChatbotBubble } from "../models/chatbot.model";
 import cn from "../utils/cn";
 import DOMPurify from "dompurify";
+import { useMemo } from "react";
 import ReactMarkdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
 import remarkGfm from "remark-gfm";
@@ -8,13 +9,13 @@ import remarkGfm from "remark-gfm";
 export default function ChatbotBubble(props: IChatbotBubble) {
     const isSelected = props.selectedChatBotIds.includes(props.result._id);
 
-    const sanitizedAnswer = () => {
+    const sanitizedAnswer = useMemo(() => {
         if (!props.result.answer) return;
         return DOMPurify.sanitize(props.result.answer, {
             ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 'ol', 'ul', 'li', 'code', 'pre', 'blockquote', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'hr', 'table', 'thead', 'tbody', 'tr', 'th', 'td', 'del', 'sub', 'sup'],
             ALLOWED_ATTR: ['class', 'style']
         });
-    }
+    }, [props.result.answer, props.result._id]);
 
     return (
         <div
@@ -83,7 +84,7 @@ export default function ChatbotBubble(props: IChatbotBubble) {
                             )
                         }}
                     >
-                        {sanitizedAnswer()}
+                        {sanitizedAnswer}
                     </ReactMarkdown>
                 </div>
             )}

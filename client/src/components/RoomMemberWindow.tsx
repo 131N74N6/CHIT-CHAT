@@ -43,7 +43,6 @@ export default function RoomMemberWindow(props: IRoomMemberWindow) {
                     isFetchingNextPage={props.isRoomMemberFetchNextPage}
                     place={{ 
                         name: "room-member", 
-                        isOwnData: props.isOwnData, 
                         isRoomOwner: props.isRoomOwner, 
                         kickMemberMt: props.kickMemberMt 
                     }}

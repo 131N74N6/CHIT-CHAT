@@ -109,7 +109,6 @@ export interface IRoomMemberWindow {
     currentUserId: string;
     fetchNextUser: (options?: FetchNextPageOptions | undefined) => Promise<InfiniteQueryObserverResult<InfiniteData<any, unknown>, Error>>;
     kickMemberMt: UseMutationResult<any, Error, string, unknown>;
-    isOwnData: UseQueryResult<boolean, Error>;
     isRoomMemberFetchNextPage: boolean;
     isRoomMemberLoading: boolean;
     isRoomOwner: UseQueryResult<boolean, Error>;
@@ -174,7 +173,6 @@ export interface IRoomWindow {
     handleMediaPreview: (event: React.ChangeEvent<HTMLInputElement, Element>) => void;
     hasNextRoomChat: boolean;
     inputMediaRef: React.RefObject<HTMLInputElement | null>;
-    isOwnData: UseQueryResult<boolean, Error>;
     isRoomMemberFetchNextPage: boolean;
     isFetchingNextRoomChat: boolean;
     isRoomChatLoading: boolean;
