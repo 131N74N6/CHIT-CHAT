@@ -18,6 +18,8 @@ export interface ChatIntrf {
     _id: string;
     created_at: string;
     media: {
+        file_name: string;
+        file_type: string;
         public_id: string;
         resource_type: string;
         url: string;
@@ -52,6 +54,30 @@ export interface IChatList {
     place: IRoomChat | IUserChat; 
     selectedIds: string[];
     toggleSelect: (id: string) => void;
+}
+
+export type IChatFileIcon = {
+    file_name: string;
+    file_type: string;
+    public_id: string;
+    resource_type: string;
+    url: string;
+}
+
+export type IChatMedia = {
+    file: {
+        file_name: string;
+        file_type: string;
+        public_id: string;
+        resource_type: string;
+        url: string;
+    };
+    is_processing: boolean;
+}
+
+export type IChatMediaList = {
+    files: IChatFileIcon[];
+    is_processing: boolean;
 }
 
 export interface IRoomChat {

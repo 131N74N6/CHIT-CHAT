@@ -33,7 +33,7 @@ app.use(cookieParser());
 app.use(cors({
     credentials: true,
     origin: [
-        "http://localhost:4000",
+        "http://localhost:5000",
         "http://localhost:5173"
     ]
 }));
@@ -47,7 +47,7 @@ app.use("/api/users/profiles", userProfileRouters);
 
 if (process.env.NODE_ENV !== "production") {
     mongodb.then(() => {
-        server.listen(4000, () => console.log("api running on http://localhost:4000"));
+        server.listen(5000, () => console.log("api running on http://localhost:5000"));
     });
 }
 

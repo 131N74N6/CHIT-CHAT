@@ -14,6 +14,7 @@ export default function useUserProfileService() {
     const queryClient = useQueryClient();
     
     const setMessage = useMessageStore((state) => state.setMessage);
+    const allowedFiles = ["image/png", "image/jpeg", "image/avif", "image/webp"]
 
     const address = useUserStore((state) => state.address);
     const setAddress = useUserStore((state) => state.setAddress);
@@ -159,7 +160,15 @@ export default function useUserProfileService() {
                 formData.append("address", address.trim());
                 formData.append("gender", gender);
                 formData.append("username", username.trim());
-                if (profilePicture) formData.append("image", profilePicture);
+
+                if (profilePicture) {
+                    if (allowedFiles.includes(profilePicture.type) === false) {
+                        setProfilePicture(null);
+                        setProfilePictureUrl(null);
+                        throw new Error("You cant upload this file");
+                    }
+                    formData.append("image", profilePicture);
+                }
 
                 if (deleteProfilePicture && deleteProfilePicture.public_id) {
                     const request = await fetch(`${import.meta.env.VITE_BASE_API_URL}/users/profiles/rm-pict`, {

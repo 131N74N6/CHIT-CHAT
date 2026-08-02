@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import type { IChatBubble } from "../models/chat.model";
 import cn from "../utils/cn";
+import { FileIcon } from "lucide-react";
 
 export default function ChatBubble(props: IChatBubble) {
     const navigate = useNavigate();
@@ -18,8 +19,15 @@ export default function ChatBubble(props: IChatBubble) {
             onClick={() => props.isSelectMode && props.toggleSelect(props.chat._id)}
         >
             {props.chat.media.length > 0 ? (
-                <div className="w-full h-auto min-h-12.5 bg-gray-300 rounded flex items-center justify-center text-xs text-gray-500">
-                    [Media: {props.chat.media[0].url}]
+                <div 
+                    className="flex gap-2.5" 
+                    onClick={() => {
+                        if (props.place.name === "room-chat") navigate(`/room/media/detail/${props.chat._id}`);
+                        if (props.place.name === "user-chat") navigate(`/user/media/detail/${props.chat._id}`)
+                    }}
+                >
+                    <FileIcon size={16}/>
+                    <div>+ {props.chat.media.length} files</div>
                 </div>
             ) : null}
             {props.place.name === "room-chat" ? 

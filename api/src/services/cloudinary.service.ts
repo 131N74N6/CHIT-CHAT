@@ -2,6 +2,8 @@ import { v2 } from "cloudinary";
 import { Readable } from "stream";
 
 export interface CloudinaryUploadResult {
+    file_name: string;
+    file_type: string;
     public_id: string;
     resource_type: string;
     url: string;
@@ -30,6 +32,8 @@ export async function uploadTOCloudinary(props: CloudinaryUploadOption): Promise
                 return;
             }
             resolve({
+                file_name: result.original_filename,
+                file_type: result.type,
                 public_id: result.public_id,
                 resource_type: result.resource_type,
                 url: result.url

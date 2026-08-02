@@ -4,6 +4,8 @@ export interface ChatIntrf {
     created_at: string;
     hidden_for: Types.ObjectId[];
     media: {
+        file_name: string;
+        file_type: string;
         public_id: string;
         resource_type: string;
         url: string;
