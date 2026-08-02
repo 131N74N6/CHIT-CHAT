@@ -338,6 +338,7 @@ export async function sendToOtherRoom(req: AuthRequest, res: Response) {
             for (let x = 0; x < media.length; x++) {
                 const cloudinary = await uploadTOCloudinary({ 
                     file_buffer: media[x].buffer,
+                    file_type: media[x].mimetype,
                     folder_name: "chat_media",
                     original_name: media[x].originalname
                 });
