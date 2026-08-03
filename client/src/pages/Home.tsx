@@ -82,6 +82,19 @@ export default function Home() {
     }, [receiverId]);
 
     useEffect(() => {
+        const savedUserChatId = localStorage.getItem("chat_id");
+        if (savedUserChatId && !chatId) setChatId(savedUserChatId);
+    }, []); 
+
+    useEffect(() => {
+        if (chatId) {
+            localStorage.setItem("chat_id", chatId);
+        } else {
+            localStorage.removeItem("chat_id");
+        }
+    }, [chatId]);
+
+    useEffect(() => {
         if (message) {
             const timer = setTimeout(() => setMessage(null), 1500);
             return () => clearTimeout(timer);

@@ -8,7 +8,6 @@ import RoomMediaDetailWindow from "./RoomMediaDetailWindow";
 export default function RoomWindow(props: IRoomWindow) {
     const seeProfile = () => {
         props.setChatId("");
-        localStorage.removeItem("chat_id");
         props.setShowRoomMedia(false);
         props.setShowProfile(true);
         props.setShowMember(false);
@@ -16,7 +15,6 @@ export default function RoomWindow(props: IRoomWindow) {
 
     const seeMedia = () => {
         props.setChatId("");
-        localStorage.removeItem("chat_id");
         props.setShowRoomMedia(true);
         props.setShowProfile(false);
         props.setShowMember(false);
@@ -24,7 +22,6 @@ export default function RoomWindow(props: IRoomWindow) {
 
     const seeMember = () => {
         props.setChatId("");
-        localStorage.removeItem("chat_id");
         props.setShowProfile(false);
         props.setShowRoomMedia(false);
         props.setShowMember(true);
@@ -32,7 +29,6 @@ export default function RoomWindow(props: IRoomWindow) {
 
     const seeRoomChat = () => {
         props.setChatId("");
-        localStorage.removeItem("chat_id");
         props.setShowRoomMedia(false);
         props.setShowProfile(false);
         props.setShowMember(false);

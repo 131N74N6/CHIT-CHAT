@@ -116,6 +116,19 @@ export default function AvailableRoom() {
     }, [roomId]);
 
     useEffect(() => {
+        const savedUserChatId = localStorage.getItem("chat_id");
+        if (savedUserChatId && !chatId) setChatId(savedUserChatId);
+    }, []); 
+
+    useEffect(() => {
+        if (chatId) {
+            localStorage.setItem("chat_id", chatId);
+        } else {
+            localStorage.removeItem("chat_id");
+        }
+    }, [chatId]);
+
+    useEffect(() => {
         if (editMode) {
             currentRoomProfile.data && currentRoomProfile.data.name ?
             setRoomName(currentRoomProfile.data.name) :

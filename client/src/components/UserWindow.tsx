@@ -7,21 +7,18 @@ import UserProfileWindow from "./UserProfileWindow";
 export default function UserWindow(props: IUserWindow) {
     const seeProfile = () => {
         props.setChatId("");
-        localStorage.removeItem("chat_id");
         props.setShowUserMedia(false);
         props.setShowUserProfile(true);
     }
 
     const seeMedia = () => {
         props.setChatId("");
-        localStorage.removeItem("chat_id");
         props.setShowUserMedia(true);
         props.setShowUserProfile(false);
     }
 
     const seeChat = () => {
         props.setChatId("");
-        localStorage.removeItem("chat_id");
         props.setShowUserMedia(false);
         props.setShowUserProfile(false);
     }
