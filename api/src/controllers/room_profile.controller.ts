@@ -20,6 +20,7 @@ export async function createRoom(req: AuthRequest, res: Response) {
         if (selectedImage) {
             const newRoomImageProfile = await uploadTOCloudinary({
                 file_buffer: selectedImage.buffer,
+                file_type: selectedImage.mimetype,
                 folder_name: "room_profile",
                 original_name: selectedImage.filename
             });
@@ -79,6 +80,7 @@ export async function changeRoom(req: AuthRequest, res: Response) {
 
                 const newImage = await uploadTOCloudinary({
                     file_buffer: selectedImage.buffer,
+                    file_type: selectedImage.mimetype,
                     folder_name: "room_profile",
                     original_name: selectedImage.originalname
                 });

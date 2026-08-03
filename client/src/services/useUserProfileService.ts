@@ -55,7 +55,7 @@ export default function useUserProfileService() {
 
     const resetNavbarState = useNavbarStore((state) => state.resetNavbarState);
 
-    const { data: user, error: userError, isLoading: isUserLoading } = useQuery<IUserProfile>({
+    const currentUser = useQuery<IUserProfile>({
         queryFn: async () => {
             try {
                 const request = await fetch(`${import.meta.env.VITE_BASE_API_URL}/users/profiles/show`, {
@@ -76,24 +76,15 @@ export default function useUserProfileService() {
         staleTime: Infinity,
     });
 
-    const currentUser = { isUserLoading, user, userError }
-
     useEffect(() => {
-        if (currentUser.user && currentUser.user.user_id && !isUserLoading) {
-            setCurrentUserId(currentUser.user.user_id);
-            setCurrentUserRoomIds(currentUser.user.room_id);
+        if (currentUser.data && currentUser.data.user_id && !currentUser.isLoading) {
+            setCurrentUserId(currentUser.data.user_id);
+            setCurrentUserRoomIds(currentUser.data.room_id);
         }
-    }, [currentUser.user, setCurrentUserId]);
+    }, [currentUser.data, setCurrentUserId]);
 
-    const { 
-        data: users, 
-        error: usersError, 
-        fetchNextPage: fetchNextUser, 
-        hasNextPage: usersHaveNextPage,
-        isFetchingNextPage: isFetchNextUser,
-        isLoading: isUsersLoading 
-    } = useInfiniteQuery({
-        enabled: !!currentUser.user?.user_id,
+    const allUsers = useInfiniteQuery({
+        enabled: !!currentUser.data?.user_id,
         getNextPageParam: (lastPage, allPages) => {
             if (lastPage.length <= 14) return;
             return allPages.length + 1;
@@ -119,18 +110,7 @@ export default function useUserProfileService() {
         staleTime: Infinity
     });
 
-    const paginatedUser: IOtherUser[] = users ? users.pages.flat() : [];
-
-    const allUsers = { 
-        fetchNextUser, 
-        usersHaveNextPage, 
-        isFetchNextUser, 
-        isUsersLoading, 
-        users: paginatedUser, 
-        usersError 
-    }
-
-    const { data: detail, error: detailError, isLoading: isDetailLoading } = useQuery<IOtherUser>({
+    const receiverUserProfile = useQuery<IOtherUser>({
         enabled: !!receiverId,
         queryFn: async () => {
             try {
@@ -150,8 +130,6 @@ export default function useUserProfileService() {
         queryKey: [`receiver-${receiverId}`],
         staleTime: Infinity
     });
-
-    const receiverUserProfile = { detail, detailError, isDetailLoading }
 
     const changeUserMt = useMutation({
         mutationFn: async () => {
@@ -207,12 +185,12 @@ export default function useUserProfileService() {
                 queryClient.invalidateQueries({ queryKey: [`receiver-${receiverId}`] });
             }
 
-            if (currentUser.user && currentUser.user.user_id) {
-                queryClient.invalidateQueries({ queryKey: [`receiver-${currentUser.user.user_id}`] });
+            if (currentUser.data && currentUser.data.user_id) {
+                queryClient.invalidateQueries({ queryKey: [`receiver-${currentUser.data.user_id}`] });
             }
 
-            if (currentUser.user && currentUser.user.room_id && currentUser.user.room_id.length > 0) {
-                currentUser.user.room_id.forEach((room_id) => {
+            if (currentUser.data && currentUser.data.room_id && currentUser.data.room_id.length > 0) {
+                currentUser.data.room_id.forEach((room_id) => {
                     queryClient.invalidateQueries({ queryKey: [`room-chat-${room_id}`] });
                     queryClient.invalidateQueries({ queryKey: [`room-member-${room_id}`] });
                 });
@@ -282,14 +260,14 @@ export default function useUserProfileService() {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['current-user'] });
-            queryClient.invalidateQueries({ queryKey: [`available-room-${currentUser.user?.user_id}`] });
+            queryClient.invalidateQueries({ queryKey: [`available-room-${currentUser.data?.user_id}`] });
             queryClient.invalidateQueries({ queryKey: [`room-member-${roomCode}`] });
             setRoomCode("");
         }
     });
 
-    const isUserProfileProcessing = changeUserMt.isPending || currentUser.isUserLoading || allUsers.isUsersLoading ||
-    deleteUserMt.isPending || joinRoomMt.isPending || receiverUserProfile.isDetailLoading;
+    const isUserProfileProcessing = changeUserMt.isPending || allUsers.isLoading ||
+    deleteUserMt.isPending || joinRoomMt.isPending || receiverUserProfile.isLoading;
 
     return {
         address,

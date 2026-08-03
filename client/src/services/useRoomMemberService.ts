@@ -1,5 +1,4 @@
 import { Query, useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import type { IOtherUser } from "../models/user.model";
 import { useUserStore } from "../stores/user.store";
 import { useRoomStore } from "../stores/room.store";
 import { useMessageStore } from "../stores/message.store";
@@ -10,14 +9,7 @@ export default function useRoomMemberService() {
     const roomId = useRoomStore((state) => state.roomId);
     const setMessage = useMessageStore((state) => state.setMessage);
     
-    const { 
-        data: paginatedRoomMember, 
-        error: roomMemberError,
-        fetchNextPage: fetchNextRoomMember,
-        isFetchingNextPage: isRoomMemberFetchNextPage,
-        hasNextPage: roomMmeberHaveNextPage,
-        isLoading: isRoomMemberLoading 
-    } = useInfiniteQuery({
+    const currentRoomMember = useInfiniteQuery({
         enabled: !!roomId,
         getNextPageParam: (lastPage, allPages) => {
             if (lastPage.length <= 14 ) return;
@@ -43,17 +35,6 @@ export default function useRoomMemberService() {
         initialPageParam: 1,
         staleTime: Infinity
     });
-
-    const roomMember: IOtherUser[] = paginatedRoomMember ? paginatedRoomMember.pages.flat() : [];
-
-    const currentRoomMember = { 
-        roomMember, 
-        roomMemberError, 
-        fetchNextRoomMember, 
-        roomMmeberHaveNextPage, 
-        isRoomMemberFetchNextPage, 
-        isRoomMemberLoading 
-    }
 
     const isRoomOwner = useQuery<boolean>({
         enabled: !!roomId && !!currentUserId,
@@ -144,7 +125,7 @@ export default function useRoomMemberService() {
         }
     });
 
-    const isRoomMemberProcessing = currentRoomMember.isRoomMemberLoading || 
+    const isRoomMemberProcessing = currentRoomMember.isLoading || 
     kickMemberMt.isPending || leftRoomMt.isPending || isRoomOwner.isLoading;
 
     return { currentRoomMember, isRoomOwner, isRoomMemberProcessing, kickMemberMt, leftRoomMt }

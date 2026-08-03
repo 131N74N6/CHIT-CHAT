@@ -106,6 +106,12 @@ export interface IRoomChatMedia {
     text: string;
 }
 
+export interface IRoomMediaDetailWindow {
+    isRoomChatProcessing: boolean;
+    roomChatMedia: UseQueryResult<any, Error>;
+    seeRoomChat: () => void;
+}
+
 export interface IRoomMemberWindow {
     currentUserId: string;
     fetchNextUser: (options?: FetchNextPageOptions | undefined) => Promise<InfiniteQueryObserverResult<InfiniteData<any, unknown>, Error>>;
@@ -161,6 +167,7 @@ export interface IRoomProfileWindow {
 }
 
 export interface IRoomWindow {
+    chatId: string;
     changeRoomMt: UseMutationResult<any, Error, void, unknown>;
     clearChatsIdsSelection: () => void;
     currentUserId: string;
@@ -195,6 +202,7 @@ export interface IRoomWindow {
     roomProfile: RoomIntrf;
     roomChats: ChatIntrf[];
     roomChatError: Error | null;
+    roomChatMedia: UseQueryResult<any, Error>;
     roomId: string;
     roomMemberError: Error | null;
     roomMemberHaveNextPage: boolean;

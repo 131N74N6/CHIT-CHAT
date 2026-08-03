@@ -31,6 +31,7 @@ export default function UserChat() {
     } = useUserProfileService();
 
     const { 
+        allUserChats, 
         clearAllUserChatsForMeMt,
         clearChosenUserChatForMeMt,
         clearSelection,
@@ -48,7 +49,6 @@ export default function UserChat() {
         setShowDeleteOption2,
         text,
         toggleSelect,
-        userChats 
     } = useUserChatService();
 
     useSocketIo({
@@ -77,7 +77,7 @@ export default function UserChat() {
 
     return (
         <section className="flex md:flex-row flex-col h-dvh relative z-10 p-2.5 gap-2.5">
-            <Navbar isProcessing={isUserChatProcessing || isUserProfileProcessing || receiverUserProfile.isDetailLoading}/>
+            <Navbar isProcessing={isUserChatProcessing || isUserProfileProcessing}/>
             {message ? <Alert message={message}/> : null}
             {showDeleteOption1 ? (
                 <UserChatDeleteOption1 
@@ -131,12 +131,12 @@ export default function UserChat() {
                     <div className="bg-gray-200 p-2 flex justify-between items-center cursor-pointer border border-gray-400">
                         <div className="flex items-center gap-2">
                             <div className="w-10 h-10 rounded-full" onClick={() => navigate(`/user/profile/${receiverId}`)}>
-                                {receiverUserProfile.detail && receiverUserProfile.detail.profile_picture !== null ? (
+                                {receiverUserProfile.data && receiverUserProfile.data.profile_picture !== null ? (
                                     <div className="w-full h-full">
                                         <img 
                                             className="w-full h-full object-cover rounded-full" 
-                                            src={receiverUserProfile.detail.profile_picture.url} 
-                                            alt={receiverUserProfile.detail.profile_picture.public_id}
+                                            src={receiverUserProfile.data.profile_picture.url} 
+                                            alt={receiverUserProfile.data.profile_picture.public_id}
                                         />
                                     </div>
                                 ) : (
@@ -144,11 +144,11 @@ export default function UserChat() {
                                         "w-full h-full rounded-full flex items-center text-[0.9rem]", 
                                         "justify-center bg-purple-500 text-white font-medium"
                                     )}>
-                                        {receiverUserProfile.detail?.username[0]}
+                                        {receiverUserProfile.data?.username[0]}
                                     </div>
                                 )}
                             </div>
-                            <div className="text-gray-900 text-[1.2rem] font-medium">{receiverUserProfile.detail?.username}</div>
+                            <div className="text-gray-900 text-[1.2rem] font-medium">{receiverUserProfile.data?.username}</div>
                         </div>
                         <button
                             className={cn(
@@ -164,23 +164,23 @@ export default function UserChat() {
                     </div>
                 )}
                 <div className="flex flex-col gap-2.5 px-2.5 h-[80%] border-x border-gray-400">
-                    {userChats.isLoading ? (
+                    {allUserChats.isLoading ? (
                         <div className="flex justify-center items-center bg-white h-full">
                             <Loading/>
                         </div>
-                    ) : userChats.error ? (
+                    ) : allUserChats.error ? (
                         <div className="flex justify-center items-center h-full">
                             <div className="text-gray-700 font-medium text-center">
-                                {userChats.error.message}
+                                {allUserChats.error.message}
                             </div>
                         </div>
                     ) : (
                         <ChatList 
-                            chats={userChats.getUserChats} 
-                            currentUserId={currentUser.user ? currentUser.user.user_id : ''} 
-                            fetchNextPage={userChats.fetchNextPage}
-                            hasNextPage={userChats.hasNextPage}
-                            isFetchingNextPage={userChats.isFetchingNextPage}
+                            chats={allUserChats.data ? allUserChats.data.pages.flat() : []} 
+                            currentUserId={currentUser.data ? currentUser.data.user_id : ""} 
+                            fetchNextPage={allUserChats.fetchNextPage}
+                            hasNextPage={allUserChats.hasNextPage}
+                            isFetchingNextPage={allUserChats.isFetchingNextPage}
                             isInRoom={false}
                             isProcessing={isUserChatProcessing || isUserProfileProcessing}
                             isSelectMode={isSelectMode}

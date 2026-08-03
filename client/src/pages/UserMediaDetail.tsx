@@ -30,12 +30,10 @@ export default function UserMediaDetail() {
         }
     }, [chatId]);
 
-    console.log(userChatMedia.data);
-
     return (
         <section className="h-dvh flex md:flex-row flex-col p-2.5 gap-2.5 relative z-10">
             <Navbar isProcessing={isUserChatProcessing}/>
-            <div className="h-full flex flex-col w-full md:w-2/5 border border-gray-400 inset-shadow-sm inset-shadow-gray-400">
+            <div className="h-full flex flex-col w-full md:w-2/5 border border-gray-400 inset-shadow-sm inset-shadow-gray-400 overflow-y-auto">
                 <div className="flex px-2.5 pt-2.5">
                     <button
                         className="cursor-pointer disabled:cursor-not-allowed font-medium text-gray-700 hover:text-gray-500 transition-colors"
@@ -55,7 +53,7 @@ export default function UserMediaDetail() {
                         <div className="text-gray-700 text-2xl font-medium text-center">{userChatMedia.error.message}</div>
                     </div>
                 ) : (
-                    <FileDetail files={userChatMedia.data} is_processing={isUserChatProcessing}/>
+                    <FileDetail files={userChatMedia.data} is_processing={userChatMedia.isLoading}/>
                 )}
             </div>
             <div 

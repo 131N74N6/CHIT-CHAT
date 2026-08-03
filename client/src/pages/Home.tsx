@@ -20,6 +20,9 @@ export default function Home() {
     
     const showUserProfile = useChatStore((state) => state.showUserProfile);
     const setShowUserProfile = useChatStore((state) => state.setShowUserProfile);
+
+    const chatId = useChatStore((state) => state.chatId);
+    const setChatId = useChatStore((state) => state.setChatId);
     
     const showUserMedia = useChatStore((state) => state.showUserMedia);
     const setShowUserMedia = useChatStore((state) => state.setShowUserMedia);
@@ -29,7 +32,6 @@ export default function Home() {
     
     const receiverId = useChatStore((state) => state.receiverId);
     const setReceiverId = useChatStore((state) => state.setReceiverId);
-    const setChatId = useChatStore((state) => state.setChatId);
 
     const { 
         allUsers, 
@@ -39,6 +41,7 @@ export default function Home() {
     } = useUserProfileService();
 
     const { 
+        allUserChats, 
         clearAllUserChatsForMeMt, 
         clearChosenUserChatForMeMt,
         clearSelection, 
@@ -58,7 +61,7 @@ export default function Home() {
         showDeleteOption1,
         showDeleteOption2,
         toggleSelect,
-        userChats 
+        userChatMedia
     } = useUserChatService();
     
     useSocketIo({
@@ -109,42 +112,43 @@ export default function Home() {
                 />
             ) : null}
             <div className="md:w-2/5 w-full h-full flex flex-col px-2.5 inset-shadow-sm inset-shadow-gray-400 border border-gray-400 overflow-y-auto">
-                {allUsers.usersError ? (
+                {allUsers.error ? (
                     <div className="flex justify-center items-center h-full">
                         <div className="text-gray-700 font-medium text-center">
-                            {allUsers.usersError.message}
+                            {allUsers.error.message}
                         </div>
                     </div>
-                ) : allUsers.isUsersLoading ? (
+                ) : allUsers.isLoading ? (
                     <div className="flex justify-center items-center h-full">
                         <Loading/>
                     </div>
                 ) : (
                     <UserList 
-                        currentUserId={currentUser.user?.user_id!}
-                        fetchNextUser={allUsers.fetchNextUser}
-                        hasNextPage={allUsers.usersHaveNextPage}
+                        currentUserId={currentUser.data ? currentUser.data.user_id : ""}
+                        fetchNextUser={allUsers.fetchNextPage}
+                        hasNextPage={allUsers.hasNextPage}
                         isProcessing={isUserChatProcessing || isUserProfileProcessing}
-                        isFetchingNextPage={allUsers.isFetchNextUser}
+                        isFetchingNextPage={allUsers.isFetchingNextPage}
                         place={{ name: "user-list-home" }}
                         setReceiverId={setReceiverId}
-                        users={allUsers.users}
+                        users={allUsers.data ? allUsers.data.pages.flat() : []}
                     />
                 )}
             </div>
             {receiverId && receiverId !== "" ? (
                 <UserWindow
+                    chatId={chatId}
                     clearSelection={clearSelection}
-                    currentUserId={currentUser.user ? currentUser.user.user_id : ""}
-                    errorProfile={receiverUserProfile.detailError}
-                    fetchNextUserChat={userChats.fetchNextPage}
+                    currentUserId={currentUser.data ? currentUser.data.user_id : ""}
+                    errorProfile={receiverUserProfile.error}
+                    fetchNextUserChat={allUserChats.fetchNextPage}
                     handleMediaPreview={handleMediaPreview}
-                    hasNextUserChat={userChats.hasNextPage}
+                    hasNextUserChat={allUserChats.hasNextPage}
                     inputMediaRef={inputMediaRef}
                     media={media}
-                    isFetchingNextUserChats={userChats.isFetchingNextPage}
-                    isProcessing={userChats.isLoading || isUserChatProcessing || isUserProfileProcessing}
-                    isProfileLoading={receiverUserProfile.isDetailLoading}
+                    isFetchingNextUserChats={allUserChats.isFetchingNextPage}
+                    isProcessing={allUserChats.isLoading || isUserChatProcessing || isUserProfileProcessing}
+                    isProfileLoading={receiverUserProfile.isLoading}
                     isUserChatProcessing={isUserChatProcessing}
                     isSelectMode={isSelectMode}
                     receiverId={receiverId}
@@ -163,9 +167,10 @@ export default function Home() {
                     showUserProfile={showUserProfile}
                     text={text}
                     toggleSelect={toggleSelect}
-                    userChatError={userChats.error}
-                    userChats={userChats.getUserChats}
-                    userProfile={receiverUserProfile.detail!}
+                    userChats={allUserChats.data ? allUserChats.data.pages.flat() : []}
+                    userChatError={allUserChats.error}
+                    userChatMedia={userChatMedia}
+                    userProfile={receiverUserProfile.data!}
                 />
             ) : (
                 <div 

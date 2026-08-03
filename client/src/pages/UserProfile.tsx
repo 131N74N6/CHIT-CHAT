@@ -19,7 +19,6 @@ export default function UserProfile() {
     const setMessage = useMessageStore((state) => state.setMessage);
 
     const { receiverUserProfile } = useUserProfileService();
-    const { detail, detailError, isDetailLoading } = receiverUserProfile;
     
     useEffect(() => {
         if (message) {
@@ -50,16 +49,16 @@ export default function UserProfile() {
     return (
         <section className="flex md:flex-row gap-2.5 p-2.5 flex-col relative h-dvh z-10">
             {message ? <Alert message={message}/> : null}
-            <Navbar isProcessing={isDetailLoading}/>
+            <Navbar/>
             <div className="flex md:w-2/5 w-full flex-col h-full border border-gray-400">
-                {isDetailLoading ? (
+                {receiverUserProfile.isLoading ? (
                     <div className="flex justify-center items-center h-full">
                         <Loading/>
                     </div>
-                ) : detailError ? (
+                ) : receiverUserProfile.error ? (
                     <div className="flex justify-center items-center h-full">
                         <div className="text-center font-medium text-4xl text-gray-800">
-                            {detailError.message}
+                            {receiverUserProfile.error.message}
                         </div>
                     </div>
                 ) : (
@@ -78,12 +77,12 @@ export default function UserProfile() {
                         </div>
                         <div className="flex justify-center">
                             <div className="w-20 h-20 rounded-full">
-                                {detail && detail.profile_picture && detail.profile_picture.public_id ? (
+                                {receiverUserProfile.data && receiverUserProfile.data.profile_picture && receiverUserProfile.data.profile_picture.public_id ? (
                                     <div className="w-full h-full rounded-full">
                                         <img
-                                            alt={detail.profile_picture.public_id}
+                                            alt={receiverUserProfile.data.profile_picture.public_id}
                                             className="w-full h-full object-cover rounded-full"
-                                            src={detail.profile_picture.url}
+                                            src={receiverUserProfile.data.profile_picture.url}
                                         />
                                     </div>
                                 ) : (
@@ -91,7 +90,7 @@ export default function UserProfile() {
                                         "bg-purple-400 text-white font-medium text-2xl text-[1.2rem]",
                                         "flex justify-center items-center w-full h-full rounded-full"
                                     )}>
-                                        {detail?.username[0]}
+                                        {receiverUserProfile.data?.username[0]}
                                     </div>
                                 )}
                             </div>
@@ -100,25 +99,25 @@ export default function UserProfile() {
                             <div className="flex flex-col gap-1.5">
                                 <div className="text-[1rem] font-medium text-gray-800">User ID</div>
                                 <div className="text-[1rem] font-medium text-gray-800">
-                                    {detail && detail._id ? detail._id : "-"}
+                                    {receiverUserProfile.data && receiverUserProfile.data._id ? receiverUserProfile.data._id : "-"}
                                 </div>
                             </div>
                             <div className="flex flex-col gap-1.5">
                                 <div className="text-[1rem] font-medium text-gray-800">Username</div>
                                 <div className="text-[1rem] font-medium text-gray-800">
-                                    {detail && detail.username ? detail.username : "-"}
+                                    {receiverUserProfile.data && receiverUserProfile.data.username ? receiverUserProfile.data.username : "-"}
                                 </div>
                             </div>
                             <div className="flex flex-col gap-1.5">
                                 <div className="text-[1rem] font-medium text-gray-800">Gender</div>
                                 <div className="text-[1rem] font-medium text-gray-800">
-                                    {detail && detail.gender ? detail.gender : "-"}
+                                    {receiverUserProfile.data && receiverUserProfile.data.gender ? receiverUserProfile.data.gender : "-"}
                                 </div>
                             </div>
                             <div className="flex flex-col gap-1.5">
                                 <div className="text-[1rem] font-medium text-gray-800">Address</div>
                                 <div className="text-[1rem] font-medium text-gray-800">
-                                    {detail && detail.address ? detail.address : "-"}
+                                    {receiverUserProfile.data && receiverUserProfile.data.address ? receiverUserProfile.data.address : "-"}
                                 </div>
                             </div>
                         </div>

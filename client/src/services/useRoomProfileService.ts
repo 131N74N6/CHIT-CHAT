@@ -37,14 +37,7 @@ export default function useRoomProfileService() {
     const oldRoomPicture = useRoomStore((state) => state.oldRoomPicture);
     const setOldRoomPicture = useRoomStore((state) => state.setOldRoomPicture);
 
-    const { 
-        data: paginatedAvailableRooms,
-        error: availableRoomsError,
-        fetchNextPage: fetchNextAvailableRoom,
-        isFetchingNextPage: isFetchNextAvailableRoom,
-        isLoading: isAvailableRoomLoading,
-        hasNextPage: availableRoomHasNextPage
-    } = useInfiniteQuery({
+    const availableRooms = useInfiniteQuery({
         enabled: !!currentUserId,
         getNextPageParam: (lastPage, allPages) => {
             if (lastPage.length <= 14) return;
@@ -71,18 +64,7 @@ export default function useRoomProfileService() {
         staleTime: Infinity
     });
 
-    const availableRooms = paginatedAvailableRooms ? paginatedAvailableRooms.pages.flat() : [];
-
-    const currentAvailableRooms = {
-        availableRooms,
-        availableRoomsError,
-        fetchNextAvailableRoom,
-        isFetchNextAvailableRoom,
-        isAvailableRoomLoading,
-        availableRoomHasNextPage
-    }
-
-    const { data: detail, error: errorDetail, isLoading: isDetailLoading } = useQuery<RoomIntrf>({
+    const currentRoomProfile = useQuery<RoomIntrf>({
         enabled: !!roomId,
         queryFn: async () => {
             try {
@@ -102,8 +84,6 @@ export default function useRoomProfileService() {
         queryKey: [`room-profile-${roomId}`],
         staleTime: Infinity
     });
-
-    const currentRoomProfile = { detail, errorDetail, isDetailLoading }
 
     const changeRoomMt = useMutation({
         mutationFn: async () => {
@@ -232,12 +212,12 @@ export default function useRoomProfileService() {
         }
     });
 
-    const isRoomProfileProcessing = changeRoomMt.isPending || currentAvailableRooms.isAvailableRoomLoading || 
-    currentRoomProfile.isDetailLoading || deleteRoomMt.isPending || makeRoomMt.isPending;
+    const isRoomProfileProcessing = changeRoomMt.isPending || availableRooms.isLoading || 
+    currentRoomProfile.isLoading || deleteRoomMt.isPending || makeRoomMt.isPending;
 
     return { 
+        availableRooms,
         changeRoomMt,
-        currentAvailableRooms,
         currentRoomProfile,
         deleteRoomImage,
         deleteRoomMt,

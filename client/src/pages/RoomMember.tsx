@@ -21,7 +21,7 @@ export default function RoomMember() {
     const setMessage = useMessageStore((state) => state.setMessage);
     
     const { currentUser } = useUserProfileService();
-    const { currentRoomMember, isRoomOwner, kickMemberMt } = useRoomMemberService();
+    const { currentRoomMember, isRoomOwner, isRoomMemberProcessing, kickMemberMt } = useRoomMemberService();
     
     useEffect(() => {
         if (message) {
@@ -51,7 +51,7 @@ export default function RoomMember() {
 
     return (
         <section className="flex flex-col md:flex-row gap-2.5 p-2.5 h-dvh relative z-10">
-            <Navbar isProcessing={currentRoomMember.isRoomMemberLoading}/>
+            <Navbar isProcessing={isRoomMemberProcessing}/>
             {message ? <Alert message={message}/> : null}
             <div className="flex flex-col h-full w-full md:w-2/5 p-2.5 border border-gray-400 overflow-y-auto">
                 <div className="flex">
@@ -63,29 +63,29 @@ export default function RoomMember() {
                         type="text"
                     />
                 </div>
-                {currentRoomMember.isRoomMemberLoading ? (
+                {currentRoomMember.isLoading ? (
                     <div className="flex justify-center items-center h-full">
                         <Loading/>
                     </div>
-                ) : currentRoomMember.roomMemberError ? (
+                ) : currentRoomMember.error ? (
                     <div className="flex justify-center items-center h-full">
                         <div className="text-center font-medium text-4xl text-gray-800">
-                            {currentRoomMember.roomMemberError.message}
+                            {currentRoomMember.error.message}
                         </div>
                     </div>
                 ) : (
                     <UserList
-                        currentUserId={currentUser.user?.user_id!}
-                        fetchNextUser={currentRoomMember.fetchNextRoomMember}
-                        hasNextPage={currentRoomMember.roomMmeberHaveNextPage}
+                        currentUserId={currentUser.data ? currentUser.data.user_id : ""}
+                        fetchNextUser={currentRoomMember.fetchNextPage}
+                        hasNextPage={currentRoomMember.hasNextPage}
                         place={{ 
                             name: "room-member", 
                             isRoomOwner: isRoomOwner, 
                             kickMemberMt: kickMemberMt 
                         }}
-                        isFetchingNextPage={currentRoomMember.isRoomMemberFetchNextPage}
-                        isProcessing={currentRoomMember.isRoomMemberLoading}
-                        users={currentRoomMember.roomMember}
+                        isFetchingNextPage={currentRoomMember.isFetchingNextPage}
+                        isProcessing={isRoomMemberProcessing}
+                        users={currentRoomMember.data ? currentRoomMember.data.pages.flat() : []}
                         setReceiverId={setReceiverId}
                     />
                 )}

@@ -22,6 +22,7 @@ export default function AvailableRoom() {
     const setRoomId = useRoomStore((state) => state.setRoomId);
 
     const setReceiverId = useChatStore((state) => state.setReceiverId);
+    const chatId = useChatStore((state) => state.chatId);
     const setChatId = useChatStore((state) => state.setChatId);
 
     const message = useMessageStore((state) => state.message);
@@ -44,8 +45,8 @@ export default function AvailableRoom() {
     } = useRoomMemberService();
 
     const { 
+        availableRooms,  
         changeRoomMt,
-        currentAvailableRooms,  
         currentRoomProfile, 
         deleteRoomMt, 
         description,
@@ -79,6 +80,7 @@ export default function AvailableRoom() {
         isSelectMode,
         media,
         removeOnePreviewFile,
+        roomChatMedia,
         selectedChatsIds,
         setIsSelectMode,
         setShowDeleteOption1,
@@ -90,7 +92,7 @@ export default function AvailableRoom() {
         showDeleteOption2,
         showRoomMedia,
         text,
-        toggleSelect
+        toggleSelect,
     } = useRoomChatService();
 
     useEffect(() => {
@@ -115,21 +117,21 @@ export default function AvailableRoom() {
 
     useEffect(() => {
         if (editMode) {
-            currentRoomProfile.detail && currentRoomProfile.detail.name ?
-            setRoomName(currentRoomProfile.detail.name) :
+            currentRoomProfile.data && currentRoomProfile.data.name ?
+            setRoomName(currentRoomProfile.data.name) :
             setRoomName("");
-            currentRoomProfile.detail && currentRoomProfile.detail.description ? 
-            setDescription(currentRoomProfile.detail.description) :
+            currentRoomProfile.data && currentRoomProfile.data.description ? 
+            setDescription(currentRoomProfile.data.description) :
             setDescription("-");
-            currentRoomProfile.detail && currentRoomProfile.detail.profile_picture !== null ? 
-            setOldRoomPicture(currentRoomProfile.detail.profile_picture) :
+            currentRoomProfile.data && currentRoomProfile.data.profile_picture !== null ? 
+            setOldRoomPicture(currentRoomProfile.data.profile_picture) :
             setOldRoomPicture(null);
         } else {
             setRoomName("");
             setDescription("");
             setOldRoomPicture(null);
         }
-    }, [editMode, roomId, currentRoomProfile.detail]);
+    }, [editMode, roomId, currentRoomProfile.data]);
 
     useSocketIo({
         identifier: ["available-room", "room-chat", "room-profile", "room-member"]
@@ -159,64 +161,66 @@ export default function AvailableRoom() {
                 />
             ) : null}
             <div className="flex flex-col md:w-2/5 h-full px-2.5 w-full inset-shadow-sm inset-shadow-gray-400 border border-gray-400 overflow-y-auto">
-                {currentAvailableRooms.isAvailableRoomLoading ? (
+                {availableRooms.isLoading ? (
                     <div className="flex justify-center items-center h-full">
                         <Loading/>
                     </div>
-                ) : currentAvailableRooms.availableRoomsError ? (
+                ) : availableRooms.error ? (
                     <div className="flex justify-center items-center h-full">
                         <div className="text-gray-700 font-medium text-center">
-                            {currentAvailableRooms.availableRoomsError.message}
+                            {availableRooms.error.message}
                         </div>
                     </div>
                 ) : (
                     <RoomList
-                        fetchNextPage={currentAvailableRooms.fetchNextAvailableRoom}
-                        hasNextPage={currentAvailableRooms.availableRoomHasNextPage}
-                        isFetchingNextPage={currentAvailableRooms.isFetchNextAvailableRoom}
-                        isProcessing={currentAvailableRooms.isAvailableRoomLoading}
-                        rooms={currentAvailableRooms.availableRooms}
+                        fetchNextPage={availableRooms.fetchNextPage}
+                        hasNextPage={availableRooms.hasNextPage}
+                        isFetchingNextPage={availableRooms.isFetchingNextPage}
+                        isProcessing={isRoomProfileProcessing}
+                        rooms={availableRooms.data ? availableRooms.data.pages.flat() : []}
                         setRoomId={setRoomId}
                     />
                 )}
             </div>
             {roomId ? (
                 <RoomWindow
+                    chatId={chatId}
                     changeRoomMt={changeRoomMt}
-                    currentUserId={currentUser.user ? currentUser.user.user_id : "-"}
+                    currentUserId={currentUser.data ? currentUser.data.user_id : ""}
                     clearChatsIdsSelection={clearChatsIdsSelection}
                     deleteRoomMt={deleteRoomMt}
                     description={description}
                     editMode={editMode}
-                    fetchNextRoomChat={allChatsInRoom.fecthNextRoomChat}
-                    fetchNextUser={currentRoomMember.fetchNextRoomMember}
+                    fetchNextRoomChat={allChatsInRoom.fetchNextPage}
+                    fetchNextUser={currentRoomMember.fetchNextPage}
                     fileInputRef={fileInputRef}
                     handleImagePreview={handleImagePreview}
                     handleMediaPreview={handleMediaPreview}
-                    hasNextRoomChat={allChatsInRoom.roomChatHasNextPage}
+                    hasNextRoomChat={allChatsInRoom.hasNextPage}
                     inputMediaRef={inputMediaRef}
-                    isFetchingNextRoomChat={allChatsInRoom.isRoomChatFetchNext}
-                    isRoomChatLoading={allChatsInRoom.isRoomChatLoading}
+                    isFetchingNextRoomChat={allChatsInRoom.isFetchingNextPage}
+                    isRoomChatLoading={allChatsInRoom.isLoading}
                     isRoomChatProcessing={isRoomChatProcessing}
-                    isRoomMemberLoading={currentRoomMember.isRoomMemberLoading}
+                    isRoomMemberLoading={currentRoomMember.isLoading}
                     isRoomOwner={isRoomOwner}
-                    isRoomProfileLoading={currentRoomProfile.isDetailLoading}
+                    isRoomProfileLoading={currentRoomProfile.isLoading}
                     isRoomProfileProcessing={isRoomProfileProcessing}
-                    isRoomMemberFetchNextPage={currentRoomMember.isRoomMemberFetchNextPage}
+                    isRoomMemberFetchNextPage={currentRoomMember.isFetchingNextPage}
                     isSelectMode={isSelectMode}
                     kickMemberMt={kickMemberMt}
                     leftRoomMt={leftRoomMt}
                     media={media}
                     oldRoomPicture={oldRoomPicture}
                     removeOnePreviewFile={removeOnePreviewFile}
-                    roomChats={allChatsInRoom.roomChats}
-                    roomChatError={allChatsInRoom.roomChatsError}
+                    roomChats={allChatsInRoom.data ? allChatsInRoom.data.pages.flat() : []}
+                    roomChatError={allChatsInRoom.error}
+                    roomChatMedia={roomChatMedia}
                     roomId={roomId}
                     roomName={roomName}
-                    roomProfile={currentRoomProfile.detail!}
-                    roomMemberError={currentRoomMember.roomMemberError}
-                    roomMemberHaveNextPage={currentRoomMember.roomMmeberHaveNextPage}
-                    roomProfileError={currentRoomProfile.errorDetail}
+                    roomProfile={currentRoomProfile.data!}
+                    roomMemberError={currentRoomMember.error}
+                    roomMemberHaveNextPage={currentRoomMember.hasNextPage}
+                    roomProfileError={currentRoomProfile.error}
                     setIsSelectMode={setIsSelectMode}
                     selectedProfileRoom={selectedProfileRoom}
                     selectedProfileRoomUrl={selectedProfileRoomUrl}
@@ -243,7 +247,7 @@ export default function AvailableRoom() {
                     showRoomMedia={showRoomMedia}
                     text={text}
                     toggleSelect={toggleSelect}
-                    users={currentRoomMember.roomMember}
+                    users={currentRoomMember.data ? currentRoomMember.data.pages.flat() : []}
                 />
             ) : (
                 <div 

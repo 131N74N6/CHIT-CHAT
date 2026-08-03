@@ -7,7 +7,7 @@ import cn from "../utils/cn";
 
 export default function FileDetail(props: IChatMediaList) {
     return (
-        <div className="p-2.5 overflow-y-auto">
+        <div className="grid lg:grid-cols-4 md:grid-cols-3 grid-cols-2 gap-2.5 p-2.5 overflow-y-auto">
             {props.files.map(file => (
                 <FileIcon file={file} is_processing={props.is_processing}/>
             ))}
@@ -34,7 +34,7 @@ function FileIcon(props: IChatMedia) {
     };
 
     return (
-        <div className="grid xl:grid-cols-5 lg:grid-cols-4 md:grid-cols-3 grid-cols-2 gap-2.5">
+        <div className="">
             {props.file.file_type.startsWith('image/') ? (
                 <div className="relative">
                     <img 

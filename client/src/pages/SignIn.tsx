@@ -24,8 +24,8 @@ export default function SignIn() {
     const { currentUser } = useUserProfileService();
 
     useEffect(() => {
-        if (currentUser.user && !currentUser.isUserLoading) navigate("/home", { replace: true });
-    }, [currentUser.user, currentUser.isUserLoading, navigate]);
+        if (currentUser.data && !currentUser.isLoading) navigate("/home", { replace: true });
+    }, [currentUser.data, currentUser.isLoading, navigate]);
     
     useEffect(() => {
         if (message) {

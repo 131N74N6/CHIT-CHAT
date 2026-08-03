@@ -1,7 +1,7 @@
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRef } from 'react';
 import { useChatStore } from '../stores/chat.store';
-import type { ChatIntrf, IFileViewer } from '../models/chat.model';
+import type { IFileViewer } from '../models/chat.model';
 import { useRoomStore } from '../stores/room.store';
 import { useMessageStore } from '../stores/message.store';
 
@@ -39,14 +39,7 @@ export default function useRoomChatService() {
     const selectedChatsIds = useRoomStore((state) => state.selectedChatsIds);
     const clearChatsIdsSelection = useRoomStore((state) => state.clearChatsIdsSelection);
 
-    const { 
-        data: paginatedRoomChats, 
-        error: roomChatsError, 
-        fetchNextPage: fecthNextRoomChat, 
-        hasNextPage: roomChatHasNextPage, 
-        isFetchingNextPage: isRoomChatFetchNext, 
-        isLoading: isRoomChatLoading, 
-    } = useInfiniteQuery({
+    const allChatsInRoom = useInfiniteQuery({
         enabled: !!roomId,
         getNextPageParam: (lastPage, allPages) => {
             if (lastPage.length <= 14) return;
@@ -71,17 +64,6 @@ export default function useRoomChatService() {
         refetchOnReconnect: true,
         staleTime: Infinity
     });
-    
-    const roomChats: ChatIntrf[] = paginatedRoomChats ? paginatedRoomChats.pages.flat() : [];
-    
-    const allChatsInRoom = {
-        roomChats,
-        roomChatsError,
-        fecthNextRoomChat,
-        roomChatHasNextPage,
-        isRoomChatFetchNext,
-        isRoomChatLoading
-    }
 
     const clearAllRoomChatsForMeMt = useMutation({
         mutationFn: async () => {
@@ -304,7 +286,7 @@ export default function useRoomChatService() {
     });
 
     const isRoomChatProcessing = clearAllRoomChatsForMeMt.isPending || clearChosenRoomChatsForMeMt.isPending ||
-    deleteAllChatsInRoomMt.isPending || deleteChosenChatsInRoomMt.isPending || allChatsInRoom.isRoomChatLoading || 
+    deleteAllChatsInRoomMt.isPending || deleteChosenChatsInRoomMt.isPending || allChatsInRoom.isLoading || 
     sendChatToRoomMt.isPending || editSelectedChatMt.isPending;
 
     return { 

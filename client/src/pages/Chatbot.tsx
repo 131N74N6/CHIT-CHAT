@@ -13,7 +13,7 @@ export default function Chatbot() {
     const setMessage = useMessageStore((state) => state.setMessage);
 
     const { 
-        allResults, 
+        showAllBotResults, 
         askAiMt, 
         clearSelectedResults,
         deleteAllResultsMt, 
@@ -85,13 +85,13 @@ export default function Chatbot() {
                     </div>
                 )}
                 <div className="flex flex-col gap-2.5 px-2.5 h-[80%]">
-                    {allResults.isResultsLoading ? (
+                    {showAllBotResults.isLoading ? (
                         <div className="flex justify-center items-center h-full">
                             <Loading/>
                         </div>
-                    ) : allResults.resultsError ? (
+                    ) : showAllBotResults.error ? (
                         <div className="flex justify-center items-center h-full">
-                            <div className="text-3xl font-medium text-gray-700">{allResults.resultsError.message}</div>
+                            <div className="text-3xl font-medium text-gray-700">{showAllBotResults.error.message}</div>
                         </div>
                     ) : askAiMt.isPending ? (
                         <div className="flex flex-col gap-2">
@@ -109,12 +109,12 @@ export default function Chatbot() {
                         </div>
                     ) : (
                         <ChatbotList
-                            fetchNextPage={allResults.fetchNextResults}
-                            hasNextPage={allResults.resultsHaveNext}
-                            isFetchingNextPage={allResults.resultsFetchNextPage}
+                            fetchNextPage={showAllBotResults.fetchNextPage}
+                            hasNextPage={showAllBotResults.hasNextPage}
+                            isFetchingNextPage={showAllBotResults.isFetchingNextPage}
                             isProcessing={isChatbotProcessing}
                             isSelectMode={isSelectMode}
-                            results={allResults.paginatedResults}
+                            results={showAllBotResults.data ? showAllBotResults.data.pages.flat() : []}
                             selectedChatBotIds={selectedChatBotIds}
                             toggleSelect={toggleSelect}
                         />

@@ -25,14 +25,7 @@ export default function useChatbotService() {
 
     const toggleSelect = useChatbotStore((state) => state.toggleSelect);
     
-    const {
-        data: results,
-        error: resultsError,
-        fetchNextPage: fetchNextResults,
-        hasNextPage: resultsHaveNext,
-        isFetchingNextPage: resultsFetchNextPage,
-        isLoading: isResultsLoading
-    } = useInfiniteQuery({
+    const showAllBotResults = useInfiniteQuery({
         enabled: !!currentUserId,
         getNextPageParam: (lastPage, allPages) => {
             if (lastPage.length <= 14) return;
@@ -58,17 +51,6 @@ export default function useChatbotService() {
         refetchOnReconnect: true,
         staleTime: Infinity
     });
-
-    const paginatedResults = results ? results.pages.flat() : [];
-
-    const allResults = { 
-        paginatedResults, 
-        resultsError, 
-        fetchNextResults, 
-        resultsHaveNext, 
-        resultsFetchNextPage, 
-        isResultsLoading 
-    }
 
     const askAiMt = useMutation({
         mutationFn: async () => {
@@ -148,11 +130,11 @@ export default function useChatbotService() {
         }
     });
 
-    const isChatbotProcessing = allResults.isResultsLoading || askAiMt.isPending ||
+    const isChatbotProcessing = showAllBotResults.isLoading || askAiMt.isPending ||
     deleteAllResultsMt.isPending || deleteChosenResultsMt.isPending;
 
     return { 
-        allResults, 
+        showAllBotResults, 
         answer, 
         askAiMt, 
         clearSelectedResults,

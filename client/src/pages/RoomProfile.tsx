@@ -22,7 +22,6 @@ export default function RoomProfile() {
     const setRoomId = useRoomStore((state) => state.setRoomId);
     
     const { currentUser, isUserProfileProcessing } = useUserProfileService();
-    const { user } = currentUser;
 
     const { 
         currentRoomProfile, 
@@ -45,8 +44,6 @@ export default function RoomProfile() {
         setSelectedProfileRoom, 
         setSelectedProfileRoomUrl
     } = useRoomProfileService();
-
-    const { detail, errorDetail, isDetailLoading } = currentRoomProfile;
 
     const { leftRoomMt } = useRoomMemberService();
 
@@ -74,37 +71,37 @@ export default function RoomProfile() {
 
     useEffect(() => {
         if (editMode) {
-            currentRoomProfile.detail && currentRoomProfile.detail.description ? 
-            setDescription(currentRoomProfile.detail.description) :
+            currentRoomProfile.data && currentRoomProfile.data.description ? 
+            setDescription(currentRoomProfile.data.description) :
             setDescription("-");
-            currentRoomProfile.detail && currentRoomProfile.detail.profile_picture !== null ? 
-            setOldRoomPicture(currentRoomProfile.detail.profile_picture) :
+            currentRoomProfile.data && currentRoomProfile.data.profile_picture !== null ? 
+            setOldRoomPicture(currentRoomProfile.data.profile_picture) :
             setOldRoomPicture(null);
         } else {
             setDescription("");
             setOldRoomPicture(null);
         }
-    }, [editMode, roomId, currentRoomProfile.detail]);
+    }, [editMode, roomId, currentRoomProfile.data]);
 
 
     useSocketIo({
         identifier: ["room-profile"]
     });
 
-    const isRoomOwner = user && detail && user.user_id === detail.creator_id;
+    const isRoomOwner = currentUser.data && currentRoomProfile.data && currentUser.data.user_id === currentRoomProfile.data.creator_id;
 
     return (
         <section className="flex md:flex-row p-2.5 gap-2.5 flex-col relative h-dvh z-10">
             {message ? <Alert message={message}/> : null}
             <Navbar isProcessing={isUserProfileProcessing}/>
-            {isDetailLoading ? (
+            {currentRoomProfile.isLoading ? (
                 <div className="flex justify-center items-center h-full">
                     <Loading/>
                 </div>
-            ) : errorDetail ? (
+            ) : currentRoomProfile.error ? (
                 <div className="flex justify-center items-center h-full">
                     <div className="text-center font-medium text-4xl text-gray-800">
-                        {errorDetail.message}
+                        {currentRoomProfile.error.message}
                     </div>
                 </div>
             ) : editMode ? (
@@ -249,12 +246,12 @@ export default function RoomProfile() {
                         </div>
                         <div className="flex justify-center">
                             <div className="w-20 h-20 rounded-full">
-                                {detail && detail.profile_picture !== null ? (
+                                {currentRoomProfile.data && currentRoomProfile.data.profile_picture !== null ? (
                                     <div className="w-full h-full rounded-full">
                                         <img
-                                            alt={detail.profile_picture.public_id}
+                                            alt={currentRoomProfile.data.profile_picture.public_id}
                                             className="w-full h-full object-cover rounded-full"
-                                            src={detail.profile_picture.url}
+                                            src={currentRoomProfile.data.profile_picture.url}
                                         />
                                     </div>
                                 ) : (
@@ -262,7 +259,7 @@ export default function RoomProfile() {
                                         "bg-blue-600 text-white font-medium text-2xl",
                                         "flex justify-center items-center w-full h-full rounded-full"
                                     )}>
-                                        {detail?.name[0]}
+                                        {currentRoomProfile.data?.name[0]}
                                     </div>
                                 )}
                             </div>
@@ -271,25 +268,25 @@ export default function RoomProfile() {
                             <div className="flex flex-col gap-1.5">
                                 <div className="text-[1rem] font-medium text-gray-800">Created At</div>
                                 <div className="text-[1rem] font-medium text-gray-800">
-                                    {detail && detail.created_at ? detail.created_at : "-"}
+                                    {currentRoomProfile.data && currentRoomProfile.data.created_at ? currentRoomProfile.data.created_at : "-"}
                                 </div>
                             </div>
                             <div className="flex flex-col gap-1.5">
                                 <div className="text-[1rem] font-medium text-gray-800">Room ID</div>
                                 <div className="text-[1rem] font-medium text-gray-800">
-                                    {detail && detail._id ? detail._id : "-"}
+                                    {currentRoomProfile.data && currentRoomProfile.data._id ? currentRoomProfile.data._id : "-"}
                                 </div>
                             </div>
                             <div className="flex flex-col gap-1.5">
                                 <div className="text-[1rem] font-medium text-gray-800">Username</div>
                                 <div className="text-[1rem] font-medium text-gray-800">
-                                    {detail && detail.name ? detail.name : "-"}
+                                    {currentRoomProfile.data && currentRoomProfile.data.name ? currentRoomProfile.data.name : "-"}
                                 </div>
                             </div>
                             <div className="flex flex-col gap-1.5">
                                 <div className="text-[1rem] font-medium text-gray-800">Description</div>
                                 <div className="text-[1rem] font-medium text-gray-800">
-                                    {detail && detail.description !== null ? detail.description : "-"}
+                                    {currentRoomProfile.data && currentRoomProfile.data.description !== null ? currentRoomProfile.data.description : "-"}
                                 </div>
                             </div>
                         </div>

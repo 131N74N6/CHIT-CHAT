@@ -10,6 +10,7 @@ export interface IUserProfileWindow {
 }
 
 export interface IUserWindow {
+    chatId: string;
     clearSelection: () => void;
     currentUserId: string;
     errorProfile: Error | null;
@@ -41,6 +42,7 @@ export interface IUserWindow {
     toggleSelect: (id: string) => void;
     userChats: ChatIntrf[];
     userChatError: Error | null;
+    userChatMedia: UseQueryResult<any, Error>;
     userProfile: IOtherUser;
 }
 

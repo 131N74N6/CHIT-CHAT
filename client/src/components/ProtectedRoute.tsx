@@ -9,7 +9,7 @@ interface ProtectedRouteIntrf {
 export default function ProtectedRoute(props: ProtectedRouteIntrf) {
     const { currentUser } = useUserService();
 
-    if (!currentUser.user && currentUser.isUserLoading) {
+    if (!currentUser.data && currentUser.isLoading) {
         return (
             <div className="bg-white flex justify-center items-center h-screen">
                 <Loading/>
@@ -17,5 +17,5 @@ export default function ProtectedRoute(props: ProtectedRouteIntrf) {
         );
     }
 
-    return currentUser.user && currentUser.user.user_id ? <>{props.children}</> : <Navigate to={"/sign-in"} replace/>
+    return currentUser.data && currentUser.data.user_id ? <>{props.children}</> : <Navigate to={"/sign-in"} replace/>
 }

@@ -1,5 +1,5 @@
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import type { ChatIntrf, IFileViewer } from "../models/chat.model";
+import type { IFileViewer } from "../models/chat.model";
 import { useRef } from "react";
 import { useChatStore } from "../stores/chat.store";
 import { useMessageStore } from "../stores/message.store";
@@ -32,6 +32,35 @@ export default function useUserChatService() {
 
     const showDeleteOption2 = useChatStore((state) => state.showDeleteOption2);
     const setShowDeleteOption2 = useChatStore((state) => state.setShowDeleteOption2);
+
+    const allUserChats = useInfiniteQuery({
+        enabled: !!receiverId,
+        getNextPageParam: (lastPage, allPages) => {
+            if (lastPage.length <= 14) return;
+            return allPages.length + 1;
+        },
+        queryFn: async ({ pageParam = 1 }: { pageParam?: number }) => {
+            try {
+                const request = await fetch(`${import.meta.env.VITE_BASE_API_URL}/users/chats/show-all/${receiverId}?page=${pageParam}&limit=${14}`, {
+                    credentials: "include",
+                    headers: { 'Content-Type': 'application/json' },
+                    method: "GET"
+                });
+                
+                const response = await request.json();
+                if (!request.ok) throw new Error(response.message);
+                return response;
+            } catch (error) {
+                throw error;
+            }
+        },
+        queryKey: [`user-chat-${receiverId}`],
+        initialPageParam: 1,
+        refetchOnMount: true,
+        refetchOnReconnect: true,
+        refetchOnWindowFocus: false,
+        staleTime: Infinity
+    });
 
     const clearAllUserChatsForMeMt = useMutation({
         mutationFn: async () => {
@@ -233,38 +262,6 @@ export default function useUserChatService() {
         }
     });
 
-    const { data, error, fetchNextPage, isFetchingNextPage, isLoading, hasNextPage } = useInfiniteQuery({
-        enabled: !!receiverId,
-        getNextPageParam: (lastPage, allPages) => {
-            if (lastPage.length <= 14) return;
-            return allPages.length + 1;
-        },
-        queryFn: async ({ pageParam = 1 }: { pageParam?: number }) => {
-            try {
-                const request = await fetch(`${import.meta.env.VITE_BASE_API_URL}/users/chats/show-all/${receiverId}?page=${pageParam}&limit=${14}`, {
-                    credentials: "include",
-                    headers: { 'Content-Type': 'application/json' },
-                    method: "GET"
-                });
-                
-                const response = await request.json();
-                if (!request.ok) throw new Error(response.message);
-                return response;
-            } catch (error) {
-                throw error;
-            }
-        },
-        queryKey: [`user-chat-${receiverId}`],
-        initialPageParam: 1,
-        refetchOnMount: true,
-        refetchOnReconnect: true,
-        refetchOnWindowFocus: false,
-        staleTime: Infinity
-    });
-
-    const getUserChats: ChatIntrf[] = data ? data.pages.flat() : [];
-    const userChats = { error, fetchNextPage, getUserChats, isFetchingNextPage, isLoading, hasNextPage }
-
     const userChatMedia = useQuery({
         enabled: !!chatId && chatId !== "",
         queryFn: async () => {
@@ -291,6 +288,7 @@ export default function useUserChatService() {
     sendChatToUserMt.isPending;
 
     return { 
+        allUserChats, 
         clearChosenUserChatForMeMt,
         clearAllUserChatsForMeMt,
         clearSelection,
@@ -314,7 +312,6 @@ export default function useUserChatService() {
         showDeleteOption2,
         text, 
         toggleSelect,
-        userChats, 
         userChatMedia
     }
 }

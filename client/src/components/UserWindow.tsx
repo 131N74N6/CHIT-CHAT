@@ -1,20 +1,27 @@
 import type { IUserWindow } from "../models/user.model";
 import UserChatWindow from "./UserChatWindow";
+import UserMediaDetailWindow from "./UserMediaDetailWindow";
 import UserMediaPreviewWindow from "./UserMediaPreviewWindow";
 import UserProfileWindow from "./UserProfileWindow";
 
 export default function UserWindow(props: IUserWindow) {
     const seeProfile = () => {
+        props.setChatId("");
+        localStorage.removeItem("chat_id");
         props.setShowUserMedia(false);
         props.setShowUserProfile(true);
     }
 
     const seeMedia = () => {
+        props.setChatId("");
+        localStorage.removeItem("chat_id");
         props.setShowUserMedia(true);
         props.setShowUserProfile(false);
     }
 
     const seeChat = () => {
+        props.setChatId("");
+        localStorage.removeItem("chat_id");
         props.setShowUserMedia(false);
         props.setShowUserProfile(false);
     }
@@ -40,6 +47,12 @@ export default function UserWindow(props: IUserWindow) {
                     sendChatToUserMt={props.sendChatToUser}
                     setText={props.setText}
                     text={props.text}
+                />
+            ) : props.chatId && props.chatId !== "" ? (
+                <UserMediaDetailWindow
+                    isUserChatProcessing={props.isUserChatProcessing}
+                    seeChat={seeChat}
+                    userChatMedia={props.userChatMedia}
                 />
             ) : (
                 <UserChatWindow

@@ -34,21 +34,19 @@ export default function YourProfile() {
         username, 
     } = useUserProfileService();
 
-    const { isUserLoading, user, userError } = currentUser;
-
     useEffect(() => {
         if (editMode) {
-            user && user.address ? setAddress(user.address) : setAddress("-");
-            user && user.gender ? setGender(user.gender) : setGender("-");
-            user && user.username ? setUserName(user.username) : setUserName("-");
-            user && user.profile_picture ? setOldProfilePicture(user.profile_picture) : setOldProfilePicture(null);
+            currentUser.data && currentUser.data.address ? setAddress(currentUser.data.address) : setAddress("-");
+            currentUser.data && currentUser.data.gender ? setGender(currentUser.data.gender) : setGender("-");
+            currentUser.data && currentUser.data.username ? setUserName(currentUser.data.username) : setUserName("-");
+            currentUser.data && currentUser.data.profile_picture ? setOldProfilePicture(currentUser.data.profile_picture) : setOldProfilePicture(null);
         } else {
             setAddress("");
             setGender("");
             setUserName("");
             setOldProfilePicture(null);
         }
-    }, [editMode, currentUser.user]);
+    }, [editMode, currentUser.data]);
 
     useEffect(() => {
         if (message) {
@@ -62,15 +60,15 @@ export default function YourProfile() {
     return (
         <section className="flex md:flex-row gap-2.5 p-2.5 flex-col relative h-dvh z-10">
             {message ? <Alert message={message}/> : null}
-            <Navbar isProcessing={isUserLoading || isUserProfileProcessing}/>
-            {isUserLoading ? (
+            <Navbar isProcessing={isUserProfileProcessing}/>
+            {currentUser.isLoading ? (
                 <div className="flex justify-center items-center h-full">
                     <Loading/>
                 </div>
-            ) : userError ? (
+            ) : currentUser.error ? (
                 <div className="flex justify-center items-center h-full">
                     <div className="text-center font-medium text-4xl text-gray-800">
-                        {userError.message}
+                        {currentUser.error.message}
                     </div>
                 </div>
             ) : editMode ? (
@@ -160,7 +158,7 @@ export default function YourProfile() {
                                         )}
                                         onClick={() => fileInputRef.current?.click()}
                                     >
-                                        {user?.username[0]}
+                                        {currentUser.data?.username[0]}
                                     </div>
                                 )}
                             </div>
@@ -232,12 +230,12 @@ export default function YourProfile() {
                         </div>
                         <div className="flex justify-center">
                             <div className="w-20 h-20 rounded-full">
-                                {user && user.profile_picture !== null && user.profile_picture.public_id !== null ? (
+                                {currentUser.data && currentUser.data.profile_picture !== null && currentUser.data.profile_picture.public_id !== null ? (
                                     <div className="w-full h-full rounded-full">
                                         <img
-                                            alt={user.profile_picture.public_id}
+                                            alt={currentUser.data.profile_picture.public_id}
                                             className="w-full h-full object-cover rounded-full"
-                                            src={user.profile_picture.url}
+                                            src={currentUser.data.profile_picture.url}
                                         />
                                     </div>
                                 ) : (
@@ -245,7 +243,7 @@ export default function YourProfile() {
                                         "bg-purple-400 text-white font-medium text-2xl text-[1.2rem]",
                                         "flex justify-center items-center w-full h-full rounded-full"
                                     )}>
-                                        {user?.username[0]}
+                                        {currentUser.data?.username[0]}
                                     </div>
                                 )}
                             </div>
@@ -254,25 +252,25 @@ export default function YourProfile() {
                             <div className="flex flex-col gap-1.5">
                                 <div className="text-[1rem] font-medium text-gray-800">User ID</div>
                                 <div className="text-[1rem] font-medium text-gray-800">
-                                    {user && user.user_id ? user.user_id : "-"}
+                                    {currentUser.data && currentUser.data.user_id ? currentUser.data.user_id : "-"}
                                 </div>
                             </div>
                             <div className="flex flex-col gap-1.5">
                                 <div className="text-[1rem] font-medium text-gray-800">Username</div>
                                 <div className="text-[1rem] font-medium text-gray-800">
-                                    {user && user.username ? user.username : "-"}
+                                    {currentUser.data && currentUser.data.username ? currentUser.data.username : "-"}
                                 </div>
                             </div>
                             <div className="flex flex-col gap-1.5">
                                 <div className="text-[1rem] font-medium text-gray-800">Gender</div>
                                 <div className="text-[1rem] font-medium text-gray-800">
-                                    {user && user.gender !== null ? user.gender : "-"}
+                                    {currentUser.data && currentUser.data.gender !== null ? currentUser.data.gender : "-"}
                                 </div>
                             </div>
                             <div className="flex flex-col gap-1.5">
                                 <div className="text-[1rem] font-medium text-gray-800">Address</div>
                                 <div className="text-[1rem] font-medium text-gray-800">
-                                    {user && user.address ? user.address : "-"}
+                                    {currentUser.data && currentUser.data.address ? currentUser.data.address : "-"}
                                 </div>
                             </div>
                         </div>

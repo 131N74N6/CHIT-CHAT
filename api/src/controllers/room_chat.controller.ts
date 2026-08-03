@@ -395,8 +395,10 @@ export async function showAllMediaInClickedChat(req: Request, res: Response) {
     try {
         const chatId = req.params.chat_id;
         const chat = await Chats.findOne({ _id: chatId });
+
+        if (!chat) return res.status(404).json({ message: "chat not found" });
         
-        const media = chat?.media;
+        const media = chat.media;
         res.status(200).json(media);
     } catch (error) {
         res.status(500).json({ message: "something went wrong" });

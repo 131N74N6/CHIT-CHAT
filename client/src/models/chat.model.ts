@@ -1,4 +1,4 @@
-import type { FetchNextPageOptions, InfiniteData, InfiniteQueryObserverResult, UseMutationResult } from "@tanstack/react-query";
+import type { FetchNextPageOptions, InfiniteData, InfiniteQueryObserverResult, UseMutationResult, UseQueryResult } from "@tanstack/react-query";
 import type { IOtherUser } from "./user.model";
 
 export interface IChatService {
@@ -146,4 +146,11 @@ export interface IUserChatDeleteOption2 {
     isProcessing: boolean;
     setIsSelectMode: (isSelectMode: boolean) => void;
     setShowDeleteOption2: (showDeleteOption2: boolean) => void;
+}
+
+export interface IUserMediaDetailWindow {
+    isUserChatProcessing: boolean;
+    seeChat: () => void;
+
+    userChatMedia: UseQueryResult<any, Error>;
 }

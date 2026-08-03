@@ -22,6 +22,9 @@ export interface ChatState {
 
     selectedIds: string[];
     
+    showSentUserMedia: boolean;
+    setShowSentUserMedia: (showSentUserMedia: boolean) => void;
+    
     showUserMedia: boolean;
     setShowUserMedia: (showUserMedia: boolean) => void;
     
@@ -68,6 +71,7 @@ export const useChatStore = create<ChatState>((set) => ({
     })),
 
     resetChatState: () => {
+        localStorage.removeItem("chat_id");
         localStorage.removeItem("receiver_id");
         set({
             chatId: "",
@@ -75,6 +79,7 @@ export const useChatStore = create<ChatState>((set) => ({
             media: [], 
             receiverId: "",
             selectedIds: [],
+            showSentUserMedia: false,
             showUserMedia: false,
             showUserProfile: false,
             text: "", 
@@ -84,6 +89,9 @@ export const useChatStore = create<ChatState>((set) => ({
     },
 
     selectedIds: [],
+
+    showSentUserMedia: false,
+    setShowSentUserMedia: (showSentUserMedia) => set({ showSentUserMedia }),
 
     showUserMedia: false,
     setShowUserMedia: (showUserMedia) => set({ showUserMedia }),

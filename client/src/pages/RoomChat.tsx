@@ -133,12 +133,12 @@ export default function RoomChat() {
                     <div className="bg-gray-200 p-2 flex justify-between items-center cursor-pointer border border-gray-400">
                         <div className="flex items-center gap-2">
                             <div className="w-10 h-10 rounded-full" onClick={() => navigate(`/rooms/profile/${roomId}`)}>
-                                {currentRoomProfile.detail && currentRoomProfile.detail.profile_picture !== null ? (
+                                {currentRoomProfile.data && currentRoomProfile.data.profile_picture !== null ? (
                                     <div className="w-full h-full">
                                         <img 
                                             className="w-full h-full object-cover rounded-full" 
-                                            src={currentRoomProfile.detail.profile_picture.url} 
-                                            alt={currentRoomProfile.detail.profile_picture.public_id}
+                                            src={currentRoomProfile.data.profile_picture.url} 
+                                            alt={currentRoomProfile.data.profile_picture.public_id}
                                         />
                                     </div>
                                 ) : (
@@ -146,11 +146,11 @@ export default function RoomChat() {
                                         "w-full h-full rounded-full flex items-center text-[0.9rem]", 
                                         "justify-center bg-purple-500 text-white font-medium"
                                     )}>
-                                        {currentRoomProfile.detail?.name[0]}
+                                        {currentRoomProfile.data?.name[0]}
                                     </div>
                                 )}
                             </div>
-                            <div className="text-gray-900 text-[1.2rem] font-medium">{currentRoomProfile.detail?.name}</div>
+                            <div className="text-gray-900 text-[1.2rem] font-medium">{currentRoomProfile.data?.name}</div>
                         </div>
                         <button
                             className={cn(
@@ -166,23 +166,23 @@ export default function RoomChat() {
                     </div>
                 )}
                 <div className="flex flex-col gap-2.5 px-2.5 h-full border-x border-gray-400">
-                    {allChatsInRoom.isRoomChatLoading ? (
+                    {allChatsInRoom.isLoading ? (
                         <div className="flex justify-center items-center bg-white h-full">
                             <Loading/>
                         </div>
-                    ) : allChatsInRoom.roomChatsError ? (
+                    ) : allChatsInRoom.error ? (
                         <div className="flex justify-center items-center h-full">
                             <div className="text-gray-700 font-medium text-center">
-                                {allChatsInRoom.roomChatsError.message}
+                                {allChatsInRoom.error.message}
                             </div>
                         </div>
                     ) : (
                         <ChatList 
-                            chats={allChatsInRoom.roomChats} 
-                            currentUserId={currentUser.user ? currentUser.user.user_id : ''} 
-                            fetchNextPage={allChatsInRoom.fecthNextRoomChat}
-                            hasNextPage={allChatsInRoom.roomChatHasNextPage}
-                            isFetchingNextPage={allChatsInRoom.isRoomChatFetchNext}
+                            chats={allChatsInRoom.data? allChatsInRoom.data.pages.flat() : []} 
+                            currentUserId={currentUser.data ? currentUser.data.user_id : ""} 
+                            fetchNextPage={allChatsInRoom.fetchNextPage}
+                            hasNextPage={allChatsInRoom.hasNextPage}
+                            isFetchingNextPage={allChatsInRoom.isFetchingNextPage}
                             isInRoom={true}
                             isProcessing={isRoomChatProcessing || isUserProfileProcessing}
                             isSelectMode={isSelectMode}

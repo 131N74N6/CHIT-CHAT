@@ -3,27 +3,36 @@ import RoomProfileWindow from "./RoomProfileWindow";
 import RoomMemberWindow from "./RoomMemberWindow";
 import RoomChatWindow from "./RoomChatWindow";
 import RoomMediaPreviewWindow from "./RoomMediaPreviewWindow";
+import RoomMediaDetailWindow from "./RoomMediaDetailWindow";
 
 export default function RoomWindow(props: IRoomWindow) {
     const seeProfile = () => {
+        props.setChatId("");
+        localStorage.removeItem("chat_id");
         props.setShowRoomMedia(false);
         props.setShowProfile(true);
         props.setShowMember(false);
     }
 
     const seeMedia = () => {
+        props.setChatId("");
+        localStorage.removeItem("chat_id");
         props.setShowRoomMedia(true);
         props.setShowProfile(false);
         props.setShowMember(false);
     }
 
     const seeMember = () => {
+        props.setChatId("");
+        localStorage.removeItem("chat_id");
         props.setShowProfile(false);
         props.setShowRoomMedia(false);
         props.setShowMember(true);
     }
 
     const seeRoomChat = () => {
+        props.setChatId("");
+        localStorage.removeItem("chat_id");
         props.setShowRoomMedia(false);
         props.setShowProfile(false);
         props.setShowMember(false);
@@ -84,6 +93,12 @@ export default function RoomWindow(props: IRoomWindow) {
                     sendChatToRoomMt={props.sendChatToRoom}
                     setText={props.setText}
                     text={props.text}
+                />
+            ) : props.chatId && props.chatId !== "" ? (
+                <RoomMediaDetailWindow
+                    isRoomChatProcessing={props.isRoomChatProcessing}
+                    roomChatMedia={props.roomChatMedia}
+                    seeRoomChat={seeRoomChat}
                 />
             ) : (
                 <RoomChatWindow

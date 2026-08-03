@@ -9,7 +9,7 @@ import { useRoomStore } from "../stores/room.store";
 export default function MediaDetail() {
     const navigate = useNavigate();
     const roomId = useRoomStore((state) => state.roomId);
-    const { allChatsInRoom, isRoomChatProcessing } = useRoomChatService();
+    const { roomChatMedia, isRoomChatProcessing } = useRoomChatService();
 
     return (
         <section className="h-dvh flex md:flex-row flex-col p-2.5 gap-2.5 relative z-10">
@@ -25,7 +25,7 @@ export default function MediaDetail() {
                         <MessageCircle size={22}/>
                     </button>
                 </div>
-                <FileDetail files={allChatsInRoom.roomChats[0].media} is_processing={isRoomChatProcessing}/>
+                <FileDetail files={roomChatMedia.data} is_processing={roomChatMedia.isLoading}/>
             </div>
             <div 
                 className={cn(

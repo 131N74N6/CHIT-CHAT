@@ -26,6 +26,7 @@ export async function changeUser(req: AuthRequest, res: Response) {
 
             const newImage = await uploadTOCloudinary({
                 file_buffer: selectedImage.buffer,
+                file_type: selectedImage.mimetype,
                 folder_name: "user_profile",
                 original_name: selectedImage.originalname
             });
