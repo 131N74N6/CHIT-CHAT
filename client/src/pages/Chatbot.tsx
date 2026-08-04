@@ -114,7 +114,7 @@ export default function Chatbot() {
                             isFetchingNextPage={showAllBotResults.isFetchingNextPage}
                             isProcessing={isChatbotProcessing}
                             isSelectMode={isSelectMode}
-                            results={showAllBotResults.data ? showAllBotResults.data.pages.flat() : []}
+                            results={showAllBotResults.data ? showAllBotResults.data.pages.flatMap(page => page).reverse() : []}
                             selectedChatBotIds={selectedChatBotIds}
                             toggleSelect={toggleSelect}
                         />

@@ -176,7 +176,7 @@ export default function UserChat() {
                         </div>
                     ) : (
                         <ChatList 
-                            chats={allUserChats.data ? allUserChats.data.pages.flat() : []} 
+                            chats={allUserChats.data ? allUserChats.data.pages.flatMap(page => page).reverse() : []} 
                             currentUserId={currentUser.data ? currentUser.data.user_id : ""} 
                             fetchNextPage={allUserChats.fetchNextPage}
                             hasNextPage={allUserChats.hasNextPage}

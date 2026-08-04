@@ -36,15 +36,13 @@ export default function ChatbotList(props: IChatbotList) {
 
     return (
         <div className="overflow-y-auto flex flex-col gap-2 py-2.5">
-            {props.isFetchingNextPage ? (
-                <div ref={topSentinelRef} className="h-1 w-full flex justify-center items-center">
+            <div ref={topSentinelRef} className="h-1 w-full flex justify-center items-center">
+                {props.isFetchingNextPage ? (
                     <Loading/>
-                </div>
-            ) : !props.isFetchingNextPage && !props.hasNextPage && props.results.length <= 14 ? null : (
-                <div className="flex justify-center">
+                ) : !props.hasNextPage ? (
                     <div className="text-center text-[0.8rem] text-gray-950 font-medium">No more older chat to show</div>
-                </div>
-            )}
+                ) : null}
+            </div>
             <div className="flex flex-col gap-2">
                 {props.results.map(result => {
                     return (

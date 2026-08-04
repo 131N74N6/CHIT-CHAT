@@ -180,7 +180,7 @@ export default function Home() {
                     showUserProfile={showUserProfile}
                     text={text}
                     toggleSelect={toggleSelect}
-                    userChats={allUserChats.data ? allUserChats.data.pages.flat() : []}
+                    userChats={allUserChats.data ? allUserChats.data.pages.flatMap(page => page).reverse() : []}
                     userChatError={allUserChats.error}
                     userChatMedia={userChatMedia}
                     userProfile={receiverUserProfile.data!}

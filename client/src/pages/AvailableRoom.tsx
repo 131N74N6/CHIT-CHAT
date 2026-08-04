@@ -225,7 +225,7 @@ export default function AvailableRoom() {
                     media={media}
                     oldRoomPicture={oldRoomPicture}
                     removeOnePreviewFile={removeOnePreviewFile}
-                    roomChats={allChatsInRoom.data ? allChatsInRoom.data.pages.flat() : []}
+                    roomChats={allChatsInRoom.data ? allChatsInRoom.data.pages.flatMap(page => page).reverse() : []}
                     roomChatError={allChatsInRoom.error}
                     roomChatMedia={roomChatMedia}
                     roomId={roomId}

@@ -178,7 +178,7 @@ export default function RoomChat() {
                         </div>
                     ) : (
                         <ChatList 
-                            chats={allChatsInRoom.data? allChatsInRoom.data.pages.flat() : []} 
+                            chats={allChatsInRoom.data? allChatsInRoom.data.pages.flatMap(page => page).reverse() : []} 
                             currentUserId={currentUser.data ? currentUser.data.user_id : ""} 
                             fetchNextPage={allChatsInRoom.fetchNextPage}
                             hasNextPage={allChatsInRoom.hasNextPage}
