@@ -42,7 +42,7 @@ export default function useRoomChatService() {
     const allChatsInRoom = useInfiniteQuery({
         enabled: !!roomId,
         getNextPageParam: (lastPage, allPages) => {
-            if (lastPage.length <= 14) return;
+            if (lastPage.length < 14) return;
             return allPages.length + 1;
         },
         queryFn: async ({pageParam = 1}: { pageParam?: number }) => {

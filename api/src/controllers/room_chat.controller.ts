@@ -382,6 +382,7 @@ export async function showwAllChatsForRoom(req: AuthRequest, res: Response) {
 
         const chats = await Chats
         .find({ room_id: roomId, hidden_for: { $nin: [userId!] } })
+        .sort({ created_at: -1 })
         .limit(limit)
         .skip(skip);
 

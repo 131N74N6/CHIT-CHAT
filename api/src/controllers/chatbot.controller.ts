@@ -65,7 +65,7 @@ export async function showAllResults(req: AuthRequest, res: Response) {
         const limit = parseInt(req.query.limit as string) || 14;
         const skip = (page - 1) * limit;
 
-        const results = await ChatBot.find({ user_id: userId }).limit(limit).skip(skip);
+        const results = await ChatBot.find({ user_id: userId }).limit(limit).skip(skip).sort({ created_at: -1 });
         res.status(200).json(results);
     } catch (error) {
         res.status(500).json({ message: "something went wrong" });

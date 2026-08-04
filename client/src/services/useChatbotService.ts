@@ -28,7 +28,7 @@ export default function useChatbotService() {
     const showAllBotResults = useInfiniteQuery({
         enabled: !!currentUserId,
         getNextPageParam: (lastPage, allPages) => {
-            if (lastPage.length <= 14) return;
+            if (lastPage.length < 14) return;
             return allPages.length + 1;
         },
         queryKey: [`all-results-${currentUserId}`],

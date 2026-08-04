@@ -416,6 +416,7 @@ export async function showAllChats(req: AuthRequest, res: Response) {
             ], 
             hidden_for: { $nin: [userId!] } 
         })
+        .sort({ created_at: -1 })
         .limit(limit)
         .skip(skip);
 

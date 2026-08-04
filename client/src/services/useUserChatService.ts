@@ -36,7 +36,7 @@ export default function useUserChatService() {
     const allUserChats = useInfiniteQuery({
         enabled: !!receiverId,
         getNextPageParam: (lastPage, allPages) => {
-            if (lastPage.length <= 14) return;
+            if (lastPage.length < 14) return;
             return allPages.length + 1;
         },
         queryFn: async ({ pageParam = 1 }: { pageParam?: number }) => {

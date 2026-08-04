@@ -1,9 +1,29 @@
 import type { IChatList } from "../models/chat.model";
-import cn from "../utils/cn";
 import ChatBubble from "./ChatBubble";
 import Loading from "./Loading";
+import useReverseScroll from "../hooks/useReverseScroll";
+import { useRef } from "react";
 
 export default function ChatList(props: IChatList) {
+    const scrollContainerRef = useRef<HTMLDivElement>(null);
+    const topSentinelRef = useRef<HTMLDivElement>(null);
+    const previousScrollHeightlRef = useRef<number>(0);
+    const isFetchingRef = useRef<boolean>(false);
+    const initialLoadDoneRef = useRef<boolean>(false);
+
+    useReverseScroll({
+        data: props.chats,
+        fetchNextPage: props.fetchNextPage,
+        hasNextPage: props.hasNextPage,
+        initialLoadDoneRef: initialLoadDoneRef,
+        isFetchingNextPage: props.isFetchingNextPage,
+        isFetchingRef: isFetchingRef,
+        isProcessing: props.isProcessing,
+        previousScrollHeightlRef: previousScrollHeightlRef,
+        scrollContainerRef: scrollContainerRef,
+        topSentinelRef: topSentinelRef
+    });
+
     if (props.chats.length === 0) {
         return (
             <div className="flex justify-center items-center h-full">
@@ -15,7 +35,16 @@ export default function ChatList(props: IChatList) {
     }
 
     return (
-        <div className="flex flex-col py-2.5 overflow-y-auto gap-2">
+        <div className="flex flex-col py-2.5 overflow-y-auto gap-2" ref={scrollContainerRef}>
+            {props.isFetchingNextPage ? (
+                <div ref={topSentinelRef} className="h-1 w-full flex justify-center items-center">
+                    <Loading/>
+                </div>
+            ) : !props.isFetchingNextPage && !props.hasNextPage && props.chats.length <= 14 ? null : (
+                <div className="flex justify-center">
+                    <div className="text-center text-[0.8rem] text-gray-950 font-medium">No more older chat to show</div>
+                </div>
+            )}
             <div className="flex flex-col gap-2">
                 {props.chats.map((chat) => {
                     return (
@@ -34,27 +63,6 @@ export default function ChatList(props: IChatList) {
                     );
                 })}
             </div>
-            {props.chats.length <= 14 ? null : (
-                <div className="flex justify-center">
-                    {props.isFetchingNextPage ? (
-                        <Loading/>
-                    ) : props.hasNextPage ? (
-                        <button
-                            disabled={props.isProcessing}
-                            className={cn(
-                                "cursor-pointer disabled:cursor-not-allowed bg-gray-400 text-gray-950", 
-                                "font-medium p-1.5 text-[0.8rem] hover:bg-gray-300 transition-colors"
-                            )}
-                            onClick={() => props.fetchNextPage()}
-                            type="button"
-                        >
-                            Load more
-                        </button>
-                    ) : (
-                        <div className="text-center text-[0.8rem] text-gray-950 font-medium">No chat to show</div>
-                    )}
-                </div>
-            )}
         </div>
     );
 }
