@@ -7,7 +7,7 @@ import { groupChatEvent } from "./event";
 
 const wsContext = new WeakMap<any, { roomId: string; handler: (data: any) => void }>();
 
-const groupChatRouters = new Elysia({ prefix: "/api/v1/group" })
+const groupChatRouters = new Elysia({ prefix: "/api/v1/groups/chats" })
 .use(apiAuthMiddleware)
 .delete("/clear/bulk", async ({ body, user }) => {
     return await groupChatController.clearChosenMessages({ ...body, sender_id: user.id });

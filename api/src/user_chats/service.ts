@@ -53,7 +53,7 @@ class UserChatService {
         });
 
         const roomId = this.getRoomId(receiverId, senderId);
-        userChatEvent.emit(roomId, { data: editedMessage, type: "message:changed" })
+        userChatEvent.emit(roomId, { data: editedMessage, type: "user-message:changed" })
     }
 
     async clearAllMessages(data: Omit<TUserChat["deleteChat"], "message_ids">) {
@@ -156,7 +156,7 @@ class UserChatService {
 
         const affectedIds = deleteOwnMessagesTemporary.map((message) => message._id.toString());
         const roomId = this.getRoomId(receiverId, senderId);
-        userChatEvent.emit(roomId, { data: affectedIds, type: "message:deleted" });
+        userChatEvent.emit(roomId, { data: affectedIds, type: "user-message:deleted" });
     }
 
     async deleteChosenMessages(data: TUserChat["deleteChat"]) {
@@ -210,7 +210,7 @@ class UserChatService {
 
         const roomId = this.getRoomId(receiverId, senderId);
         const affectedIds = deleteOwnMessagesTemporary.map((message) => message._id.toString());
-        userChatEvent.emit(roomId, { data: affectedIds, type: "message:deleted" });
+        userChatEvent.emit(roomId, { data: affectedIds, type: "user-message:deleted" });
     }
 
     private async executeDeletion(data: TUserChat["executeDeletion"]) {
@@ -321,7 +321,7 @@ class UserChatService {
         }
 
         const roomId = this.getRoomId(receiverId, senderId);
-        userChatEvent.emit(roomId, { data: message, type: "message:sent" });
+        userChatEvent.emit(roomId, { data: message, type: "user-message:sent" });
     }
 
     async showAllMessages(data: Omit<TUserChat["messagePagination"], "skip">) {

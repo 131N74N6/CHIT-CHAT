@@ -9,9 +9,9 @@ export const userChatSchema = {
     wsPayload: t.Object({
         data: t.Any(),
         type: t.Union([
-            t.Literal("message:changed"),
-            t.Literal("message:deleted"),
-            t.Literal("message:sent")
+            t.Literal("user-message:changed"),
+            t.Literal("user-message:deleted"),
+            t.Literal("user-message:sent")
         ])
     }),
     executeDeletion: t.Object({

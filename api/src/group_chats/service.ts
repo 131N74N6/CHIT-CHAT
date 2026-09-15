@@ -56,7 +56,7 @@ class GroupChatService {
             _id: id, group_id: groupId, sender_id: senderId, text: text 
         });
 
-        groupChatEvent.emit(groupId, { data: edited, type: "message:changed" });
+        groupChatEvent.emit(groupId, { data: edited, type: "group-message:changed" });
     }
     
     async clearAllMessages(data: Omit<TGroupChats["deleteMessage"], "message_ids">) {
@@ -160,7 +160,7 @@ class GroupChatService {
         });
 
         const affectedIds = deleteOtherMessagesTemporary.map((message) => message._id.toString());
-        groupChatEvent.emit(groupId, { data: affectedIds, type: "message:deleted" });
+        groupChatEvent.emit(groupId, { data: affectedIds, type: "group-message:deleted" });
     }
 
     async deleteChosenMessages(data: TGroupChats["deleteMessage"]) {
@@ -212,7 +212,7 @@ class GroupChatService {
         });
 
         const affectedIds = deleteOwnMessagesTemporary.map((message) => message._id.toString());
-        groupChatEvent.emit(groupId, { data: affectedIds, type: "message:deleted" });
+        groupChatEvent.emit(groupId, { data: affectedIds, type: "group-message:deleted" });
     }
 
     private async executeDeletion(data: TGroupChats["executeDeletion"]) {
@@ -322,7 +322,7 @@ class GroupChatService {
             await Promise.all(uploadedFiles);
         }
 
-        groupChatEvent.emit(groupId, { data: message, type: "message:sent" });
+        groupChatEvent.emit(groupId, { data: message, type: "group-message:sent" });
     }
 
     async showAllMessages(data: Omit<TGroupChats["additionalFilter"], "skip">) {

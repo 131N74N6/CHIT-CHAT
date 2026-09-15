@@ -71,7 +71,9 @@ export const groupChatSchema = {
     wsPayload: t.Object({
         data: t.Any(),
         type: t.Union([
-            t.Literal("message:changed"), t.Literal("message:deleted"), t.Literal("message:sent")
+            t.Literal("group-message:changed"), 
+            t.Literal("group-message:deleted"), 
+            t.Literal("group-message:sent")
         ])
     })
 }

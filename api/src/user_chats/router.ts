@@ -74,7 +74,6 @@ const userChatRouters = new Elysia({ prefix: "/api/v1/user-chats" })
             }
 
             const roomId = [senderId, receiverId].sort().join("_");
-
             const handler = (data: any) => ws.send(JSON.stringify(data));
 
             userChatEvent.on(roomId, handler);

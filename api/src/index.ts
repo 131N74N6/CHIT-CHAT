@@ -5,6 +5,7 @@ import { authServiceApi } from "./auth/service";
 import { v2 } from "cloudinary";
 import userChatRouters from "./user_chats/router";
 import groupChatRouters from "./group_chats/router";
+import groupMemberRouters from "./group_members/router";
 
 const port = import.meta.env.PORT || 3000;
 
@@ -22,6 +23,7 @@ const app = new Elysia()
 }))
 .all("/api/auth/*", async (ctx) => await authServiceApi.handler(ctx.request))
 .use(groupChatRouters)
+.use(groupMemberRouters)
 .use(userChatRouters)
 .get("/", () => "🦊 Hello Elysia")
 .get("/api", () => "🦊 Elysia API is ready 🚀")
