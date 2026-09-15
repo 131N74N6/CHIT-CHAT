@@ -1,54 +1,32 @@
-import dns from "node:dns/promises";
-import dotenv from "dotenv";
-dotenv.config();
-
-if (process.env.NODE_ENV !== "production") {
-    dns.setServers(["1.1.1.1", "8.8.8.8"]);
-    console.log("dns server: 1.1.1.1 or 8.8.8.8");
-}
-
-import { mongodb } from "./services/mongodb.service";
+import { Elysia } from "elysia";
+import { setupErrorHandler } from "./error/handler";
+import cors from "@elysiajs/cors";
+import { authServiceApi } from "./auth/service";
 import { v2 } from "cloudinary";
-import express from "express";
-import cookieParser from "cookie-parser";
-import cors from "cors";
-import { app, server } from "./services/socket_io.service";
-import userProfileRouters from "./routers/user_profile.router";
-import authRouters from "./routers/auth.router";
-import userChatsRouters from "./routers/user_chat.router";
-import chatBotRouters from "./routers/chatbot.router";
-import roomChatsRouters from "./routers/room_chat.router";
-import roomProfileRouters from "./routers/room_profile.router";
-import roomMembersRouters from "./routers/room_member.router";
-import { authRateLimiter } from "./middlewares/auth.middleware";
+import userChatRouters from "./user_chats/router";
+import groupChatRouters from "./group_chats/router";
+
+const port = import.meta.env.PORT || 3000;
 
 v2.config({
-    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-    api_key: process.env.CLOUDINARY_API_KEY,
-    api_secret: process.env.CLOUDINARY_API_SECRET,
-})
+    api_key: import.meta.env.CLOUDINARY_API_KEY,
+    api_secret: import.meta.env.CLOUDINARY_API_SECRET,
+    cloud_name: import.meta.env.CLOUDINARY_CLOUD_NAME,
+});
 
-app.use(express.json());
-app.use(cookieParser());
-app.use(cors({
+const app = new Elysia()
+.use(setupErrorHandler)
+.use(cors({
     credentials: true,
-    origin: [
-        "http://localhost:5000",
-        "http://localhost:5173"
-    ]
-}));
-app.use("/api/auths", authRateLimiter, authRouters);
-app.use("/api/chatbots", chatBotRouters);
-app.use("/api/rooms/chats", roomChatsRouters);
-app.use("/api/rooms/members", roomMembersRouters);
-app.use("/api/rooms/profiles", roomProfileRouters);
-app.use("/api/users/chats", userChatsRouters);
-app.use("/api/users/profiles", userProfileRouters);
+    origin: ["http://localhost:5173", "http://localhost:3000"]
+}))
+.all("/api/auth/*", async (ctx) => await authServiceApi.handler(ctx.request))
+.use(groupChatRouters)
+.use(userChatRouters)
+.get("/", () => "🦊 Hello Elysia")
+.get("/api", () => "🦊 Elysia API is ready 🚀")
+.get("/api/v1", () => "🦊 Elysia API current version: 1.0 🚀")
+.listen(port, () => console.log(`🦊 Elysia is running at http://localhost:${port}`));
 
-if (process.env.NODE_ENV !== "production") {
-    mongodb.then(() => {
-        server.listen(5000, () => console.log("api running on http://localhost:5000"));
-    });
-}
-
+export type App = typeof app;
 export default app;
