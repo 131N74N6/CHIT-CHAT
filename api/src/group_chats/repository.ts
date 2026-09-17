@@ -68,7 +68,8 @@ class GroupChatRepository {
     }
 
     async findAllMembers(group_id: string) {
-        return await this.group_members.find({ group_id: { $in: [new ObjectId(group_id)] } }).toArray();
+        return await this.group_members.find({ group_id: new ObjectId(group_id) })
+        .toArray();
     }
 
     async hideMessages(data: TGroupChats["hideChosenMessages"]) {
@@ -81,10 +82,10 @@ class GroupChatRepository {
         const message = {
             created_at: new Date(),
             files_total: data.files_total,
-            group_id: data.group_id,
+            group_id: new ObjectId(data.group_id),
             hidden_for: [],
             group_name: data.group_name,
-            sender_id: data.sender_id,
+            sender_id: new ObjectId(data.sender_id),
             sender_name: data.sender_name,
             text: data.text,
             updated_at: new Date()

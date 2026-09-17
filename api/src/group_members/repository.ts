@@ -1,35 +1,33 @@
 import { ObjectId } from "mongodb";
 import { db } from "../mongodb/service";
 import { TGroupMember } from "./model";
+import { User } from "../auth/model";
 
 class GroupMemberRepository {
-    private group_members = db().collection("group_members");
+    private users = db().collection<Omit<User, "id">>("user");
 
     async joinGroup(data: TGroupMember["joinGroup"]) {
-        const newMember = {
-            joined_at: new Date(),
-            group_id: data.group_id,
-            profile_picture: data.profile_picture,
-            user_id: data.user_id,
-            username: data.username
-        }
+        await this.users.updateOne({ _id: new ObjectId(data.user_id) }, {
+            $addToSet: { group_ids: data.group_id }
+        });
 
-        const result = await this.group_members.insertOne(newMember);
-        return { _id: result.insertedId, ...newMember }
+        return data.group_id;
     }
 
     async kickMember(data: TGroupMember["leftGroup"]) {
-        return await this.group_members.deleteOne({ 
-            group_id: new ObjectId(data.group_id), 
-            user_id: new ObjectId(data.user_id) 
-        }); 
+        await this.users.updateOne({ _id: new ObjectId(data.user_id) }, {
+            $pull: { group_ids: [data.group_id] }
+        });
+
+        return data.user_id;
     }
 
     async leftGroup(data: TGroupMember["leftGroup"]) {
-        return await this.group_members.deleteOne({ 
-            group_id: new ObjectId(data.group_id), 
-            user_id: new ObjectId(data.user_id) 
-        }); 
+        await this.users.updateOne({ _id: new ObjectId(data.user_id) }, {
+            $pull: { group_ids: [data.group_id] }
+        });
+
+        return data.user_id;
     }
 
     async showAllMembers(data: TGroupMember["filter"]) {
@@ -37,7 +35,7 @@ class GroupMemberRepository {
         const page = data.page;
         const skip = (page - 1) * limit;
 
-        return await this.group_members.find({ group_id: new ObjectId(data.group_id) })
+        return await this.users.find({ group_ids: { $in: [data.group_id] } })
         .limit(limit)
         .skip(skip)
         .toArray();

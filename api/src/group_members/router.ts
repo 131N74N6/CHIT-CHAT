@@ -25,9 +25,7 @@ const groupMemberRouters = new Elysia({ prefix: "/api/v1/groups/members" })
     query: groupMemberSchema.filter
 })
 .post("/", async ({ body, user }) => {
-    return await groupMemberController.joinGroup({ 
-        group_id: body.group_id, user_id: user.id, username: user.name, profile_picture: user.image 
-    });
+    return await groupMemberController.joinGroup({ group_id: body.group_id, user_id: user.id });
 }, {
     body: t.Pick(groupMemberSchema.joinGroup, ["group_id"])
 })
