@@ -19,7 +19,7 @@ class GroupMemberController {
 
     async showAllMembers(data: TGroupMember["filter"]) {
         const members = await groupMemberService.showAllMembers(data);
-        return { data: members, message: "successfully retrieved group members" }
+        return { data: members }
     }
 }
 

@@ -44,6 +44,17 @@ export const userChatSchema = {
         receiver_id: t.String({ pattern: "^[0-9a-fA-F]{24}$", error: "invalid receiver" }),
         sender_id: t.String({ pattern: "^[0-9a-fA-F]{24}$", error: "invalid sender" })
     }),
+    sendFiles: t.Object({
+        file_name: t.String({ error: "invalid file name", minLength: 1 }),
+        file_type: t.String({ error: "invalid file type", minLength: 1 }),
+        public_id: t.String({ error: "invalid file", minLength: 1 }),
+        resource_type: t.String({ error: "unable to get file", minLength: 1 }),
+        size: t.Number({ error: "invalid file size" }),
+        url: t.String({ error: "failed to access file", minLength: 1 }),
+        message_id: t.Transform(t.String({ pattern: "^[0-9a-fA-F]{24}$", error: "invalid messages chat" }))
+        .Decode((id) => new ObjectId(id))
+        .Encode((id) => id.toHexString())
+    }),
     sendMessageRaw: t.Object({
         files: t.Optional(t.Union([
             t.File({
@@ -69,7 +80,6 @@ export const userChatSchema = {
         receiver_id: t.String({ error: "invalid receiver", pattern: "^[0-9A-Fa-f]{24}$" }),
         sender_id: t.String({ pattern: "^[0-9A-Fa-f]{24}$", error: "invalid sender" }),
         limit: t.Number({ maximum: 54, minimum: 52, error: "maximum message each page is 54 and the minimum is 52" }),
-        skip: t.Number({ maximum: 54, minimum: 52, error: "maximum skipped message is 54 and the minimum is 52" }),
         page: t.Number({ minimum: 1, error: "message page must start from 1" })
     })
 }

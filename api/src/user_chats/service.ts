@@ -5,7 +5,6 @@ import { v2 } from "cloudinary";
 import userChatRepository from "./repository";
 import { userChatEvent } from "./event";
 import { uploadToCloudinary } from "../cloudinary/service";
-import userChatFilesRepository from "../user_chats_files/repository";
 
 class UserChatService {
     private checkIsFileSupported(file: File) {
@@ -36,18 +35,18 @@ class UserChatService {
         return value;
     }
 
-    async changeChosenMessage(data: TUserChat["changeMessageResult"]) {
-        const messageId = this.checkIsIdValid("message chat", data._id);
-        const receiverId = this.checkIsIdValid("receiver", data.receiver_id);
-        const senderId = this.checkIsIdValid("sender", data.sender_id);
+    async changeChosenMessage(props: TUserChat["changeMessageResult"]) {
+        const messageId = this.checkIsIdValid("message chat", props._id);
+        const receiverId = this.checkIsIdValid("receiver", props.receiver_id);
+        const senderId = this.checkIsIdValid("sender", props.sender_id);
         const message = await userChatRepository.findOneMessageById(messageId);
 
         if (!message) throw new ChitChatApiError("message not found", 404);
-        if (message.text === data.text) return;
+        if (message.text === props.text) return;
 
         const editedMessage = await userChatRepository.changeMessage({ 
             _id: messageId, 
-            text: data.text, 
+            text: props.text, 
             receiver_id: receiverId, 
             sender_id: senderId 
         });
@@ -56,11 +55,11 @@ class UserChatService {
         userChatEvent.emit(roomId, { data: editedMessage, type: "user-message:changed" })
     }
 
-    async clearAllMessages(data: Omit<TUserChat["deleteChat"], "message_ids">) {
-        const receiverId = this.checkIsIdValid("receiver", data.receiver_id);
-        const senderId = this.checkIsIdValid("sender", data.sender_id);
+    async clearAllMessages(props: Omit<TUserChat["deleteChat"], "message_ids">) {
+        const receiverId = this.checkIsIdValid("receiver", props.receiver_id);
+        const senderId = this.checkIsIdValid("sender", props.sender_id);
 
-        const chats = await userChatRepository.findAllMessages(data);
+        const chats = await userChatRepository.findAllMessages(props);
         if (chats.length === 0) throw new ChitChatApiError("chat not found", 404);
 
         const deleteAllMessagePermanently = chats.filter((chat) => {
@@ -79,10 +78,10 @@ class UserChatService {
         });
     }
 
-    async clearChosenMessage(data: TUserChat["deleteChat"]) {
-        const messageIds = data.message_ids.map((id) => this.checkIsIdValid("message chat", id));
-        const receiverId = this.checkIsIdValid("receiver", data.receiver_id);
-        const senderId = this.checkIsIdValid("sender", data.sender_id);
+    async clearChosenMessage(props: TUserChat["deleteChat"]) {
+        const messageIds = props.message_ids.map((id) => this.checkIsIdValid("message chat", id));
+        const receiverId = this.checkIsIdValid("receiver", props.receiver_id);
+        const senderId = this.checkIsIdValid("sender", props.sender_id);
 
         const chats = await userChatRepository.findAllMessagesById(messageIds);
         if (chats.length === 0) throw new ChitChatApiError("chat not found", 404);
@@ -103,9 +102,9 @@ class UserChatService {
         });
     }
 
-    async deleteAllMessages(data: Omit<TUserChat["deleteChat"], "message_ids">) {
-        const receiverId = this.checkIsIdValid("receiver", data.receiver_id);
-        const senderId = this.checkIsIdValid("sender", data.sender_id);
+    async deleteAllMessages(props: Omit<TUserChat["deleteChat"], "message_ids">) {
+        const receiverId = this.checkIsIdValid("receiver", props.receiver_id);
+        const senderId = this.checkIsIdValid("sender", props.sender_id);
 
         const chats = await userChatRepository.findAllMessages({ 
             receiver_id: receiverId, sender_id: senderId 
@@ -159,10 +158,10 @@ class UserChatService {
         userChatEvent.emit(roomId, { data: affectedIds, type: "user-message:deleted" });
     }
 
-    async deleteChosenMessages(data: TUserChat["deleteChat"]) {
-        const messageIds = data.message_ids.map((id) => this.checkIsIdValid("message chat", id));
-        const receiverId = this.checkIsIdValid("receiver", data.receiver_id);
-        const senderId = this.checkIsIdValid("sender", data.sender_id);
+    async deleteChosenMessages(props: TUserChat["deleteChat"]) {
+        const messageIds = props.message_ids.map((id) => this.checkIsIdValid("message chat", id));
+        const receiverId = this.checkIsIdValid("receiver", props.receiver_id);
+        const senderId = this.checkIsIdValid("sender", props.sender_id);
 
         const chats = await userChatRepository.findAllMessagesById(messageIds);
         if (chats.length === 0) throw new ChitChatApiError("chat not found", 404);
@@ -213,68 +212,68 @@ class UserChatService {
         userChatEvent.emit(roomId, { data: affectedIds, type: "user-message:deleted" });
     }
 
-    private async executeDeletion(data: TUserChat["executeDeletion"]) {
+    private async executeDeletion(props: TUserChat["executeDeletion"]) {
         const operations: Promise<any>[] = [];
 
         this.executeMediaDeletion({
             deleteFunctions: (ids) => userChatRepository.deleteAllMessagesPermanently(ids),
-            messages: data.deleteMessagePermanently,
+            messages: props.deleteMessagePermanently,
             operations: operations,
         });
 
         this.executeMediaDeletion({
             deleteFunctions: (ids) => userChatRepository.deleteAllMessagesTemporary(ids),
-            messages: data.deleteMessageTemporary,
+            messages: props.deleteMessageTemporary,
             operations: operations
         });
 
-        if (data.hideMessages.length > 0) {
-            const ids = data.hideMessages.map(message => message._id);
+        if (props.hideMessages.length > 0) {
+            const ids = props.hideMessages.map(message => message._id);
             operations.push(userChatRepository.hideChosenMessages({ 
-                user_id: data.sender_id, message_ids: ids 
+                user_id: props.sender_id, message_ids: ids 
             }));
         }
 
         if (operations.length > 0) await Promise.all(operations);
     }
 
-    private executeMediaDeletion(data: TUserChat["executeMediaDeletion"]) {
-        if (data.messages.length === 0) return;
-        const selectedMessageids = data.messages.map(message => message._id);
-        const selectedFiles = data.messages.flatMap(message => message.files || []);
+    private executeMediaDeletion(props: TUserChat["executeMediaDeletion"]) {
+        if (props.messages.length === 0) return;
+        const selectedMessageids = props.messages.map(message => message._id);
+        const selectedFiles = props.messages.flatMap(message => message.files || []);
 
         if (selectedFiles.length > 0) {
             const removeFromCloudinary = selectedFiles.map(files => {
                 return v2.uploader.destroy(files.public_id, { resource_type: files.resource_type });
             });
 
-            data.operations.push(...removeFromCloudinary);
+            props.operations.push(...removeFromCloudinary);
         }
 
-        data.operations.push(data.deleteFunctions(selectedMessageids));
+        props.operations.push(props.deleteFunctions(selectedMessageids));
     }
 
     private getRoomId(receiver_id: string, sender_id: string) {
         return [receiver_id, sender_id].sort().join("_");
     }
 
-    async sendMessages(data: TUserChat["sendMessageRaw"]) {
+    async sendMessages(props: TUserChat["sendMessageRaw"]) {
         let filesTotal: number = 0;
         let selectedFiles: any[] = [];
         let text: string = "";
 
-        const receiverId = this.checkIsIdValid("receiver", data.receiver_id);
-        const senderId = this.checkIsIdValid("sender", data.sender_id);
-        const chosenFiles = Array.isArray(data.files) ? data.files : (data.files ? [data.files] : []);
+        const receiverId = this.checkIsIdValid("receiver", props.receiver_id);
+        const senderId = this.checkIsIdValid("sender", props.sender_id);
+        const chosenFiles = Array.isArray(props.files) ? props.files : (props.files ? [props.files] : []);
 
-        if (data.text) text = this.checkIsInputAString("message", data.text);
+        if (props.text) text = this.checkIsInputAString("message", props.text);
 
         if (!text && chosenFiles.length === 0) {
             throw new ChitChatApiError("message or file is required", 400);
         }
 
-        if (chosenFiles.length > 20) {
-            throw new ChitChatApiError("only accept 20 files or less", 400);
+        if (chosenFiles.length > 8) {
+            throw new ChitChatApiError("only accept 8 files or less", 400);
         }
 
         if (chosenFiles.length > 0) {
@@ -306,7 +305,7 @@ class UserChatService {
 
         if (selectedFiles.length > 0) {
             const uploadedFiles = selectedFiles.map((uploadedFile) => {
-                return userChatFilesRepository.sendFiles({
+                return userChatRepository.sendFiles({
                     file_name: uploadedFile.file_name,
                     file_type: uploadedFile.file_type,
                     message_id: message._id,
@@ -324,16 +323,12 @@ class UserChatService {
         userChatEvent.emit(roomId, { data: message, type: "user-message:sent" });
     }
 
-    async showAllMessages(data: Omit<TUserChat["messagePagination"], "skip">) {
-        const receiverId = this.checkIsIdValid("receiver", data.receiver_id);
-        const senderId = this.checkIsIdValid("sender", data.sender_id);
-
-        const limit = data.limit;
-        const page = data.page;
-        const skip = (page - 1) * limit;
+    async showAllMessages(props: TUserChat["messagePagination"]) {
+        const receiverId = this.checkIsIdValid("receiver", props.receiver_id);
+        const senderId = this.checkIsIdValid("sender", props.sender_id);
 
         return await userChatRepository.showAllMessages({
-            limit: limit, skip: skip, receiver_id: receiverId, sender_id: senderId
+            limit: props.limit, page: props.page, receiver_id: receiverId, sender_id: senderId
         });
     }
 

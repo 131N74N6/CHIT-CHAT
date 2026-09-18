@@ -273,8 +273,8 @@ class GroupChatService {
 
         if (data.text) text = this.checkIsInputAString("message", data.text);
 
-        if (chosenFiles.length > 20) {
-            throw new ChitChatApiError("only accept 20 files or less", 400);
+        if (chosenFiles.length > 8) {
+            throw new ChitChatApiError("only accept 8 files or less", 400);
         }
 
         if (chosenFiles.length > 0) {

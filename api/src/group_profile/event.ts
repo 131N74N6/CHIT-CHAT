@@ -1,3 +1,3 @@
 import { EventEmitter } from "events";
 
-export const groupProfile = new EventEmitter();
+export const groupProfileEvent = new EventEmitter();

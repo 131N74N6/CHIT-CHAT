@@ -34,12 +34,12 @@ class GroupChatController {
 
     async showAllMessages(data: Omit<TGroupChats["additionalFilter"], "skip">) {
         const messages = await groupChatService.showAllMessages(data);
-        return { data: messages, message: "messages from group retrieved successfully" }
+        return { data: messages }
     }
 
     async showUploadedFilesByMessageId(id: string) {
         const files = await groupChatService.showUploadedFilesByMessageId(id);
-        return { data: files, message: "uploaded files retrieved successfully" }
+        return { data: files }
     }
 }
 

@@ -5,45 +5,57 @@ export const groupProfile = {
         _id: t.String({ error: "invalid group", pattern: "^[0-9A-Fa-f]{24}$" }),
         group_description: t.Optional(t.String({ error: "invalid group description", minLength: 1 })),
         group_name: t.Optional(t.String({ error: "invalid group name", minLength: 1 })),
-        group_profile: t.Optional(t.File({ error: "unsupported file", type: "image/*", maxSize: 7340032 })),
-        owner_id: t.String({ error: "invalid group owner", pattern: "^[0-9A-Fa-f]{24}$" })
+        group_profile: t.Optional(t.Union([
+            t.File({ error: "unsupported file", type: "image/*", maxSize: 7340032 }),
+            t.Null()
+        ])),
+        user_id: t.String({ error: "invalid group owner", pattern: "^[0-9A-Fa-f]{24}$" })
     }),
     changeGroupResult: t.Object({
         _id: t.String({ error: "invalid group", pattern: "^[0-9A-Fa-f]{24}$" }),
         group_description: t.Optional(t.String({ error: "invalid group description", minLength: 1 })),
         group_name: t.Optional(t.String({ error: "invalid group name", minLength: 1 })),
-        group_profile: t.Optional(t.Object({
-            file_name: t.String({ error: "invalid file name", minLength: 1 }),
-            file_type: t.String({ error: "invalid file type", minLength: 1 }),
-            public_id: t.String({ error: "invalid file", minLength: 1 }),
-            resource_type: t.String({ error: "unable to get file", minLength: 1 }),
-            size: t.Number({ error: "invalid file size" }),
-            url: t.String({ error: "failed to access file", minLength: 1 })
-        })),
-        owner_id: t.String({ error: "invalid group owner", pattern: "^[0-9A-Fa-f]{24}$" })
+        group_profile: t.Optional(t.Union([
+            t.Null(),
+            t.Object({
+                file_name: t.String({ error: "invalid file name", minLength: 1 }),
+                file_type: t.String({ error: "invalid file type", minLength: 1 }),
+                public_id: t.String({ error: "invalid file", minLength: 1 }),
+                resource_type: t.String({ error: "unable to get file", minLength: 1 }),
+                size: t.Number({ error: "invalid file size" }),
+                url: t.String({ error: "failed to access file", minLength: 1 })
+            })
+        ])),
+        user_id: t.String({ error: "invalid group owner", pattern: "^[0-9A-Fa-f]{24}$" })
     }),
     createGroupRaw: t.Object({
         group_description: t.Optional(t.String({ error: "invalid group description", minLength: 1 })),
         group_name: t.String({ error: "invalid group name", minLength: 1 }),
-        group_profile: t.Optional(t.File({ error: "unsupported file", type: "image/*", maxSize: 7340032 })),
-        owner_id: t.String({ error: "invalid owner", pattern: "^[0-9A-Fa-f]{24}$" }),
+        group_profile: t.Optional(t.Union([
+            t.File({ error: "unsupported file", type: "image/*", maxSize: 7340032 }),
+            t.Null()
+        ])),
+        user_id: t.String({ error: "invalid owner", pattern: "^[0-9A-Fa-f]{24}$" }),
     }),
     createGroupResult: t.Object({
         group_description: t.Optional(t.String({ error: "invalid group description", minLength: 1 })),
         group_name: t.String({ error: "invalid group name", minLength: 1 }),
-        group_profile: t.Optional(t.Object({
-            file_name: t.String({ error: "invalid file name", minLength: 1 }),
-            file_type: t.String({ error: "invalid file type", minLength: 1 }),
-            public_id: t.String({ error: "invalid file", minLength: 1 }),
-            resource_type: t.String({ error: "unable to get file", minLength: 1 }),
-            size: t.Number({ error: "invalid file size" }),
-            url: t.String({ error: "failed to access file", minLength: 1 })
-        })),
-        owner_id: t.String({ error: "invalid group owner", pattern: "^[0-9A-Fa-f]{24}$" }),
+        group_profile: t.Optional(t.Union([
+            t.Null(),
+            t.Object({
+                file_name: t.String({ error: "invalid file name", minLength: 1 }),
+                file_type: t.String({ error: "invalid file type", minLength: 1 }),
+                public_id: t.String({ error: "invalid file", minLength: 1 }),
+                resource_type: t.String({ error: "unable to get file", minLength: 1 }),
+                size: t.Number({ error: "invalid file size" }),
+                url: t.String({ error: "failed to access file", minLength: 1 })
+            })
+        ])),
+        user_id: t.String({ error: "invalid group owner", pattern: "^[0-9A-Fa-f]{24}$" }),
     }),
     deleteGroup: t.Object({
         group_id: t.String({ error: "invalid group", pattern: "^[0-9A-Fa-f]{24}$" }),
-        owner_id: t.String({ error: "invalid group owner", pattern: "^[0-9A-Fa-f]{24}$" })
+        user_id: t.String({ error: "invalid group owner", pattern: "^[0-9A-Fa-f]{24}$" })
     }),
     filter: t.Object({
         limit: t.Number({ maximum: 32, minimum: 28, error: "maximum group profile each page is 32 and the minimum is 28" }),
@@ -56,11 +68,7 @@ export const groupProfile = {
     }),
     wsPayload: t.Object({
         data: t.Any(),
-        type: t.Union([
-            t.Literal("group:changed"),
-            t.Literal("group:created"),
-            t.Literal("group:deleted")
-        ])
+        type: t.Union([ t.Literal("group:changed"), t.Literal("group:deleted") ])
     })
 }
 
