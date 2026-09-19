@@ -52,8 +52,9 @@ export const userChatSchema = {
         size: t.Number({ error: "invalid file size" }),
         url: t.String({ error: "failed to access file", minLength: 1 }),
         message_id: t.Transform(t.String({ pattern: "^[0-9a-fA-F]{24}$", error: "invalid messages chat" }))
-        .Decode((id) => new ObjectId(id))
-        .Encode((id) => id.toHexString())
+        .Decode((id) => new ObjectId(id)).Encode((id) => id.toHexString()),
+        sender_id: t.Transform(t.String({ error: "invalid sender", pattern: "^[0-9A-Fa-f]{24}$" }))
+        .Decode((id) => new ObjectId(id)).Encode((id) => id.toHexString())
     }),
     sendMessageRaw: t.Object({
         files: t.Optional(t.Union([

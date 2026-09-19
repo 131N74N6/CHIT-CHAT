@@ -90,6 +90,7 @@ class UserChatRepository {
             resource_type: props.resource_type,
             size: props.size,
             url: props.url,
+            sender_id: props.sender_id,
             message_id: props.message_id
         });
     }

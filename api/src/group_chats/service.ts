@@ -314,6 +314,7 @@ class GroupChatService {
                     message_id: message._id,
                     public_id: uploadedFile.public_id,
                     resource_type: uploadedFile.resource_type,
+                    sender_id: message.sender_id,
                     size: uploadedFile.size,
                     url: uploadedFile.url
                 });

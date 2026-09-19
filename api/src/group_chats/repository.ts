@@ -87,7 +87,8 @@ class GroupChatRepository {
             resource_type: data.resource_type,
             size: data.size,
             url: data.url,
-            message_id: data.message_id
+            sender_id: data.sender_id,
+            message_id: data.message_id,
         });
     }
 
@@ -112,6 +113,16 @@ class GroupChatRepository {
         return await this.group_chats.find({ 
             group_id: new ObjectId(data.group_id), 
             hidden_for: { $nin: [new ObjectId(data.sender_id)] } 
+        }, { 
+            projection: { 
+                _id: 1, 
+                created_at: 1, 
+                files_total: 1, 
+                sender_id: 1, 
+                sender_name: 1, 
+                text: 1, 
+                updated_at: 1 
+            } 
         })
         .sort({ created_at: -1 })
         .limit(data.limit)

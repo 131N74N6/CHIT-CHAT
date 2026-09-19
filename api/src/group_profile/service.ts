@@ -8,9 +8,6 @@ import { groupChatEvent } from "../group_chats/event";
 import { v2 } from "cloudinary";
 import { CloudinaryUploadResult } from "../cloudinary/model";
 
-const allowedFileType = ["image/jpeg", "image/png", "image/webp", "image/avif"];
-const maxFileSize = 7340032;
-
 class GroupProfileService {
     async changeGroup(props: TGroupProfile["changeGroupRaw"]) {
         const groupId = this.checkIsIdValid("group", props._id);
@@ -55,11 +52,12 @@ class GroupProfileService {
             const arrayBuffer = await props.group_profile.arrayBuffer();
             const fileBuffer = Buffer.from(arrayBuffer);
 
-            if (!allowedFileType.includes(props.group_profile.type)) {
+            if (!props.group_profile.type.includes("application") && 
+            !props.group_profile.type.includes("image") && !props.group_profile.type.includes("video")) {
                 throw new ChitChatApiError("this file is not allowed", 400);
             }
 
-            if (props.group_profile.size > maxFileSize) {
+            if (props.group_profile.size > 7340032) {
                 throw new ChitChatApiError("this file size is too large", 400);
             }
 
@@ -139,11 +137,12 @@ class GroupProfileService {
         }
 
         if (props.group_profile) {
-            if (!allowedFileType.includes(props.group_profile.type)) {
+            if (!props.group_profile.type.includes("application") && 
+            !props.group_profile.type.includes("image") && !props.group_profile.type.includes("video")) {
                 throw new ChitChatApiError("this file is not allowed", 400);
             }
 
-            if (props.group_profile.size > maxFileSize) {
+            if (props.group_profile.size > 7340032) {
                 throw new ChitChatApiError("this file size is too large", 400);
             }
 
