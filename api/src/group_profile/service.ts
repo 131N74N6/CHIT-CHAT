@@ -6,6 +6,7 @@ import { uploadToCloudinary } from "../cloudinary/service";
 import { groupProfileEvent } from "./event";
 import { groupChatEvent } from "../group_chats/event";
 import { v2 } from "cloudinary";
+import { CloudinaryUploadResult } from "../cloudinary/model";
 
 const allowedFileType = ["image/jpeg", "image/png", "image/webp", "image/avif"];
 const maxFileSize = 7340032;
@@ -19,7 +20,15 @@ class GroupProfileService {
 
         let newDescription = "";
         let newName = "";
-        let newProfilePicture: any = null;
+
+        let newProfilePicture: CloudinaryUploadResult = {
+            file_name: "", 
+            file_type: "", 
+            public_id: "", 
+            resource_type: "", 
+            size: 0, 
+            url: ""
+        }
 
         const group = await groupProfileRepository.findOneGroup(groupId);
         if (!group) throw new ChitChatApiError("group not found", 404);
@@ -115,7 +124,15 @@ class GroupProfileService {
         const userId = this.checkIsIdValid("group owner", props.user_id);
         
         let newDescription = "";
-        let newProfilePicture: any = null;
+
+        let newProfilePicture: CloudinaryUploadResult = {
+            file_name: "", 
+            file_type: "", 
+            public_id: "", 
+            resource_type: "", 
+            size: 0, 
+            url: ""
+        }
 
         if (props.group_description) {
             newDescription = this.checkIsInputAString("group name", props.group_description);

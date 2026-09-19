@@ -5,10 +5,12 @@ import { v2 } from "cloudinary";
 import userChatRepository from "./repository";
 import { userChatEvent } from "./event";
 import { uploadToCloudinary } from "../cloudinary/service";
+import { CloudinaryUploadResult } from "../cloudinary/model";
 
 class UserChatService {
     private checkIsFileSupported(file: File) {
-        const isFileNotSupported = !file.type.includes("image") && 
+        const isFileNotSupported = 
+        !file.type.includes("image") && 
         !file.type.includes("video") && 
         !file.type.includes("application");
 
@@ -259,7 +261,7 @@ class UserChatService {
 
     async sendMessages(props: TUserChat["sendMessageRaw"]) {
         let filesTotal: number = 0;
-        let selectedFiles: any[] = [];
+        let selectedFiles: CloudinaryUploadResult[] = [];
         let text: string = "";
 
         const receiverId = this.checkIsIdValid("receiver", props.receiver_id);

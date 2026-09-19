@@ -5,7 +5,7 @@ import { ObjectId } from "mongodb";
 import { ChitChatApiError } from "../error/handler";
 import { groupChatEvent } from "./event";
 import { uploadToCloudinary } from "../cloudinary/service";
-import groupChatFilesRepository from "../group_chats_files/repository";
+import { CloudinaryUploadResult } from "../cloudinary/model";
 
 class GroupChatService {
     private checkIsFileSupported(file: File) {
@@ -258,7 +258,7 @@ class GroupChatService {
 
     async sendMessage(data: TGroupChats["sendMessageRaw"]) {
         let filesTotal: number = 0;
-        let selectedFiles: any[] = [];
+        let selectedFiles: CloudinaryUploadResult[] = [];
         let text: string = "";
 
         const chosenFiles = Array.isArray(data.files) ? data.files : (data.files ? [data.files] : []);
@@ -308,7 +308,7 @@ class GroupChatService {
 
         if (selectedFiles.length > 0) {
             const uploadedFiles = selectedFiles.map((uploadedFile) => {
-                return groupChatFilesRepository.sendFiles({
+                return groupChatRepository.sendFiles({
                     file_name: uploadedFile.file_name,
                     file_type: uploadedFile.file_type,
                     message_id: message._id,

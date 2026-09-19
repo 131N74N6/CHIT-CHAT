@@ -9,43 +9,43 @@ const wsContext = new WeakMap<any, { roomId: string; handler: (data: any) => voi
 
 const userChatRouters = new Elysia({ prefix: "/api/v1/user-chats" })
 .use(apiAuthMiddleware)
-.delete("/clear/bulk", async ({ body, user }) => {
-    return await userChatController.clearChosenMessage({ ...body, sender_id: user.id });
+.delete("/clear/bulk", async (context) => {
+    return await userChatController.clearChosenMessage({ ...context.body, sender_id: context.user.id });
 }, {
     body: t.Omit(userChatSchema.deleteChat, ["sender_id"])
 })
-.delete("/clear", async ({ query, user }) => {
-    return await userChatController.clearAllMessages({ ...query, sender_id: user.id });
+.delete("/clear", async (context) => {
+    return await userChatController.clearAllMessages({ ...context.query, sender_id: context.user.id });
 }, {
     query: t.Pick(userChatSchema.deleteChat, ["receiver_id"])
 })
-.delete("/bulk", async ({ body, user }) => {
-    return await userChatController.deleteChosenMessages({ ...body, sender_id: user.id });
+.delete("/bulk", async (context) => {
+    return await userChatController.deleteChosenMessages({ ...context.body, sender_id: context.user.id });
 }, {
     body: t.Omit(userChatSchema.deleteChat, ["sender_id"])
 })
-.delete("/", async ({ query, user }) => {
-    return await userChatController.deleteAllMessages({ ...query, sender_id: user.id });
+.delete("/", async (context) => {
+    return await userChatController.deleteAllMessages({ ...context.query, sender_id: context.user.id });
 }, {
     query: t.Pick(userChatSchema.deleteChat, ["receiver_id"])
 })
-.get("/files/:_id", async ({ params }) => {
-    return await userChatController.showChosenMessageFiles(params._id);
+.get("/files/:_id", async (context) => {
+    return await userChatController.showChosenMessageFiles(context.params._id);
 }, {
     params: t.Pick(userChatSchema.changeMessageResult, ["_id"])
 })
-.get("/", async ({ query, user }) => {
-    return await userChatController.showAllMessages({ ...query, sender_id: user.id })
+.get("/", async (context) => {
+    return await userChatController.showAllMessages({ ...context.query, sender_id: context.user.id })
 }, {
     query: t.Omit(userChatSchema.messagePagination, ["sender_id", "skip"])
 })
-.post("/", async ({ body, user }) => {
-    return await userChatController.sendMessages({ ...body, sender_id: user.id });
+.post("/", async (context) => {
+    return await userChatController.sendMessages({ ...context.body, sender_id: context.user.id });
 }, {
     body: t.Omit(userChatSchema.sendMessageRaw, ["sender_id"])
 })
-.put("/", async ({ body, user }) => {
-    return await userChatController.changeChosenMessage({ ...body, sender_id: user.id });
+.put("/", async (context) => {
+    return await userChatController.changeChosenMessage({ ...context.body, sender_id: context.user.id });
 }, {
     body: t.Omit(userChatSchema.changeMessageResult, ["sender_id"])
 })

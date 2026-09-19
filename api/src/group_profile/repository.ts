@@ -34,7 +34,7 @@ class GroupProfileRepository {
                 updated_at: new Date(),
             }),
             this.users.updateOne({ _id: new ObjectId(props.user_id) }, {
-                $addToSet: { group_ids: [props.user_id.toString()] }
+                $addToSet: { group_ids: props.user_id }
             })
         ]);
     }

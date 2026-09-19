@@ -114,30 +114,15 @@ class UserChatRepository {
         const limit = props.limit;
         const skip = (page - 1) * limit;
 
-        return await this.user_chats.aggregate([
-            { $match: { 
-                $or: [
-                    { 
-                        sender_id: new ObjectId(props.sender_id), 
-                        receiver_id: new ObjectId(props.receiver_id) 
-                    }, 
-                    { 
-                        sender_id: new ObjectId(props.receiver_id), 
-                        receiver_id: new ObjectId(props.sender_id) 
-                    }
-                ],
-                hidden_for: { $nin: [new ObjectId(props.sender_id)] }
-            }},
-            { $sort: { created_at: -1 }},
-            { $limit: limit },
-            { $skip: skip },
-            { $lookup: {
-                from: "messages_files",
-                localField: "_id",
-                foreignField: "message_id",
-                as: "files"
-            }}
-        ])
+        return await this.user_chats.find({ 
+            $or: [
+                { sender_id: new ObjectId(props.sender_id), receiver_id: new ObjectId(props.receiver_id) }, 
+                { sender_id: new ObjectId(props.receiver_id), receiver_id: new ObjectId(props.sender_id) }
+            ],
+            hidden_for: { $nin: [new ObjectId(props.sender_id)] }
+        })
+        .limit(limit)
+        .skip(skip)
         .toArray();
     }
 

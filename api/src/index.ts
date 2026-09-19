@@ -7,6 +7,7 @@ import userChatRouters from "./user_chats/router";
 import groupChatRouters from "./group_chats/router";
 import groupMemberRouters from "./group_members/router";
 import groupProfileRouters from "./group_profile/router";
+import userProfileRouters from "./user_profile/router";
 
 const port = import.meta.env.PORT || 3000;
 
@@ -27,6 +28,7 @@ const app = new Elysia()
 .use(groupMemberRouters)
 .use(groupProfileRouters)
 .use(userChatRouters)
+.use(userProfileRouters)
 .get("/", () => "🦊 Hello Elysia")
 .get("/api", () => "🦊 Elysia API is ready 🚀")
 .get("/api/v1", () => "🦊 Elysia API current version: 1.0 🚀")

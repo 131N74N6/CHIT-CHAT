@@ -1,6 +1,6 @@
 import { t, UnwrapSchema } from "elysia";
 
-export const groupProfile = {
+export const groupProfileSchema = {
     changeGroupRaw: t.Object({
         _id: t.String({ error: "invalid group", pattern: "^[0-9A-Fa-f]{24}$" }),
         group_description: t.Optional(t.String({ error: "invalid group description", minLength: 1 })),
@@ -66,12 +66,12 @@ export const groupProfile = {
         group_id: t.String({ pattern: "^[0-9a-fA-F]{24}$", error: "invalid group" }),
         token: t.String({ minLength: 1, error: "invalid token" })
     }),
-    wsPayload: t.Object({
-        data: t.Any(),
-        type: t.Union([ t.Literal("group:changed"), t.Literal("group:deleted") ])
+    wsSubscription: t.Object({
+        room_handler: t.Function([t.Any()], t.Void()),
+        room_name: t.String({ error: "invalid user", minLength: 1 })
     })
 }
 
 export type TGroupProfile = {
-    [o in keyof typeof groupProfile]: UnwrapSchema<typeof groupProfile[o]>;
+    [o in keyof typeof groupProfileSchema]: UnwrapSchema<typeof groupProfileSchema[o]>;
 }
