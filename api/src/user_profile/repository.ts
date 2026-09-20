@@ -6,12 +6,10 @@ import { TUserProfile } from "./model";
 class UserProfileRepository {
     private accounts = db().collection("account");
     private group_chats = db().collection("group_chats");
-    private group_chats_files = db().collection("group_chats_files");
     private group_profiles = db().collection("group_profiles");
     private sessions = db().collection("session");
     private users = db().collection<Omit<User, "id">>("user");
     private user_chats = db().collection("user_chats");
-    private user_chats_files = db().collection("user_chats_files");
     
     async changeUser(props: TUserProfile["changeResult"]) {
         await Promise.all([
@@ -38,13 +36,11 @@ class UserProfileRepository {
         await Promise.all([
             this.accounts.deleteOne({ userId: new ObjectId(id) }),
             this.group_chats.deleteMany({ sender_id: new ObjectId(id) }),
-            this.group_chats_files.deleteMany({ sender_id: new ObjectId(id) }),
             this.group_profiles.deleteMany({ owner_id: new ObjectId(id) }),
             this.user_chats.deleteMany(
                 { $or: [{ sender_id: new ObjectId(id) }, { receiver_id: new ObjectId(id) }] }
             ),
             this.sessions.deleteMany({ userId: new ObjectId(id) }),
-            this.user_chats_files.deleteMany({ sender_id: new ObjectId(id) }),
             this.users.deleteOne({ _id: new ObjectId(id) })
         ]);
 

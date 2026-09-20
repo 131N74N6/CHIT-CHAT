@@ -37,7 +37,7 @@ const groupChatRouters = new Elysia({ prefix: "/api/v1/groups/chats" })
 .get("/", async ({ query, user }) => {
     return await groupChatController.showAllMessages({ ...query, sender_id: user.id });
 }, {
-    query: t.Omit(groupChatSchema.additionalFilter, ["sender_id", "skip"])
+    query: t.Omit(groupChatSchema.additionalFilter, ["sender_id"])
 })
 .post("/", async ({ body, user }) => {
     return await groupChatController.sendMessage({ ...body, sender_id: user.id, sender_name: user.name });

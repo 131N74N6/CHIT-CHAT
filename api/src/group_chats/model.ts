@@ -6,7 +6,6 @@ export const groupChatSchema = {
         group_id: t.String({ pattern: "^[0-9A-Fa-f]{24}$", error: "invalid group" }),
         limit: t.Number({ maximum: 54, minimum: 52, error: "maximum message each page is 54 and the minimum is 52" }),
         sender_id: t.String({ error: "invalid sender", pattern: "^[0-9A-Fa-f]{24}$" }),
-        skip: t.Number({ maximum: 54, minimum: 52, error: "maximum skipped message is 54 and the minimum is 52" }),
         page: t.Number({ minimum: 1, error: "message page must start from 1" })
     }),
     changeMessage: t.Object({
@@ -38,20 +37,16 @@ export const groupChatSchema = {
             .Encode(value => value.toHexString())
         ),
         sender_id: t.String({ pattern: "^[0-9A-Fa-f]{24}$", error: "invalid sender" })
-    }),    
-    sendFiles: t.Object({
-        file_name: t.String({ error: "invalid file name", minLength: 1 }),
-        file_type: t.String({ error: "invalid file type", minLength: 1 }),
-        public_id: t.String({ error: "invalid file", minLength: 1 }),
-        resource_type: t.String({ error: "unable to get file", minLength: 1 }),
-        size: t.Number({ error: "invalid file size" }),
-        url: t.String({ error: "failed to access file", minLength: 1 }),
-        message_id: t.Transform(t.String({ pattern: "^[0-9a-fA-F]{24}$", error: "invalid messages chat" }))
-        .Decode((id) => new ObjectId(id)).Encode((id) => id.toHexString()),
-        sender_id: t.Transform(t.String({ error: "invalid sender", pattern: "^[0-9A-Fa-f]{24}$" }))
-        .Decode((id) => new ObjectId(id)).Encode((id) => id.toHexString())
     }),
     sendMessageResult: t.Object({
+        files: t.Array(t.Object({
+            file_name: t.String({ error: "invalid file name", minLength: 1 }),
+            file_type: t.String({ error: "invalid file type", minLength: 1 }),
+            public_id: t.String({ error: "invalid file", minLength: 1 }),
+            resource_type: t.String({ error: "unable to get file", minLength: 1 }),
+            size: t.Number({ error: "invalid file size" }),
+            url: t.String({ error: "failed to access file", minLength: 1 })
+        })),
         files_total: t.Number({ minimum: 0, error: "minimum files total is 0 and maximum is 20", maximum: 20 }),
         group_id: t.String({ error: "invalid group", pattern: "^[0-9A-Fa-f]{24}$" }),
         group_name: t.String({ error: "invalid group name", minLength: 1 }),
@@ -79,14 +74,6 @@ export const groupChatSchema = {
     wsConfig: t.Object({
         group_id: t.String({ error: "invalid group", pattern: "^[0-9A-Fa-f]{24}$" }),
         token: t.String({ minLength: 1, error: "invalid token" })
-    }),
-    wsPayload: t.Object({
-        data: t.Any(),
-        type: t.Union([
-            t.Literal("group-message:changed"), 
-            t.Literal("group-message:deleted"), 
-            t.Literal("group-message:sent")
-        ])
     })
 }
 

@@ -32,13 +32,13 @@ class UserChatController {
         return { message: "message has been sent" }
     }
 
-    async showAllMessages(props: TUserChat["messagePagination"]) {
+    async showAllMessages(props: TUserChat["filter"]) {
         const messages = await userChatService.showAllMessages(props);
         return { data: messages }
     }
 
-    async showChosenMessageFiles(message_id: string) {
-        const files = await userChatService.showChosenMessageFiles(message_id);
+    async showChosenMessageFiles(id: string) {
+        const files = await userChatService.showChosenMessageFiles(id);
         return { data: files }
     }
 }

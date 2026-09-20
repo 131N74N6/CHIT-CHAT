@@ -1,66 +1,41 @@
 import { ObjectId } from "mongodb";
 import { db } from "../mongodb/service";
 import { TGroupChats } from "./model";
+import { User } from "../auth/model";
 
 class GroupChatRepository {
     private group_chats = db().collection("group_chats");
-    private group_members = db().collection("group_members");
-    private group_chats_files = db().collection("group_chats_files");
+    private users = db().collection<Omit<User, "id">>("user");
 
-    async changeChosenMessage(data: TGroupChats["changeMessage"]) {
+    async changeChosenMessage(props: TGroupChats["changeMessage"]) {
         const edited = await this.group_chats.findOneAndUpdate({ 
-            _id: new ObjectId(data._id), 
-            group_id: new ObjectId(data.group_id), 
-            sender_id: new ObjectId(data.group_id),
+            _id: new ObjectId(props._id), 
+            group_id: new ObjectId(props.group_id), 
+            sender_id: new ObjectId(props.group_id),
         }, {
-            $set: { text: data.text, updated_at: new Date() }
+            $set: { text: props.text, updated_at: new Date() }
         }, { returnDocument: "after" });
 
         return edited;
     }
 
     async deleteMessagesPermanently(ids: ObjectId[]) {
-        return await Promise.all([
-            this.group_chats_files.deleteMany({ message_id: { $in: ids } }),
-            this.group_chats.deleteMany({ _id: { $in: ids }})
-        ]);
+        return await this.group_chats.deleteMany({ _id: { $in: ids }});
     }
 
     async deleteMessagesTemporary(ids: ObjectId[]) {
-        return await Promise.all([
-            this.group_chats_files.deleteMany({ message_id: { $in: ids } }),
-            this.group_chats.updateMany({ _id: { $in: ids }}, {
-                $set: { text: "This message has been deleted", files_total: 0 }
-            })
-        ]);
+        return await this.group_chats.updateMany({ _id: { $in: ids }}, { 
+            $set: { files: [], files_total: 0, text: "This message has been deleted" } 
+        });
     }
 
     async findAllMessages(group_id: string) {
-        return await this.group_chats.aggregate([
-            { $match: { group_id: new ObjectId(group_id) }},
-            { $lookup: {
-                from: "group_chats_files",
-                foreignField: "message_id",
-                localField: "_id",
-                as: "files"
-            }}
-        ])
-        .toArray();
+        return await this.group_chats.find({ group_id: new ObjectId(group_id) }).toArray();
     }
 
     async findChosenMessagesById(ids: string[]) {
         const messageIds = ids.map((id) => new ObjectId(id));
-
-        return await this.group_chats.aggregate([
-            { $match: { _id: { $in: messageIds }}},
-            { $lookup: {
-                from: "group_chats_files",
-                foreignField: "message_id",
-                localField: "_id",
-                as: "files"
-            }}
-        ])
-        .toArray();
+        return await this.group_chats.find({ _id: { $in: messageIds } }).toArray();
     }
 
     async findOneMessageById(id: string) {
@@ -68,40 +43,26 @@ class GroupChatRepository {
     }
 
     async findAllMembers(group_id: string) {
-        return await this.group_members.find({ group_id: new ObjectId(group_id) })
-        .toArray();
+        return await this.users.find({ group_ids: { $in: [group_id] } }).toArray();
     }
 
-    async hideMessages(data: TGroupChats["hideChosenMessages"]) {
-        return await this.group_chats.updateMany({ _id: { $in: data.message_ids }}, {
-            $addToSet: { hidden_for: data.sender_id }
+    async hideMessages(props: TGroupChats["hideChosenMessages"]) {
+        return await this.group_chats.updateMany({ _id: { $in: props.message_ids }}, {
+            $addToSet: { hidden_for: props.sender_id }
         });
     }
 
-    async sendFiles(data: TGroupChats["sendFiles"]) {
-        return await this.group_chats_files.insertOne({
-            created_at: new Date,
-            file_name: data.file_name,
-            file_type: data.file_type,
-            public_id: data.public_id,
-            resource_type: data.resource_type,
-            size: data.size,
-            url: data.url,
-            sender_id: data.sender_id,
-            message_id: data.message_id,
-        });
-    }
-
-    async sendMessages(data: TGroupChats["sendMessageResult"]) {
+    async sendMessages(props: TGroupChats["sendMessageResult"]) {
         const message = {
             created_at: new Date(),
-            files_total: data.files_total,
-            group_id: new ObjectId(data.group_id),
+            files: props.files,
+            files_total: props.files_total,
+            group_id: new ObjectId(props.group_id),
             hidden_for: [],
-            group_name: data.group_name,
-            sender_id: new ObjectId(data.sender_id),
-            sender_name: data.sender_name,
-            text: data.text,
+            group_name: props.group_name,
+            sender_id: new ObjectId(props.sender_id),
+            sender_name: props.sender_name,
+            text: props.text,
             updated_at: new Date()
         }
 
@@ -109,10 +70,14 @@ class GroupChatRepository {
         return { ...message, _id: result.insertedId }
     }
 
-    async showAllMessages(data: Omit<TGroupChats["additionalFilter"], "page">) {
+    async showAllMessages(props: TGroupChats["additionalFilter"]) {
+        const limit = props.limit;
+        const page = props.page;
+        const skip = (page - 1);
+
         return await this.group_chats.find({ 
-            group_id: new ObjectId(data.group_id), 
-            hidden_for: { $nin: [new ObjectId(data.sender_id)] } 
+            group_id: new ObjectId(props.group_id), 
+            hidden_for: { $nin: [new ObjectId(props.sender_id)] } 
         }, { 
             projection: { 
                 _id: 1, 
@@ -125,13 +90,13 @@ class GroupChatRepository {
             } 
         })
         .sort({ created_at: -1 })
-        .limit(data.limit)
-        .skip(data.skip)
+        .limit(limit)
+        .skip(skip)
         .toArray();
     }
 
     async showUploadedFilesByMessageId(id: string) {
-        return await this.group_chats_files.find({ message_id: new ObjectId(id) }).toArray();
+        return await this.group_chats.findOne({ _id: new ObjectId(id) }, { projection: { files: 1 } });
     }
 }
 

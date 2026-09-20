@@ -298,6 +298,7 @@ class GroupChatService {
         }
 
         const message = await groupChatRepository.sendMessages({
+            files: selectedFiles,
             files_total: filesTotal,
             group_id: groupId,
             group_name: groupName,
@@ -306,36 +307,15 @@ class GroupChatService {
             text: text
         });
 
-        if (selectedFiles.length > 0) {
-            const uploadedFiles = selectedFiles.map((uploadedFile) => {
-                return groupChatRepository.sendFiles({
-                    file_name: uploadedFile.file_name,
-                    file_type: uploadedFile.file_type,
-                    message_id: message._id,
-                    public_id: uploadedFile.public_id,
-                    resource_type: uploadedFile.resource_type,
-                    sender_id: message.sender_id,
-                    size: uploadedFile.size,
-                    url: uploadedFile.url
-                });
-            });
-
-            await Promise.all(uploadedFiles);
-        }
-
         groupChatEvent.emit(groupId, { data: message, type: "group-message:sent" });
     }
 
-    async showAllMessages(data: Omit<TGroupChats["additionalFilter"], "skip">) {
-        const groupId = this.checkIsIdValid("group", data.group_id);
-        const senderId = this.checkIsIdValid("sender", data.sender_id);
-
-        const limit = data.limit;
-        const page = data.page;
-        const skip = (page - 1) * limit;
+    async showAllMessages(props: Omit<TGroupChats["additionalFilter"], "skip">) {
+        const groupId = this.checkIsIdValid("group", props.group_id);
+        const senderId = this.checkIsIdValid("sender", props.sender_id);
 
         const messages = await groupChatRepository.showAllMessages({
-            group_id: groupId, skip: skip, limit: limit, sender_id: senderId
+            group_id: groupId, sender_id: senderId, page: props.page, limit: props.limit
         });
 
         return messages;

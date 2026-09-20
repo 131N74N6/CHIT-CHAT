@@ -32,10 +32,9 @@ class UserProfileService {
             url: ""
         }
 
-        if (username === user.name && 
-            description === user.description && 
-            user.image_filename === image.file_name
-        ) return;
+        if (username === user.name && description === user.description && user.image_filename === image.file_name) {
+            return;
+        }
 
         if (props.image) {
             const getArrayBuffer = await props.image.arrayBuffer();

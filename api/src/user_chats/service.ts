@@ -85,7 +85,7 @@ class UserChatService {
         const receiverId = this.checkIsIdValid("receiver", props.receiver_id);
         const senderId = this.checkIsIdValid("sender", props.sender_id);
 
-        const chats = await userChatRepository.findAllMessagesById(messageIds);
+        const chats = await userChatRepository.findChosenMessagesById(messageIds);
         if (chats.length === 0) throw new ChitChatApiError("chat not found", 404);
 
         const deleteChosenMessagesPermanently = chats.filter((chat) => {
@@ -165,7 +165,7 @@ class UserChatService {
         const receiverId = this.checkIsIdValid("receiver", props.receiver_id);
         const senderId = this.checkIsIdValid("sender", props.sender_id);
 
-        const chats = await userChatRepository.findAllMessagesById(messageIds);
+        const chats = await userChatRepository.findChosenMessagesById(messageIds);
         if (chats.length === 0) throw new ChitChatApiError("chat not found", 404);
 
         const deleteOwnMessagePermanently = chats.filter((chat) => {
@@ -299,34 +299,18 @@ class UserChatService {
         }
 
         const message = await userChatRepository.sendMessage({
+            files: selectedFiles,
             files_total: filesTotal,
             receiver_id: receiverId,
             sender_id: senderId,
             text: text
         });
 
-        if (selectedFiles.length > 0) {
-            const uploadedFiles = selectedFiles.map((uploadedFile) => {
-                return userChatRepository.sendFiles({
-                    file_name: uploadedFile.file_name,
-                    file_type: uploadedFile.file_type,
-                    message_id: message._id,
-                    public_id: uploadedFile.public_id,
-                    resource_type: uploadedFile.resource_type,
-                    sender_id: message.sender_id,
-                    size: uploadedFile.size,
-                    url: uploadedFile.url
-                });
-            });
-
-            await Promise.all(uploadedFiles);
-        }
-
         const roomId = this.getRoomId(receiverId, senderId);
         userChatEvent.emit(roomId, { data: message, type: "user-message:sent" });
     }
 
-    async showAllMessages(props: TUserChat["messagePagination"]) {
+    async showAllMessages(props: TUserChat["filter"]) {
         const receiverId = this.checkIsIdValid("receiver", props.receiver_id);
         const senderId = this.checkIsIdValid("sender", props.sender_id);
 
@@ -335,8 +319,8 @@ class UserChatService {
         });
     }
 
-    async showChosenMessageFiles(message_id: string) {
-        const messageId = this.checkIsIdValid("message chat", message_id);
+    async showChosenMessageFiles(id: string) {
+        const messageId = this.checkIsIdValid("message chat", id);
         return await userChatRepository.showChosenMessageFiles(messageId);
     }
 }
