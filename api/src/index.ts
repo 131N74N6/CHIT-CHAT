@@ -8,6 +8,7 @@ import groupChatRouters from "./group_chats/router";
 import groupMemberRouters from "./group_members/router";
 import groupProfileRouters from "./group_profile/router";
 import userProfileRouters from "./user_profile/router";
+import chatBotRouters from "./chatbot/router";
 
 const port = import.meta.env.PORT || 3000;
 
@@ -24,6 +25,7 @@ const app = new Elysia()
     origin: ["http://localhost:5173", "http://localhost:3000"]
 }))
 .all("/api/auth/*", async (ctx) => await authServiceApi.handler(ctx.request))
+.use(chatBotRouters)
 .use(groupChatRouters)
 .use(groupMemberRouters)
 .use(groupProfileRouters)
