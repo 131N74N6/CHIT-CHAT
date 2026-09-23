@@ -1,258 +1,81 @@
-import { ObjectId } from "mongodb";
 import { TUserChat } from "./model";
-import { ChitChatApiError } from "../error/handler";
-import { v2 } from "cloudinary";
 import userChatRepository from "./repository";
 import { userChatEvent } from "./event";
-import { uploadToCloudinary } from "../cloudinary/service";
-import { CloudinaryUploadResult } from "../cloudinary/model";
+import userChatUseCase from "./usecase";
 
 class UserChatService {
-    private checkIsFileSupported(file: File) {
-        const isFileNotSupported = 
-        !file.type.includes("image") && 
-        !file.type.includes("video") && 
-        !file.type.includes("application");
-
-        if (isFileNotSupported) {
-            throw new ChitChatApiError("unsupported file", 400);
-        }
-
-        return file;
-    }
-
-    private checkIsIdValid(field: string, value: unknown) {
-        if (!value || typeof value !== "string" || !ObjectId.isValid(value)) {
-            throw new ChitChatApiError(`invalid ${field}`, 400);
-        }
-
-        return value;
-    }
-
-    private checkIsInputAString(field: string, value: unknown) {
-        if (!value || value === "" || typeof value !== "string") {
-            throw new ChitChatApiError(`invalid ${field}`, 400);
-        }
-
-        return value;
-    }
-
     async changeChosenMessage(props: TUserChat["changeMessageResult"]) {
-        const messageId = this.checkIsIdValid("message chat", props._id);
-        const receiverId = this.checkIsIdValid("receiver", props.receiver_id);
-        const senderId = this.checkIsIdValid("sender", props.sender_id);
-        const message = await userChatRepository.findOneMessageById(messageId);
-
-        if (!message) throw new ChitChatApiError("message not found", 404);
-        if (message.text === props.text) return;
+        const checkpoint = await userChatUseCase.checkBeforeChangeMessage(props);
 
         const editedMessage = await userChatRepository.changeMessage({ 
-            _id: messageId, 
-            text: props.text, 
-            receiver_id: receiverId, 
-            sender_id: senderId 
+            _id: checkpoint?.messageId!, 
+            text: checkpoint?.newText, 
+            receiver_id: checkpoint?.receiverId!, 
+            sender_id: checkpoint?.senderId! 
         });
 
-        const roomId = this.getRoomId(receiverId, senderId);
+        const roomId = this.getRoomId(checkpoint?.receiverId!, checkpoint?.senderId!);
         userChatEvent.emit(roomId, { data: editedMessage, type: "user-message:changed" });
     }
 
     async clearAllMessages(props: Omit<TUserChat["deleteChat"], "message_ids">) {
-        const receiverId = this.checkIsIdValid("receiver", props.receiver_id);
-        const senderId = this.checkIsIdValid("sender", props.sender_id);
+        const checkpoint = await userChatUseCase.checkBeforeClearAll(props);
 
-        const chats = await userChatRepository.findAllMessages(props);
-        if (chats.length === 0) throw new ChitChatApiError("chat not found", 404);
-
-        const deleteAllMessagePermanently = chats.filter((chat) => {
-            return chat.hidden_for.some((id: ObjectId) => id.toString() === receiverId)
-        });
-
-        const hideAllMessages = chats.filter((chat) => {
-            return !chat.hidden_for.some((id: ObjectId) => id.toString() === receiverId)
-        });
-
-        await this.executeDeletion({
-            deleteMessagePermanently: deleteAllMessagePermanently,
+        await userChatUseCase.executeDeletion({
+            deleteMessagePermanently: checkpoint.deleteAllMessagePermanently,
             deleteMessageTemporary: [],
-            hideMessages: hideAllMessages,
-            sender_id: senderId
+            hideMessages: checkpoint.hideAllMessages,
+            sender_id: checkpoint.senderId
         });
     }
 
     async clearChosenMessage(props: TUserChat["deleteChat"]) {
-        const messageIds = props.message_ids.map((id) => this.checkIsIdValid("message chat", id));
-        const receiverId = this.checkIsIdValid("receiver", props.receiver_id);
-        const senderId = this.checkIsIdValid("sender", props.sender_id);
+        const checkpoint = await userChatUseCase.checkBeforeClearChosen(props);
 
-        const chats = await userChatRepository.findChosenMessagesById(messageIds);
-        if (chats.length === 0) throw new ChitChatApiError("chat not found", 404);
-
-        const deleteChosenMessagesPermanently = chats.filter((chat) => {
-            return chat.hidden_for.some((id: ObjectId) => id.toString() === receiverId)
-        });
-
-        const hideChosenMessages = chats.filter((chat) => {
-            return !chat.hidden_for.some((id: ObjectId) => id.toString() === receiverId)
-        });
-
-        await this.executeDeletion({
-            deleteMessagePermanently: deleteChosenMessagesPermanently,
+        await userChatUseCase.executeDeletion({
+            deleteMessagePermanently: checkpoint.deleteChosenMessagesPermanently,
             deleteMessageTemporary: [],
-            hideMessages: hideChosenMessages,
-            sender_id: senderId
+            hideMessages: checkpoint.hideChosenMessages,
+            sender_id: checkpoint.senderId
         });
     }
 
     async deleteAllMessages(props: Omit<TUserChat["deleteChat"], "message_ids">) {
-        const receiverId = this.checkIsIdValid("receiver", props.receiver_id);
-        const senderId = this.checkIsIdValid("sender", props.sender_id);
+        const checkpoint = await userChatUseCase.checkBeforeDeleteAll(props);
 
-        const chats = await userChatRepository.findAllMessages({ 
-            receiver_id: receiverId, sender_id: senderId 
-        });
-
-        if (chats.length === 0) throw new ChitChatApiError("chat not found", 404);
-
-        const deleteOwnMessagePermanently = chats.filter((chat) => {
-            return chat.hidden_for.some((id: ObjectId) => id.toString() === receiverId) &&
-            (chat.receiver_id === receiverId && chat.sender_id === senderId)
-        });
-
-        const deleteOwnMessagesTemporary = chats.filter((chat) => {
-            return !chat.hidden_for.some((id: ObjectId) => id.toString() === receiverId) &&
-            (chat.receiver_id === receiverId && chat.sender_id === senderId)
-        });
-
-        const deleteOtherMessagesPermanently = chats.filter((chat) => {
-            return chat.hidden_for.some((id: ObjectId) => id.toString() === receiverId) &&
-            (chat.receiver_id === senderId && chat.sender_id === receiverId)
-        });
-
-        const deleteOtherMessagesTemporary = chats.filter((chat) => {
-            return !chat.hidden_for.some((id: ObjectId) => id.toString() === receiverId) &&
-            (chat.receiver_id === senderId && chat.sender_id === receiverId)
-        });
-
-        const hideDeletedMessages = chats.filter((chat) => {
-            return chat.text === "This message has been deleted" &&
-            !chat.hidden_for.some((id: ObjectId) => id.toString() === receiverId)
-        });
-
-        const removeDeletedMessagesPermanently = chats.filter((chat) => {
-            return chat.text === "This message has been deleted" &&
-            chat.hidden_for.some((id: ObjectId) => id.toString() === receiverId)
-        });
-
-        await this.executeDeletion({
+        await userChatUseCase.executeDeletion({
             deleteMessagePermanently: [
-                ...deleteOwnMessagePermanently, 
-                ...deleteOtherMessagesPermanently, 
-                ...removeDeletedMessagesPermanently
+                ...checkpoint.deleteOwnMessagePermanently, 
+                ...checkpoint.deleteOtherMessagesPermanently, 
+                ...checkpoint.removeDeletedMessagesPermanently
             ],
-            deleteMessageTemporary: deleteOwnMessagesTemporary,
-            hideMessages: [...hideDeletedMessages, ...deleteOtherMessagesTemporary],
-            sender_id: senderId
+            deleteMessageTemporary: checkpoint.deleteOwnMessagesTemporary,
+            hideMessages: [...checkpoint.hideDeletedMessages, ...checkpoint.deleteOtherMessagesTemporary],
+            sender_id: checkpoint.senderId
         });
 
-        const affectedIds = deleteOwnMessagesTemporary.map((message) => message._id.toString());
-        const roomId = this.getRoomId(receiverId, senderId);
+        const affectedIds = checkpoint.deleteOwnMessagesTemporary.map((message) => message._id.toString());
+        const roomId = this.getRoomId(checkpoint.receiverId, checkpoint.senderId);
         userChatEvent.emit(roomId, { data: affectedIds, type: "user-message:deleted" });
     }
 
     async deleteChosenMessages(props: TUserChat["deleteChat"]) {
-        const messageIds = props.message_ids.map((id) => this.checkIsIdValid("message chat", id));
-        const receiverId = this.checkIsIdValid("receiver", props.receiver_id);
-        const senderId = this.checkIsIdValid("sender", props.sender_id);
+        const checkpoint = await userChatUseCase.checkBeforeDeleteChosen(props);
 
-        const chats = await userChatRepository.findChosenMessagesById(messageIds);
-        if (chats.length === 0) throw new ChitChatApiError("chat not found", 404);
-
-        const deleteOwnMessagePermanently = chats.filter((chat) => {
-            return chat.hidden_for.some((id: ObjectId) => id.toString() === receiverId) &&
-            (chat.receiver_id === receiverId && chat.sender_id === senderId)
-        });
-
-        const deleteOwnMessagesTemporary = chats.filter((chat) => {
-            return !chat.hidden_for.some((id: ObjectId) => id.toString() === receiverId) &&
-            (chat.receiver_id === receiverId && chat.sender_id === senderId)
-        });
-
-        const deleteOtherMessagesPermanently = chats.filter((chat) => {
-            return chat.hidden_for.some((id: ObjectId) => id.toString() === receiverId) &&
-            (chat.receiver_id === senderId && chat.sender_id === receiverId)
-        });
-
-        const deleteOtherMessagesTemporary = chats.filter((chat) => {
-            return !chat.hidden_for.some((id: ObjectId) => id.toString() === receiverId) &&
-            (chat.receiver_id === senderId && chat.sender_id === receiverId)
-        });
-
-        const hideDeletedMessages = chats.filter((chat) => {
-            return !chat.hidden_for.some((id: ObjectId) => id.toString() === receiverId) &&
-            chat.text === "This message has been deleted"
-        });
-
-        const removeDeletedMessagesPermanently = chats.filter((chat) => {
-            return chat.hidden_for.some((id: ObjectId) => id.toString() === receiverId) &&
-            chat.text === "This message has been deleted"
-        });
-
-        await this.executeDeletion({
+        await userChatUseCase.executeDeletion({
             deleteMessagePermanently: [
-                ...deleteOwnMessagePermanently,
-                ...deleteOtherMessagesPermanently,
-                ...removeDeletedMessagesPermanently
+                ...checkpoint.deleteOwnMessagePermanently,
+                ...checkpoint.deleteOtherMessagesPermanently,
+                ...checkpoint.removeDeletedMessagesPermanently
             ],
-            deleteMessageTemporary: deleteOwnMessagesTemporary,
-            hideMessages: [...hideDeletedMessages, ...deleteOtherMessagesTemporary],
-            sender_id: senderId
+            deleteMessageTemporary: checkpoint.deleteOwnMessagesTemporary,
+            hideMessages: [...checkpoint.hideDeletedMessages, ...checkpoint.deleteOtherMessagesTemporary],
+            sender_id: checkpoint.senderId
         });
 
-        const roomId = this.getRoomId(receiverId, senderId);
-        const affectedIds = deleteOwnMessagesTemporary.map((message) => message._id.toString());
+        const roomId = this.getRoomId(checkpoint.receiverId, checkpoint.senderId);
+        const affectedIds = checkpoint.deleteOwnMessagesTemporary.map((message) => message._id.toString());
         userChatEvent.emit(roomId, { data: affectedIds, type: "user-message:deleted" });
-    }
-
-    private async executeDeletion(props: TUserChat["executeDeletion"]) {
-        const operations: Promise<any>[] = [];
-
-        this.executeMediaDeletion({
-            deleteFunctions: (ids) => userChatRepository.deleteAllMessagesPermanently(ids),
-            messages: props.deleteMessagePermanently,
-            operations: operations,
-        });
-
-        this.executeMediaDeletion({
-            deleteFunctions: (ids) => userChatRepository.deleteAllMessagesTemporary(ids),
-            messages: props.deleteMessageTemporary,
-            operations: operations
-        });
-
-        if (props.hideMessages.length > 0) {
-            const ids = props.hideMessages.map(message => message._id);
-            operations.push(userChatRepository.hideChosenMessages({ 
-                user_id: props.sender_id, message_ids: ids 
-            }));
-        }
-
-        if (operations.length > 0) await Promise.all(operations);
-    }
-
-    private executeMediaDeletion(props: TUserChat["executeMediaDeletion"]) {
-        if (props.messages.length === 0) return;
-        const selectedMessageids = props.messages.map(message => message._id);
-        const selectedFiles = props.messages.flatMap(message => message.files || []);
-
-        if (selectedFiles.length > 0) {
-            const removeFromCloudinary = selectedFiles.map(files => {
-                return v2.uploader.destroy(files.public_id, { resource_type: files.resource_type });
-            });
-
-            props.operations.push(...removeFromCloudinary);
-        }
-
-        props.operations.push(props.deleteFunctions(selectedMessageids));
     }
 
     private getRoomId(receiver_id: string, sender_id: string) {
@@ -260,68 +83,34 @@ class UserChatService {
     }
 
     async sendMessages(props: TUserChat["sendMessageRaw"]) {
-        let filesTotal: number = 0;
-        let selectedFiles: CloudinaryUploadResult[] = [];
-        let text: string = "";
-
-        const receiverId = this.checkIsIdValid("receiver", props.receiver_id);
-        const senderId = this.checkIsIdValid("sender", props.sender_id);
-        const chosenFiles = Array.isArray(props.files) ? props.files : (props.files ? [props.files] : []);
-
-        if (props.text) text = this.checkIsInputAString("message", props.text);
-
-        if (!text && chosenFiles.length === 0) {
-            throw new ChitChatApiError("message or file is required", 400);
-        }
-
-        if (chosenFiles.length > 8) {
-            throw new ChitChatApiError("only accept 8 files or less", 400);
-        }
-
-        if (chosenFiles.length > 0) {
-            filesTotal = chosenFiles.length;
-            
-            const result = chosenFiles.map(async (chosenFile) => {
-                const file = this.checkIsFileSupported(chosenFile);
-                const fileArrayBuffer = await file.arrayBuffer();
-                const fileBuffer = Buffer.from(fileArrayBuffer);
-
-                return await uploadToCloudinary({
-                    file_buffer: fileBuffer,
-                    foldername: "chat_media",
-                    mimetype: file.type,
-                    original_name: file.name,
-                    size: file.size
-                });
-            });
-
-            selectedFiles = await Promise.all(result);
-        }
+        const checkpoint = await userChatUseCase.checkBeforeSendingMessage(props);
 
         const message = await userChatRepository.sendMessage({
-            files: selectedFiles,
-            files_total: filesTotal,
-            receiver_id: receiverId,
-            sender_id: senderId,
-            text: text
+            files: checkpoint.selectedFiles,
+            files_total: checkpoint.filesTotal,
+            receiver_id: checkpoint.receiverId,
+            sender_id: checkpoint.senderId,
+            text: checkpoint.text
         });
 
-        const roomId = this.getRoomId(receiverId, senderId);
+        const roomId = this.getRoomId(checkpoint.receiverId, checkpoint.senderId);
         userChatEvent.emit(roomId, { data: message, type: "user-message:sent" });
     }
 
     async showAllMessages(props: TUserChat["filter"]) {
-        const receiverId = this.checkIsIdValid("receiver", props.receiver_id);
-        const senderId = this.checkIsIdValid("sender", props.sender_id);
+        const checkpoint = userChatUseCase.checkBeforeShowAllMessages(props);
 
         return await userChatRepository.showAllMessages({
-            limit: props.limit, page: props.page, receiver_id: receiverId, sender_id: senderId
+            limit: props.limit, 
+            page: props.page, 
+            receiver_id: checkpoint.receiverId, 
+            sender_id: checkpoint.senderId
         });
     }
 
     async showChosenMessageFiles(id: string) {
-        const messageId = this.checkIsIdValid("message chat", id);
-        return await userChatRepository.showChosenMessageFiles(messageId);
+        const checkpoint = userChatUseCase.checkBeforeShowChosenMessageFiles(id);
+        return await userChatRepository.showChosenMessageFiles(checkpoint);
     }
 }
 
