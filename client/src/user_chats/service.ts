@@ -1,5 +1,5 @@
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { useChatStore } from "./store";
 import { useMessageStore } from "../stores/message.store";
 import { apiRequest, apiUpload } from "../api";
@@ -26,6 +26,10 @@ export default function useUserChatService() {
 
     const setChosenMessage = useChatStore((state) => state.setChosenMessage);
     const setOpenPopUpOption = useChatStore((state) => state.setOpenPopUpOption);
+
+    useEffect(() => {
+        
+    }, [queryClient]);
 
     const changeMessageMt = useMutation({
         mutationFn: async (id: string) => {
