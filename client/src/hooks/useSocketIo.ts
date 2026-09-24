@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import useSocketIoService from "../services/useSocketIoService";
 import { useQueryClient } from "@tanstack/react-query";
 import { useUserStore } from "../stores/user.store";
-import { useChatStore } from "../stores/chat.store";
+import { useChatStore } from "../user_chats/store";
 import { useRoomStore } from "../stores/room.store";
 
 interface ChatSocketIntrf {

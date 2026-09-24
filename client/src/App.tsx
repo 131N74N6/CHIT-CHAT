@@ -1,7 +1,7 @@
 import AvailableRoom from "./pages/AvailableRoom";
 import Chatbot from "./pages/Chatbot";
 import CreateRoom from "./pages/CreateRoom";
-import Home from "./pages/Home";
+import Home from "./user_chats/Home";
 import JoinRoom from "./pages/JoinRoom";
 import RoomMediaDetail from "./pages/RoomMediaDetail";
 import RoomMediaPreview from "./pages/RoomMediaPreview";
@@ -9,13 +9,13 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import RoomChat from "./pages/RoomChat";
 import RoomMember from "./pages/RoomMember";
 import RoomProfile from "./pages/RoomProfile";
-import SignIn from "./pages/SignIn";
-import SignUp from "./pages/SignUp";
-import UserChat from "./pages/UserChat";
-import UserMediaDetail from "./pages/UserMediaDetail";
-import UserMediaPreview from "./pages/UserMediaPreview";
+import SignIn from "./auths/SignIn";
+import SignUp from "./auths/SignUp";
+import UserChat from "./user_chats/UserChat";
+import UserMediaDetail from "./user_chats/UserMediaDetail";
+import UserMediaPreview from "./user_chats/UserMediaPreview";
 import UserProfile from "./pages/UserProfile";
-import YourProfile from "./pages/YourProfile";
+import YourProfile from "./auths/YourProfile";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 

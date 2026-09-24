@@ -15,7 +15,7 @@ import { useMessageStore } from "../stores/message.store";
 import Alert from "../components/Alert";
 import RoomChatDeleteOption1 from "../components/RoomChatDeleteOption1";
 import RoomChatDeleteOption2 from "../components/RoomChatDeleteOption2";
-import { useChatStore } from "../stores/chat.store";
+import { useChatStore } from "../user_chats/store";
 
 export default function AvailableRoom() {
     const roomId = useRoomStore((state) => state.roomId);

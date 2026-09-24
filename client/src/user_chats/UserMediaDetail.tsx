@@ -1,10 +1,10 @@
 import { MessageCircle } from "lucide-react";
 import cn from "../utils/cn";
 import Navbar from "../components/Navbar";
-import useUserChatService from "../services/useUserChatService";
+import useUserChatService from "./service";
 import FileDetail from "../components/FileDetail";
 import { useNavigate } from "react-router-dom";
-import { useChatStore } from "../stores/chat.store";
+import { useChatStore } from "./store";
 import { useEffect } from "react";
 import Loading from "../components/Loading";
 

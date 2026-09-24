@@ -2,10 +2,10 @@ import { MessageCircle, FilesIcon, SendIcon, X } from "lucide-react";
 import FileViewer from "../components/FileViewer";
 import cn from "../utils/cn";
 import Navbar from "../components/Navbar";
-import useUserChatService from "../services/useUserChatService";
+import useUserChatService from "./service";
 import { useMessageStore } from "../stores/message.store";
 import { useEffect } from "react";
-import { useChatStore } from "../stores/chat.store";
+import { useChatStore } from "./store";
 import { useNavigate } from "react-router-dom";
 import Alert from "../components/Alert";
 

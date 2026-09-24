@@ -1,6 +1,6 @@
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRef } from 'react';
-import { useChatStore } from '../stores/chat.store';
+import { useChatStore } from '../user_chats/store';
 import type { IFileViewer } from '../models/chat.model';
 import { useRoomStore } from '../stores/room.store';
 import { useMessageStore } from '../stores/message.store';

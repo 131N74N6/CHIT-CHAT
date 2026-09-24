@@ -14,7 +14,7 @@ import useSocketIo from "../hooks/useSocketIo";
 import RoomChatDeleteOption1 from "../components/RoomChatDeleteOption1";
 import RoomChatDeleteOption2 from "../components/RoomChatDeleteOption2";
 import { useRoomStore } from "../stores/room.store";
-import { useChatStore } from "../stores/chat.store";
+import { useChatStore } from "../user_chats/store";
 
 export default function RoomChat() {
     const navigate = useNavigate();

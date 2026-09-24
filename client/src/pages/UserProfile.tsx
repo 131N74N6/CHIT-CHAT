@@ -8,7 +8,7 @@ import cn from "../utils/cn";
 import Navbar from "../components/Navbar";
 import { ArrowBigLeft, MessageCircle } from "lucide-react";
 import useSocketIo from "../hooks/useSocketIo";
-import { useChatStore } from "../stores/chat.store";
+import { useChatStore } from "../user_chats/store";
 
 export default function UserProfile() {
     const navigate = useNavigate();

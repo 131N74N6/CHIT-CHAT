@@ -1,5 +1,5 @@
 import ChatList from "../components/ChatList";
-import useUserChatService from "../services/useUserChatService";
+import useUserChatService from "./service";
 import cn from "../utils/cn";
 import Loading from "../components/Loading";
 import { File, Menu, MenuSquare, MessageCircle, SendIcon, X } from "lucide-react";
@@ -12,7 +12,7 @@ import useSocketIo from "../hooks/useSocketIo";
 import Alert from "../components/Alert";
 import UserChatDeleteOption1 from "../components/UserChatDeleteOption1";
 import UserChatDeleteOption2 from "../components/UserChatDeleteOption2";
-import { useChatStore } from "../stores/chat.store";
+import { useChatStore } from "./store";
 
 export default function UserChat() {
     const receiverId = useChatStore((state) => state.receiverId);

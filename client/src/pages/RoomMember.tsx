@@ -10,7 +10,7 @@ import { useEffect } from "react";
 import Alert from "../components/Alert";
 import { MessageCircle } from "lucide-react";
 import { useRoomStore } from "../stores/room.store";
-import { useChatStore } from "../stores/chat.store";
+import { useChatStore } from "../user_chats/store";
 
 export default function RoomMember() {
     const roomId = useRoomStore((state) => state.roomId);

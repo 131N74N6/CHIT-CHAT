@@ -2,7 +2,7 @@ import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tansta
 import type { IOtherUser, IUserProfile } from "../models/user.model";
 import { useNavigate } from "react-router-dom";
 import { useRoomStore } from "../stores/room.store";
-import { useChatStore } from "../stores/chat.store";
+import { useChatStore } from "../user_chats/store";
 import { useUserStore } from "../stores/user.store";
 import { useNavbarStore } from "../stores/navbar.store";
 import { useEffect, useRef } from "react";
