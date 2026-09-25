@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import useUserProfileService from "../services/useUserProfileService";
+import useUserProfileService from "../user_profiles/service";
 import { useMessageStore } from "../stores/message.store";
 import Loading from "../components/Loading";
 import Navbar from "../components/Navbar";

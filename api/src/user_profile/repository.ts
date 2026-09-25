@@ -18,6 +18,8 @@ class UserProfileRepository {
             }),
             this.users.updateOne({ _id: new ObjectId(props.id) }, { 
                 $set: {
+                    address: props.address,
+                    gender: props.gender,
                     description: props.description,
                     image: props.image,
                     image_filename: props.image_filename,
@@ -51,11 +53,13 @@ class UserProfileRepository {
         return await this.users.findOne({ _id: new ObjectId(props.id) }, {
             projection: {
                 _id: 1,
+                address: 1,
                 createdAt: 1,
+                gender: 1,
+                image: 1,
+                description: 1,
                 name: 1,
                 image_public_id: 1,
-                image_filename: 1,
-                image_resource_type: 1
             }
         });
     }
@@ -80,10 +84,12 @@ class UserProfileRepository {
         return await this.users.findOne({ _id: new ObjectId(props.id) }, {
             projection: {
                 _id: 1,
+                address: 1,
                 createdAt: 1,
-                name: 1,
+                gender: 1,
                 image: 1,
                 description: 1,
+                name: 1,
                 image_public_id: 1,
             }
         });

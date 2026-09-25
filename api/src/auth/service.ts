@@ -48,7 +48,9 @@ export const authServiceApi = betterAuth({
 
     user: {
         additionalFields: {
+            address: { type: "string", required: false },
             description: { type: "string", required: false },
+            gender: { type: "string", required: false },
             group_ids: { type: "string[]", required: false },
             image_public_id: { type: "string", required: false },
             image_filename: { type: "string", required: false },

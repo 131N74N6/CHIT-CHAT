@@ -7,7 +7,7 @@ import { useMessageStore } from "../stores/message.store";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Loading from "../components/Loading";
-import useUserProfileService from "../services/useUserProfileService";
+import useUserProfileService from "../user_profiles/service";
 import useSocketIo from "../hooks/useSocketIo";
 import useRoomMemberService from "../services/useRoomMemberService";
 import { useRoomStore } from "../stores/room.store";

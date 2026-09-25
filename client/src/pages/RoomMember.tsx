@@ -4,7 +4,7 @@ import UserList from "../components/UserList";
 import useSocketIo from "../hooks/useSocketIo";
 import useRoomMemberService from "../services/useRoomMemberService";
 import cn from "../utils/cn";
-import useUserProfileService from "../services/useUserProfileService";
+import useUserProfileService from "../user_profiles/service";
 import { useMessageStore } from "../stores/message.store";
 import { useEffect } from "react";
 import Alert from "../components/Alert";

@@ -28,7 +28,8 @@ export default function useUserChatService() {
     const setOpenPopUpOption = useChatStore((state) => state.setOpenPopUpOption);
 
     useEffect(() => {
-        
+        if (!currentUserId || !otherUserId) return;
+        if (getSessionToken.isLoading || !getSessionToken.data) return;
     }, [queryClient]);
 
     const changeMessageMt = useMutation({

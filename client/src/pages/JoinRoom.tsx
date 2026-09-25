@@ -4,7 +4,7 @@ import { useMessageStore } from "../stores/message.store";
 import { useEffect } from "react";
 import Alert from "../components/Alert";
 import { MessageCircle } from "lucide-react";
-import useUserProfileService from "../services/useUserProfileService";
+import useUserProfileService from "../user_profiles/service";
 
 export default function JoinRoom() {
     const message = useMessageStore((state) => state.message);

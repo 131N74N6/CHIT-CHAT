@@ -6,7 +6,7 @@ import { File, Menu, MenuSquare, MessageCircle, SendIcon, X } from "lucide-react
 import { useMessageStore } from "../stores/message.store";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
-import useUserProfileService from "../services/useUserProfileService";
+import useUserProfileService from "../user_profiles/service";
 import Navbar from "../components/Navbar";
 import useSocketIo from "../hooks/useSocketIo";
 import Alert from "../components/Alert";

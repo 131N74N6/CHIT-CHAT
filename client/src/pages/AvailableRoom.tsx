@@ -5,7 +5,7 @@ import RoomList from "../components/RoomList";
 import useRoomMemberService from "../services/useRoomMemberService";
 import useRoomProfileService from "../services/useRoomProfileService";
 import RoomWindow from "../components/RoomWindow";
-import useUserProfileService from "../services/useUserProfileService";
+import useUserProfileService from "../user_profiles/service";
 import { MessageCircle } from "lucide-react";
 import { useRoomStore } from "../stores/room.store";
 import useSocketIo from "../hooks/useSocketIo";

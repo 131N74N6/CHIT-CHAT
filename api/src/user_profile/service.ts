@@ -13,6 +13,8 @@ import { uploadToCloudinary } from "../cloudinary/service";
 class UserProfileService {
     async changeUser(props: TUserProfile["changeRaw"]) {
         const userId = this.checkIsIdIsValid("user", props.id);
+        let address = "";
+        let gender = "";
         let username = "";
         let description = "";
         
@@ -21,7 +23,9 @@ class UserProfileService {
         if (user._id.toString() !== userId) throw new ChitChatApiError("you are not allowed", 403);
 
         if (props.name) username = this.checkIsInputIsAString("username", props.name);
+        if (props.address) address = this.checkIsInputIsAString("address", props.address);
         if (props.description) description = this.checkIsInputIsAString("description", props.description);
+        if (props.gender) gender = this.checkIsInputIsAString("gender", props.gender);
 
         let image: CloudinaryUploadResult = {
             file_name: "", 
@@ -32,7 +36,11 @@ class UserProfileService {
             url: ""
         }
 
-        if (username === user.name && description === user.description && user.image_filename === image.file_name) {
+        if (username === user.name && 
+            description === user.description && 
+            user.image_filename === image.file_name &&
+            user.gender === gender && user.address === address
+        ) {
             return;
         }
 
@@ -58,6 +66,8 @@ class UserProfileService {
         }
 
         const result = await userProfileRepository.changeUser({
+            address: address,
+            gender: gender,
             id: userId,
             description: description,
             image: image.url,

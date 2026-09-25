@@ -1,6 +1,6 @@
 import { Camera, MessageCircle, X } from "lucide-react";
 import Navbar from "../components/Navbar";
-import useUserProfileService from "../services/useUserProfileService";
+import useUserProfileService from "../user_profiles/service";
 import cn from "../utils/cn";
 import { useMessageStore } from "../stores/message.store";
 import { useEffect } from "react";

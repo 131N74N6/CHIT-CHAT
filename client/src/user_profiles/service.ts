@@ -1,11 +1,11 @@
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import type { IOtherUser, IUserProfile } from "../models/user.model";
+import type { IOtherUser } from "../models/user.model";
 import { useNavigate } from "react-router-dom";
 import { useRoomStore } from "../stores/room.store";
 import { useChatStore } from "../user_chats/store";
-import { useUserStore } from "../stores/user.store";
+import { useUserStore } from "./store";
 import { useNavbarStore } from "../stores/navbar.store";
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 import { useMessageStore } from "../stores/message.store";
 
 export default function useUserProfileService() {
@@ -18,15 +18,12 @@ export default function useUserProfileService() {
 
     const address = useUserStore((state) => state.address);
     const setAddress = useUserStore((state) => state.setAddress);
-
-    const setCurrentUserId = useUserStore((state) => state.setCurrentUserId);
-    const setCurrentUserRoomIds = useUserStore((state) => state.setCurrentUserRoomIds);
+    
+    const description = useUserStore((state) => state.description);
+    const setDescription = useUserStore((state) => state.setDescription);
 
     const editMode = useUserStore((state) => state.editMode);
     const setEditMode = useUserStore((state) => state.setEditMode);
-    
-    const deleteProfilePicture = useUserStore((state) => state.deleteProfilePicture);
-    const setDeleteProfilePicture = useUserStore((state) => state.setDeleteProfilePicture);
 
     const gender = useUserStore((state) => state.gender);
     const setGender = useUserStore((state) => state.setGender);
@@ -54,34 +51,6 @@ export default function useUserProfileService() {
     const receiverId = useChatStore((state) => state.receiverId);
 
     const resetNavbarState = useNavbarStore((state) => state.resetNavbarState);
-
-    const currentUser = useQuery<IUserProfile>({
-        queryFn: async () => {
-            try {
-                const request = await fetch(`${import.meta.env.VITE_BASE_API_URL}/users/profiles/show`, {
-                    credentials: "include",
-                    headers: { 'Content-Type': 'application/json' },
-                    method: "GET"
-                });
-
-                const response = await request.json();
-                if (!request.ok) throw new Error(response.message);
-                return response;
-            } catch (error) {
-                throw error;
-            }
-        },
-        queryKey: ['current-user'],
-        retry: false,
-        staleTime: Infinity,
-    });
-
-    useEffect(() => {
-        if (currentUser.data && currentUser.data.user_id && !currentUser.isLoading) {
-            setCurrentUserId(currentUser.data.user_id);
-            setCurrentUserRoomIds(currentUser.data.room_id);
-        }
-    }, [currentUser.data, setCurrentUserId]);
 
     const allUsers = useInfiniteQuery({
         enabled: !!currentUser.data?.user_id,
@@ -134,10 +103,11 @@ export default function useUserProfileService() {
     const changeUserMt = useMutation({
         mutationFn: async () => {
             try {
-                const formData = new FormData();
-                formData.append("address", address.trim());
-                formData.append("gender", gender);
-                formData.append("username", username.trim());
+                const newUserInfo = new FormData();
+                newUserInfo.append("address", address.trim());
+                newUserInfo.append("description", description.trim());
+                newUserInfo.append("gender", gender.trim());
+                newUserInfo.append("name", username.trim());
 
                 if (profilePicture) {
                     if (allowedFiles.includes(profilePicture.type) === false) {
@@ -145,7 +115,7 @@ export default function useUserProfileService() {
                         setProfilePictureUrl(null);
                         throw new Error("You cant upload this file");
                     }
-                    formData.append("image", profilePicture);
+                    newUserInfo.append("image", profilePicture);
                 }
 
                 if (deleteProfilePicture && deleteProfilePicture.public_id) {
@@ -162,7 +132,7 @@ export default function useUserProfileService() {
                 }
 
                 const request = await fetch(`${import.meta.env.VITE_BASE_API_URL}/users/profiles/remake`, {
-                    body: formData,
+                    body: newUserInfo,
                     credentials: "include",
                     method: "PUT"
                 });

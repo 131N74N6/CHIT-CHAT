@@ -16,6 +16,10 @@ const userProfileRouters = new Elysia({ prefix: "/api/v1/users" })
 .get("/", async (context) => {
     return await userProfileController.showUser({ id: context.user.id });
 })
+.get("/session", async (context) => {
+    const token = context.cookie['better-auth.session_token'].value;
+    return { data: token };
+})
 .put("/", async (context) => {
     return await userProfileController.changeUser({ id: context.user.id, ...context.body });
 }, {

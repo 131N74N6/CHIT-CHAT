@@ -1,15 +1,15 @@
 import { Navigate } from "react-router-dom";
-import useUserService from "../services/useUserProfileService";
-import Loading from "./Loading";
+import Loading from "../components/Loading";
+import useAuthService from "./service";
 
 interface ProtectedRouteIntrf {
     children: React.ReactNode;
 }
 
 export default function ProtectedRoute(props: ProtectedRouteIntrf) {
-    const { currentUser } = useUserService();
+    const auths = useAuthService();
 
-    if (!currentUser.data && currentUser.isLoading) {
+    if (!auths.getCurrentUser.data && auths.getCurrentUser.isLoading) {
         return (
             <div className="bg-white flex justify-center items-center h-screen">
                 <Loading/>
@@ -17,5 +17,6 @@ export default function ProtectedRoute(props: ProtectedRouteIntrf) {
         );
     }
 
-    return currentUser.data && currentUser.data.user_id ? <>{props.children}</> : <Navigate to={"/sign-in"} replace/>
+    return auths.getCurrentUser.data && auths.getCurrentUser.data.user_id ? 
+    <>{props.children}</> : <Navigate to={"/sign-in"} replace/>;
 }

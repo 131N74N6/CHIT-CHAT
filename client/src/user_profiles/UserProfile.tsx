@@ -1,4 +1,4 @@
-import useUserProfileService from "../services/useUserProfileService";
+import useUserProfileService from "./service";
 import { useNavigate } from "react-router-dom";
 import { useMessageStore } from "../stores/message.store";
 import { useEffect } from "react";
@@ -13,7 +13,6 @@ import { useChatStore } from "../user_chats/store";
 export default function UserProfile() {
     const navigate = useNavigate();
     const receiverId = useChatStore((state) => state.receiverId);
-    const setReceiverId = useChatStore((state) => state.setReceiverId);
 
     const message = useMessageStore((state) => state.message);
     const setMessage = useMessageStore((state) => state.setMessage);
@@ -28,19 +27,6 @@ export default function UserProfile() {
             return () => clearTimeout(timer);
         }
     }, [message, setMessage]);
-
-    useEffect(() => {
-        const savedReceiverId = localStorage.getItem("receiver_id");
-        if (savedReceiverId && !receiverId) setReceiverId(savedReceiverId);
-    }, []); 
-
-    useEffect(() => {
-        if (receiverId) {
-            localStorage.setItem("receiver_id", receiverId);
-        } else {
-            localStorage.removeItem("receiver_id");
-        }
-    }, [receiverId]);
 
     useSocketIo({
         identifier: ["user-profile"]
