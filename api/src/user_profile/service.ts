@@ -11,6 +11,22 @@ import { CloudinaryUploadResult } from "../cloudinary/model";
 import { uploadToCloudinary } from "../cloudinary/service";
 
 class UserProfileService {
+    private checkIsIdIsValid(field: string, value: unknown) {
+        if (!value || typeof value !== "string" || !ObjectId.isValid(value)) {
+            throw new ChitChatApiError(`invalid ${field}`, 400);
+        }
+
+        return value;
+    }
+    
+    private checkIsInputIsAString(field: string, value: unknown) {
+        if (!value || typeof value !== "string") {
+            throw new ChitChatApiError(`invalid ${field}`, 400);
+        }
+
+        return value;
+    }
+
     async changeUser(props: TUserProfile["changeRaw"]) {
         const userId = this.checkIsIdIsValid("user", props.id);
         let address = "";
@@ -126,22 +142,6 @@ class UserProfileService {
             data: forCurrentUserProfileRoom, 
             type: "user-profile:changed" 
         });
-    }
-    
-    private checkIsIdIsValid(field: string, value: unknown) {
-        if (!value || typeof value !== "string" || !ObjectId.isValid(value)) {
-            throw new ChitChatApiError(`invalid ${field}`, 400);
-        }
-
-        return value;
-    }
-    
-    private checkIsInputIsAString(field: string, value: unknown) {
-        if (!value || typeof value !== "string") {
-            throw new ChitChatApiError(`invalid ${field}`, 400);
-        }
-
-        return value;
     }
 
     async deleteUser(id: string) {

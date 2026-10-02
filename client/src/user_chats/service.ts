@@ -4,18 +4,17 @@ import { useChatStore } from "./store";
 import { useMessageStore } from "../stores/message.store";
 import { apiRequest, apiUpload } from "../api";
 import type { IFilePreview, IUserChat, IUserChatFiles } from "./model";
+import { useUserStore } from "../user_profiles/store";
+import { userChatWebSocket } from "./event";
 
 export default function useUserChatService() {
     const queryClient = useQueryClient();
     const inputMediaRef = useRef<HTMLInputElement>(null);
 
+    const chosenMessageId = useChatStore((state) => state.chosenMessageId);
     const setSelectMode = useChatStore((state) => state.setSelectMode);
 
-    const chosenMessageId = useChatStore((state) => state.chosenMessageId);
-
     const receiverId = useChatStore((state) => state.receiverId);
-    const setMessage = useMessageStore((state) => state.setMessage);
-
     const chosenFiles = useChatStore((state) => state.chosenFiles);
     const setChosenFiles = useChatStore((state) => state.setChosenFiles);
 
@@ -27,10 +26,129 @@ export default function useUserChatService() {
     const setChosenMessage = useChatStore((state) => state.setChosenMessage);
     const setOpenPopUpOption = useChatStore((state) => state.setOpenPopUpOption);
 
+    const currentUserId = useUserStore((state) => state.currentUserId);
+    const setMessage = useMessageStore((state) => state.setMessage);
+
+    const getSessionToken = useQuery({
+        enabled: !!currentUserId,
+        queryFn: async () => {
+            const response = await apiRequest<string>("/api/v1/users/session", { method: "GET" });
+            return response.data;
+        },
+        queryKey: [`user-session-token-${currentUserId}`],
+        retry: 3,
+        retryDelay: 1000,
+    });
+
     useEffect(() => {
-        if (!currentUserId || !otherUserId) return;
+        if (!currentUserId || !receiverId) return;
         if (getSessionToken.isLoading || !getSessionToken.data) return;
-    }, [queryClient]);
+
+        const token = getSessionToken.data;
+
+        if (!token || typeof token !== "string") {
+            setMessage("authentication failed");
+            return;
+        }
+
+        const apiUrl = import.meta.env.VITE_BASE_API_URL;
+        userChatWebSocket.enableReconnect();
+        userChatWebSocket.connect(token, receiverId, apiUrl);
+
+        const handleConnected = (payload: any) => {
+            setMessage(payload.message);
+        };
+
+        const handleMessage = (payload: any) => {
+            if (payload.type === "error") {
+                setMessage(payload.message);
+                return;
+            }
+            const queryKey = [`user-chat-${receiverId}`];
+            
+            if (payload.type === "user-message:sent") {
+                queryClient.setQueryData(queryKey, (old: any) => {
+                    if (!old) return;
+                    const newMessagePage = [...old.pages];
+                    newMessagePage[0] = [payload.data, ...newMessagePage[0]];
+                    return { ...old, pages: newMessagePage }
+                });
+            } else if (payload.type === "user-message:deleted") {
+                queryClient.setQueryData(queryKey, (old: any) => {
+                    if (!old) return;
+                    const newMessagePage = old.pages.map((page: any[]) => {
+                        return page.map((message: any) => {
+                            if (payload.data.includes(message._id)) {
+                                return { 
+                                    ...message, 
+                                    files_total: 0,
+                                    text: "This message has been deleted", 
+                                }
+                            }
+                            return message;
+                        });
+                    });
+                    return { ...old, pages: newMessagePage };
+                });
+            } else if (payload.type === "user-message:changed") {
+                queryClient.setQueryData(queryKey, (old: any) => {
+                    if (!old) return old;
+                    const newMessagePage = old.pages.map((page: any[]) => {
+                        return page.map((message) => {
+                            return message._id === payload.data._id ? payload.data : message
+                        });
+                    });
+                    return { ...old, pages: newMessagePage };
+                });
+            }
+        }
+
+        const handleReconnecting = (payload: any) => {
+            setMessage(payload.message);
+        }
+
+        const handleMaxRetries = (payload: any) => {
+            setMessage(payload.message);
+            userChatWebSocket.disconnect();
+        }
+
+        const handleDisconnected = () => {
+            //
+        }
+
+        const handleError = (payload: any) => {
+            const msg = payload.message;
+            setMessage(msg);
+
+            if (msg.includes("not allowed") || msg.includes("Invalid user")) {
+                userChatWebSocket.disconnect();
+            }
+        }
+
+        userChatWebSocket.on("connected", handleConnected);
+        userChatWebSocket.on("message", handleMessage);
+        userChatWebSocket.on("disconnected", handleDisconnected);
+        userChatWebSocket.on("error", handleError);
+        userChatWebSocket.on("reconnecting", handleReconnecting);
+        userChatWebSocket.on("max_retries", handleMaxRetries);
+
+        return () => {
+            userChatWebSocket.off("connected", handleConnected);
+            userChatWebSocket.off("message", handleMessage);
+            userChatWebSocket.off("disconnected", handleDisconnected);
+            userChatWebSocket.off("error", handleError);
+            userChatWebSocket.off("reconnecting", handleReconnecting);
+            userChatWebSocket.off("max_retries", handleMaxRetries);
+        }
+    }, [
+        currentUserId, 
+        getSessionToken.data, 
+        getSessionToken.isLoading, 
+        getSessionToken.error, 
+        queryClient, 
+        receiverId, 
+        setMessage
+    ]);
 
     const changeMessageMt = useMutation({
         mutationFn: async (id: string) => {

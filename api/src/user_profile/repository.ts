@@ -49,6 +49,28 @@ class UserProfileRepository {
         return id;
     }
 
+    async getChatPartnerIds(props: { id: string }): Promise<string[]> {
+        const userChats = await this.user_chats.find({
+            $or: [
+                { sender_id: new ObjectId(props.id) },
+                { receiver_id: new ObjectId(props.id) }
+            ]
+        }, { projection: { sender_id: 1, receiver_id: 1 }}).toArray();
+
+        const partnerIds = new Set<string>();
+        const selfId = props.id;
+
+        userChats.forEach(chat => {
+            const senderId = chat.sender_id.toString();
+            const receiverId = chat.receiver_id.toString();
+            
+            if (senderId !== selfId) partnerIds.add(senderId);
+            if (receiverId !== selfId) partnerIds.add(receiverId);
+        });
+
+        return Array.from(partnerIds);
+    }
+
     async findUserById(props: TUserProfile["showUser"]) {
         return await this.users.findOne({ _id: new ObjectId(props.id) }, {
             projection: {
