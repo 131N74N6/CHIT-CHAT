@@ -1,4 +1,4 @@
-import AvailableRoom from "./pages/AvailableRoom";
+import AvailableGroup from "./group_profiles/AvailableGroup";
 import Chatbot from "./pages/Chatbot";
 import CreateRoom from "./pages/CreateRoom";
 import Home from "./user_chats/Home";
@@ -6,7 +6,7 @@ import JoinRoom from "./pages/JoinRoom";
 import RoomMediaDetail from "./pages/RoomMediaDetail";
 import RoomMediaPreview from "./pages/RoomMediaPreview";
 import ProtectedRoute from "./auths/ProtectedRoute";
-import RoomChat from "./pages/RoomChat";
+import GroupChat from "./group_chats/GroupChat";
 import GroupMember from "./group_member/GroupMember";
 import RoomProfile from "./pages/RoomProfile";
 import SignIn from "./auths/SignIn";
@@ -42,10 +42,10 @@ export default function App() {
                     <Route element={<ProtectedRoute><UserMediaPreview/></ProtectedRoute>} path="/user/chat/preview/:receiver_id"/>
                     <Route element={<ProtectedRoute><UserMediaDetail/></ProtectedRoute>} path="/user/media/detail/:chat_id"/>
                     <Route element={<ProtectedRoute><UserProfile/></ProtectedRoute>} path="/user/profile/:receiver_id"/>
-                    <Route element={<ProtectedRoute><AvailableRoom/></ProtectedRoute>} path="/rooms"/>
+                    <Route element={<ProtectedRoute><AvailableGroup/></ProtectedRoute>} path="/rooms"/>
                     <Route element={<ProtectedRoute><CreateRoom/></ProtectedRoute>} path="/rooms/create"/>
                     <Route element={<ProtectedRoute><JoinRoom/></ProtectedRoute>} path="/rooms/join"/>
-                    <Route element={<ProtectedRoute><RoomChat/></ProtectedRoute>} path="/rooms/chat/:room_id"/>
+                    <Route element={<ProtectedRoute><GroupChat/></ProtectedRoute>} path="/rooms/chat/:room_id"/>
                     <Route element={<ProtectedRoute><RoomMediaPreview/></ProtectedRoute>} path="/room/chat/preview/:room_id"/>
                     <Route element={<ProtectedRoute><RoomMediaDetail/></ProtectedRoute>} path="/room/media/detail/:chat_id"/>
                     <Route element={<ProtectedRoute><RoomProfile/></ProtectedRoute>} path="/rooms/profile/:room_id"/>

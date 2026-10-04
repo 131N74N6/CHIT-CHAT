@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import type { GroupState } from "./model";
+import type { GroupState } from "../group_member/model";
 
 export const useGroupStore = create<GroupState>((set) => ({
     clearChatsIdsSelection: () => set({ selectedChatsIds: [] }),

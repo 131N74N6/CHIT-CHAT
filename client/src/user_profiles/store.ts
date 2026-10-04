@@ -21,6 +21,9 @@ export const useUserStore = create<UserState>()(persist((set) => ({
     gender: "",
     setGender: (gender) => set({ gender }),
 
+    groupIds: [],
+    setGroupIds: (groupIds: string[]) => set({ groupIds }),
+
     oldProfile: null,
     setOldProfilePicture: (oldProfile) => set({ oldProfile }),
 
@@ -51,6 +54,7 @@ export const useUserStore = create<UserState>()(persist((set) => ({
 }), {
     name: "user_info",
     partialize: (state) =>({
-        currentUserId: state.currentUserId
+        currentUserId: state.currentUserId,
+        groupIds: state.groupIds
     })}
 ));

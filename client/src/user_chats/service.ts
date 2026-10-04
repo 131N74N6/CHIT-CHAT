@@ -1,6 +1,6 @@
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef } from "react";
-import { useChatStore } from "./store";
+import { useUserChatStore } from "./store";
 import { useMessageStore } from "../stores/message.store";
 import { apiRequest, apiUpload } from "../api";
 import type { IFilePreview, IUserChat, IUserChatFiles } from "./model";
@@ -11,20 +11,20 @@ export default function useUserChatService() {
     const queryClient = useQueryClient();
     const inputMediaRef = useRef<HTMLInputElement>(null);
 
-    const chosenMessageId = useChatStore((state) => state.chosenMessageId);
-    const setSelectMode = useChatStore((state) => state.setSelectMode);
+    const chosenMessageId = useUserChatStore((state) => state.chosenMessageId);
+    const setSelectMode = useUserChatStore((state) => state.setSelectMode);
 
-    const receiverId = useChatStore((state) => state.receiverId);
-    const chosenFiles = useChatStore((state) => state.chosenFiles);
-    const setChosenFiles = useChatStore((state) => state.setChosenFiles);
+    const receiverId = useUserChatStore((state) => state.receiverId);
+    const chosenFiles = useUserChatStore((state) => state.chosenFiles);
+    const setChosenFiles = useUserChatStore((state) => state.setChosenFiles);
 
-    const text = useChatStore((state) => state.text);
-    const setText = useChatStore((state) => state.setText);
+    const text = useUserChatStore((state) => state.text);
+    const setText = useUserChatStore((state) => state.setText);
 
-    const resetChosenMessageIds = useChatStore((state) => state.resetChosenMessageIds);
+    const resetChosenMessageIds = useUserChatStore((state) => state.resetChosenMessageIds);
 
-    const setChosenMessage = useChatStore((state) => state.setChosenMessage);
-    const setOpenPopUpOption = useChatStore((state) => state.setOpenPopUpOption);
+    const setChosenMessage = useUserChatStore((state) => state.setChosenMessage);
+    const setOpenPopUpOption = useUserChatStore((state) => state.setOpenPopUpOption);
 
     const currentUserId = useUserStore((state) => state.currentUserId);
     const setMessage = useMessageStore((state) => state.setMessage);

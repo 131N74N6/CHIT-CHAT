@@ -9,9 +9,9 @@ const wsContext = new WeakMap<any, TGroupProfile["wsSubscription"][]>();
 
 const groupProfileRouters = new Elysia({ prefix: "/api/v1/groups" })
 .use(apiAuthMiddleware)
-.delete("/:group_id", async (context) => {
+.delete("/", async (context) => {
     return await groupProfileController.deleteGroup({ 
-        group_id: context.params.group_id, user_id: context.user.id
+        group_id: context.body.group_id, user_id: context.user.id
     });
 }, {
     body: t.Pick(groupProfileSchema.deleteGroup, ["group_id"])

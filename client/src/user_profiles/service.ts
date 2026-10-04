@@ -21,6 +21,7 @@ export default function useUserProfileService() {
     const setAddress = useUserStore((state) => state.setAddress);
 
     const currentUserId = useUserStore((state) => state.currentUserId);
+    const groupIds = useUserStore((state) => state.groupIds);
     
     const description = useUserStore((state) => state.description);
     const setDescription = useUserStore((state) => state.setDescription);
@@ -82,12 +83,12 @@ export default function useUserProfileService() {
 
             queryClient.invalidateQueries({ queryKey: [`other-user-${currentUserId}`] });
 
-            // if (currentUser.data && currentUser.data.room_id && currentUser.data.room_id.length > 0) {
-            //     currentUser.data.room_id.forEach((room_id) => {
-            //         queryClient.invalidateQueries({ queryKey: [`group-chat-${room_id}`] });
-            //         queryClient.invalidateQueries({ queryKey: [`group-member-${room_id}`] });
-            //     });
-            // }
+            if (groupIds.length > 0) {
+                groupIds.map((group_id) => {
+                    queryClient.invalidateQueries({ queryKey: [`group-chat-${group_id}`] });
+                    queryClient.invalidateQueries({ queryKey: [`group-member-${group_id}`] });
+                });
+            }
 
             setAddress("");
             setDescription("");

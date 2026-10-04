@@ -5,6 +5,7 @@ import { User } from "../auth/model";
 
 class GroupChatRepository {
     private group_chats = db().collection("group_chats");
+    private group_profiles = db().collection("group_profiles");
     private users = db().collection<Omit<User, "id">>("user");
 
     async changeChosenMessage(props: TGroupChats["changeMessage"]) {
@@ -46,6 +47,13 @@ class GroupChatRepository {
         return await this.users.find({ group_ids: { $in: [group_id] } }).toArray();
     }
 
+    async findOneGroupById(id: string) {
+        let groupName = "";
+        const group = await this.group_profiles.findOne({ _id: new ObjectId(id) });
+        if (group) groupName = group.group_name;
+        return groupName;
+    }
+
     async hideMessages(props: TGroupChats["hideChosenMessages"]) {
         return await this.group_chats.updateMany({ _id: { $in: props.message_ids }}, {
             $addToSet: { hidden_for: props.sender_id }
@@ -59,7 +67,7 @@ class GroupChatRepository {
             files_total: props.files_total,
             group_id: new ObjectId(props.group_id),
             hidden_for: [],
-            group_name: props.group_name,
+            group_name: await this.findOneGroupById(props.group_id),
             sender_id: new ObjectId(props.sender_id),
             sender_name: props.sender_name,
             text: props.text,

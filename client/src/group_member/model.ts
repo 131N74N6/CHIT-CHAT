@@ -38,7 +38,7 @@ export interface GroupState {
     setGroupId: (GroupId: string) => void;
 
     groupName: string;
-    setGroupName: (GroupName: string) => void;
+    setGroupName: (groupName: string) => void;
 
     memberId: string;
     setMemberId: (memberId: string) => void;

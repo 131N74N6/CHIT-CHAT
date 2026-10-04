@@ -20,6 +20,9 @@ export interface UserState {
     gender: string;
     setGender: (gender: string) => void;
 
+    groupIds: string[];
+    setGroupIds: (groupIds: string[]) => void;
+
     profilePicture: File | null;
     setProfilePicture: (profilePicture: File | null) => void;
 

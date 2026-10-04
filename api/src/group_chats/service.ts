@@ -261,7 +261,6 @@ class GroupChatService {
 
         const chosenFiles = Array.isArray(props.files) ? props.files : (props.files ? [props.files] : []);
         const groupId = this.checkIsIdValid("group", props.group_id);
-        const groupName = this.checkIsInputAString("group name", props.group_name);
         const senderId = this.checkIsIdValid("sender", props.sender_id);
         const senderName = this.checkIsInputAString("sender name", props.sender_name);
 
@@ -299,7 +298,6 @@ class GroupChatService {
             files: selectedFiles,
             files_total: filesTotal,
             group_id: groupId,
-            group_name: groupName,
             sender_id: senderId,
             sender_name: senderName,
             text: text

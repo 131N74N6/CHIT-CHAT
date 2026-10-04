@@ -15,15 +15,15 @@ import { useMessageStore } from "../stores/message.store";
 import Alert from "../components/Alert";
 import RoomChatDeleteOption1 from "../components/RoomChatDeleteOption1";
 import RoomChatDeleteOption2 from "../components/RoomChatDeleteOption2";
-import { useChatStore } from "../user_chats/store";
+import { useUserChatStore } from "../user_chats/store";
 
-export default function AvailableRoom() {
+export default function AvailableGroup() {
     const roomId = useRoomStore((state) => state.roomId);
     const setRoomId = useRoomStore((state) => state.setRoomId);
+    const setReceiverId = useUserChatStore((state) => state.setReceiverId);
 
-    const setReceiverId = useChatStore((state) => state.setReceiverId);
-    const chatId = useChatStore((state) => state.chatId);
-    const setChatId = useChatStore((state) => state.setChatId);
+    const chosenMessageId = useUserChatStore((state) => state.chosenMessageId);
+    const setChosenMessageId = useUserChatStore((state) => state.setChosenMessageId);
 
     const message = useMessageStore((state) => state.message);
     const setMessage = useMessageStore((state) => state.setMessage);

@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { useRoomStore } from "../stores/room.store";
-import { useChatStore } from "../user_chats/store";
+import { useUserChatStore } from "../user_chats/store";
 import { useNavbarStore } from "../stores/navbar.store";
 import { useChatbotStore } from "../stores/chatbot.store";
 import { useMessageStore } from "../stores/message.store";
@@ -29,11 +29,13 @@ export default function useAuthService() {
     const resetSignUpState = useAuthStore((state) => state.resetSignUpState);
 
     const resetRoomState = useRoomStore((state) => state.resetRoomState);
-    const resetChatState = useChatStore((state) => state.resetChatState);
+    const resetChatState = useUserChatStore((state) => state.resetChatState);
     const clearChatBotState = useChatbotStore((state) => state.clearChatBotState);
     
     const resetNavbarState = useNavbarStore((state) => state.resetNavbarState);
+    
     const setCurrentUserId = useUserStore((state) => state.setCurrentUserId);
+    const setGroupIds = useUserStore((state) => state.setGroupIds);
 
     const authServiceClient = createAuthClient({
         baseURL: import.meta.env.VITE_BASE_API_URL,
@@ -53,6 +55,7 @@ export default function useAuthService() {
                 created_at: request.data.user.createdAt,
                 description: request.data.user.description,
                 email: request.data.user.email, 
+                group_ids: request.data.user.group_ids,
                 profile_picture: {
                     public_id: request.data.user.image_public_id,
                     url: request.data.user.image,
@@ -67,10 +70,16 @@ export default function useAuthService() {
     });
 
     useEffect(() => {
-        if (getCurrentUser.data && getCurrentUser.data.user_id) {
-            setCurrentUserId(getCurrentUser.data.user_id);
-        }
+        if (!getCurrentUser.data) return;
+        setCurrentUserId(getCurrentUser.data.user_id);
     }, [getCurrentUser.data?.user_id, setCurrentUserId]);
+
+    useEffect(() => {
+        if (!getCurrentUser.data) return;
+        if (getCurrentUser.data.group_ids && getCurrentUser.data.group_ids.length > 0) {
+            setGroupIds(getCurrentUser.data.group_ids);
+        }
+    }, [getCurrentUser.data?.group_ids, getCurrentUser.data?.group_ids?.length, setGroupIds]);
 
     const signInMt = useMutation({
         mutationFn: async () => {
@@ -113,6 +122,7 @@ export default function useAuthService() {
             resetRoomState();
             resetNavbarState();
             useUserStore.persist.clearStorage();
+            useUserChatStore.persist.clearStorage();
             navigate("/sign-in");
         }
     });

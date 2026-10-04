@@ -2,7 +2,7 @@ import { Query, useInfiniteQuery, useMutation, useQuery, useQueryClient } from "
 import { useMessageStore } from "../stores/message.store";
 import { useUserStore } from "../user_profiles/store";
 import { apiRequest } from "../api";
-import { useGroupStore } from "./store";
+import { useGroupStore } from "../group_profiles/store";
 import type { Users } from "../user_profiles/model";
 
 export default function useGroupMembers() {

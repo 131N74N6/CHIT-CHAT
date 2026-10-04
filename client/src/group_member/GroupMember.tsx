@@ -6,13 +6,13 @@ import { useMessageStore } from "../stores/message.store";
 import { useEffect } from "react";
 import Alert from "../components/Alert";
 import { MessageCircle } from "lucide-react";
-import { useGroupStore } from "./store";
 import { useParams } from "react-router-dom";
 import useGroupMembers from "./service";
+import { useGroupChatStore } from "../group_chats/store";
 
 export default function GroupMember() {
     const { room_id } = useParams();
-    const setGroupId = useGroupStore((state) => state.setGroupId);
+    const setGroupId = useGroupChatStore((state) => state.setGroupId);
     
     const message = useMessageStore((state) => state.message);
     const setMessage = useMessageStore((state) => state.setMessage);

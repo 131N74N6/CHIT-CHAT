@@ -49,7 +49,6 @@ export const groupChatSchema = {
         })),
         files_total: t.Number({ minimum: 0, error: "minimum files total is 0 and maximum is 20", maximum: 20 }),
         group_id: t.String({ error: "invalid group", pattern: "^[0-9A-Fa-f]{24}$" }),
-        group_name: t.String({ error: "invalid group name", minLength: 1 }),
         sender_id: t.String({ error: "invalid sender", pattern: "^[0-9A-Fa-f]{24}$" }),
         sender_name: t.String({ error: "invalid sender name" }),
         text: t.Optional(t.String({ error: "invalid message" }))
@@ -66,7 +65,6 @@ export const groupChatSchema = {
             }))
         ])),
         group_id: t.String({ error: "invalid group", pattern: "^[0-9A-Fa-f]{24}$" }),
-        group_name: t.String({ error: "invalid group name", minLength: 1 }),
         sender_id: t.String({ error: "invalid sender" }),
         sender_name: t.String({ error: "invalid sender name" }),
         text: t.Optional(t.String({ error: "invalid message" }))
