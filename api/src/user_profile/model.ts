@@ -22,8 +22,9 @@ export const userProfileSchema = {
         name: t.Optional(t.String({ error: "invalid username", minLength: 1 })),
     }),
     showAllUser: t.Object({
+        id: t.String({ error: "invalid user", pattern: "^[0-9A-Fa-f]{24}$" }),
         page: t.Number({ default: 1, minimum: 1, error: "user page must start from 1" }),
-        limit: t.Number({ default: 16, minimum: 16, maximum: 22, error: "maximum user data each page is 22 and the minimum is 22" })
+        limit: t.Number({ default: 16, minimum: 16, maximum: 32, error: "maximum user data each page is 32 and the minimum is 32" })
     }),
     showUser: t.Object({
         id: t.String({ error: "invalid user", pattern: "^[0-9A-Fa-f]{24}$" })

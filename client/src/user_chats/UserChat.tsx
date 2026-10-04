@@ -8,65 +8,22 @@ import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import useUserProfileService from "../user_profiles/service";
 import Navbar from "../components/Navbar";
-import useSocketIo from "../hooks/useSocketIo";
 import Alert from "../components/Alert";
 import UserChatDeleteOption1 from "../components/UserChatDeleteOption1";
 import UserChatDeleteOption2 from "../components/UserChatDeleteOption2";
-import { useChatStore } from "./store";
+import { useUserChatStore } from "./store";
 
 export default function UserChat() {
-    const receiverId = useChatStore((state) => state.receiverId);
-    const setReceiverId = useChatStore((state) => state.setReceiverId);
+    const receiverId = useUserChatStore((state) => state.receiverId);
     
-    const setChatId = useChatStore((state) => state.setChatId);
+    const chosenMessageId = useUserChatStore((state) => state.chosenMessageId);
     const navigate = useNavigate();
     
     const message = useMessageStore((state) => state.message);
     const setMessage = useMessageStore((state) => state.setMessage);
 
-    const { 
-        currentUser, 
-        isUserProfileProcessing, 
-        receiverUserProfile 
-    } = useUserProfileService();
-
-    const { 
-        allUserChats, 
-        clearAllUserChatsForMeMt,
-        clearChosenUserChatForMeMt,
-        clearSelection,
-        deleteAllUserChatsMt,
-        deleteChosenUsersChatMt,
-        isSelectMode,
-        setIsSelectMode,
-        isUserChatProcessing, 
-        sendChatToUserMt,
-        selectedIds,
-        setText,
-        showDeleteOption1,
-        showDeleteOption2,
-        setShowDeleteOption1,
-        setShowDeleteOption2,
-        text,
-        toggleSelect,
-    } = useUserChatService();
-
-    useSocketIo({
-        identifier: ["user-chat", "user-profile"]
-    });
-
-    useEffect(() => {
-        const savedReceiverId = localStorage.getItem("receiver_id");
-        if (savedReceiverId && !receiverId) setReceiverId(savedReceiverId);
-    }, []); 
-
-    useEffect(() => {
-        if (receiverId) {
-            localStorage.setItem("receiver_id", receiverId);
-        } else {
-            localStorage.removeItem("receiver_id");
-        }
-    }, [receiverId]);
+    const userProfile = useUserProfileService();
+    const userChat = useUserChatService();
 
     useEffect(() => {
         if (message) {
@@ -186,7 +143,7 @@ export default function UserChat() {
                             isSelectMode={isSelectMode}
                             place={{ name: "user-chat" }}
                             selectedIds={selectedIds}
-                            setChatId={setChatId}
+                            chosenMessageId={chosenMessageId}
                             toggleSelect={toggleSelect}
                         />
                     )}

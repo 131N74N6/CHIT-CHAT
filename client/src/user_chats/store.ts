@@ -2,7 +2,7 @@ import { create } from "zustand";
 import type { IUserChatState } from "./model";
 import { persist } from "zustand/middleware";
 
-export const useChatStore = create<IUserChatState>()(persist((set) => ({
+export const useUserChatStore = create<IUserChatState>()(persist((set) => ({
     chosenFiles: [],
     setChosenFiles: (chosenFile) => set((state) => ({ 
         chosenFiles: typeof chosenFile === 'function' ? chosenFile(state.chosenFiles) : chosenFile 
@@ -40,6 +40,9 @@ export const useChatStore = create<IUserChatState>()(persist((set) => ({
             openPopUpOption: false
         })
     },
+
+    openPopUpOption: false,
+    setOpenPopUpOption: (openPopUpOption) => set({ openPopUpOption }),
     
     selectMode: false,
     setSelectMode: (selectMode) => set({ selectMode }),
@@ -49,9 +52,6 @@ export const useChatStore = create<IUserChatState>()(persist((set) => ({
 
     showUserMedia: false,
     setShowUserMedia: (showUserMedia) => set({ showUserMedia }),
-
-    openPopUpOption: false,
-    setOpenPopUpOption: (openPopUpOption) => set({ openPopUpOption }),
 
     showUserProfile: false,
     setShowUserProfile: (showUserProfile) => set({ showUserProfile }),

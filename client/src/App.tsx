@@ -7,7 +7,7 @@ import RoomMediaDetail from "./pages/RoomMediaDetail";
 import RoomMediaPreview from "./pages/RoomMediaPreview";
 import ProtectedRoute from "./auths/ProtectedRoute";
 import RoomChat from "./pages/RoomChat";
-import RoomMember from "./pages/RoomMember";
+import GroupMember from "./group_member/GroupMember";
 import RoomProfile from "./pages/RoomProfile";
 import SignIn from "./auths/SignIn";
 import SignUp from "./auths/SignUp";
@@ -49,7 +49,7 @@ export default function App() {
                     <Route element={<ProtectedRoute><RoomMediaPreview/></ProtectedRoute>} path="/room/chat/preview/:room_id"/>
                     <Route element={<ProtectedRoute><RoomMediaDetail/></ProtectedRoute>} path="/room/media/detail/:chat_id"/>
                     <Route element={<ProtectedRoute><RoomProfile/></ProtectedRoute>} path="/rooms/profile/:room_id"/>
-                    <Route element={<ProtectedRoute><RoomMember/></ProtectedRoute>} path="/rooms/member/:room_id"/>
+                    <Route element={<ProtectedRoute><GroupMember/></ProtectedRoute>} path="/rooms/member/:room_id"/>
                     <Route element={<ProtectedRoute><Chatbot/></ProtectedRoute>} path="/chatbot"/>
                     <Route path="*" element={<Navigate to="/sign-in" replace/>}/>
                 </Routes>

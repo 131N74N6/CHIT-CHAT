@@ -7,17 +7,16 @@ import Loading from "../components/Loading";
 import cn from "../utils/cn";
 import Navbar from "../components/Navbar";
 import { ArrowBigLeft, MessageCircle } from "lucide-react";
-import useSocketIo from "../hooks/useSocketIo";
-import { useChatStore } from "../user_chats/store";
+import { useUserChatStore } from "../user_chats/store";
 
 export default function UserProfile() {
     const navigate = useNavigate();
-    const receiverId = useChatStore((state) => state.receiverId);
+    const receiverId = useUserChatStore((state) => state.receiverId);
 
     const message = useMessageStore((state) => state.message);
     const setMessage = useMessageStore((state) => state.setMessage);
 
-    const { receiverUserProfile } = useUserProfileService();
+    const userProfile = useUserProfileService();
     
     useEffect(() => {
         if (message) {
@@ -28,23 +27,19 @@ export default function UserProfile() {
         }
     }, [message, setMessage]);
 
-    useSocketIo({
-        identifier: ["user-profile"]
-    });
-
     return (
         <section className="flex md:flex-row gap-2.5 p-2.5 flex-col relative h-dvh z-10">
             {message ? <Alert message={message}/> : null}
             <Navbar/>
             <div className="flex md:w-2/5 w-full flex-col h-full border border-gray-400">
-                {receiverUserProfile.isLoading ? (
+                {userProfile.showOtherUser.isLoading ? (
                     <div className="flex justify-center items-center h-full">
                         <Loading/>
                     </div>
-                ) : receiverUserProfile.error ? (
+                ) : userProfile.showOtherUser.error ? (
                     <div className="flex justify-center items-center h-full">
                         <div className="text-center font-medium text-4xl text-gray-800">
-                            {receiverUserProfile.error.message}
+                            {userProfile.showOtherUser.error.message}
                         </div>
                     </div>
                 ) : (
@@ -63,12 +58,12 @@ export default function UserProfile() {
                         </div>
                         <div className="flex justify-center">
                             <div className="w-20 h-20 rounded-full">
-                                {receiverUserProfile.data && receiverUserProfile.data.profile_picture && receiverUserProfile.data.profile_picture.public_id ? (
+                                {userProfile.showOtherUser.data && userProfile.showOtherUser.data.image && userProfile.showOtherUser.data.image_public_id ? (
                                     <div className="w-full h-full rounded-full">
                                         <img
-                                            alt={receiverUserProfile.data.profile_picture.public_id}
+                                            alt={userProfile.showOtherUser.data.image_public_id}
                                             className="w-full h-full object-cover rounded-full"
-                                            src={receiverUserProfile.data.profile_picture.url}
+                                            src={userProfile.showOtherUser.data.image}
                                         />
                                     </div>
                                 ) : (
@@ -76,7 +71,7 @@ export default function UserProfile() {
                                         "bg-purple-400 text-white font-medium text-2xl text-[1.2rem]",
                                         "flex justify-center items-center w-full h-full rounded-full"
                                     )}>
-                                        {receiverUserProfile.data?.username[0]}
+                                        {userProfile.showOtherUser.data?.name[0]}
                                     </div>
                                 )}
                             </div>
@@ -85,25 +80,25 @@ export default function UserProfile() {
                             <div className="flex flex-col gap-1.5">
                                 <div className="text-[1rem] font-medium text-gray-800">User ID</div>
                                 <div className="text-[1rem] font-medium text-gray-800">
-                                    {receiverUserProfile.data && receiverUserProfile.data._id ? receiverUserProfile.data._id : "-"}
+                                    {userProfile.showOtherUser.data && userProfile.showOtherUser.data._id ? userProfile.showOtherUser.data._id : "-"}
                                 </div>
                             </div>
                             <div className="flex flex-col gap-1.5">
-                                <div className="text-[1rem] font-medium text-gray-800">Username</div>
+                                <div className="text-[1rem] font-medium text-gray-800">name</div>
                                 <div className="text-[1rem] font-medium text-gray-800">
-                                    {receiverUserProfile.data && receiverUserProfile.data.username ? receiverUserProfile.data.username : "-"}
+                                    {userProfile.showOtherUser.data && userProfile.showOtherUser.data.name ? userProfile.showOtherUser.data.name : "-"}
                                 </div>
                             </div>
                             <div className="flex flex-col gap-1.5">
                                 <div className="text-[1rem] font-medium text-gray-800">Gender</div>
                                 <div className="text-[1rem] font-medium text-gray-800">
-                                    {receiverUserProfile.data && receiverUserProfile.data.gender ? receiverUserProfile.data.gender : "-"}
+                                    {userProfile.showOtherUser.data && userProfile.showOtherUser.data.gender ? userProfile.showOtherUser.data.gender : "-"}
                                 </div>
                             </div>
                             <div className="flex flex-col gap-1.5">
                                 <div className="text-[1rem] font-medium text-gray-800">Address</div>
                                 <div className="text-[1rem] font-medium text-gray-800">
-                                    {receiverUserProfile.data && receiverUserProfile.data.address ? receiverUserProfile.data.address : "-"}
+                                    {userProfile.showOtherUser.data && userProfile.showOtherUser.data.address ? userProfile.showOtherUser.data.address : "-"}
                                 </div>
                             </div>
                         </div>

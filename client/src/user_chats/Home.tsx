@@ -1,7 +1,7 @@
 import Loading from "../components/Loading";
 import Navbar from "../components/Navbar";
 import useUserChatService from "./service";
-import UserList from "../components/UserList";
+import UserList from "../user_profiles/UserList";
 import useUserProfileService from "../user_profiles/service";
 import UserWindow from "../components/UserWindow";
 import { MessageCircle } from "lucide-react";

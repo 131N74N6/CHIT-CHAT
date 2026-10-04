@@ -49,26 +49,26 @@ class UserProfileRepository {
         return id;
     }
 
-    async getChatPartnerIds(props: { id: string }): Promise<string[]> {
+    async findMessageOwnerIds(user_id: string): Promise<string[]> {
         const userChats = await this.user_chats.find({
             $or: [
-                { sender_id: new ObjectId(props.id) },
-                { receiver_id: new ObjectId(props.id) }
+                { sender_id: new ObjectId(user_id) },
+                { receiver_id: new ObjectId(user_id) }
             ]
         }, { projection: { sender_id: 1, receiver_id: 1 }}).toArray();
 
-        const partnerIds = new Set<string>();
-        const selfId = props.id;
+        const userIdGot = new Set<string>();
+        const selfId = user_id;
 
         userChats.forEach(chat => {
             const senderId = chat.sender_id.toString();
             const receiverId = chat.receiver_id.toString();
             
-            if (senderId !== selfId) partnerIds.add(senderId);
-            if (receiverId !== selfId) partnerIds.add(receiverId);
+            if (senderId !== selfId) userIdGot.add(senderId);
+            if (receiverId !== selfId) userIdGot.add(receiverId);
         });
 
-        return Array.from(partnerIds);
+        return Array.from(userIdGot);
     }
 
     async findUserById(props: TUserProfile["showUser"]) {
@@ -91,10 +91,9 @@ class UserProfileRepository {
         const page = props.page;
         const skip = (page - 1) * limit;
 
-        return await this.users.find({}, {
+        return await this.users.find({ _id: { $neq: new ObjectId(props.id)} }, {
             projection: {
                 _id: 1,
-                createdAt: 1,
                 name: 1,
                 image: 1,
                 image_public_id: 1,

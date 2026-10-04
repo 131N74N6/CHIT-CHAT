@@ -5,6 +5,14 @@ import { User } from "../auth/model";
 
 class GroupMemberRepository {
     private users = db().collection<Omit<User, "id">>("user");
+    private group_profiles = db().collection("group_profiles");
+
+    async isGroupOwner(group_id: string, user_id: string) {
+        let isOwner = false;
+        const group = await this.group_profiles.findOne({ _id: new ObjectId(group_id) });
+        if (group) isOwner = new ObjectId(user_id) === new ObjectId(group.owner_id)
+        return isOwner;
+    }
 
     async joinGroup(props: TGroupMember["joinGroup"]) {
         await this.users.updateOne({ _id: new ObjectId(props.user_id) }, {
@@ -37,7 +45,7 @@ class GroupMemberRepository {
 
         return await this.users.find(
             { group_ids: { $in: [props.group_id] } },
-            { projection: { _id: 1, image: 1, name: 1 } }
+            { projection: { _id: 1, image: 1, image_public_id: 1, name: 1 } }
         )
         .limit(limit)
         .skip(skip)

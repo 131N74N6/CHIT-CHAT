@@ -10,14 +10,19 @@ const wsContext = new WeakMap<any, { roomId: string; handler: (data: any) => voi
 const groupMemberRouters = new Elysia({ prefix: "/api/v1/groups/members" })
 .use(apiAuthMiddleware)
 .delete("/kick", async (context) => {
-    return await groupMemberController.kickMember(context.query);
+    return await groupMemberController.kickMember(context.body);
 }, {
-    query: groupMemberSchema.leftGroup
+    body: groupMemberSchema.leftGroup
 })
 .delete("/left", async ({ query, user }) => {
     return await groupMemberController.leftGroup({ ...query, user_id: user.id });
 }, {
     query: t.Pick(groupMemberSchema.leftGroup, ["group_id"])
+})
+.get("/owner", async ({ query, user }) => {
+    return await groupMemberController.isGroupOwner(query.group_id, user.id);
+}, {
+    query: t.Pick(groupMemberSchema.joinGroup, ["group_id"])
 })
 .get("/", async ({ query }) => {
     return await groupMemberController.showAllMembers(query);

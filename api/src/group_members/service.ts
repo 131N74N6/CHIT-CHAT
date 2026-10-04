@@ -13,6 +13,13 @@ class GroupMemberService {
         return value;
     }
 
+    async isGroupOwner(group_id: string, user_id: string) {
+        const groupId = this.checkIsIdValid("group", group_id);
+        const userId = this.checkIsIdValid("user", user_id);
+        const isOwner = await groupMemberRepository.isGroupOwner(groupId, userId);
+        return isOwner;
+    }
+
     async joinGroup(data: TGroupMember["joinGroup"]) {
         const groupId = this.checkIsIdValid("group", data.group_id);
         const roomId = `member-from-group-${groupId}`;

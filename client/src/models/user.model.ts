@@ -74,13 +74,11 @@ export interface IOtherUser {
 }
 
 export interface UserListIntrf {
-    currentUserId: string;
     fetchNextUser: (options?: FetchNextPageOptions | undefined) => Promise<InfiniteQueryObserverResult<InfiniteData<any, unknown>, Error>>;
     hasNextPage: boolean;
     isFetchingNextPage: boolean;
     place: IRoomMember | IListOfUsers;
     isProcessing: boolean;
-    setReceiverId: (receiverId: string) => void;
     users: IOtherUser[];
 }
 
@@ -88,18 +86,15 @@ export interface UserItemIntrf {
     isProcessing: boolean;
     isOwnData: boolean;
     place: IRoomMember | IListOfUsers;
-    setReceiverId: (receiverId: string) => void;
     user: IOtherUser;
 }
 
 export interface IRoomMember {
-    isRoomOwner: UseQueryResult<boolean, Error>;
     kickMemberMt: UseMutationResult<any, Error, string, unknown>;
     name: "room-member";
 }
 
 export interface IListOfUsers {
-    isRoomOwner?: never;
     kickMemberMt?: never;
     name: "user-list-home";
 }

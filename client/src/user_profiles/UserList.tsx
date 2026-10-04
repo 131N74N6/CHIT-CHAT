@@ -1,9 +1,12 @@
-import type { UserListIntrf } from "../models/user.model";
 import cn from "../utils/cn";
-import Loading from "./Loading";
+import Loading from "../components/Loading";
 import UserData from "./UserData";
+import type { UserList } from "./model";
+import { useUserStore } from "./store";
 
-export default function UserList(props: UserListIntrf) {
+export default function UserList(props: UserList) {
+    const currentUserId = useUserStore((state) => state.currentUserId);
+    
     if (props.users.length === 0) {
         return (
             <div className="flex justify-center items-center h-full">
@@ -21,10 +24,9 @@ export default function UserList(props: UserListIntrf) {
                     return (
                         <UserData 
                             isProcessing={props.isProcessing}
-                            isOwnData={props.currentUserId === user._id}
+                            isOwnData={currentUserId === user._id}
                             key={`user-${user._id}`}
                             place={props.place}
-                            setReceiverId={props.setReceiverId} 
                             user={user} 
                         />
                     );

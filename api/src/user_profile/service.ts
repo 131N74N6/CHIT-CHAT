@@ -27,6 +27,10 @@ class UserProfileService {
         return value;
     }
 
+    private getRoomId(receiver_id: string, sender_id: string) {
+        return [receiver_id, sender_id].sort().join("_");
+    }
+
     async changeUser(props: TUserProfile["changeRaw"]) {
         const userId = this.checkIsIdIsValid("user", props.id);
         let address = "";
@@ -96,6 +100,20 @@ class UserProfileService {
 
         const availableUserRoom = `available-user-${userId}`;
         const currentUserProfileRoom = `current-user-profile-${userId}`;
+        const oneToOneMessageRoom = await userProfileRepository.findMessageOwnerIds(userId);
+
+        for (let a = 0; a < oneToOneMessageRoom.length; a++) {
+            const room = this.getRoomId(userId, oneToOneMessageRoom[a]);
+            userChatEvent.emit(room, {
+                data: {
+                    _id: result.id, 
+                    name: result.name, 
+                    image: result.image, 
+                    image_public_id: result.image_public_id
+                },
+                type: "interlocutors:changed"
+            });
+        }
 
         const forAvailableUserRoom = {
             _id: result.id, 
@@ -160,9 +178,9 @@ class UserProfileService {
         }
 
         const result = await userProfileRepository.deleteUser(userId);
-        const room1 = `current-user-profile-${userId}`;
-        const room2 = `available-user-${userId}`;
-        const room3 = `user-chat-${userId}`;
+        const availableRoom = `available-user-${userId}`;
+        const currentUserProfileRoom = `current-user-profile-${userId}`;
+        const oneToOneMessageRoom = await userProfileRepository.findMessageOwnerIds(userId);
 
         if (user.group_ids && user.group_ids.length > 0) {
             user.group_ids.map((group_id) => {
@@ -172,13 +190,17 @@ class UserProfileService {
             });
         }
 
-        userChatEvent.emit(room3, { data: result, type: "user-message:deleted" });
-        userProfileEvent.emit(room1, { data: result, type: "available-user:changed:deleted" });
-        userProfileEvent.emit(room2, { data: result, type: "user-profile:deleted" });
+        for (let a = 0; a < oneToOneMessageRoom.length; a++) {
+            userChatEvent.emit(oneToOneMessageRoom[a], { data: result, type: "user-message:deleted" });
+        }
+
+        userProfileEvent.emit(availableRoom, { data: result, type: "available-user:deleted" });
+        userProfileEvent.emit(currentUserProfileRoom, { data: result, type: "user-profile:deleted" });
     }
 
     async showAllUsers(props: TUserProfile["showAllUser"]) {
-        return await userProfileRepository.showAllUsers(props);
+        const userId = this.checkIsIdIsValid("user", props.id);
+        return await userProfileRepository.showAllUsers({ id: userId, limit: props.limit, page: props.page });
     }
 
     async showUser(props: TUserProfile["showUser"]) {

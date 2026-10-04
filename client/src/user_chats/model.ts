@@ -51,7 +51,6 @@ export interface IFilePreview {
     url: string;
 }
 
-
 export interface IUserChatState {
     chosenMessage: IUserChat | null;
     setChosenMessage: (chosenMessage: IUserChat | null) => void;
