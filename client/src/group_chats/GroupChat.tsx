@@ -1,6 +1,6 @@
 import Alert from "../components/Alert";
 import cn from "../utils/cn";
-import ChatList from "../components/ChatList";
+import ChatList from "../user_chats/MessageList";
 import Loading from "../components/Loading";
 import { File, MessageCircle, SendIcon, Settings2 } from "lucide-react";
 import { useEffect } from "react";

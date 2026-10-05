@@ -1,13 +1,13 @@
 import Loading from "../components/Loading";
 import Navbar from "../components/Navbar";
-import useUserChatService from "./service";
-import UserList from "../user_profiles/UserList";
-import useUserProfileService from "../user_profiles/service";
+import useUserChatService from "../user_chats/service";
+import UserList from "./UserList";
+import useUserProfileService from "./service";
 import UserWindow from "../components/UserWindow";
 import { MessageCircle } from "lucide-react";
 import { useEffect } from "react";
 import { useMessageStore } from "../stores/message.store";
-import { useChatStore } from "./store";
+import { useChatStore } from "../user_chats/store";
 import useSocketIo from "../hooks/useSocketIo";
 import cn from "../utils/cn";
 import Alert from "../components/Alert";

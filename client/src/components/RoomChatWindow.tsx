@@ -1,5 +1,5 @@
 import cn from "../utils/cn";
-import ChatList from "./ChatList";
+import ChatList from "../user_chats/MessageList";
 import Loading from "./Loading";
 import { File, Menu, MenuSquare, SendIcon, X } from "lucide-react";
 import type { IRoomChatWindow } from "../models/room.model";

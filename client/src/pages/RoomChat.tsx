@@ -1,6 +1,6 @@
 import Alert from "../components/Alert";
 import cn from "../utils/cn";
-import ChatList from "../components/ChatList";
+import ChatList from "../user_chats/MessageList";
 import Loading from "../components/Loading";
 import useRoomChatService from "../services/useRoomChatService";
 import { File, Menu, MenuSquare, MessageCircle, SendIcon, X } from "lucide-react";

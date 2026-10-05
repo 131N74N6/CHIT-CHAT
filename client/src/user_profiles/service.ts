@@ -160,7 +160,7 @@ export default function useUserProfileService() {
         staleTime: Infinity
     });
 
-    const isUserProfileProcessing = [
+    const isProcessing = [
         changeUserMt, 
         deleteUserMt
     ].some((feature => feature.isPending));
@@ -171,7 +171,7 @@ export default function useUserProfileService() {
         deleteUserMt,
         fileInputRef,
         handleImagePreview,
-        isUserProfileProcessing,
+        isProcessing,
         showOtherUser,
     }
 }

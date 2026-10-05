@@ -28,6 +28,9 @@ export const userProfileSchema = {
     }),
     showUser: t.Object({
         id: t.String({ error: "invalid user", pattern: "^[0-9A-Fa-f]{24}$" })
+    }),
+    waConfig: t.Object({
+        token: t.String({ minLength: 1, error: "invalid token" })
     })
 }
 

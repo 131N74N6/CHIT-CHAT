@@ -1,29 +1,40 @@
-import ChatList from "../components/ChatList";
+import ChatList from "./MessageList";
 import useUserChatService from "./service";
 import cn from "../utils/cn";
 import Loading from "../components/Loading";
-import { File, Menu, MenuSquare, MessageCircle, SendIcon, X } from "lucide-react";
+import { File, MessageCircle, SendIcon, Settings2 } from "lucide-react";
 import { useMessageStore } from "../stores/message.store";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useEffect } from "react";
-import useUserProfileService from "../user_profiles/service";
 import Navbar from "../components/Navbar";
 import Alert from "../components/Alert";
-import UserChatDeleteOption1 from "../components/UserChatDeleteOption1";
-import UserChatDeleteOption2 from "../components/UserChatDeleteOption2";
 import { useUserChatStore } from "./store";
+import PopUpOption from "./PopUpOption";
+import useUserProfileService from "../user_profiles/service";
 
 export default function UserChat() {
-    const receiverId = useUserChatStore((state) => state.receiverId);
-    
-    const chosenMessageId = useUserChatStore((state) => state.chosenMessageId);
+    const { receiver_id } = useParams();
+    const chosenMessageIds = useUserChatStore((state) => state.chosenMessageIds);
     const navigate = useNavigate();
     
     const message = useMessageStore((state) => state.message);
     const setMessage = useMessageStore((state) => state.setMessage);
 
-    const userProfile = useUserProfileService();
+    const text = useUserChatStore((state) => state.text);
+    const setText = useUserChatStore((state) => state.setText);
+
+    const openPopUpOption = useUserChatStore((state) => state.openPopUpOption);
+    const setOpenPopUpOption = useUserChatStore((state) => state.setOpenPopUpOption);
+
+    const receiverId = useUserChatStore((state) => state.receiverId);
+    const setReceiverId = useUserChatStore((state) => state.setReceiverId);
+
     const userChat = useUserChatService();
+    const user = useUserProfileService();
+
+    useEffect(() => {
+        if (receiver_id) setReceiverId(receiver_id);
+    }, [receiver_id, setReceiverId]);
 
     useEffect(() => {
         if (message) {
@@ -34,117 +45,74 @@ export default function UserChat() {
 
     return (
         <section className="flex md:flex-row flex-col h-dvh relative z-10 p-2.5 gap-2.5">
-            <Navbar isProcessing={isUserChatProcessing || isUserProfileProcessing}/>
+            <Navbar isProcessing={userChat.isProcessing || user.isProcessing}/>
             {message ? <Alert message={message}/> : null}
-            {showDeleteOption1 ? (
-                <UserChatDeleteOption1 
-                    clearAllUserChatsForMeMt={clearAllUserChatsForMeMt}
-                    deleteAllUserChatsMt={deleteAllUserChatsMt}
-                    isProcessing={isUserChatProcessing || isUserProfileProcessing}
-                    setIsSelectMode={setIsSelectMode}
-                    setShowDeleteOption1={setShowDeleteOption1}
+            {!openPopUpOption ? null : (
+                <PopUpOption
+                    isProcessing={userChat.isProcessing || user.isProcessing}
+                    clearAll={userChat.clearAllMessagesMt}
+                    chosenMessageIds={chosenMessageIds}
+                    clearChosen={userChat.clearChosenMessagesMt}
+                    deleteAll={userChat.deleteAllMessagesMt}
+                    deleteChosen={userChat.deleteChosenMessagesMt}
                 />
-            ) : null}
-            {showDeleteOption2 ? (
-                <UserChatDeleteOption2 
-                    clearChosenUserChatForMeMt={clearChosenUserChatForMeMt}
-                    clearSelection={clearSelection}
-                    deleteChosenUsersChatMt={deleteChosenUsersChatMt}
-                    isProcessing={isUserChatProcessing || isUserProfileProcessing}
-                    setIsSelectMode={setIsSelectMode}
-                    setShowDeleteOption2={setShowDeleteOption2}
-                />
-            ) : null}
-            <div className="md:w-2/5 w-full h-full flex flex-col overflow-y-auto">
-                {isSelectMode ? (
-                    <div className="bg-gray-200 p-2 flex gap-1.5 cursor-pointer justify-end border border-gray-400">
-                        <button
-                            className={cn(
-                                "font-medium text-gray-600 cursor-pointer", 
-                                "disabled:cursor-not-allowed hover:text-gray-400 transition-colors"
-                            )}
-                            disabled={isUserChatProcessing || isUserProfileProcessing}
-                            onClick={() => {
-                                clearSelection();
-                                setIsSelectMode(false);
-                            }}
-                            type="button"
-                        >
-                            <X size={23}/>
-                        </button>
-                        <button
-                            className={cn(
-                                "font-medium text-gray-600 cursor-pointer", 
-                                "disabled:cursor-not-allowed hover:text-gray-400 transition-colors"
-                            )}
-                            disabled={isUserChatProcessing || isUserProfileProcessing}
-                            onClick={() => setShowDeleteOption2(true)}
-                            type="button"
-                        >
-                            <Menu size={23}/>
-                        </button>
-                    </div>
-                ) : (
-                    <div className="bg-gray-200 p-2 flex justify-between items-center cursor-pointer border border-gray-400">
-                        <div className="flex items-center gap-2">
-                            <div className="w-10 h-10 rounded-full" onClick={() => navigate(`/user/profile/${receiverId}`)}>
-                                {receiverUserProfile.data && receiverUserProfile.data.profile_picture !== null ? (
-                                    <div className="w-full h-full">
-                                        <img 
-                                            className="w-full h-full object-cover rounded-full" 
-                                            src={receiverUserProfile.data.profile_picture.url} 
-                                            alt={receiverUserProfile.data.profile_picture.public_id}
-                                        />
-                                    </div>
-                                ) : (
-                                    <div className={cn(
-                                        "w-full h-full rounded-full flex items-center text-[0.9rem]", 
-                                        "justify-center bg-purple-500 text-white font-medium"
-                                    )}>
-                                        {receiverUserProfile.data?.username[0]}
-                                    </div>
-                                )}
+            )}
+            <main className="md:w-2/5 w-full h-full flex flex-col overflow-y-auto">
+                <header className="bg-zinc-800 flex justify-between p-2.5">
+                    <button 
+                        className="flex-row flex items-center gap-2.5 cursor-pointer disabled:cursor-not-allowed"
+                        disabled={userChat.isProcessing || user.isProcessing}
+                        onClick={() => navigate(`/users/${receiverId}`)}
+                        type="button"
+                    >
+                        {user.showOtherUser.data && user.showOtherUser.data.image_public_id ? (
+                            <div className="w-8 h-8 rounded-full">
+                                <img
+                                    className="w-full h-full object-cover rounded-full"
+                                    alt={`${user.showOtherUser.data.name}-picture`}
+                                    src={user.showOtherUser.data.image}
+                                />
                             </div>
-                            <div className="text-gray-900 text-[1.2rem] font-medium">{receiverUserProfile.data?.username}</div>
-                        </div>
-                        <button
-                            className={cn(
-                                "font-medium text-gray-600 cursor-pointer", 
-                                "disabled:cursor-not-allowed hover:text-gray-400 transition-colors"
-                            )}
-                            disabled={isUserChatProcessing || isUserProfileProcessing}
-                            onClick={() => setShowDeleteOption1(true)}
+                        ) : (
+                            <div className="bg-amber-400 flex justify-center items-center w-8 h-8 rounded-full">
+                                <p className="text-olive-800 font-medium">{user.showOtherUser.data?.name[0]}</p>
+                            </div>
+                        )}
+                        <h3 className="text-white text-base text-left font-medium">
+                            {user.showOtherUser.data?.name}
+                        </h3>
+                    </button>
+                    <section className="flex gap-2">
+                        <button 
+                            className="text-base font-medium cursor-pointer disabled:cursor-not-allowed text-white"
+                            disabled={userChat.isProcessing || user.isProcessing}
+                            onClick={() => setOpenPopUpOption(true)}
                             type="button"
                         >
-                            <MenuSquare size={23}/>
+                            <Settings2 size={22}/>
                         </button>
-                    </div>
-                )}
+                    </section>
+                </header>
                 <div className="flex flex-col gap-2.5 px-2.5 h-[80%] border-x border-gray-400">
-                    {allUserChats.isLoading ? (
+                    {userChat.showAllUserChats.isLoading ? (
                         <div className="flex justify-center items-center bg-white h-full">
                             <Loading/>
                         </div>
-                    ) : allUserChats.error ? (
+                    ) : userChat.showAllUserChats.error ? (
                         <div className="flex justify-center items-center h-full">
                             <div className="text-gray-700 font-medium text-center">
-                                {allUserChats.error.message}
+                                {userChat.showAllUserChats.error.message}
                             </div>
                         </div>
                     ) : (
                         <ChatList 
-                            chats={allUserChats.data ? allUserChats.data.pages.flatMap(page => page).reverse() : []} 
-                            currentUserId={currentUser.data ? currentUser.data.user_id : ""} 
-                            fetchNextPage={allUserChats.fetchNextPage}
-                            hasNextPage={allUserChats.hasNextPage}
-                            isFetchingNextPage={allUserChats.isFetchingNextPage}
-                            isInRoom={false}
-                            isProcessing={isUserChatProcessing || isUserProfileProcessing}
-                            isSelectMode={isSelectMode}
-                            place={{ name: "user-chat" }}
-                            selectedIds={selectedIds}
-                            chosenMessageId={chosenMessageId}
-                            toggleSelect={toggleSelect}
+                            chats={userChat.showAllUserChats.data ? 
+                                userChat.showAllUserChats.data.pages.flatMap(page => page).reverse() : []
+                            } 
+                            fetchNextPage={userChat.showAllUserChats.fetchNextPage}
+                            hasNextPage={userChat.showAllUserChats.hasNextPage}
+                            isFetchingNextPage={userChat.showAllUserChats.isFetchingNextPage}
+                            isProcessing={userChat.isProcessing || user.isProcessing}
                         />
                     )}
                 </div>
@@ -152,7 +120,7 @@ export default function UserChat() {
                     className="bg-white relative h-[20%] inset-shadow-gray-200 p-1.5 flex flex-col gap-1.5 border border-gray-400"
                     onSubmit={(event: React.SubmitEvent<HTMLFormElement>) => {
                         event.preventDefault();
-                        sendChatToUserMt.mutate();
+                        userChat.sendMessageMt.mutate();
                     }}
                 >
                     <textarea
@@ -166,14 +134,14 @@ export default function UserChat() {
                         <div className="flex flex-col gap-2.5">
                             <button
                                 className="text-blue-500 font-medium cursor-pointer disabled:cursor-not-allowed"
-                                disabled={isUserChatProcessing || isUserProfileProcessing}
+                                disabled={userChat.isProcessing || user.isProcessing}
                                 type="submit"
                             >
                                 <SendIcon size={22}/>
                             </button>
                             <button 
                                 className="text-blue-500 font-medium cursor-pointer disabled:cursor-not-allowed"
-                                disabled={isUserChatProcessing || isUserProfileProcessing}
+                                disabled={userChat.isProcessing || user.isProcessing}
                                 onClick={() => navigate(`/user/chat/preview/${receiverId}`)}
                                 type="button"
                             >
@@ -182,7 +150,7 @@ export default function UserChat() {
                         </div>
                     </div>
                 </form>
-            </div>
+            </main>
             <div 
                 className={cn(
                     "md:flex md:justify-center md:items-center md:h-full md:w-2/5", 

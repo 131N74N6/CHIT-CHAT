@@ -1,7 +1,7 @@
 import { File, Menu, MenuSquare, SendIcon, X } from "lucide-react";
 import cn from "../utils/cn"
 import type { IUserChatWindow } from "../models/chat.model";
-import ChatList from "./ChatList";
+import ChatList from "../user_chats/MessageList";
 import Loading from "./Loading";
 
 export default function UserChatWindow(props: IUserChatWindow) {

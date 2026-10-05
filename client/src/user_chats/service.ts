@@ -170,10 +170,10 @@ export default function useUserChatService() {
         }
     });
 
-    const clearAllUserChatsForMeMt = useMutation({
+    const clearAllMessagesMt = useMutation({
         mutationFn: async () => {
             const endpoint = `${import.meta.env.VITE_BASE_API_URL}/api/v1/user-chats/clear`;
-            return await apiRequest(endpoint, { method: "DELETE" });
+            await apiRequest(endpoint, { method: "DELETE" });
         },
         onError: (error) => {
             setMessage(error.message);
@@ -187,10 +187,10 @@ export default function useUserChatService() {
         }
     });
     
-    const clearChosenUserChatForMeMt = useMutation({
+    const clearChosenMessagesMt = useMutation({
         mutationFn: async () => {
             const endpoint = `${import.meta.env.VITE_BASE_API_URL}/api/v1/user-chats/clear/bulk`;
-            return await apiRequest(endpoint, { method: "DELETE" });
+            await apiRequest(endpoint, { method: "DELETE" });
         },
         onError: (error) => {
             setMessage(error.message);
@@ -204,10 +204,10 @@ export default function useUserChatService() {
         }
     });
 
-    const deleteAllUserChatsMt = useMutation({
+    const deleteAllMessagesMt = useMutation({
         mutationFn: async () => {
             const endpoint = `${import.meta.env.VITE_BASE_API_URL}/api/v1/user-chats`;
-            return await apiRequest(endpoint, { method: "DELETE" });
+            await apiRequest(endpoint, { method: "DELETE" });
         },
         onError: (error) => {
             setMessage(error.message);
@@ -221,10 +221,10 @@ export default function useUserChatService() {
         }
     });
 
-    const deleteChosenUsersChatMt = useMutation({
+    const deleteChosenMessagesMt = useMutation({
         mutationFn: async () => {
             const endpoint = `${import.meta.env.VITE_BASE_API_URL}/api/v1/user-chats/bulk`;
-            return await apiRequest(endpoint, { method: "DELETE" });
+            await apiRequest(endpoint, { method: "DELETE" });
         },
         onError: (error) => {
             setMessage(error.message);
@@ -271,8 +271,7 @@ export default function useUserChatService() {
             }
     
             const endpoint = `${import.meta.env.VITE_BASE_API_URL}/api/v1/user-chats`;
-            const request = await apiUpload(endpoint, formData, "POST");
-            return request.data;
+            await apiUpload(endpoint, formData, "POST");
         },
         onError: (error) => {
             setMessage(error.message);
@@ -318,19 +317,19 @@ export default function useUserChatService() {
 
     const isProcessing = [
         changeMessageMt,
-        clearAllUserChatsForMeMt,
-        clearChosenUserChatForMeMt,
-        deleteAllUserChatsMt,
-        deleteChosenUsersChatMt,
+        clearAllMessagesMt,
+        clearChosenMessagesMt,
+        deleteAllMessagesMt,
+        deleteChosenMessagesMt,
         sendMessageMt
     ].some((feature) => feature.isPending);
 
     return { 
         showAllUserChats, 
-        clearChosenUserChatForMeMt,
-        clearAllUserChatsForMeMt,
-        deleteAllUserChatsMt,
-        deleteChosenUsersChatMt,
+        clearChosenMessagesMt,
+        clearAllMessagesMt,
+        deleteAllMessagesMt,
+        deleteChosenMessagesMt,
         changeMessageMt,
         handleMediaPreview, 
         inputMediaRef, 

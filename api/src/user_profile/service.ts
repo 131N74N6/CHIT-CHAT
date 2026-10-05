@@ -191,7 +191,7 @@ class UserProfileService {
         }
 
         for (let a = 0; a < oneToOneMessageRoom.length; a++) {
-            userChatEvent.emit(oneToOneMessageRoom[a], { data: result, type: "user-message:deleted" });
+            userChatEvent.emit(oneToOneMessageRoom[a], { data: result, type: "interlocutors:deleted" });
         }
 
         userProfileEvent.emit(availableRoom, { data: result, type: "available-user:deleted" });

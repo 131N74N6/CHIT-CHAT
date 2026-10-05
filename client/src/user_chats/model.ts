@@ -1,16 +1,8 @@
-import type { FetchNextPageOptions, InfiniteData, InfiniteQueryObserverResult } from "@tanstack/react-query";
+import type { FetchNextPageOptions, InfiniteData, InfiniteQueryObserverResult, UseMutationResult } from "@tanstack/react-query";
 
 export interface IUserChat {
     _id: string;
     created_at: Date;
-    files: {
-        file_name: string;
-        file_type: string;
-        public_id: string;
-        resource_type: string;
-        size: number;
-        url: string;
-    }[];
     files_total: number;
     text: string;
     receiver_id: string;
@@ -18,19 +10,18 @@ export interface IUserChat {
     updated_at: Date;
 }
 
-export interface IUserChatData {
+export interface IUserMessageData {
     chat: IUserChat;
-    is_processing: boolean;
+    isProcessing: boolean;
     own: boolean;
 }
 
-export interface IChatList {
+export interface IUserMessageList {
     chats: IUserChat[];
-    current_user_id: string;
-    fetch_next_page: (options?: FetchNextPageOptions | undefined) => Promise<InfiniteQueryObserverResult<InfiniteData<any, unknown>, Error>>;
-    has_next_page: boolean;
-    is_fetching_next_page: boolean;
-    is_processing: boolean;
+    fetchNextPage: (options?: FetchNextPageOptions | undefined) => Promise<InfiniteQueryObserverResult<InfiniteData<any, unknown>, Error>>;
+    hasNextPage: boolean;
+    isFetchingNextPage: boolean;
+    isProcessing: boolean;
 }
 
 export interface IUserChatFiles {
@@ -87,4 +78,13 @@ export interface IUserChatState {
     
     text: string;
     setText: (text: string) => void;
+}
+
+export interface iPopUpOptionForUser {
+    chosenMessageIds: string[];
+    clearAll: UseMutationResult<void, Error, void, unknown>;
+    clearChosen: UseMutationResult<void, Error, void, unknown>;
+    deleteAll: UseMutationResult<void, Error, void, unknown>;
+    deleteChosen: UseMutationResult<void, Error, void, unknown>;
+    isProcessing: boolean;
 }
