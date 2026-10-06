@@ -1,7 +1,7 @@
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useGroupChatStore } from "./store";
 import { useRef } from "react";
-import type { IGroupChat, IGroupChatFiles, IGroupFilePreview } from "./model";
+import type { IGroupMessage, IGroupMessageFiles, IGroupFilePreview } from "./model";
 import { useMessageStore } from "../stores/message.store";
 import { apiRequest, apiUpload } from "../api";
 
@@ -181,7 +181,7 @@ export default function useGroupChatService() {
         enabled: !!groupMessageId && !!groupId && groupMessageId !== "",
         queryFn: async () => {
             const endpoint = `${import.meta.env.VITE_BASE_API_URL}/api/v1/groups/chats/files?_id=${groupMessageId}`;
-            const request = await apiRequest<IGroupChatFiles>(endpoint, { method: "GET" });
+            const request = await apiRequest<IGroupMessageFiles>(endpoint, { method: "GET" });
             return request.data;
         },
         queryKey: [`group-chat-files-${groupMessageId}`],
@@ -200,7 +200,7 @@ export default function useGroupChatService() {
             const endpoint = `${import.meta.env.VITE_BASE_API_URL}/api/v1/groups/chats?
             group_id=${groupId}?page=${pageParam}&limit=${52}`;
 
-            const request = await apiRequest<IGroupChat[]>(endpoint, { method: "GET" });
+            const request = await apiRequest<IGroupMessage[]>(endpoint, { method: "GET" });
             return request.data ?? [];
         },
         initialPageParam: 1,

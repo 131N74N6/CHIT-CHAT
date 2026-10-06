@@ -4,14 +4,30 @@ import { ChitChatApiError } from "../error/handler";
 import groupProfileRepository from "./repository";
 import { uploadToCloudinary } from "../cloudinary/service";
 import { groupProfileEvent } from "./event";
-import { groupChatEvent } from "../group_chats/event";
 import { v2 } from "cloudinary";
 import { CloudinaryUploadResult } from "../cloudinary/model";
 
 class GroupProfileService {
+    private checkIsIdValid(field: string, value: unknown) {
+        if (!value || typeof value !== "string" || !ObjectId.isValid(value)) {
+            throw new ChitChatApiError(`invalid ${field}`, 400);
+        }
+        
+        return value;
+    }
+
+    private checkIsInputAString(field: string, value: unknown) {
+        if (!value || typeof value !== "string" || value === "") {
+            throw new ChitChatApiError(`invalid ${field}`, 400);
+        }
+        
+        return value;
+    }
+
     async changeGroup(props: TGroupProfile["changeGroupRaw"]) {
         const groupId = this.checkIsIdValid("group", props._id);
         const userId = this.checkIsIdValid("group owner", props.owner_id);
+
         const room1 = `group-profile-${groupId}`;
         const room2 = `joined-group-${userId}`;
 
@@ -91,30 +107,14 @@ class GroupProfileService {
             group_profile: result?.group_profile
         };
 
-        const broadcastToGroupChat = {
+        const broadcastToJoinedGroup = {
             _id: groupId,
             group_name: result?.group_name,
             group_profile: result?.group_profile
         };
 
-        groupProfileEvent.emit(room1, { data: broadcastToGroupProfile, type: "group:changed" });
-        groupChatEvent.emit(room2, { data: broadcastToGroupChat, type: "group:changed" });
-    }
-
-    private checkIsIdValid(field: string, value: unknown) {
-        if (!value || typeof value !== "string" || !ObjectId.isValid(value)) {
-            throw new ChitChatApiError(`invalid ${field}`, 400);
-        }
-        
-        return value;
-    }
-
-    private checkIsInputAString(field: string, value: unknown) {
-        if (!value || typeof value !== "string" || value === "") {
-            throw new ChitChatApiError(`invalid ${field}`, 400);
-        }
-        
-        return value;
+        groupProfileEvent.emit(room1, { data: broadcastToGroupProfile, type: "group-profile:changed" });
+        groupProfileEvent.emit(room2, { data: broadcastToJoinedGroup, type: "joined-group:changed" });
     }
 
     async createGroup(props: TGroupProfile["createGroupRaw"]) {
@@ -189,8 +189,34 @@ class GroupProfileService {
         await groupProfileRepository.deleteGroup({ group_id: groupId, owner_id: userId });
 
         const result = await groupProfileRepository.deleteGroup({ group_id: groupId, owner_id: userId});
-        groupChatEvent.emit(room1, { data: result.group_id, type: "group:deleted" });
-        groupChatEvent.emit(room2, { data: result.group_id, type: "group:deleted" });
+        groupProfileEvent.emit(room1, { data: result.group_id, type: "group-profile:deleted" });
+        groupProfileEvent.emit(room2, { data: result.group_id, type: "joined-group:deleted" });
+    }
+
+    async deleteGroupProfilePicture(props: TGroupProfile["deleteGroup"]) {
+        const groupId = this.checkIsIdValid("group", props.group_id);
+        const userId = this.checkIsIdValid("group owner", props.owner_id);
+
+        const room1 = `group-profile-${groupId}`;
+        const room2 = `joined-group-${userId}`;
+        
+        const group = await groupProfileRepository.findOneGroup(groupId);
+        if (!group) throw new ChitChatApiError("group not found", 404);
+
+        if (group.owner_id.toString() !== userId) {
+            throw new ChitChatApiError("you are not allowed to delete this group", 403);
+        }
+
+        if (group.group_profile && group.group_profile.public_id) {
+            await v2.uploader.destroy(group.group_profile.public_id, {
+                resource_type: group.group_profile.resource_type
+            });
+        }
+
+        const result = await groupProfileRepository.deleteGroupProfilePicture(groupId);
+
+        groupProfileEvent.emit(room1, { data: result, type: "group-profile-picture:deleted" });
+        groupProfileEvent.emit(room2, { data: result, type: "joined-group-profile-picture:deleted" });
     }
 
     async showAllGroups(props: TGroupProfile["filter"]) {

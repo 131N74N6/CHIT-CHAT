@@ -105,7 +105,7 @@ export interface IGroupChatPopUp {
     group_profile: {
         _id: string;
         group_description: string;
-        group_profile: {
+        picture: {
             file_name: string;
             file_type: string;
             public_id: string;

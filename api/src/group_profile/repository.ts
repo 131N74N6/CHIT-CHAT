@@ -51,6 +51,21 @@ class GroupProfileRepository {
         return props;
     }
 
+    async deleteGroupProfilePicture(_id: string) {
+        await this.group_profiles.updateOne({ _id: new ObjectId(_id) }, {
+            group_profile: {
+                file_name: "", 
+                file_type: "", 
+                public_id: "", 
+                resource_type: "", 
+                size: 0, 
+                url: ""
+            }
+        });
+
+        return _id;
+    }
+
     async findOneGroup(id: string) {
         return await this.group_profiles.findOne({ _id: new ObjectId(id) });
     }

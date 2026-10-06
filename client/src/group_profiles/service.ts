@@ -30,7 +30,7 @@ export default function useGroupProfileService() {
 
     const setSelectedProfileGroupUrl = useGroupProfileStore((state) => state.setSelectedProfileGroupUrl);
 
-    const changeRoomMt = useMutation({
+    const changeGroupMt = useMutation({
         mutationFn: async () => {
             const endpoint = `${import.meta.env.VITE_BASE_API_URL}/api/v1/groups`;
             const newGroupProfileInfo = new FormData();
@@ -120,6 +120,30 @@ export default function useGroupProfileService() {
             });
         }
     });
+
+    const deleteGroupProfilePictureMt = useMutation({
+        mutationFn: async () => {
+            const endpoint = `${import.meta.env.VITE_BASE_API_URL}/api/v1/groups/${groupId}`;
+            await apiRequest(endpoint, { method: "PUT" });
+        },
+        onError: (error) => {
+            setMessage(error.message);
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({
+                predicate: (query) => {
+                    const queryKey = query.queryKey;
+                    if (Array.isArray(queryKey) && queryKey.length > 0 && typeof queryKey[0] === "string") {
+                        return queryKey[0].startsWith(`group-chat-${groupId}`) ||
+                        queryKey[0].startsWith(`group-member-${groupId}`) ||
+                        queryKey[0].startsWith(`available-group-${currentUserId}`) ||
+                        queryKey[0].startsWith(`group-profile-${groupId}`);
+                    }
+                    return false;
+                }
+            });
+        }
+    });
     
     const handleImagePreview = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0]
@@ -158,12 +182,13 @@ export default function useGroupProfileService() {
     });
 
     const isProcessing = [
-        changeRoomMt, deleteGroupMt, createGroupMt
+        changeGroupMt, deleteGroupMt, createGroupMt, deleteGroupProfilePictureMt
     ].some((feature) => feature.isPending);
 
     return { 
         showJoinedGroup,
-        changeRoomMt,
+        changeGroupMt,
+        deleteGroupProfilePictureMt,
         showGroupDetail,
         deleteGroupMt,
         fileInputRef, 

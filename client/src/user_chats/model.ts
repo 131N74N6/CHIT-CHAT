@@ -88,3 +88,8 @@ export interface iPopUpOptionForUser {
     deleteChosen: UseMutationResult<void, Error, void, unknown>;
     isProcessing: boolean;
 }
+
+export interface IUserChatPopUp {
+    userChat: {}
+    userProfile: {}
+}

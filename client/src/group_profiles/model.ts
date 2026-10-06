@@ -1,4 +1,4 @@
-import type { FetchNextPageOptions, InfiniteData, InfiniteQueryObserverResult } from "@tanstack/react-query";
+import type { FetchNextPageOptions, InfiniteData, InfiniteQueryObserverResult, UseMutationResult } from "@tanstack/react-query";
 
 export interface IGroupProfileState {
     editMode: boolean;
@@ -9,6 +9,23 @@ export interface IGroupProfileState {
 
     groupName: string;
     setGroupName: (groupName: string) => void;
+
+    oldGroupProfilePicture: {
+        file_name: string;
+        file_type: string;
+        public_id: string;
+        resource_type: string;
+        size: number;
+        url: string;
+    };
+    setOldGroupProfilePicture: (oldGroupProfilePicture: {
+        file_name: string;
+        file_type: string;
+        public_id: string;
+        resource_type: string;
+        size: number;
+        url: string;
+    }) => void
     
     resetGroupProfileState: () => void;
     
@@ -42,6 +59,7 @@ export interface IGroupProfileData {
 
 export interface IGroupProfileDetail {
     _id: string;
+    created_at: Date;
     group_description: string;
     group_profile: {
         file_name: string;
@@ -60,5 +78,35 @@ export interface IGroupProfileList {
     fetchNextPage: (options?: FetchNextPageOptions | undefined) => Promise<InfiniteQueryObserverResult<InfiniteData<any, unknown>, Error>>;
     hasNextPage: boolean;
     isFetchingNextPage: boolean;
+    isProcessing: boolean;
+}
+
+export interface IGroupProfileDetailPopUp {
+    groupMember: {
+        leftGroupMt: UseMutationResult<unknown, Error, void, unknown>;
+    }
+    groupProfile: {
+        _id: string;
+        changeGroupMt: UseMutationResult<void, Error, void, unknown>;
+        created_at: Date;
+        deleteGroupMt: UseMutationResult<void, Error, void, unknown>;
+        deleteGroupProfilePictureMt: UseMutationResult<void, Error, void, unknown>
+        description: string;
+        error: Error | null;
+        fileInputRef: React.RefObject<HTMLInputElement | null>;
+        handleImagePreview: (event: React.ChangeEvent<HTMLInputElement, Element>) => void;
+        picture: {
+            file_name: string;
+            file_type: string;
+            public_id: string;
+            resource_type: string;
+            size: number;
+            url: string;
+        };
+        group_name: string;
+        isLoading: boolean;
+        isGroupOwner: boolean;
+        isOwnerId: boolean;
+    }
     isProcessing: boolean;
 }

@@ -17,6 +17,11 @@ class GroupProfileController {
         return { message: "this group has been deleted" }
     }
 
+    async deleteGroupProfilePicture(props: TGroupProfile["deleteGroup"]) {
+        await groupProfileService.deleteGroupProfilePicture(props);
+        return { message: "this group profile picture has been deleted" }
+    }
+
     async showAllGroups(props: TGroupProfile["filter"]) {
         const result = await groupProfileService.showAllGroups(props);
         return { data: result }

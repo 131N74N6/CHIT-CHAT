@@ -126,6 +126,7 @@ export default function useGroupMemberService() {
         isProcessing,
         joinGroupMt,
         kickMemberMt,
+        leftGroupMt,
         showGroupMembers
     }
 }

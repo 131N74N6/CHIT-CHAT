@@ -2,19 +2,16 @@ import { ArrowLeft, MessageCircle } from "lucide-react";
 import Loading from "../components/Loading";
 import { useGroupChatStore } from "../group_chats/store";
 import UserList from "../user_profiles/UserList";
-import useGroupMemberService from "./service";
 import { useGroupMemberStore } from "./store";
 import { useGroupProfileStore } from "../group_profiles/store";
 import cn from "../utils/cn";
+import type { IGroupMemberPopUp } from "./model";
 
-export default function GroupMemberPopUp() {
-    const setGroupId = useGroupChatStore((state) => state.setGroupId);
+export default function GroupMemberPopUp(props: IGroupMemberPopUp) {
     const setShowGroupChatPopUp = useGroupChatStore((state) => state.setShowGroupChatPopUp);
     const setFilesPopUp = useGroupChatStore((state) => state.setFilesPopUp);
     const setShowMemberPopUp = useGroupMemberStore((state) => state.setShowMemberPopUp);
     const setShowProfile = useGroupProfileStore((state) => state.setShowProfile);
-
-    const groupMembers = useGroupMemberService();
 
     const seeProfileGroup = () => {
         setShowGroupChatPopUp(false);
@@ -29,7 +26,7 @@ export default function GroupMemberPopUp() {
                 <div className="flex gap-2">
                     <button 
                         className="text-base font-medium cursor-pointer disabled:cursor-not-allowed text-gray-900"
-                        disabled={groupChat.isProcessing}
+                        disabled={props.isProcessing}
                         onClick={seeProfileGroup}
                         type="button"
                     >
@@ -41,30 +38,28 @@ export default function GroupMemberPopUp() {
                         type="text"
                     />
                 </div>
-                {groupMembers.showGroupMembers.isLoading ? (
+                {props.groupMembers.isLoading ? (
                     <div className="flex justify-center items-center h-full">
                         <Loading/>
                     </div>
-                ) : groupMembers.showGroupMembers.error ? (
+                ) : props.groupMembers.error ? (
                     <div className="flex justify-center items-center h-full">
                         <div className="text-center font-medium text-4xl text-gray-800">
-                            {groupMembers.showGroupMembers.error.message}
+                            {props.groupMembers.error.message}
                         </div>
                     </div>
                 ) : (
                     <UserList
-                        fetchNextUser={groupMembers.showGroupMembers.fetchNextPage}
-                        hasNextPage={groupMembers.showGroupMembers.hasNextPage}
+                        fetchNextUser={props.groupMembers.fetchNextPage}
+                        hasNextPage={props.groupMembers.hasNextPage}
                         place={{ 
                             name: "group-member", 
-                            isGroupOwner: groupMembers.isGroupOwner, 
-                            kickMemberMt: groupMembers.kickMemberMt 
+                            isGroupOwner: props.groupMembers.isGroupOwner, 
+                            kickMemberMt: props.groupMembers.kickMemberMt 
                         }}
-                        isFetchingNextPage={groupMembers.showGroupMembers.isFetchingNextPage}
-                        isProcessing={groupMembers.isProcessing}
-                        users={groupMembers.showGroupMembers.data ? 
-                            groupMembers.showGroupMembers.data.pages.flat() : []
-                        }
+                        isFetchingNextPage={props.groupMembers.isFetchingNextPage}
+                        isProcessing={props.isProcessing}
+                        users={props.groupMembers.data}
                     />
                 )}
             </div>

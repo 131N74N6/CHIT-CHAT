@@ -1,6 +1,5 @@
 import Loading from "../components/Loading";
 import Navbar from "../components/Navbar";
-import RoomWindow from "../components/RoomWindow";
 import { MessageCircle } from "lucide-react";
 import cn from "../utils/cn";
 import { useEffect } from "react";
@@ -12,6 +11,12 @@ import useGroupChatService from "../group_chats/service";
 import useGroupMemberService from "../group_member/service";
 import { useGroupChatStore } from "../group_chats/store";
 import PopUpOption from "../group_chats/PopUpOption";
+import GroupChatPopUp from "../group_chats/GroupChatPopUp";
+import { useGroupMemberStore } from "../group_member/store";
+import GroupMemberPopUp from "../group_member/GroupMemberPopUp";
+import { useUserStore } from "../user_profiles/store";
+import { useGroupProfileStore } from "./store";
+import GroupDetailPopUp from "./GroupDetailPopUp";
 
 export default function AvailableGroup() {
     const groupId = useGroupChatStore((state) => state.groupId);
@@ -22,10 +27,23 @@ export default function AvailableGroup() {
     const openPopUpOption = useGroupChatStore((state) => state.openPopUpOption);
     const chosenMessageIdsFromGroup = useGroupChatStore((state) => state.chosenMessageIdsFromGroup);
 
+    const showGroupChatPopUp = useGroupChatStore((state) => state.showGroupChatPopUp);
+    const showMemberPopUp = useGroupMemberStore((state) => state.showMemberPopUp);
+
+    const editMode = useGroupProfileStore((state) => state.editMode);
+    const setGroupDescription = useGroupProfileStore((state) => state.setGroupDescription);
+    const setGroupName = useGroupProfileStore((state) => state.setGroupName);
+    const setOldGroupProfilePicture = useGroupProfileStore((state) => state.setOldGroupProfilePicture);
+    const setSelectedProfileGroup = useGroupProfileStore((state) => state.setSelectedProfileGroup);
+    const setSelectedProfileGroupUrl = useGroupProfileStore((state) => state.setSelectedProfileGroupUrl);
+    const showProfile = useGroupProfileStore((state) => state.showProfile);
+
     const groupChat = useGroupChatService();
     const groupProfile = useGroupProfileService();
     const groupMember = useGroupMemberService();
 
+    const currentUserId = useUserStore((state) => state.currentUserId);
+    
     useEffect(() => {
         if (message) {
             const timer = setTimeout(() => setMessage(null), 1500);
@@ -35,21 +53,41 @@ export default function AvailableGroup() {
 
     useEffect(() => {
         if (editMode) {
-            currentRoomProfile.data && currentRoomProfile.data.name ?
-            setRoomName(currentRoomProfile.data.name) :
-            setRoomName("");
-            currentRoomProfile.data && currentRoomProfile.data.description ? 
-            setDescription(currentRoomProfile.data.description) :
-            setDescription("-");
-            currentRoomProfile.data && currentRoomProfile.data.profile_picture !== null ? 
-            setOldRoomPicture(currentRoomProfile.data.profile_picture) :
-            setOldRoomPicture(null);
+            groupProfile.showGroupDetail.data && groupProfile.showGroupDetail.data.group_name ?
+            setGroupName(groupProfile.showGroupDetail.data.group_name) :
+            setGroupName("-");
+
+            groupProfile.showGroupDetail.data && groupProfile.showGroupDetail.data.group_description ? 
+            setGroupDescription(groupProfile.showGroupDetail.data.group_description) :
+            setGroupDescription("-");
+
+            groupProfile.showGroupDetail.data && groupProfile.showGroupDetail.data.group_profile.public_id !== "" ? 
+            setOldGroupProfilePicture(groupProfile.showGroupDetail.data.group_profile) :
+            setOldGroupProfilePicture({
+                file_name: "",
+                file_type: "",
+                public_id: "",
+                resource_type: "",
+                size: 0,
+                url: "",
+            });
         } else {
-            setRoomName("");
-            setDescription("");
-            setOldRoomPicture(null);
+            setGroupDescription("-");
+            setGroupName("-");
+            setSelectedProfileGroup(null);
+            setOldGroupProfilePicture({
+                file_name: "",
+                file_type: "",
+                public_id: "",
+                resource_type: "",
+                size: 0,
+                url: "",
+            });
+            setSelectedProfileGroupUrl("");
         }
-    }, [editMode, roomId, currentRoomProfile.data]);
+    }, [editMode, groupId, groupProfile.showGroupDetail.data]);
+
+    const isGroupOwner = currentUserId === groupProfile.showGroupDetail.data?.owner_id;
 
     return (
         <section className="flex md:flex-row flex-col gap-2.5 p-2.5 h-dvh relative z-10">
@@ -87,72 +125,105 @@ export default function AvailableGroup() {
                 )}
             </div>
             {groupId ? (
-                <RoomWindow
-                    chatId={chatId}
-                    changeRoomMt={changeRoomMt}
-                    currentUserId={currentUser.data ? currentUser.data.user_id : ""}
-                    clearChatsIdsSelection={clearChatsIdsSelection}
-                    deleteRoomMt={deleteRoomMt}
-                    description={description}
-                    editMode={editMode}
-                    fetchNextRoomChat={allChatsInRoom.fetchNextPage}
-                    fetchNextUser={currentRoomMember.fetchNextPage}
-                    fileInputRef={fileInputRef}
-                    handleImagePreview={handleImagePreview}
-                    handleMediaPreview={handleMediaPreview}
-                    hasNextRoomChat={allChatsInRoom.hasNextPage}
-                    inputMediaRef={inputMediaRef}
-                    isFetchingNextRoomChat={allChatsInRoom.isFetchingNextPage}
-                    isRoomChatLoading={allChatsInRoom.isLoading}
-                    isRoomChatProcessing={isRoomChatProcessing}
-                    isRoomMemberLoading={currentRoomMember.isLoading}
-                    isRoomOwner={isRoomOwner}
-                    isRoomProfileLoading={currentRoomProfile.isLoading}
-                    isRoomProfileProcessing={isRoomProfileProcessing}
-                    isRoomMemberFetchNextPage={currentRoomMember.isFetchingNextPage}
-                    isSelectMode={isSelectMode}
-                    kickMemberMt={kickMemberMt}
-                    leftRoomMt={leftRoomMt}
-                    media={media}
-                    oldRoomPicture={oldRoomPicture}
-                    removeOnePreviewFile={removeOnePreviewFile}
-                    roomChats={allChatsInRoom.data ? allChatsInRoom.data.pages.flatMap(page => page).reverse() : []}
-                    roomChatError={allChatsInRoom.error}
-                    roomChatMedia={roomChatMedia}
-                    roomId={roomId}
-                    roomName={roomName}
-                    roomProfile={currentRoomProfile.data!}
-                    roomMemberError={currentRoomMember.error}
-                    roomMemberHaveNextPage={currentRoomMember.hasNextPage}
-                    roomProfileError={currentRoomProfile.error}
-                    setIsSelectMode={setIsSelectMode}
-                    selectedProfileRoom={selectedProfileRoom}
-                    selectedProfileRoomUrl={selectedProfileRoomUrl}
-                    setReceiverId={setReceiverId}
-                    setRoomId={setRoomId}
-                    selectedChatsIds={selectedChatsIds}
-                    sendChatToRoom={sendChatToRoomMt}
-                    setChatId={setChatId}
-                    setDeleteRoomImage={setDeleteRoomImage}
-                    setDescription={setDescription}
-                    setEditMode={setEditMode}
-                    setOldRoomPicture={setOldRoomPicture}
-                    setRoomName={setRoomName}
-                    setSelectedProfileRoom={setSelectedProfileRoom}
-                    setSelectedProfileRoomUrl={setSelectedProfileRoomUrl}
-                    setShowDeleteOption1={setShowDeleteOption1}
-                    setShowDeleteOption2={setShowDeleteOption2}
-                    setShowMember={setShowMember}
-                    setShowProfile={setShowProfile}
-                    setShowRoomMedia={setShowRoomMedia}
-                    setText={setText}
-                    showMember={showMember}
-                    showProfile={showProfile}
-                    showRoomMedia={showRoomMedia}
-                    text={text}
-                    toggleSelect={toggleSelect}
-                    users={currentRoomMember.data ? currentRoomMember.data.pages.flat() : []}
-                />
+                <>
+                    {showGroupChatPopUp ? (
+                        <GroupChatPopUp 
+                            group_chat={{
+                                chats: groupChat.showAllGroupMessages.data ? 
+                                groupChat.showAllGroupMessages.data.pages.flatMap(page => page).reverse() : [],
+
+                                fetchNextPage: groupChat.showAllGroupMessages.fetchNextPage,
+                                hasNextPage: groupChat.showAllGroupMessages.hasNextPage,
+                                isFetchingNextPage: groupChat.showAllGroupMessages.isFetchingNextPage,
+                                isLoading: groupChat.showAllGroupMessages.isLoading,
+                                error: groupChat.showAllGroupMessages.error,
+                                isProcessing: groupChat.isProcessing || groupMember.isProcessing || groupProfile.isProcessing
+                            }} 
+                            group_profile={{
+                                _id: groupProfile.showGroupDetail.data ?
+                                groupProfile.showGroupDetail.data._id : "-",
+
+                                group_description: groupProfile.showGroupDetail.data ?
+                                groupProfile.showGroupDetail.data.group_description : "-",
+
+                                picture: {
+                                    file_name: groupProfile.showGroupDetail.data ?
+                                    groupProfile.showGroupDetail.data.group_profile.file_name : "-",
+
+                                    file_type: groupProfile.showGroupDetail.data ?
+                                    groupProfile.showGroupDetail.data.group_profile.file_type : "-",
+
+                                    public_id: groupProfile.showGroupDetail.data ?
+                                    groupProfile.showGroupDetail.data.group_profile.file_name : "-",
+
+                                    resource_type: groupProfile.showGroupDetail.data ?
+                                    groupProfile.showGroupDetail.data.group_profile.resource_type : "-",
+
+                                    size: groupProfile.showGroupDetail.data ?
+                                    groupProfile.showGroupDetail.data.group_profile.size : 0,
+
+                                    url: groupProfile.showGroupDetail.data ?
+                                    groupProfile.showGroupDetail.data.group_profile.url : "-"
+                                },
+                                group_name: groupProfile.showGroupDetail.data ?
+                                groupProfile.showGroupDetail.data.group_name : "-"
+                            }}
+                        />
+                    ) : null}
+                    {showMemberPopUp ? (
+                        <GroupMemberPopUp 
+                            groupMembers={{
+                                data: groupMember.showGroupMembers.data ? 
+                                groupMember.showGroupMembers.data.pages.flat() : [],
+
+                                error: groupMember.showGroupMembers.error,
+                                fetchNextPage: groupMember.showGroupMembers.fetchNextPage,
+                                hasNextPage: groupMember.showGroupMembers.hasNextPage,
+                                isFetchingNextPage: groupMember.showGroupMembers.isFetchingNextPage,
+                                isGroupOwner: groupMember.isGroupOwner,
+                                isLoading: groupMember.showGroupMembers.isLoading,
+                                kickMemberMt: groupMember.kickMemberMt,
+                                place: { 
+                                    name: "group-member", 
+                                    isGroupOwner: groupMember.isGroupOwner, 
+                                    kickMemberMt: groupMember.kickMemberMt 
+                                }
+                            }}
+                            isProcessing={false}
+                        />
+                    ) : null}
+                    {showProfile ? (
+                        <GroupDetailPopUp 
+                        groupMember={{
+                            leftGroupMt: groupMember.leftGroupMt
+                        }} 
+                        groupProfile={{
+                            _id: "",
+                            changeGroupMt: groupProfile.changeGroupMt,
+                            created_at: undefined,
+                            deleteGroupMt: groupProfile.deleteGroupMt,
+                            deleteGroupProfilePictureMt: groupProfile.deleteGroupProfilePictureMt,
+                            description: "",
+                            error: groupProfile.showGroupDetail.error,
+                            fileInputRef: groupProfile.fileInputRef,
+                            handleImagePreview: groupProfile.handleImagePreview,
+                            picture: {
+                                file_name: "",
+                                file_type: "",
+                                public_id: "",
+                                resource_type: "",
+                                size: 0,
+                                url: ""
+                            },
+                            group_name: "",
+                            isLoading: false,
+                            isGroupOwner: false,
+                            isOwnerId: isGroupOwner
+                        }} 
+                        isProcessing={groupChat.isProcessing || groupMember.isProcessing || groupProfile.isProcessing}
+                    />
+                    ) : null}
+                </>
             ) : (
                 <div 
                     className={cn(

@@ -81,12 +81,12 @@ export default function GroupChatPopUp(props: IGroupChatPopUp) {
                     onClick={seeProfileGroup}
                     type="button"
                 >
-                    {props.group_profile.group_profile.public_id !== "" ? (
+                    {props.group_profile.picture.public_id !== "" ? (
                         <div className="w-8 h-8 rounded-full">
                             <img
                                 className="w-full h-full object-cover rounded-full"
                                 alt={`${props.group_profile.group_name}-picture`}
-                                src={props.group_profile.group_profile.url}
+                                src={props.group_profile.picture.url}
                             />
                         </div>
                     ) : (

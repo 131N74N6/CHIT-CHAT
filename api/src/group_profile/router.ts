@@ -47,6 +47,13 @@ const groupProfileRouters = new Elysia({ prefix: "/api/v1/groups" })
 }, {
     body: t.Omit(groupProfileSchema.changeGroupRaw, ["user_id"])
 })
+.put("/:_id", async (context) => {
+    return await groupProfileController.deleteGroupProfilePicture({ 
+        group_id: context.params._id, owner_id: context.user.id 
+    });
+}, {
+    params: t.Pick(groupProfileSchema.changeGroupRaw, ["_id"])
+})
 .ws("/ws", {
     query: groupProfileSchema.wsConfig,
     
