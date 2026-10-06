@@ -9,7 +9,7 @@ export const groupProfileSchema = {
             t.File({ error: "unsupported file", type: "image/*", maxSize: 7340032 }),
             t.Null()
         ])),
-        user_id: t.String({ error: "invalid group owner", pattern: "^[0-9A-Fa-f]{24}$" })
+        owner_id: t.String({ error: "invalid group owner", pattern: "^[0-9A-Fa-f]{24}$" })
     }),
     changeGroupResult: t.Object({
         _id: t.String({ error: "invalid group", pattern: "^[0-9A-Fa-f]{24}$" }),
@@ -26,7 +26,7 @@ export const groupProfileSchema = {
                 url: t.String({ error: "failed to access file", minLength: 1 })
             })
         ])),
-        user_id: t.String({ error: "invalid group owner", pattern: "^[0-9A-Fa-f]{24}$" })
+        owner_id: t.String({ error: "invalid group owner", pattern: "^[0-9A-Fa-f]{24}$" })
     }),
     createGroupRaw: t.Object({
         group_description: t.Optional(t.String({ error: "invalid group description", minLength: 1 })),
@@ -35,7 +35,7 @@ export const groupProfileSchema = {
             t.File({ error: "unsupported file", type: "image/*", maxSize: 7340032 }),
             t.Null()
         ])),
-        user_id: t.String({ error: "invalid owner", pattern: "^[0-9A-Fa-f]{24}$" }),
+        owner_id: t.String({ error: "invalid owner", pattern: "^[0-9A-Fa-f]{24}$" }),
     }),
     createGroupResult: t.Object({
         group_description: t.Optional(t.String({ error: "invalid group description", minLength: 1 })),
@@ -51,14 +51,14 @@ export const groupProfileSchema = {
                 url: t.String({ error: "failed to access file", minLength: 1 })
             })
         ])),
-        user_id: t.String({ error: "invalid group owner", pattern: "^[0-9A-Fa-f]{24}$" }),
+        owner_id: t.String({ error: "invalid group owner", pattern: "^[0-9A-Fa-f]{24}$" }),
     }),
     deleteGroup: t.Object({
         group_id: t.String({ error: "invalid group", pattern: "^[0-9A-Fa-f]{24}$" }),
-        user_id: t.String({ error: "invalid group owner", pattern: "^[0-9A-Fa-f]{24}$" })
+        owner_id: t.String({ error: "invalid group owner", pattern: "^[0-9A-Fa-f]{24}$" })
     }),
     filter: t.Object({
-        limit: t.Number({ maximum: 32, minimum: 28, error: "maximum group profile each page is 32 and the minimum is 28" }),
+        limit: t.Number({ maximum: 32, minimum: 16, error: "maximum group profile each page is 32 and the minimum is 16" }),
         page: t.Number({ minimum: 1, error: "group profile page must start from 1" }),
         user_id: t.String({ error: "invalid user", pattern: "^[0-9A-Fa-f]{24}$" })
     }),

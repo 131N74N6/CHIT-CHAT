@@ -7,7 +7,7 @@ import { useEffect } from "react";
 import Alert from "../components/Alert";
 import useRoomProfileService from "../services/useRoomProfileService";
 
-export default function CreateRoom() {
+export default function CreateGroup() {
     const message = useMessageStore((state) => state.message);
     const setMessage = useMessageStore((state) => state.setMessage);
 

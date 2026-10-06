@@ -23,11 +23,19 @@ export default function UserChat() {
     const text = useUserChatStore((state) => state.text);
     const setText = useUserChatStore((state) => state.setText);
 
+    const chosenMessage = useUserChatStore((state) => state.chosenMessage);
+    const setChosenMessage = useUserChatStore((state) => state.setChosenMessage);
+
     const openPopUpOption = useUserChatStore((state) => state.openPopUpOption);
     const setOpenPopUpOption = useUserChatStore((state) => state.setOpenPopUpOption);
 
     const receiverId = useUserChatStore((state) => state.receiverId);
     const setReceiverId = useUserChatStore((state) => state.setReceiverId);
+
+    const resetChosenMessageIds = useUserChatStore((state) => state.resetChosenMessageIds);
+
+    const selectMode = useUserChatStore((state) => state.selectMode);
+    const setSelectMode = useUserChatStore((state) => state.setSelectMode);
 
     const userChat = useUserChatService();
     const user = useUserProfileService();
@@ -42,6 +50,26 @@ export default function UserChat() {
             return () => clearTimeout(timer);
         }
     }, [message, setMessage]);
+
+    const sendMessage = (event: React.SubmitEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        if (userChat.isProcessing) return;
+
+        if (selectMode && chosenMessage) {
+            if (!text.trim() || chosenMessage.text.trim() === text.trim()) {
+                setChosenMessage(null);
+                setText("");
+                setSelectMode(false);
+                resetChosenMessageIds();
+                return;
+            }
+            
+            userChat.changeMessageMt.mutate(chosenMessage._id);
+            return
+        }
+
+        userChat.sendMessageMt.mutate();
+    }
 
     return (
         <section className="flex md:flex-row flex-col h-dvh relative z-10 p-2.5 gap-2.5">
@@ -118,10 +146,7 @@ export default function UserChat() {
                 </div>
                 <form 
                     className="bg-white relative h-[20%] inset-shadow-gray-200 p-1.5 flex flex-col gap-1.5 border border-gray-400"
-                    onSubmit={(event: React.SubmitEvent<HTMLFormElement>) => {
-                        event.preventDefault();
-                        userChat.sendMessageMt.mutate();
-                    }}
+                    onSubmit={sendMessage}
                 >
                     <textarea
                         className="focus:outline-0 outline-0 w-full h-full resize-none pr-12"

@@ -44,18 +44,22 @@ export const useGroupChatStore = create<IGroupChatState>()(persist((set) => ({
         groupName: "",
         openPopUpOption: false,
         selectMode: false,
-        showFilePreviewForGroup: false,
-        showFileThatSentToGroup: false,
+        showGroupChatPopUp: false,
+        showFilesPopUp: false,
+        showFilePreviewPopUp: false,
     }),
 
     selectMode: false,
     setSelectMode: (selectMode) => set({ selectMode }),
 
-    showFilePreviewForGroup: false,
-    setFilePreviewForGroup: (showFilePreviewForGroup) => set({ showFilePreviewForGroup }),
+    showGroupChatPopUp: false,
+    setShowGroupChatPopUp: (showGroupChatPopUp) => set({ showGroupChatPopUp }),
 
-    showFileThatSentToGroup: false,
-    setFileThatSentToGroup: (showFileThatSentToGroup: boolean) => set({ showFileThatSentToGroup })
+    showFilesPopUp: false,
+    setFilesPopUp: (showFilesPopUp) => set({ showFilesPopUp }),
+
+    showFilePreviewPopUp: false,
+    setFilePreviewPopUp: (showFilePreviewPopUp: boolean) => set({ showFilePreviewPopUp })
 }), {
     name: "group_chats",
     partialize: (state: IGroupChatState) => ({ 

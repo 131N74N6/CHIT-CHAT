@@ -10,7 +10,7 @@ class GroupProfileRepository {
 
     async changeGroup(props: TGroupProfile["changeGroupResult"]) {
         const result = await this.group_profiles.findOneAndUpdate({ 
-            _id: new ObjectId(props._id), owner_id: new ObjectId(props.user_id) 
+            _id: new ObjectId(props._id), owner_id: new ObjectId(props.owner_id) 
         }, {
             $set: {
                 group_description: props.group_description,
@@ -30,11 +30,11 @@ class GroupProfileRepository {
                 group_description: props.group_description,
                 group_name: props.group_name,
                 group_profile: props.group_profile,
-                owner_id: new ObjectId(props.user_id),
+                owner_id: new ObjectId(props.owner_id),
                 updated_at: new Date(),
             }),
-            this.users.updateOne({ _id: new ObjectId(props.user_id) }, {
-                $addToSet: { group_ids: props.user_id }
+            this.users.updateOne({ _id: new ObjectId(props.owner_id) }, {
+                $addToSet: { group_ids: props.owner_id }
             })
         ]);
     }

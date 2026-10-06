@@ -1,18 +1,23 @@
-import { useNavigate } from "react-router-dom";
-import cn from "../utils/cn";
 import { FileIcon } from "lucide-react";
-import type { IUserMessageData } from "./model";
-import { useUserChatStore } from "./store";
+import type { IGroupMessageData } from "./model";
+import cn from "../utils/cn";
+import { useGroupChatStore } from "./store";
+import { useNavigate } from "react-router-dom";
+import { useUserChatStore } from "../user_chats/store";
 
-export default function MessaeBubble(props: IUserMessageData) {
+export default function MessageBubble(props: IGroupMessageData) {
     const navigate = useNavigate();
-    const chosenMessageIds = useUserChatStore((state) => state.chosenMessageIds);
-    const setChosenMessageIds = useUserChatStore((state) => state.setChosenMessageIds);
 
-    const selectMode = useUserChatStore((state) => state.selectMode);
-    const setChosenMessageId = useUserChatStore((state) => state.setChosenMessageId);
+    const chosenMessageIdsFromGroup = useGroupChatStore((state) => state.chosenMessageIdsFromGroup);
+    const setChosenMessageIdsFromGroup = useGroupChatStore((state) => state.setChosenMessageIdsFromGroup);
 
-    const isSelected = chosenMessageIds.includes(props.chat._id);
+    const setGroupMessageId = useGroupChatStore((state) => state.setGroupMessageId);
+
+    const selectMode = useGroupChatStore((state) => state.selectMode);
+
+    const setReceiverId = useUserChatStore((state) => state.setReceiverId);
+
+    const isSelected = chosenMessageIdsFromGroup.includes(props.chat._id);
 
     return (
         <div 
@@ -23,13 +28,13 @@ export default function MessaeBubble(props: IUserMessageData) {
                 selectMode ? "cursor-pointer hover:opacity-80" : "",
                 isSelected ? "ring-4 ring-orange-500 border-2 border-orange-600 bg-orange-50 text-gray-900" : ""
             )}
-            onClick={() => selectMode && setChosenMessageIds(props.chat._id)}
+            onClick={() => selectMode && setChosenMessageIdsFromGroup(props.chat._id)}
         >
             {props.chat.files_total > 0 ? (
                 <div className="cursor-pointer bg-gray-100 p-2 rounded-md">
                     <div 
                         className="items-center gap-2.5 md:flex hidden" 
-                        onClick={() => setChosenMessageId(props.chat._id)}
+                        onClick={() => setGroupMessageId(props.chat._id)}
                     >
                         <FileIcon size={16}/>
                         <div>{props.chat.files_total} files</div>
@@ -37,10 +42,8 @@ export default function MessaeBubble(props: IUserMessageData) {
                     <div 
                         className="items-center gap-2.5 cursor-pointer md:hidden flex" 
                         onClick={() => {
-                            setChosenMessageId(props.chat._id);
-                            navigate(`/user/media/detail/${props.chat._id}`);
-                            // props.setChatId(props.chat._id);
-                            // navigate(`/room/media/detail/${props.chat._id}`);
+                            setGroupMessageId(props.chat._id);
+                            navigate(`/room/media/detail/${props.chat._id}`);
                         }}
                     >
                         <FileIcon size={16}/>
@@ -48,24 +51,21 @@ export default function MessaeBubble(props: IUserMessageData) {
                     </div>
                 </div>
             ) : null}
-            {/* {props.place.name === "room-chat" ? 
-                props.own ? (
-                    <div className="text-left font-medium text-[0.7rem]">{props.chat.sender_name}</div>
-                ) : (
-                    <button 
-                        className="text-left font-medium text-[0.7rem] cursor-pointer disabled:cursor-not-allowed" 
-                        disabled={props.isProcessing}
-                        onClick={() => {
-                            if (props.place.setReceiverId) props.place.setReceiverId(props.chat.sender_id);
-                            navigate(`/user/chat/${props.chat.sender_id}`);
-                        }}
-                        type="button"
-                    >
-                        {props.chat.sender_name}
-                    </button>
-                ) : (
-                    null
-                )} */}
+            {props.own ? (
+                <div className="text-left font-medium text-[0.7rem]">{props.chat.sender_name}</div>
+            ) : (
+                <button 
+                    className="text-left font-medium text-[0.7rem] cursor-pointer disabled:cursor-not-allowed" 
+                    disabled={props.isProcessing}
+                    onClick={() => {
+                        if (setReceiverId) setReceiverId(props.chat.sender_id);
+                        navigate(`/user/chat/${props.chat.sender_id}`);
+                    }}
+                    type="button"
+                >
+                    {props.chat.sender_name}
+                </button>
+            )}
             <div className="wrap-break-word font-medium text-base">
                 {props.chat.text}
             </div>

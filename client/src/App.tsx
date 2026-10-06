@@ -1,8 +1,8 @@
 import AvailableGroup from "./group_profiles/AvailableGroup";
-import Chatbot from "./pages/Chatbot";
-import CreateRoom from "./pages/CreateRoom";
+import Chatbot from "./chatbot/Chatbot";
+import CreateGroup from "./group_profiles/CreateGroup";
 import Home from "./user_profiles/Home";
-import JoinRoom from "./pages/JoinRoom";
+import JoinGroup from "./group_member/JoinGroup";
 import RoomMediaDetail from "./pages/RoomMediaDetail";
 import RoomMediaPreview from "./pages/RoomMediaPreview";
 import ProtectedRoute from "./auths/ProtectedRoute";
@@ -43,8 +43,8 @@ export default function App() {
                     <Route element={<ProtectedRoute><UserMediaDetail/></ProtectedRoute>} path="/user/media/detail/:chat_id"/>
                     <Route element={<ProtectedRoute><UserProfile/></ProtectedRoute>} path="/user/profile/:receiver_id"/>
                     <Route element={<ProtectedRoute><AvailableGroup/></ProtectedRoute>} path="/rooms"/>
-                    <Route element={<ProtectedRoute><CreateRoom/></ProtectedRoute>} path="/rooms/create"/>
-                    <Route element={<ProtectedRoute><JoinRoom/></ProtectedRoute>} path="/rooms/join"/>
+                    <Route element={<ProtectedRoute><CreateGroup/></ProtectedRoute>} path="/rooms/create"/>
+                    <Route element={<ProtectedRoute><JoinGroup/></ProtectedRoute>} path="/rooms/join"/>
                     <Route element={<ProtectedRoute><GroupChat/></ProtectedRoute>} path="/rooms/chat/:room_id"/>
                     <Route element={<ProtectedRoute><RoomMediaPreview/></ProtectedRoute>} path="/room/chat/preview/:room_id"/>
                     <Route element={<ProtectedRoute><RoomMediaDetail/></ProtectedRoute>} path="/room/media/detail/:chat_id"/>

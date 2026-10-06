@@ -1,99 +1,30 @@
 import Loading from "../components/Loading";
 import Navbar from "../components/Navbar";
-import useRoomChatService from "../services/useRoomChatService";
-import RoomList from "../components/RoomList";
-import useRoomMemberService from "../services/useRoomMemberService";
-import useRoomProfileService from "../services/useRoomProfileService";
 import RoomWindow from "../components/RoomWindow";
-import useUserProfileService from "../user_profiles/service";
 import { MessageCircle } from "lucide-react";
-import { useRoomStore } from "../stores/room.store";
-import useSocketIo from "../hooks/useSocketIo";
 import cn from "../utils/cn";
 import { useEffect } from "react";
 import { useMessageStore } from "../stores/message.store";
 import Alert from "../components/Alert";
-import RoomChatDeleteOption1 from "../components/RoomChatDeleteOption1";
-import RoomChatDeleteOption2 from "../components/RoomChatDeleteOption2";
-import { useUserChatStore } from "../user_chats/store";
+import GroupList from "./GroupList";
+import useGroupProfileService from "./service";
+import useGroupChatService from "../group_chats/service";
+import useGroupMemberService from "../group_member/service";
+import { useGroupChatStore } from "../group_chats/store";
+import PopUpOption from "../group_chats/PopUpOption";
 
 export default function AvailableGroup() {
-    const roomId = useRoomStore((state) => state.roomId);
-    const setRoomId = useRoomStore((state) => state.setRoomId);
-    const setReceiverId = useUserChatStore((state) => state.setReceiverId);
-
-    const chosenMessageId = useUserChatStore((state) => state.chosenMessageId);
-    const setChosenMessageId = useUserChatStore((state) => state.setChosenMessageId);
+    const groupId = useGroupChatStore((state) => state.groupId);
 
     const message = useMessageStore((state) => state.message);
     const setMessage = useMessageStore((state) => state.setMessage);
 
-    const showMember = useRoomStore((state) => state.showMember);
-    const setShowMember = useRoomStore((state) => state.setShowMember);
+    const openPopUpOption = useGroupChatStore((state) => state.openPopUpOption);
+    const chosenMessageIdsFromGroup = useGroupChatStore((state) => state.chosenMessageIdsFromGroup);
 
-    const showProfile = useRoomStore((state) => state.showProfile);
-    const setShowProfile = useRoomStore((state) => state.setShowProfile);
-
-    const { currentUser, isUserProfileProcessing } = useUserProfileService();
-
-    const { 
-        currentRoomMember, 
-        isRoomOwner,
-        isRoomMemberProcessing, 
-        kickMemberMt,
-        leftRoomMt 
-    } = useRoomMemberService();
-
-    const { 
-        availableRooms,  
-        changeRoomMt,
-        currentRoomProfile, 
-        deleteRoomMt, 
-        description,
-        editMode,
-        fileInputRef,
-        handleImagePreview,
-        isRoomProfileProcessing, 
-        oldRoomPicture,
-        roomName,
-        selectedProfileRoom,
-        selectedProfileRoomUrl,
-        setDeleteRoomImage,
-        setDescription,
-        setEditMode,
-        setOldRoomPicture,
-        setRoomName,
-        setSelectedProfileRoom,
-        setSelectedProfileRoomUrl
-    } = useRoomProfileService();
-
-    const { 
-        allChatsInRoom, 
-        clearAllRoomChatsForMeMt,
-        clearChosenRoomChatsForMeMt,
-        clearChatsIdsSelection,
-        deleteAllChatsInRoomMt,
-        deleteChosenChatsInRoomMt,
-        handleMediaPreview,
-        inputMediaRef,
-        isRoomChatProcessing, 
-        isSelectMode,
-        media,
-        removeOnePreviewFile,
-        roomChatMedia,
-        selectedChatsIds,
-        setIsSelectMode,
-        setShowDeleteOption1,
-        setShowDeleteOption2,
-        setShowRoomMedia,
-        setText,
-        sendChatToRoomMt,
-        showDeleteOption1, 
-        showDeleteOption2,
-        showRoomMedia,
-        text,
-        toggleSelect,
-    } = useRoomChatService();
+    const groupChat = useGroupChatService();
+    const groupProfile = useGroupProfileService();
+    const groupMember = useGroupMemberService();
 
     useEffect(() => {
         if (message) {
@@ -101,32 +32,6 @@ export default function AvailableGroup() {
             return () => clearTimeout(timer);
         }
     }, [message, setMessage]);
-
-    useEffect(() => {
-        const savedRoomId = localStorage.getItem("room_id");
-        if (savedRoomId && !roomId) setRoomId(savedRoomId);
-    }, []); 
-
-    useEffect(() => {
-        if (roomId) {
-            localStorage.setItem("room_id", roomId);
-        } else {
-            localStorage.removeItem("room_id");
-        }
-    }, [roomId]);
-
-    useEffect(() => {
-        const savedUserChatId = localStorage.getItem("chat_id");
-        if (savedUserChatId && !chatId) setChatId(savedUserChatId);
-    }, []); 
-
-    useEffect(() => {
-        if (chatId) {
-            localStorage.setItem("chat_id", chatId);
-        } else {
-            localStorage.removeItem("chat_id");
-        }
-    }, [chatId]);
 
     useEffect(() => {
         if (editMode) {
@@ -146,56 +51,42 @@ export default function AvailableGroup() {
         }
     }, [editMode, roomId, currentRoomProfile.data]);
 
-    useSocketIo({
-        identifier: ["available-room", "room-chat", "room-profile", "room-member"]
-    });
-
     return (
         <section className="flex md:flex-row flex-col gap-2.5 p-2.5 h-dvh relative z-10">
             {message ? <Alert message={message}/> : null}
-            <Navbar isProcessing={isRoomChatProcessing || isUserProfileProcessing}/>
-            {showDeleteOption1 ? (
-                <RoomChatDeleteOption1
-                    clearAllRoomChatsForMeMt={clearAllRoomChatsForMeMt}
-                    deleteAllChatsInRoomMt={deleteAllChatsInRoomMt}
-                    isProcessing={isRoomChatProcessing || isUserProfileProcessing || isRoomProfileProcessing || isRoomMemberProcessing}
-                    setIsSelectMode={setIsSelectMode}
-                    setShowDeleteOption1={setShowDeleteOption1}
+            <Navbar isProcessing={groupChat.isProcessing || groupMember.isProcessing || groupProfile.isProcessing}/>
+            {!openPopUpOption ? null : (
+                <PopUpOption
+                    isProcessing={groupChat.isProcessing}
+                    clearAll={groupChat.clearAllMessageFromGroupMt}
+                    chosenMessageIds={chosenMessageIdsFromGroup}
+                    clearChosen={groupChat.clearChosenMessageFromGroupMt}
+                    deleteAll={groupChat.deleteAllMessagesFromGroupMt}
+                    deleteChosen={groupChat.deleteChosenMessagesFromGroupMt}
                 />
-            ) : null}
-            {showDeleteOption2 ? (
-                <RoomChatDeleteOption2
-                    clearChosenRoomChatsForMeMt={clearChosenRoomChatsForMeMt}
-                    deleteChosenChatsInRoomMt={deleteChosenChatsInRoomMt}
-                    clearSelection={clearChatsIdsSelection}
-                    isProcessing={isRoomChatProcessing || isUserProfileProcessing || isRoomProfileProcessing || isRoomMemberProcessing}
-                    setIsSelectMode={setIsSelectMode}
-                    setShowDeleteOption2={setShowDeleteOption2}
-                />
-            ) : null}
+            )}
             <div className="flex flex-col md:w-2/5 h-full px-2.5 w-full inset-shadow-sm inset-shadow-gray-400 border border-gray-400 overflow-y-auto">
-                {availableRooms.isLoading ? (
+                {groupProfile.showJoinedGroup.isLoading ? (
                     <div className="flex justify-center items-center h-full">
                         <Loading/>
                     </div>
-                ) : availableRooms.error ? (
+                ) : groupProfile.showJoinedGroup.error ? (
                     <div className="flex justify-center items-center h-full">
                         <div className="text-gray-700 font-medium text-center">
-                            {availableRooms.error.message}
+                            {groupProfile.showJoinedGroup.error.message}
                         </div>
                     </div>
                 ) : (
-                    <RoomList
-                        fetchNextPage={availableRooms.fetchNextPage}
-                        hasNextPage={availableRooms.hasNextPage}
-                        isFetchingNextPage={availableRooms.isFetchingNextPage}
-                        isProcessing={isRoomProfileProcessing}
-                        rooms={availableRooms.data ? availableRooms.data.pages.flat() : []}
-                        setRoomId={setRoomId}
+                    <GroupList
+                        fetchNextPage={groupProfile.showJoinedGroup.fetchNextPage}
+                        hasNextPage={groupProfile.showJoinedGroup.hasNextPage}
+                        isFetchingNextPage={groupProfile.showJoinedGroup.isFetchingNextPage}
+                        isProcessing={groupChat.isProcessing || groupMember.isProcessing || groupProfile.isProcessing}
+                        groups={groupProfile.showJoinedGroup.data ? groupProfile.showJoinedGroup.data.pages.flat() : []}
                     />
                 )}
             </div>
-            {roomId ? (
+            {groupId ? (
                 <RoomWindow
                     chatId={chatId}
                     changeRoomMt={changeRoomMt}

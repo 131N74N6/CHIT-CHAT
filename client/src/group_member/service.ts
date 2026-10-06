@@ -2,12 +2,12 @@ import { Query, useInfiniteQuery, useMutation, useQuery, useQueryClient } from "
 import { useMessageStore } from "../stores/message.store";
 import { useUserStore } from "../user_profiles/store";
 import { apiRequest } from "../api";
-import { useGroupStore } from "../group_profiles/store";
 import type { Users } from "../user_profiles/model";
+import { useGroupChatStore } from "../group_chats/store";
 
-export default function useGroupMembers() {
+export default function useGroupMemberService() {
     const queryClient = useQueryClient();
-    const groupId = useGroupStore((state) => state.groupId);
+    const groupId = useGroupChatStore((state) => state.groupId);
 
     const setMessage = useMessageStore((state) => state.setMessage);
     

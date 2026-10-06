@@ -6,7 +6,7 @@ import Alert from "../components/Alert";
 import { MessageCircle } from "lucide-react";
 import useUserProfileService from "../user_profiles/service";
 
-export default function JoinRoom() {
+export default function JoinGroup() {
     const message = useMessageStore((state) => state.message);
     const setMessage = useMessageStore((state) => state.setMessage);
 

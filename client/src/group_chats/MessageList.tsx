@@ -1,26 +1,22 @@
-import MessageBubble from "./MessageBubble";
 import { useCallback, useEffect, useRef } from "react";
-import type { IUserMessageList } from "./model";
 import { useUserStore } from "../user_profiles/store";
+import MessageBubble from "./MessageBubble";
+import type { IGroupMessageList } from "./model";
 
-export default function MessageList(props: IUserMessageList) {
-    const scrollContainerRef = useRef<HTMLDivElement>(null);
-    
-    // Ref untuk menyimpan state scroll sebelum memuat pesan lama
+export default function MessageList(props: IGroupMessageList) {
+    const scrollContainerRef = useRef<HTMLDivElement >(null);
     const previousScrollHeightRef = useRef<number>(0);
     const previousScrollTopRef = useRef<number>(0);
-    
-    // Ref untuk melacak panjang pesan sebelumnya
-    const prevMessagesLengthRef = useRef<number>(0);
-    
+    const previousMessagesLengthRef = useRef<number>(0);
+
     const currentUserId = useUserStore((state) => state.currentUserId);
 
     useEffect(() => {
         const container = scrollContainerRef.current;
         if (!container || props.chats.length === 0) return;
 
-        const initialLoad = prevMessagesLengthRef.current === 0 && props.chats.length > 0;
-        const newMessageExist = props.chats.length > prevMessagesLengthRef.current && !props.isFetchingNextPage;
+        const initialLoad = previousMessagesLengthRef.current === 0 && props.chats.length > 0;
+        const newMessageExist = props.chats.length > previousMessagesLengthRef.current && !props.isFetchingNextPage;
 
         if (initialLoad || newMessageExist) {
             requestAnimationFrame(() => {
@@ -28,7 +24,7 @@ export default function MessageList(props: IUserMessageList) {
             });
         }
 
-        prevMessagesLengthRef.current = props.chats.length;
+        previousMessagesLengthRef.current = props.chats.length;
     }, [props.chats, props.isFetchingNextPage]);
 
     useEffect(() => {
@@ -45,16 +41,16 @@ export default function MessageList(props: IUserMessageList) {
             container.scrollTop = previousScrollTopRef.current + heightDifference;
             previousScrollHeightRef.current = 0;
         }
-    }, [props.isFetchingNextPage, props.chats]);
+    }, [props.chats, props.isFetchingNextPage]);
 
     const handleScroll = useCallback(() => {
         if (!scrollContainerRef.current) return;
         const currentScrollContainer = scrollContainerRef.current;
 
-        if (currentScrollContainer.scrollTop < 52 && props.hasNextPage && !props.isFetchingNextPage ) {
+        if (currentScrollContainer.scrollTop < 52 && props.hasNextPage && !props.isFetchingNextPage) {
             props.fetchNextPage();
         }
-    }, [props.fetchNextPage, props.isFetchingNextPage, props.hasNextPage]);
+    }, [props.fetchNextPage, props.hasNextPage, props.isFetchingNextPage]);
 
     useEffect(() => {
         const container = scrollContainerRef.current;
@@ -68,7 +64,7 @@ export default function MessageList(props: IUserMessageList) {
         return (
             <div className="flex justify-center items-center h-full">
                 <div className="bg-white">
-                    <span className="text-gray-700 font-semibold text-[1rem]">No chats found...</span>
+                    <span className="text-gray-700 font-semibold text-[1rem]">No messages found...</span>
                 </div>
             </div>
         );

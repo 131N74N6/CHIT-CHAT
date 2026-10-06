@@ -11,15 +11,15 @@ const groupProfileRouters = new Elysia({ prefix: "/api/v1/groups" })
 .use(apiAuthMiddleware)
 .delete("/", async (context) => {
     return await groupProfileController.deleteGroup({ 
-        group_id: context.body.group_id, user_id: context.user.id
+        group_id: context.query.group_id, owner_id: context.user.id
     });
 }, {
-    body: t.Pick(groupProfileSchema.deleteGroup, ["group_id"])
+    query: t.Pick(groupProfileSchema.deleteGroup, ["group_id"])
 })
 .get("/", async (context) => {
-    return await groupProfileController.showAllGroups(context.query);
+    return await groupProfileController.showAllGroups({ ...context.query, user_id: context.user.id });
 }, {
-    query: groupProfileSchema.filter
+    query: t.Omit(groupProfileSchema.filter, ["user_id"])
 })
 .get("/:_id", async (context) => {
     return await groupProfileController.showGroupDetail(context.params._id);
@@ -31,7 +31,7 @@ const groupProfileRouters = new Elysia({ prefix: "/api/v1/groups" })
         group_description: context.body.group_description,
         group_name: context.body.group_name,
         group_profile: context.body.group_profile,
-        user_id: context.user.id 
+        owner_id: context.user.id 
     });
 }, {
     body: t.Omit(groupProfileSchema.createGroupRaw, ["user_id"])
@@ -42,7 +42,7 @@ const groupProfileRouters = new Elysia({ prefix: "/api/v1/groups" })
         group_description: context.body.group_description,
         group_name: context.body.group_name,
         group_profile: context.body.group_profile,
-        user_id: context.user.id, 
+        owner_id: context.user.id, 
     });
 }, {
     body: t.Omit(groupProfileSchema.changeGroupRaw, ["user_id"])

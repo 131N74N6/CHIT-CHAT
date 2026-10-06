@@ -1,17 +1,16 @@
 import Alert from "../components/Alert";
 import cn from "../utils/cn";
-import ChatList from "../user_chats/MessageList";
 import Loading from "../components/Loading";
 import { File, MessageCircle, SendIcon, Settings2 } from "lucide-react";
 import { useEffect } from "react";
 import { useMessageStore } from "../stores/message.store";
 import { useNavigate, useParams } from "react-router-dom";
 import Navbar from "../components/Navbar";
-import { useUserChatStore } from "../user_chats/store";
 import useGroupChatService from "./service";
 import { useGroupChatStore } from "./store";
 import PopUpOption from "./PopUpOption";
 import useGroupProfileService from "../group_profiles/service";
+import MessageList from "./MessageList";
 
 export default function GroupChat() {
     const { room_id } = useParams();
@@ -30,9 +29,6 @@ export default function GroupChat() {
 
     const message = useMessageStore((state) => state.message);
     const setMessage = useMessageStore((state) => state.setMessage);
-
-    const setReceiverId = useUserChatStore((state) => state.setReceiverId);
-    const setChatId = useGroupChatStore((state) => state.groupId);
     
     const chosenMessageFromGroup = useGroupChatStore((state) => state.chosenMessageFromGroup);
     const setChosenMessageFromGroup = useGroupChatStore((state) => state.setChosenMessageFromGroup);
@@ -61,13 +57,14 @@ export default function GroupChat() {
         if (groupChat.isProcessing) return;
 
         if (selectMode && chosenMessageFromGroup) {
-            if (!groupMessage || groupMessage.trim() === chosenMessageFromGroup.text) {
+            if (!groupMessage.trim() || groupMessage.trim() === chosenMessageFromGroup.text) {
                 setChosenMessageFromGroup(null);
                 setGroupMessage("");
                 setSelectMode(false);
                 resetChosenMessageIdsFromGroup();
                 return;
             }
+
             groupChat.changeChosenMessageMt.mutate(chosenMessageFromGroup._id);
             return;
         }
@@ -94,26 +91,25 @@ export default function GroupChat() {
                     <button 
                         className="flex-row flex items-center gap-2.5 cursor-pointer disabled:cursor-not-allowed"
                         disabled={groupChat.isProcessing}
-                        onClick={() => navigate(`/users/${user.getCurrentUser.data?.user_id}`)}
+                        onClick={() => navigate(`/rooms/profile/${groupId}`)}
                         type="button"
                     >
-                        {user.getCurrentUser.data && 
-                        user.getCurrentUser.data.profile_picture && 
-                        user.getCurrentUser.data.profile_picture.public_id ? (
+                        {groupProfile.showGroupDetail.data && 
+                        groupProfile.showGroupDetail.data.group_profile.public_id !== "" ? (
                             <div className="w-8 h-8 rounded-full">
                                 <img
                                     className="w-full h-full object-cover rounded-full"
-                                    alt={`${user.getCurrentUser.data.user_name}-picture`}
-                                    src={user.getCurrentUser.data?.profile_picture.url}
+                                    alt={`${groupProfile.showGroupDetail.data.group_name}-picture`}
+                                    src={groupProfile.showGroupDetail.data.group_profile.url}
                                 />
                             </div>
                         ) : (
                             <div className="bg-amber-400 flex justify-center items-center w-8 h-8 rounded-full">
-                                <p className="text-olive-800 font-medium">{user.getCurrentUser.data?.user_name[0]}</p>
+                                <p className="text-olive-800 font-medium">{groupProfile.showGroupDetail.data?.group_name[0]}</p>
                             </div>
                         )}
                         <h3 className="text-white text-base text-left font-medium">
-                            {user.getCurrentUser.data?.user_name}
+                            {groupProfile.showGroupDetail.data?.group_name}
                         </h3>
                     </button>
                     <section className="flex gap-2">
@@ -128,30 +124,25 @@ export default function GroupChat() {
                     </section>
                 </header>
                 <div className="flex flex-col gap-2.5 px-2.5 h-full border-x border-gray-400">
-                    {allChatsInRoom.isLoading ? (
+                    {groupChat.showAllGroupMessages.isLoading ? (
                         <div className="flex justify-center items-center bg-white h-full">
                             <Loading/>
                         </div>
-                    ) : allChatsInRoom.error ? (
+                    ) : groupChat.showAllGroupMessages.error ? (
                         <div className="flex justify-center items-center h-full">
                             <div className="text-gray-700 font-medium text-center">
-                                {allChatsInRoom.error.message}
+                                {groupChat.showAllGroupMessages.error.message}
                             </div>
                         </div>
                     ) : (
-                        <ChatList 
-                            chats={allChatsInRoom.data? allChatsInRoom.data.pages.flatMap(page => page).reverse() : []} 
-                            currentUserId={currentUser.data ? currentUser.data.user_id : ""} 
-                            fetchNextPage={allChatsInRoom.fetchNextPage}
-                            hasNextPage={allChatsInRoom.hasNextPage}
-                            isFetchingNextPage={allChatsInRoom.isFetchingNextPage}
-                            isInRoom={true}
-                            isProcessing={isRoomChatProcessing || isUserProfileProcessing}
-                            selectMode={selectMode}
-                            selectedIds={selectedChatsIds}
-                            setChatId={setChatId}
-                            place={{ name: "room-chat", setReceiverId: setReceiverId }}
-                            toggleSelect={toggleSelect}
+                        <MessageList 
+                            chats={groupChat.showAllGroupMessages.data? 
+                                groupChat.showAllGroupMessages.data.pages.flatMap(page => page).reverse() : []
+                            }
+                            fetchNextPage={groupChat.showAllGroupMessages.fetchNextPage}
+                            hasNextPage={groupChat.showAllGroupMessages.hasNextPage}
+                            isFetchingNextPage={groupChat.showAllGroupMessages.isFetchingNextPage}
+                            isProcessing={groupChat.isProcessing}
                         />
                     )}
                 </div>

@@ -11,7 +11,7 @@ import { CloudinaryUploadResult } from "../cloudinary/model";
 class GroupProfileService {
     async changeGroup(props: TGroupProfile["changeGroupRaw"]) {
         const groupId = this.checkIsIdValid("group", props._id);
-        const userId = this.checkIsIdValid("group owner", props.user_id);
+        const userId = this.checkIsIdValid("group owner", props.owner_id);
         const room1 = `group-profile-${groupId}`;
         const room2 = `joined-group-${userId}`;
 
@@ -78,27 +78,27 @@ class GroupProfileService {
 
         const result = await groupProfileRepository.changeGroup({
             _id: groupId,
-            user_id: userId,
-            group_description: newDescription,
-            group_name: newName,
+            owner_id: userId,
+            group_description: newDescription || "-",
+            group_name: newName || "-",
             group_profile: newProfilePicture
         });
 
-        const sendToRoom1 = {
+        const broadcastToGroupProfile = {
             _id: groupId,
             group_description: result?.group_description,
             group_name: result?.group_name,
             group_profile: result?.group_profile
         };
 
-        const sendToRoom2 = {
+        const broadcastToGroupChat = {
             _id: groupId,
             group_name: result?.group_name,
             group_profile: result?.group_profile
         };
 
-        groupProfileEvent.emit(room1, { data: sendToRoom1, type: "group:changed" });
-        groupChatEvent.emit(room2, { data: sendToRoom2, type: "group:changed" });
+        groupProfileEvent.emit(room1, { data: broadcastToGroupProfile, type: "group:changed" });
+        groupChatEvent.emit(room2, { data: broadcastToGroupChat, type: "group:changed" });
     }
 
     private checkIsIdValid(field: string, value: unknown) {
@@ -119,7 +119,7 @@ class GroupProfileService {
 
     async createGroup(props: TGroupProfile["createGroupRaw"]) {
         const groupName = this.checkIsInputAString("group name", props.group_name);
-        const userId = this.checkIsIdValid("group owner", props.user_id);
+        const userId = this.checkIsIdValid("group owner", props.owner_id);
         
         let newDescription = "";
 
@@ -160,7 +160,7 @@ class GroupProfileService {
 
         await groupProfileRepository.createGroup({
             group_name: groupName,
-            user_id: userId,
+            owner_id: userId,
             group_description: newDescription,
             group_profile: newProfilePicture
         });
@@ -168,7 +168,7 @@ class GroupProfileService {
 
     async deleteGroup(props: TGroupProfile["deleteGroup"]) {
         const groupId = this.checkIsIdValid("group", props.group_id);
-        const userId = this.checkIsIdValid("group owner", props.user_id);
+        const userId = this.checkIsIdValid("group owner", props.owner_id);
 
         const room1 = `group-profile-${groupId}`;
         const room2 = `joined-group-${userId}`;
@@ -186,9 +186,9 @@ class GroupProfileService {
             });
         }
 
-        await groupProfileRepository.deleteGroup({ group_id: groupId, user_id: userId });
+        await groupProfileRepository.deleteGroup({ group_id: groupId, owner_id: userId });
 
-        const result = await groupProfileRepository.deleteGroup({ group_id: groupId, user_id: userId});
+        const result = await groupProfileRepository.deleteGroup({ group_id: groupId, owner_id: userId});
         groupChatEvent.emit(room1, { data: result.group_id, type: "group:deleted" });
         groupChatEvent.emit(room2, { data: result.group_id, type: "group:deleted" });
     }

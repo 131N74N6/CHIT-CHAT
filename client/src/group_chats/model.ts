@@ -11,8 +11,8 @@ export interface IGroupChatState {
     chosenFiles: IGroupFilePreview[];
     setChosenFiles: (files: IGroupFilePreview[] | ((prev: IGroupFilePreview[]) => IGroupFilePreview[])) => void;
 
-    chosenMessageFromGroup: IGroupChat | null;
-    setChosenMessageFromGroup: (chosenMessageFromGroup: IGroupChat | null) => void;
+    chosenMessageFromGroup: IGroupMessage | null;
+    setChosenMessageFromGroup: (chosenMessageFromGroup: IGroupMessage | null) => void;
 
     chosenMessageIdsFromGroup: string[];
     resetChosenMessageIdsFromGroup: () => void;
@@ -38,14 +38,17 @@ export interface IGroupChatState {
     selectMode: boolean;
     setSelectMode: (selectMode: boolean) => void;
 
-    showFilePreviewForGroup: boolean;
-    setFilePreviewForGroup: (showFilePreviewForGroup: boolean) => void;
+    showGroupChatPopUp: boolean;
+    setShowGroupChatPopUp: (showGroupChatPopUp: boolean) => void;
 
-    showFileThatSentToGroup: boolean;
-    setFileThatSentToGroup: (showFileThatSentToGroup: boolean) => void;
+    showFilesPopUp: boolean;
+    setFilesPopUp: (showFilesPopUp: boolean) => void;
+
+    showFilePreviewPopUp: boolean;
+    setFilePreviewPopUp: (showFilePreviewPopUp: boolean) => void;
 }
 
-export interface IGroupChat {
+export interface IGroupMessage {
     _id: string;
     created_at: Date;
     files_total: number;
@@ -55,22 +58,21 @@ export interface IGroupChat {
     updated_at: Date;
 }
 
-export interface IGroupChatData {
-    chat: IGroupChat;
-    is_processing: boolean;
+export interface IGroupMessageData {
+    chat: IGroupMessage;
+    isProcessing: boolean;
     own: boolean;
 }
 
-export interface IChatList {
-    chats: IGroupChat[];
-    current_Group_id: string;
-    fetch_next_page: (options?: FetchNextPageOptions | undefined) => Promise<InfiniteQueryObserverResult<InfiniteData<any, unknown>, Error>>;
-    has_next_page: boolean;
-    is_fetching_next_page: boolean;
-    is_processing: boolean;
+export interface IGroupMessageList {
+    chats: IGroupMessage[];
+    fetchNextPage: (options?: FetchNextPageOptions | undefined) => Promise<InfiniteQueryObserverResult<InfiniteData<any, unknown>, Error>>;
+    hasNextPage: boolean;
+    isFetchingNextPage: boolean;
+    isProcessing: boolean;
 }
 
-export interface IGroupChatFiles {
+export interface IGroupMessageFiles {
     files: {
         file_name: string;
         file_type: string;
@@ -81,11 +83,36 @@ export interface IGroupChatFiles {
     }[];
 }
 
-export type iPopUpOptionForGroup = {
+export interface iPopUpOptionForGroup {
     chosenMessageIds: string[];
     clearAll: UseMutationResult<void, Error, void, unknown>;
     clearChosen: UseMutationResult<void, Error, void, unknown>;
     deleteAll: UseMutationResult<void, Error, void, unknown>;
     deleteChosen: UseMutationResult<void, Error, void, unknown>;
     isProcessing: boolean;
+}
+
+export interface IGroupChatPopUp {
+    group_chat: {
+        chats: IGroupMessage[];
+        fetchNextPage: (options?: FetchNextPageOptions | undefined) => Promise<InfiniteQueryObserverResult<InfiniteData<any, unknown>, Error>>;
+        hasNextPage: boolean;
+        isFetchingNextPage: boolean;
+        isLoading: boolean;
+        error: Error | null;
+        isProcessing: boolean;
+    }
+    group_profile: {
+        _id: string;
+        group_description: string;
+        group_profile: {
+            file_name: string;
+            file_type: string;
+            public_id: string;
+            resource_type: string;
+            size: number;
+            url: string;
+        };
+        group_name: string;
+    }
 }
