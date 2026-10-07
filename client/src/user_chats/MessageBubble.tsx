@@ -3,16 +3,36 @@ import cn from "../utils/cn";
 import { FileIcon } from "lucide-react";
 import type { IUserMessageData } from "./model";
 import { useUserChatStore } from "./store";
+import { useUserStore } from "../user_profiles/store";
 
 export default function MessageBubble(props: IUserMessageData) {
     const navigate = useNavigate();
+    const setShowUserMedia = useUserChatStore((state) => state.setShowUserMedia);
+
     const chosenMessageIds = useUserChatStore((state) => state.chosenMessageIds);
     const setChosenMessageIds = useUserChatStore((state) => state.setChosenMessageIds);
 
     const selectMode = useUserChatStore((state) => state.selectMode);
     const setChosenMessageId = useUserChatStore((state) => state.setChosenMessageId);
 
+    const setShowUserChatPopUp = useUserChatStore((state) => state.setShowUserChatPopUp);
+    const setShowUserChatFilesPopUp = useUserChatStore((state) => state.setShowUserChatFilesPopUp);
+    const setShowUserProfilePopUp = useUserStore((state) => state.setShowUserProfilePopUp);
+
     const isSelected = chosenMessageIds.includes(props.chat._id);
+
+    const seeUserChatFiles = () => {
+        setShowUserMedia(false);
+        setChosenMessageId(props.chat._id);
+        setShowUserChatPopUp(false);
+        setShowUserChatFilesPopUp(true);
+        setShowUserProfilePopUp(false);
+    }
+
+    const seeUserChatFilesPage = () => {
+        setChosenMessageId(props.chat._id);
+        navigate(`/user/media/detail/${props.chat._id}`);
+    }
 
     return (
         <div 
@@ -29,43 +49,20 @@ export default function MessageBubble(props: IUserMessageData) {
                 <div className="cursor-pointer bg-gray-100 p-2 rounded-md">
                     <div 
                         className="items-center gap-2.5 md:flex hidden" 
-                        onClick={() => setChosenMessageId(props.chat._id)}
+                        onClick={seeUserChatFiles}
                     >
                         <FileIcon size={16}/>
                         <div>{props.chat.files_total} files</div>
                     </div>
                     <div 
                         className="items-center gap-2.5 cursor-pointer md:hidden flex" 
-                        onClick={() => {
-                            setChosenMessageId(props.chat._id);
-                            navigate(`/user/media/detail/${props.chat._id}`);
-                            // props.setChatId(props.chat._id);
-                            // navigate(`/room/media/detail/${props.chat._id}`);
-                        }}
+                        onClick={seeUserChatFilesPage}
                     >
                         <FileIcon size={16}/>
                         <div>{props.chat.files_total} files</div>
                     </div>
                 </div>
             ) : null}
-            {/* {props.place.name === "room-chat" ? 
-                props.own ? (
-                    <div className="text-left font-medium text-[0.7rem]">{props.chat.sender_name}</div>
-                ) : (
-                    <button 
-                        className="text-left font-medium text-[0.7rem] cursor-pointer disabled:cursor-not-allowed" 
-                        disabled={props.isProcessing}
-                        onClick={() => {
-                            if (props.place.setReceiverId) props.place.setReceiverId(props.chat.sender_id);
-                            navigate(`/user/chat/${props.chat.sender_id}`);
-                        }}
-                        type="button"
-                    >
-                        {props.chat.sender_name}
-                    </button>
-                ) : (
-                    null
-                )} */}
             <div className="wrap-break-word font-medium text-base">
                 {props.chat.text}
             </div>

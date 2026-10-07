@@ -230,7 +230,7 @@ export default function GroupDetailPopUp(props: IGroupProfileDetailPopUp) {
                             <div className="flex flex-col gap-1.5">
                                 <div className="text-[1rem] font-medium text-gray-800">Created At</div>
                                 <div className="text-[1rem] font-medium text-gray-800">
-                                    {new Date(props.groupProfile?.created_at).toLocaleString()}
+                                    {new Date(props.groupProfile.created_at).toLocaleString()}
                                 </div>
                             </div>
                             <div className="flex flex-col gap-1.5">

@@ -43,11 +43,15 @@ export const useUserStore = create<UserState>()(persist((set) => ({
         profilePicture: null,
         profilePictureUrl: null,
         roomCode: "",
+        showUserProfilePopUp: false,
         username: "",
     }),
     
     roomCode: "",
     setRoomCode: (roomCode) => set({ roomCode }),
+
+    showUserProfilePopUp: false,
+    setShowUserProfilePopUp: (showUserProfilePopUp) => set({ showUserProfilePopUp }),
 
     username: "",
     setUserName: (username) => set({ username }),

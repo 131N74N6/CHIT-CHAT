@@ -106,7 +106,6 @@ export interface IGroupProfileDetailPopUp {
         group_name: string;
         isLoading: boolean;
         isGroupOwner: boolean;
-        isOwnerId: boolean;
     }
     isProcessing: boolean;
 }

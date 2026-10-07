@@ -48,7 +48,6 @@ export default function useUserProfileService() {
 
     const resetNavbarState = useNavbarStore((state) => state.resetNavbarState);
 
-
     const changeUserMt = useMutation({
         mutationFn: async () => {
             const endpoint = `${import.meta.env.VITE_BASE_API_URL}/api/v1/users`;
@@ -160,10 +159,7 @@ export default function useUserProfileService() {
         staleTime: Infinity
     });
 
-    const isProcessing = [
-        changeUserMt, 
-        deleteUserMt
-    ].some((feature => feature.isPending));
+    const isProcessing = [changeUserMt, deleteUserMt].some((feature => feature.isPending));
 
     return {
         showUsers,

@@ -194,34 +194,55 @@ export default function AvailableGroup() {
                     ) : null}
                     {showProfile ? (
                         <GroupDetailPopUp 
-                        groupMember={{
-                            leftGroupMt: groupMember.leftGroupMt
-                        }} 
-                        groupProfile={{
-                            _id: "",
-                            changeGroupMt: groupProfile.changeGroupMt,
-                            created_at: undefined,
-                            deleteGroupMt: groupProfile.deleteGroupMt,
-                            deleteGroupProfilePictureMt: groupProfile.deleteGroupProfilePictureMt,
-                            description: "",
-                            error: groupProfile.showGroupDetail.error,
-                            fileInputRef: groupProfile.fileInputRef,
-                            handleImagePreview: groupProfile.handleImagePreview,
-                            picture: {
-                                file_name: "",
-                                file_type: "",
-                                public_id: "",
-                                resource_type: "",
-                                size: 0,
-                                url: ""
-                            },
-                            group_name: "",
-                            isLoading: false,
-                            isGroupOwner: false,
-                            isOwnerId: isGroupOwner
-                        }} 
-                        isProcessing={groupChat.isProcessing || groupMember.isProcessing || groupProfile.isProcessing}
-                    />
+                            groupMember={{
+                                leftGroupMt: groupMember.leftGroupMt
+                            }} 
+                            groupProfile={{
+                                _id: groupProfile.showGroupDetail.data ? 
+                                groupProfile.showGroupDetail.data._id : "-",
+                                
+                                changeGroupMt: groupProfile.changeGroupMt,
+
+                                created_at: groupProfile.showGroupDetail.data ? 
+                                groupProfile.showGroupDetail.data.created_at : new Date(),
+
+                                deleteGroupMt: groupProfile.deleteGroupMt,
+                                deleteGroupProfilePictureMt: groupProfile.deleteGroupProfilePictureMt,
+
+                                description: groupProfile.showGroupDetail.data ? 
+                                groupProfile.showGroupDetail.data.group_description : "-",
+
+                                error: groupProfile.showGroupDetail.error,
+                                fileInputRef: groupProfile.fileInputRef,
+                                handleImagePreview: groupProfile.handleImagePreview,
+
+                                picture: {
+                                    file_name: groupProfile.showGroupDetail.data ? 
+                                    groupProfile.showGroupDetail.data.group_profile.file_name : "-",
+
+                                    file_type: groupProfile.showGroupDetail.data ? 
+                                    groupProfile.showGroupDetail.data.group_profile.file_type : "-",
+
+                                    public_id: groupProfile.showGroupDetail.data ? 
+                                    groupProfile.showGroupDetail.data.group_profile.public_id : "-",
+
+                                    resource_type: groupProfile.showGroupDetail.data ? 
+                                    groupProfile.showGroupDetail.data.group_profile.resource_type : "-",
+
+                                    size: groupProfile.showGroupDetail.data ? 
+                                    groupProfile.showGroupDetail.data.group_profile.size : 0,
+                                    
+                                    url: groupProfile.showGroupDetail.data ? 
+                                    groupProfile.showGroupDetail.data.group_profile.url : "-"
+                                },
+                                group_name: groupProfile.showGroupDetail.data ? 
+                                groupProfile.showGroupDetail.data.group_name : "-",
+
+                                isLoading: false,
+                                isGroupOwner: isGroupOwner
+                            }} 
+                            isProcessing={groupChat.isProcessing || groupMember.isProcessing || groupProfile.isProcessing}
+                        />
                     ) : null}
                 </>
             ) : (

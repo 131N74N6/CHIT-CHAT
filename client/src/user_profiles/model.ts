@@ -44,6 +44,9 @@ export interface UserState {
 
     roomCode: string;
     setRoomCode: (roomCode: string) => void;
+    
+    showUserProfilePopUp: boolean;
+    setShowUserProfilePopUp: (showUserProfilePopUp: boolean) => void;
 
     username: string;
     setUserName: (username: string) => void;
@@ -87,4 +90,15 @@ export interface UsersMarks {
     isGroupOwner?: never;
     kickMemberMt?: never;
     name: "user-list-home";
+}
+
+export interface IUserProfilePopUp {
+    _id: string;
+    address: string;
+    error: Error | null;
+    gender: string;
+    isLoading: boolean;
+    image: string;
+    image_public_id: string
+    name: string;
 }

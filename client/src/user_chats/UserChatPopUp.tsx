@@ -1,40 +1,31 @@
 import ChatList from "./MessageList";
 import useUserChatService from "./service";
-import cn from "../utils/cn";
 import Loading from "../components/Loading";
-import { File, MessageCircle, SendIcon, Settings2 } from "lucide-react";
-import { useMessageStore } from "../stores/message.store";
-import { useNavigate } from "react-router-dom";
-import Navbar from "../components/Navbar";
-import Alert from "../components/Alert";
+import { File, SendIcon, Settings2, X } from "lucide-react";
 import { useUserChatStore } from "./store";
-import PopUpOption from "./PopUpOption";
 import useUserProfileService from "../user_profiles/service";
-import type { IGroupChatPopUp } from "../group_chats/model";
+import { useUserStore } from "../user_profiles/store";
+import type { IUserChatPopUp } from "./model";
 
-export default function UserChatPopUp(props: IGroupChatPopUp) {
-    const chosenMessageIds = useUserChatStore((state) => state.chosenMessageIds);
-    const navigate = useNavigate();
-    
-    const message = useMessageStore((state) => state.message);
-    const setMessage = useMessageStore((state) => state.setMessage);
-
+export default function UserChatPopUp(props: IUserChatPopUp) {
     const text = useUserChatStore((state) => state.text);
     const setText = useUserChatStore((state) => state.setText);
 
     const chosenMessage = useUserChatStore((state) => state.chosenMessage);
     const setChosenMessage = useUserChatStore((state) => state.setChosenMessage);
 
-    const openPopUpOption = useUserChatStore((state) => state.openPopUpOption);
     const setOpenPopUpOption = useUserChatStore((state) => state.setOpenPopUpOption);
 
-    const receiverId = useUserChatStore((state) => state.receiverId);
-    const setReceiverId = useUserChatStore((state) => state.setReceiverId);
+    const setShowUserChatFilesPopUp = useUserChatStore((state) => state.setShowUserChatFilesPopUp);
+    const setShowUserMedia = useUserChatStore((state) => state.setShowUserMedia);
 
     const resetChosenMessageIds = useUserChatStore((state) => state.resetChosenMessageIds);
+    const setShowUserChatPopUp = useUserChatStore((state) => state.setShowUserChatPopUp);
 
     const selectMode = useUserChatStore((state) => state.selectMode);
     const setSelectMode = useUserChatStore((state) => state.setSelectMode);
+
+    const setShowUserProfilePopUp = useUserStore((state) => state.setShowUserProfilePopUp);
 
     const userChat = useUserChatService();
     const user = useUserProfileService();
@@ -59,26 +50,45 @@ export default function UserChatPopUp(props: IGroupChatPopUp) {
         userChat.sendMessageMt.mutate();
     }
 
+    const closeUserChatPopUp = () => {
+        setShowUserMedia(false);
+        setShowUserChatPopUp(false);
+        setShowUserChatFilesPopUp(false);
+        setShowUserProfilePopUp(false);
+    }
+
+    const seeUserProfile = () => {
+        setShowUserMedia(false);
+        setShowUserChatPopUp(false);
+        setShowUserChatFilesPopUp(false);
+        setShowUserProfilePopUp(true);
+    }
+
+    const seeFilePreview = () => {
+        setShowUserMedia(true);
+        setShowUserChatPopUp(false);
+        setShowUserChatFilesPopUp(false);
+        setShowUserProfilePopUp(false);
+    }
+
     return (
-        <section className="flex md:flex-row flex-col h-dvh relative z-10 p-2.5 gap-2.5">
-            <Navbar isProcessing={userChat.isProcessing || user.isProcessing}/>
-            {message ? <Alert message={message}/> : null}
-            {!openPopUpOption ? null : (
-                <PopUpOption
-                    isProcessing={userChat.isProcessing || user.isProcessing}
-                    clearAll={userChat.clearAllMessagesMt}
-                    chosenMessageIds={chosenMessageIds}
-                    clearChosen={userChat.clearChosenMessagesMt}
-                    deleteAll={userChat.deleteAllMessagesMt}
-                    deleteChosen={userChat.deleteChosenMessagesMt}
-                />
-            )}
-            <main className="md:w-2/5 w-full h-full flex flex-col overflow-y-auto">
-                <header className="bg-zinc-800 flex justify-between p-2.5">
+        <section className="h-full overflow-y-auto p-2.5 md:flex hidden flex-col w-full md:w-2/5">
+            <header className="bg-zinc-800 flex justify-between p-2.5">
+                {props.userProfile.error ? (
+                    <div className="flex justify-center items-center h-full">
+                        <div className="text-gray-700 font-medium text-center">
+                            {props.userProfile.error.message}
+                        </div>
+                    </div>
+                ) : props.userProfile.isLoading ? (
+                    <div className="flex justify-center items-center bg-white h-full">
+                        <Loading/>
+                    </div>
+                ) : (
                     <button 
                         className="flex-row flex items-center gap-2.5 cursor-pointer disabled:cursor-not-allowed"
-                        disabled={userChat.isProcessing || user.isProcessing}
-                        onClick={() => navigate(`/users/${receiverId}`)}
+                        disabled={props.isProcessing}
+                        onClick={seeUserProfile}
                         type="button"
                     >
                         {user.showOtherUser.data && user.showOtherUser.data.image_public_id ? (
@@ -98,88 +108,78 @@ export default function UserChatPopUp(props: IGroupChatPopUp) {
                             {user.showOtherUser.data?.name}
                         </h3>
                     </button>
-                    <section className="flex gap-2">
+                )}
+                <section className="flex gap-2">
+                    <button 
+                        className="text-base font-medium cursor-pointer disabled:cursor-not-allowed text-white"
+                        disabled={props.isProcessing}
+                        onClick={() => setOpenPopUpOption(true)}
+                        type="button"
+                    >
+                        <Settings2 size={22}/>
+                    </button>
+                    <button 
+                        className="text-base font-medium cursor-pointer disabled:cursor-not-allowed text-white"
+                        disabled={props.isProcessing}
+                        onClick={closeUserChatPopUp}
+                        type="button"
+                    >
+                        <X size={22}/>
+                    </button>
+                </section>
+            </header>
+            <div className="flex flex-col gap-2.5 px-2.5 h-[80%] border-x border-gray-400">
+                {props.userChat.isLoading ? (
+                    <div className="flex justify-center items-center bg-white h-full">
+                        <Loading/>
+                    </div>
+                ) : props.userChat.error ? (
+                    <div className="flex justify-center items-center h-full">
+                        <div className="text-gray-700 font-medium text-center">
+                            {props.userChat.error.message}
+                        </div>
+                    </div>
+                ) : (
+                    <ChatList 
+                        chats={props.userChat.data} 
+                        fetchNextPage={props.userChat.fetchNextPage}
+                        hasNextPage={props.userChat.hasNextPage}
+                        isFetchingNextPage={props.userChat.isFetchingNextPage}
+                        isProcessing={props.isProcessing}
+                    />
+                )}
+            </div>
+            <form 
+                className="bg-white relative h-[20%] inset-shadow-gray-200 p-1.5 flex flex-col gap-1.5 border border-gray-400"
+                onSubmit={sendMessage}
+            >
+                <textarea
+                    className="focus:outline-0 outline-0 w-full h-full resize-none pr-12"
+                    id="message"
+                    name="message"
+                    onChange={(event) => setText(event.target.value)}
+                    value={text}
+                />
+                <div className="absolute bottom-2 right-2 top-2 flex items-center bg-white">
+                    <div className="flex flex-col gap-2.5">
+                        <button
+                            className="text-blue-500 font-medium cursor-pointer disabled:cursor-not-allowed"
+                            disabled={props.isProcessing}
+                            type="submit"
+                        >
+                            <SendIcon size={22}/>
+                        </button>
                         <button 
-                            className="text-base font-medium cursor-pointer disabled:cursor-not-allowed text-white"
-                            disabled={userChat.isProcessing || user.isProcessing}
-                            onClick={() => setOpenPopUpOption(true)}
+                            className="text-blue-500 font-medium cursor-pointer disabled:cursor-not-allowed"
+                            disabled={props.isProcessing}
+                            onClick={seeFilePreview}
                             type="button"
                         >
-                            <Settings2 size={22}/>
+                            <File size={22}/>
                         </button>
-                    </section>
-                </header>
-                <div className="flex flex-col gap-2.5 px-2.5 h-[80%] border-x border-gray-400">
-                    {userChat.showAllUserChats.isLoading ? (
-                        <div className="flex justify-center items-center bg-white h-full">
-                            <Loading/>
-                        </div>
-                    ) : userChat.showAllUserChats.error ? (
-                        <div className="flex justify-center items-center h-full">
-                            <div className="text-gray-700 font-medium text-center">
-                                {userChat.showAllUserChats.error.message}
-                            </div>
-                        </div>
-                    ) : (
-                        <ChatList 
-                            chats={userChat.showAllUserChats.data ? 
-                                userChat.showAllUserChats.data.pages.flatMap(page => page).reverse() : []
-                            } 
-                            fetchNextPage={userChat.showAllUserChats.fetchNextPage}
-                            hasNextPage={userChat.showAllUserChats.hasNextPage}
-                            isFetchingNextPage={userChat.showAllUserChats.isFetchingNextPage}
-                            isProcessing={userChat.isProcessing || user.isProcessing}
-                        />
-                    )}
-                </div>
-                <form 
-                    className="bg-white relative h-[20%] inset-shadow-gray-200 p-1.5 flex flex-col gap-1.5 border border-gray-400"
-                    onSubmit={sendMessage}
-                >
-                    <textarea
-                        className="focus:outline-0 outline-0 w-full h-full resize-none pr-12"
-                        id="message"
-                        name="message"
-                        onChange={(event) => setText(event.target.value)}
-                        value={text}
-                    />
-                    <div className="absolute bottom-2 right-2 top-2 flex items-center bg-white">
-                        <div className="flex flex-col gap-2.5">
-                            <button
-                                className="text-blue-500 font-medium cursor-pointer disabled:cursor-not-allowed"
-                                disabled={userChat.isProcessing || user.isProcessing}
-                                type="submit"
-                            >
-                                <SendIcon size={22}/>
-                            </button>
-                            <button 
-                                className="text-blue-500 font-medium cursor-pointer disabled:cursor-not-allowed"
-                                disabled={userChat.isProcessing || user.isProcessing}
-                                onClick={() => navigate(`/user/chat/preview/${receiverId}`)}
-                                type="button"
-                            >
-                                <File size={22}/>
-                            </button>
-                        </div>
-                    </div>
-                </form>
-            </main>
-            <div 
-                className={cn(
-                    "md:flex md:justify-center md:items-center md:h-full md:w-2/5", 
-                    "md:bg-white hidden inset-shadow-sm inset-shadow-gray-400",
-                    "border border-gray-400"
-                )}
-            >
-                <div className="flex flex-col gap-2">
-                    <div className="text-gray-500 font-medium flex justify-center">
-                        <MessageCircle size={34}/>
-                    </div>
-                    <div className="text-gray-700 font-medium text-center">
-                        Welcome to Chit Chat
                     </div>
                 </div>
-            </div>
+            </form>
         </section>
     );
 }

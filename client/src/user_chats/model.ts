@@ -61,8 +61,8 @@ export interface IUserChatState {
 
     resetChatState: () => void;
     
-    showSentUserMedia: boolean;
-    setShowSentUserMedia: (showSentUserMedia: boolean) => void;
+    showUserChatFilesPopUp: boolean;
+    setShowUserChatFilesPopUp: (showUserChatFilesPopUp: boolean) => void;
     
     showUserMedia: boolean;
     setShowUserMedia: (showUserMedia: boolean) => void;
@@ -73,8 +73,8 @@ export interface IUserChatState {
     selectMode: boolean;
     setSelectMode: (selectMode: boolean) => void;
     
-    showUserProfile: boolean;
-    setShowUserProfile: (showUserProfile: boolean) => void;
+    showUserChatPopUp: boolean;
+    setShowUserChatPopUp: (showUserChatPopUp: boolean) => void;
     
     text: string;
     setText: (text: string) => void;
@@ -90,6 +90,20 @@ export interface iPopUpOptionForUser {
 }
 
 export interface IUserChatPopUp {
-    userChat: {}
-    userProfile: {}
+    isProcessing: boolean;
+    userChat: {
+        data: IUserChat[];
+        error: Error | null;
+        fetchNextPage: (options?: FetchNextPageOptions | undefined) => Promise<InfiniteQueryObserverResult<InfiniteData<any, unknown>, Error>>;
+        hasNextPage: boolean;
+        isFetchingNextPage: boolean;
+        isLoading: boolean;
+    }
+    userProfile: {
+        error: Error | null;
+        image: string;
+        image_public_id: string;
+        isLoading: boolean;
+        name: string;
+    }
 }

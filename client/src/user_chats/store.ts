@@ -33,9 +33,9 @@ export const useUserChatStore = create<IUserChatState>()(persist((set) => ({
             selectMode: false,
             chosenFiles: [], 
             receiverId: "",
-            showSentUserMedia: false,
+            showUserChatFilesPopUp: false,
             showUserMedia: false,
-            showUserProfile: false,
+            showUserChatPopUp: false,
             text: "", 
             openPopUpOption: false
         })
@@ -47,14 +47,14 @@ export const useUserChatStore = create<IUserChatState>()(persist((set) => ({
     selectMode: false,
     setSelectMode: (selectMode) => set({ selectMode }),
 
-    showSentUserMedia: false,
-    setShowSentUserMedia: (showSentUserMedia) => set({ showSentUserMedia }),
+    showUserChatFilesPopUp: false,
+    setShowUserChatFilesPopUp: (showUserChatFilesPopUp) => set({ showUserChatFilesPopUp }),
 
     showUserMedia: false,
     setShowUserMedia: (showUserMedia) => set({ showUserMedia }),
 
-    showUserProfile: false,
-    setShowUserProfile: (showUserProfile) => set({ showUserProfile }),
+    showUserChatPopUp: false,
+    setShowUserChatPopUp: (showUserChatPopUp) => set({ showUserChatPopUp }),
 
     text: "",
     setText: (text) => set({ text }),

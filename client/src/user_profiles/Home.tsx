@@ -3,96 +3,43 @@ import Navbar from "../components/Navbar";
 import useUserChatService from "../user_chats/service";
 import UserList from "./UserList";
 import useUserProfileService from "./service";
-import UserWindow from "../components/UserWindow";
 import { MessageCircle } from "lucide-react";
 import { useEffect } from "react";
 import { useMessageStore } from "../stores/message.store";
-import { useChatStore } from "../user_chats/store";
-import useSocketIo from "../hooks/useSocketIo";
-import cn from "../utils/cn";
+import { useUserChatStore } from "../user_chats/store";
 import Alert from "../components/Alert";
-import UserChatDeleteOption1 from "../components/UserChatDeleteOption1";
-import UserChatDeleteOption2 from "../components/UserChatDeleteOption2";
+import PopUpOption from "../user_chats/PopUpOption";
+import { useUserStore } from "./store";
+import UserChatPopUp from "../user_chats/UserChatPopUp";
+import type { FetchNextPageOptions, InfiniteQueryObserverResult, InfiniteData } from "@tanstack/react-query";
+import cn from "../utils/cn";
+import UserProfilePopUp from "./UserProfilePopUp";
 
 export default function Home() {
     const message = useMessageStore((state) => state.message);
     const setMessage = useMessageStore((state) => state.setMessage);
     
-    const showUserProfile = useChatStore((state) => state.showUserProfile);
-    const setShowUserProfile = useChatStore((state) => state.setShowUserProfile);
+    const showUserProfile = useUserChatStore((state) => state.showUserProfile);
+    const setShowUserProfile = useUserChatStore((state) => state.setShowUserProfile);
 
-    const chatId = useChatStore((state) => state.chatId);
-    const setChatId = useChatStore((state) => state.setChatId);
+    const openPopUpOption = useUserChatStore((state) => state.openPopUpOption);
+    const chosenMessageIds = useUserChatStore((state) => state.chosenMessageIds);
+
+    const showUserChatPopUp = useUserChatStore((state) => state.showUserChatPopUp);
     
-    const showUserMedia = useChatStore((state) => state.showUserMedia);
-    const setShowUserMedia = useChatStore((state) => state.setShowUserMedia);
+    const showUserMedia = useUserChatStore((state) => state.showUserMedia);
+    const showUserChatFilesPopUp = useUserChatStore((state) => state.showUserChatFilesPopUp);
     
-    const text = useChatStore((state) => state.text);
-    const setText = useChatStore((state) => state.setText);
+    const text = useUserChatStore((state) => state.text);
+    const setText = useUserChatStore((state) => state.setText);
     
-    const receiverId = useChatStore((state) => state.receiverId);
-    const setReceiverId = useChatStore((state) => state.setReceiverId);
+    const receiverId = useUserChatStore((state) => state.receiverId);
+    const setReceiverId = useUserChatStore((state) => state.setReceiverId);
 
-    const { 
-        allUsers, 
-        currentUser, 
-        isUserProfileProcessing, 
-        receiverUserProfile 
-    } = useUserProfileService();
+    const showUserProfilePopUp = useUserStore((state) => state.showUserProfilePopUp);
 
-    const { 
-        allUserChats, 
-        clearAllUserChatsForMeMt, 
-        clearChosenUserChatForMeMt,
-        clearSelection, 
-        deleteAllUserChatsMt, 
-        deleteChosenUsersChatMt,
-        handleMediaPreview,
-        inputMediaRef,
-        isSelectMode,
-        isUserChatProcessing, 
-        media,
-        removeOnePreviewFile,
-        selectedIds,
-        sendChatToUserMt,
-        setIsSelectMode,
-        setShowDeleteOption1,
-        setShowDeleteOption2,
-        showDeleteOption1,
-        showDeleteOption2,
-        toggleSelect,
-        userChatMedia
-    } = useUserChatService();
-    
-    useSocketIo({
-        identifier: ["available-user", "user-chat", "user-profile"]
-    });
-
-    useEffect(() => {
-        const savedReceiverId = localStorage.getItem("receiver_id");
-        if (savedReceiverId && !receiverId) setReceiverId(savedReceiverId);
-    }, []); 
-
-    useEffect(() => {
-        if (receiverId) {
-            localStorage.setItem("receiver_id", receiverId);
-        } else {
-            localStorage.removeItem("receiver_id");
-        }
-    }, [receiverId]);
-
-    useEffect(() => {
-        const savedUserChatId = localStorage.getItem("chat_id");
-        if (savedUserChatId && !chatId) setChatId(savedUserChatId);
-    }, []); 
-
-    useEffect(() => {
-        if (chatId) {
-            localStorage.setItem("chat_id", chatId);
-        } else {
-            localStorage.removeItem("chat_id");
-        }
-    }, [chatId]);
+    const userChat = useUserChatService();
+    const userProfile = useUserProfileService();
 
     useEffect(() => {
         if (message) {
@@ -104,87 +51,74 @@ export default function Home() {
     return (
         <section className="flex md:flex-row p-2.5 gap-2.5 flex-col h-dvh relative z-10">
             {message ? <Alert message={message}/> : null}
-            <Navbar isProcessing={isUserChatProcessing || isUserProfileProcessing}/>
-            {showDeleteOption1 ? (
-                <UserChatDeleteOption1
-                    deleteAllUserChatsMt={deleteAllUserChatsMt}
-                    clearAllUserChatsForMeMt={clearAllUserChatsForMeMt}
-                    isProcessing={isUserChatProcessing || isUserProfileProcessing}
-                    setIsSelectMode={setIsSelectMode}
-                    setShowDeleteOption1={setShowDeleteOption1}
+            <Navbar isProcessing={userProfile.isProcessing || userChat.isProcessing}/>
+            {!openPopUpOption ? null : (
+                <PopUpOption
+                    isProcessing={userChat.isProcessing || userProfile.isProcessing}
+                    clearAll={userChat.clearAllMessagesMt}
+                    chosenMessageIds={chosenMessageIds}
+                    clearChosen={userChat.clearChosenMessagesMt}
+                    deleteAll={userChat.deleteAllMessagesMt}
+                    deleteChosen={userChat.deleteChosenMessagesMt}
                 />
-            ) : null}
-            {showDeleteOption2 ? (
-                <UserChatDeleteOption2
-                    clearChosenUserChatForMeMt={clearChosenUserChatForMeMt}
-                    clearSelection={clearSelection}
-                    deleteChosenUsersChatMt={deleteChosenUsersChatMt}
-                    isProcessing={isUserChatProcessing || isUserProfileProcessing}
-                    setIsSelectMode={setIsSelectMode}
-                    setShowDeleteOption2={setShowDeleteOption2}
-                />
-            ) : null}
+            )}
             <div className="md:w-2/5 w-full h-full flex flex-col px-2.5 inset-shadow-sm inset-shadow-gray-400 border border-gray-400 overflow-y-auto">
-                {allUsers.error ? (
+                {userProfile.showUsers.error ? (
                     <div className="flex justify-center items-center h-full">
                         <div className="text-gray-700 font-medium text-center">
-                            {allUsers.error.message}
+                            {userProfile.showUsers.error.message}
                         </div>
                     </div>
-                ) : allUsers.isLoading ? (
+                ) : userProfile.showUsers.isLoading ? (
                     <div className="flex justify-center items-center h-full">
                         <Loading/>
                     </div>
                 ) : (
                     <UserList 
-                        currentUserId={currentUser.data ? currentUser.data.user_id : ""}
-                        fetchNextUser={allUsers.fetchNextPage}
-                        hasNextPage={allUsers.hasNextPage}
-                        isProcessing={isUserChatProcessing || isUserProfileProcessing}
-                        isFetchingNextPage={allUsers.isFetchingNextPage}
+                        fetchNextUser={userProfile.showUsers.fetchNextPage}
+                        hasNextPage={userProfile.showUsers.hasNextPage}
+                        isProcessing={userProfile.isProcessing || userChat.isProcessing}
+                        isFetchingNextPage={userProfile.showUsers.isFetchingNextPage}
                         place={{ name: "user-list-home" }}
-                        setReceiverId={setReceiverId}
-                        users={allUsers.data ? allUsers.data.pages.flat() : []}
+                        users={userProfile.showUsers.data ? userProfile.showUsers.data.pages.flat() : []}
                     />
                 )}
             </div>
             {receiverId && receiverId !== "" ? (
-                <UserWindow
-                    chatId={chatId}
-                    clearSelection={clearSelection}
-                    currentUserId={currentUser.data ? currentUser.data.user_id : ""}
-                    errorProfile={receiverUserProfile.error}
-                    fetchNextUserChat={allUserChats.fetchNextPage}
-                    handleMediaPreview={handleMediaPreview}
-                    hasNextUserChat={allUserChats.hasNextPage}
-                    inputMediaRef={inputMediaRef}
-                    media={media}
-                    isFetchingNextUserChats={allUserChats.isFetchingNextPage}
-                    isProcessing={allUserChats.isLoading || isUserChatProcessing || isUserProfileProcessing}
-                    isProfileLoading={receiverUserProfile.isLoading}
-                    isUserChatProcessing={isUserChatProcessing}
-                    isSelectMode={isSelectMode}
-                    receiverId={receiverId}
-                    removeOnePreviewFile={removeOnePreviewFile}
-                    selectedIds={selectedIds}
-                    sendChatToUser={sendChatToUserMt}
-                    setChatId={setChatId}
-                    setIsSelectMode={setIsSelectMode}
-                    setReceiverId={setReceiverId}
-                    setShowDeleteOption1={setShowDeleteOption1}
-                    setShowDeleteOption2={setShowDeleteOption2}
-                    setShowUserMedia={setShowUserMedia}
-                    setShowUserProfile={setShowUserProfile}
-                    setText={setText}
-                    showUserMedia={showUserMedia}
-                    showUserProfile={showUserProfile}
-                    text={text}
-                    toggleSelect={toggleSelect}
-                    userChats={allUserChats.data ? allUserChats.data.pages.flatMap(page => page).reverse() : []}
-                    userChatError={allUserChats.error}
-                    userChatMedia={userChatMedia}
-                    userProfile={receiverUserProfile.data!}
-                />
+                <>
+                    {showUserChatPopUp ? (
+                        <UserChatPopUp isProcessing={false} 
+                            userChat={{
+                                data: [],
+                                error: null,
+                                fetchNextPage: userChat.showAllUserChats.fetchNextPage,
+                                hasNextPage: false,
+                                isFetchingNextPage: false,
+                                isLoading: false
+                            }} 
+                            userProfile={{
+                                error: null,
+                                image: "",
+                                image_public_id: "",
+                                isLoading: false,
+                                name: ""
+                            }}
+                        />
+                    ) : null}
+                    {showUserProfile ? (
+                        <UserProfilePopUp 
+                            _id={""} 
+                            address={""} 
+                            error={null} 
+                            gender={""} 
+                            isLoading={false} 
+                            image={""} 
+                            image_public_id={""} 
+                            name={""}
+                        />
+                    ) : null}
+                    {showUserMedia}
+                </>
             ) : (
                 <div 
                     className={cn(
