@@ -1,57 +1,57 @@
 import { MessageCircle } from "lucide-react";
-import cn from "../utils/cn";
+import UserChatFileList from "../user_chats/UserChatFileList";
 import Navbar from "../navbar/Navbar";
-import useUserChatService from "./service";
-import UserChatFileList from "./UserChatFileList";
+import cn from "../utils/cn";
 import { useNavigate, useParams } from "react-router-dom";
-import Loading from "../components/Loading";
-import { useUserChatStore } from "./store";
+import useGroupChatService from "./service";
+import { useGroupChatStore } from "./store";
 import { useEffect } from "react";
+import Loading from "../components/Loading";
 
-export default function UserChatFiles() {
+export default function GroupChatFiles() {
     const { chat_id } = useParams();
     const navigate = useNavigate();
-    
-    const receiverId = useUserChatStore((state) => state.receiverId);
-    const setChosenMessageId = useUserChatStore((state) => state.setChosenMessageId);
 
-    const userChat = useUserChatService();
+    const groupId = useGroupChatStore((state) => state.groupId);
+    const setGroupMessageId = useGroupChatStore((state) => state.setGroupMessageId);
+
+    const groupChat = useGroupChatService();
 
     useEffect(() => {
-        if (chat_id) setChosenMessageId(chat_id);
-    }, [chat_id, setChosenMessageId]);
+        if (chat_id) setGroupMessageId(chat_id);
+    }, [chat_id, setGroupMessageId]);
 
     return (
         <section className="h-dvh flex md:flex-row flex-col p-2.5 gap-2.5 relative z-10">
-            <Navbar isProcessing={userChat.isProcessing}/>
-            <main className="h-full flex flex-col w-full md:w-2/5 border border-gray-400 inset-shadow-sm inset-shadow-gray-400 overflow-y-auto">
+            <Navbar isProcessing={groupChat.isProcessing}/>
+            <div className="h-full flex flex-col w-full md:w-2/5 border border-gray-400 inset-shadow-sm inset-shadow-gray-400">
                 <div className="flex px-2.5 pt-2.5">
                     <button
                         className="cursor-pointer disabled:cursor-not-allowed font-medium text-gray-700 hover:text-gray-500 transition-colors"
-                        disabled={userChat.isProcessing}
-                        onClick={() => navigate(`/user/chat/${receiverId}`)}
+                        disabled={groupChat.isProcessing}
+                        onClick={() => navigate(`/rooms/chat/${groupId}`)}
                         type="button"
                     >
                         <MessageCircle size={22}/>
                     </button>
                 </div>
-                {userChat.showChosenMessageFiles.isLoading ? (
+                {groupChat.showFilesThatSentToGroup.error ? (
                     <div className="flex justify-center items-center h-full">
-                        <Loading/>
+                        <div className="text-gray-700 font-medium text-center">
+                            {groupChat.showFilesThatSentToGroup.error.message}
+                        </div>
                     </div>
-                ) : userChat.showChosenMessageFiles.error ? (
-                    <div className="flex justify-center items-center h-full">
-                        <div className="text-gray-700 text-2xl font-medium text-center">{userChat.showChosenMessageFiles.error.message}</div>
+                ) : groupChat.showAllGroupMessages.isLoading ? (
+                    <div className="flex justify-center items-center bg-white h-full">
+                        <Loading/>
                     </div>
                 ) : (
                     <UserChatFileList 
-                        files={userChat.showChosenMessageFiles.data? 
-                            userChat.showChosenMessageFiles.data.files : []
-                        } 
-                        isLoading={userChat.showChosenMessageFiles.isLoading}
+                        files={groupChat.showFilesThatSentToGroup.data ? groupChat.showFilesThatSentToGroup.data.files : []} 
+                        isLoading={groupChat.showFilesThatSentToGroup.isLoading}
                     />
                 )}
-            </main>
+            </div>
             <div 
                 className={cn(
                     "md:flex md:justify-center md:items-center md:h-full md:w-2/5", 

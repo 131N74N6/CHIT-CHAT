@@ -8,7 +8,8 @@ import { useGroupMemberStore } from "../group_member/store";
 
 export default function GroupDetailPopUp(props: IGroupProfileDetailPopUp) {
     const setShowGroupChatPopUp = useGroupChatStore((state) => state.setShowGroupChatPopUp);
-    const setFilesPopUp = useGroupChatStore((state) => state.setFilesPopUp);
+    const setShowGroupChatFilesPopUp = useGroupChatStore((state) => state.setShowGroupChatFilesPopUp);
+    const setShowGroupChatFilePreviewPopUp = useGroupChatStore((state) => state.setShowGroupChatFilePreviewPopUp);
 
     const setShowMemberPopUp = useGroupMemberStore((state) => state.setShowMemberPopUp);
     
@@ -35,14 +36,16 @@ export default function GroupDetailPopUp(props: IGroupProfileDetailPopUp) {
         setShowGroupChatPopUp(true);
         setShowMemberPopUp(false);
         setShowProfile(false);
-        setFilesPopUp(false);
+        setShowGroupChatFilesPopUp(false);
+        setShowGroupChatFilePreviewPopUp(false);
     }
 
     const seeGroupMember = () => {
         setShowGroupChatPopUp(false);
         setShowMemberPopUp(true);
         setShowProfile(false);
-        setFilesPopUp(false);
+        setShowGroupChatFilesPopUp(false);
+        setShowGroupChatFilePreviewPopUp(false);
     }
 
     return (

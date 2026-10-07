@@ -1,6 +1,6 @@
 import { MessageCircle } from "lucide-react";
 import Loading from "./Loading";
-import FileDetail from "./FileDetail";
+import FileDetail from "../user_chats/UserChatFileList";
 import type { IUserMediaDetailWindow } from "../models/chat.model";
 
 export default function UserMediaDetailWindow(props: IUserMediaDetailWindow) {

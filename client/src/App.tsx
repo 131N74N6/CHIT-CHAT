@@ -3,8 +3,8 @@ import Chatbot from "./chatbot/Chatbot";
 import CreateGroup from "./group_profiles/CreateGroup";
 import Home from "./user_profiles/Home";
 import JoinGroup from "./group_member/JoinGroup";
-import RoomMediaDetail from "./pages/RoomMediaDetail";
-import RoomMediaPreview from "./pages/RoomMediaPreview";
+import GroupChatFiles from "./group_chats/GroupChatFiles";
+import GroupChatFilesPreview from "./group_chats/GroupChatFilesPreview";
 import ProtectedRoute from "./auths/ProtectedRoute";
 import GroupChat from "./group_chats/GroupChat";
 import GroupMember from "./group_member/GroupMember";
@@ -12,21 +12,14 @@ import GroupDetail from "./group_profiles/GroupDetail";
 import SignIn from "./auths/SignIn";
 import SignUp from "./auths/SignUp";
 import UserChat from "./user_chats/UserChat";
-import UserMediaDetail from "./user_chats/UserMediaDetail";
-import UserMediaPreview from "./user_chats/UserMediaPreview";
+import UserChatFiles from "./user_chats/UserChatFiles";
+import UserChatFilesPreview from "./user_chats/UserChatFilesPreview";
 import UserProfile from "./user_profiles/UserProfile";
 import YourProfile from "./auths/YourProfile";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
-const queryClient = new QueryClient({
-    defaultOptions: {
-        queries: {
-            refetchOnMount: false,
-            refetchOnWindowFocus: false
-        }
-    }
-});
+const queryClient = new QueryClient();
 
 export default function App() {
     return (
@@ -39,15 +32,15 @@ export default function App() {
                     <Route element={<ProtectedRoute><Home/></ProtectedRoute>} path="/home"/>
                     <Route element={<ProtectedRoute><YourProfile/></ProtectedRoute>} path="/profile"/>
                     <Route element={<ProtectedRoute><UserChat/></ProtectedRoute>} path="/user/chat/:receiver_id"/>
-                    <Route element={<ProtectedRoute><UserMediaPreview/></ProtectedRoute>} path="/user/chat/preview/:receiver_id"/>
-                    <Route element={<ProtectedRoute><UserMediaDetail/></ProtectedRoute>} path="/user/media/detail/:chat_id"/>
+                    <Route element={<ProtectedRoute><UserChatFilesPreview/></ProtectedRoute>} path="/user/chat/preview/:receiver_id"/>
+                    <Route element={<ProtectedRoute><UserChatFiles/></ProtectedRoute>} path="/user/media/detail/:chat_id"/>
                     <Route element={<ProtectedRoute><UserProfile/></ProtectedRoute>} path="/user/profile/:receiver_id"/>
                     <Route element={<ProtectedRoute><AvailableGroup/></ProtectedRoute>} path="/rooms"/>
                     <Route element={<ProtectedRoute><CreateGroup/></ProtectedRoute>} path="/rooms/create"/>
                     <Route element={<ProtectedRoute><JoinGroup/></ProtectedRoute>} path="/rooms/join"/>
                     <Route element={<ProtectedRoute><GroupChat/></ProtectedRoute>} path="/rooms/chat/:room_id"/>
-                    <Route element={<ProtectedRoute><RoomMediaPreview/></ProtectedRoute>} path="/room/chat/preview/:room_id"/>
-                    <Route element={<ProtectedRoute><RoomMediaDetail/></ProtectedRoute>} path="/room/media/detail/:chat_id"/>
+                    <Route element={<ProtectedRoute><GroupChatFilesPreview/></ProtectedRoute>} path="/room/chat/preview/:room_id"/>
+                    <Route element={<ProtectedRoute><GroupChatFiles/></ProtectedRoute>} path="/room/media/detail/:chat_id"/>
                     <Route element={<ProtectedRoute><GroupDetail/></ProtectedRoute>} path="/rooms/profile/:room_id"/>
                     <Route element={<ProtectedRoute><GroupMember/></ProtectedRoute>} path="/rooms/member/:room_id"/>
                     <Route element={<ProtectedRoute><Chatbot/></ProtectedRoute>} path="/chatbot"/>

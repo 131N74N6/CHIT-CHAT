@@ -1,7 +1,7 @@
 import { BrushCleaning, CheckCircle, Eraser, MessageCircle, SendIcon, X } from "lucide-react";
 import useChatbotService from "./service";
 import cn from "../utils/cn";
-import Navbar from "../components/Navbar";
+import Navbar from "../navbar/Navbar";
 import { useEffect } from "react";
 import { useMessageStore } from "../stores/message.store";
 import Alert from "../components/Alert";

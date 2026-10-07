@@ -10,10 +10,10 @@ import type { IGroupChatPopUp } from "./model";
 
 export default function GroupChatPopUp(props: IGroupChatPopUp) {
     const setOpenPopUpOption = useGroupChatStore((state) => state.setOpenPopUpOption);
-    const setShowProfile = useGroupProfileStore((state) => state.setShowProfile);
-
     const setShowGroupChatPopUp = useGroupChatStore((state) => state.setShowGroupChatPopUp);
-    const setFilesPopUp = useGroupChatStore((state) => state.setFilesPopUp);
+    
+    const setShowGroupChatFilesPopUp = useGroupChatStore((state) => state.setShowGroupChatFilesPopUp);
+    const setShowGroupChatFilePreviewPopUp = useGroupChatStore((state) => state.setShowGroupChatFilePreviewPopUp);
     
     const groupMessage = useGroupChatStore((state) => state.groupMessage);
     const setGroupMessage = useGroupChatStore((state) => state.setGroupMessage);
@@ -23,10 +23,11 @@ export default function GroupChatPopUp(props: IGroupChatPopUp) {
     
     const selectMode = useGroupChatStore((state) => state.selectMode);
     const setSelectMode = useGroupChatStore((state) => state.setSelectMode);
-    
     const resetChosenMessageIdsFromGroup = useGroupChatStore((state) => state.resetChosenMessageIdsFromGroup);
     
     const setShowMemberPopUp = useGroupMemberStore((state) => state.setShowMemberPopUp);
+
+    const setShowProfile = useGroupProfileStore((state) => state.setShowProfile);
 
     const groupChat = useGroupChatService();
     const groupProfile = useGroupProfileService();
@@ -55,21 +56,24 @@ export default function GroupChatPopUp(props: IGroupChatPopUp) {
         setShowGroupChatPopUp(false);
         setShowMemberPopUp(false);
         setShowProfile(false);
-        setFilesPopUp(false);
+        setShowGroupChatFilesPopUp(false);
+        setShowGroupChatFilePreviewPopUp(false);
     }
 
     const seeProfileGroup = () => {
         setShowGroupChatPopUp(false);
         setShowMemberPopUp(false);
         setShowProfile(true);
-        setFilesPopUp(false);
+        setShowGroupChatFilesPopUp(false);
+        setShowGroupChatFilePreviewPopUp(false);
     }
 
-    const seeFiles = () => {
+    const seeFilePreview = () => {
         setShowGroupChatPopUp(false);
         setShowMemberPopUp(false);
         setShowProfile(false);
-        setFilesPopUp(true);
+        setShowGroupChatFilesPopUp(false);
+        setShowGroupChatFilePreviewPopUp(true);
     }
     
     return (
@@ -161,7 +165,7 @@ export default function GroupChatPopUp(props: IGroupChatPopUp) {
                         <button 
                             className="text-blue-500 font-medium cursor-pointer disabled:cursor-not-allowed"
                             disabled={groupChat.isProcessing || groupProfile.isProcessing}
-                            onClick={seeFiles}
+                            onClick={seeFilePreview}
                             type="button"
                         >
                             <File size={22}/>

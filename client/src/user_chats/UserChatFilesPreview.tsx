@@ -1,101 +1,88 @@
-import Navbar from "../components/Navbar";
-import useRoomChatService from "../services/useRoomChatService";
+import { MessageCircle, FilesIcon, SendIcon, X } from "lucide-react";
+import FileViewer from "../components/FileViewer";
+import cn from "../utils/cn";
+import Navbar from "../navbar/Navbar";
+import useUserChatService from "./service";
 import { useMessageStore } from "../stores/message.store";
 import { useEffect } from "react";
-import { FilesIcon, MessageCircle, SendIcon, X } from "lucide-react";
-import cn from "../utils/cn";
-import FileViewer from "../components/FileViewer";
+import { useUserChatStore } from "./store";
+import { useNavigate, useParams } from "react-router-dom";
 import Alert from "../components/Alert";
-import { useNavigate } from "react-router-dom";
-import { useRoomStore } from "../stores/room.store";
 
-export default function RoomMediaPreview() {
+export default function UserChatFilesPreview() {
+    const { receiver_id } = useParams();
     const navigate = useNavigate();
-    const roomId = useRoomStore((state) => state.roomId);
-    const setRoomId = useRoomStore((state) => state.setRoomId);
+
+    const receiverId = useUserChatStore((state) => state.receiverId);
+    const setReceiverId = useUserChatStore((state) => state.setReceiverId);
+
+    const text = useUserChatStore((state) => state.text);
+    const setText = useUserChatStore((state) => state.setText);
+
+    const chosenFiles = useUserChatStore((state) => state.chosenFiles);
+    const removeOneFile = useUserChatStore((state) => state.removeOneFile);
     
     const message = useMessageStore((state) => state.message);
     const setMessage = useMessageStore((state) => state.setMessage);
 
-    const { 
-        handleMediaPreview, 
-        inputMediaRef, 
-        isRoomChatProcessing,
-        media,
-        removeOnePreviewFile,
-        sendChatToRoomMt,
-        setText,
-        text 
-    } = useRoomChatService();
+    const userChat = useUserChatService();
 
     useEffect(() => {
         if (message) {
-            const timer = setTimeout(() => {
-                setMessage(null);
-            }, 1500);
-
+            const timer = setTimeout(() => setMessage(null), 1500);
             return () => clearTimeout(timer);
         }
     }, [message, setMessage]);
 
     useEffect(() => {
-        const savedRoomId = localStorage.getItem("room_id");
-        if (savedRoomId && !roomId) setRoomId(savedRoomId);
-    }, []);
-
-    useEffect(() => {
-        if (roomId) {
-            localStorage.setItem("room_id", roomId);
-        } else {
-            localStorage.removeItem("room_id");
-        }
-    }, [roomId]);
+        if (receiver_id) setReceiverId(receiver_id);
+    }, [receiver_id, setReceiverId]);
 
     return (
         <section className="flex md:flex-row flex-col h-dvh gap-2.5 p-2.5 relative z-10">
             {message ? <Alert message={message}/> : null}
-            <Navbar isProcessing={isRoomChatProcessing}/>
+            <Navbar isProcessing={userChat.isProcessing}/>
             <form 
-                className="flex flex-col h-full gap-2.5 p-2.5 md:w-2/5 w-full inset-shadow-sm inset-shadow-gray-400 border border-gray-400"
+                className="flex flex-col h-full gap-2.5 p-2.5 md:w-2/5 w-full inset-shadow-sm inset-shadow-gray-400 border border-gray-400 overflow-y-auto"
                 onSubmit={(event: React.SubmitEvent<HTMLFormElement>) => {
                     event.preventDefault();
-                    sendChatToRoomMt.mutate();
+                    userChat.sendMessageMt.mutate();
                 }}
             >
                 <input
                     className="hidden"
-                    id="room-file"
+                    id="user-chat-file"
                     multiple
-                    name="room-file"
-                    onChange={handleMediaPreview}
-                    ref={inputMediaRef}
+                    name="user-chat-file"
+                    onChange={userChat.handleMediaPreview}
+                    ref={userChat.inputMediaRef}
                     type="file"
                 />
                 <div 
                     className="border border-dashed cursor-pointer border-gray-600 h-[80%] overflow-y-auto" 
-                    onClick={() => inputMediaRef.current?.click()}
+                    onClick={() => userChat.inputMediaRef.current?.click()}
                 >
-                    {media.length > 0 ? (
+                    {chosenFiles.length > 0 ? (
                         <div className="rounded p-2 grid gap-2 md:grid-cols-3 sm:grid-cols-2 grid-cols-1">
-                            {media.map((media, index) => {
+                            {chosenFiles.map((chosenFile, index) => {
                                 return (
                                     <div className=" relative group">
                                         <FileViewer
-                                            file={media.file}
-                                            fileName={media.fileName}
-                                            fileType={media.fileType}
+                                            file={chosenFile.file}
+                                            fileName={chosenFile.file_type}
+                                            fileType={chosenFile.file_type}
                                             key={`file-in-room-${index}`}
-                                            previewUrl={media.previewUrl}
+                                            previewUrl={chosenFile.url}
                                         />
                                         <button
                                             className={cn(
                                                 "transition-opacity duration-300 ease-in-out cursor-pointer absolute top-1 right-1", 
                                                 "text-white font-medium bg-red-600 w-6 h-6 rounded-full flex justify-center items-center"
                                             )}
-                                            disabled={isRoomChatProcessing}
+                                            disabled={userChat.isProcessing}
                                             onClick={(event) => {
                                                 event.stopPropagation();
-                                                removeOnePreviewFile(media.fileName)
+                                                removeOneFile(chosenFile.file_type)
                                             }}
                                             type="button"
                                         >
@@ -126,15 +113,15 @@ export default function RoomMediaPreview() {
                         <div className="flex flex-col gap-2.5">
                             <button
                                 className="text-blue-500 font-medium cursor-pointer disabled:cursor-not-allowed"
-                                disabled={isRoomChatProcessing}
+                                disabled={userChat.isProcessing}
                                 type="submit"
                             >
                                 <SendIcon size={22}/>
                             </button>
                             <button 
                                 className="text-blue-500 font-medium cursor-pointer disabled:cursor-not-allowed"
-                                disabled={isRoomChatProcessing}
-                                onClick={() => navigate(`/rooms/chat/${roomId}`)}
+                                disabled={userChat.isProcessing}
+                                onClick={() => navigate(`/user/chat/${receiverId}`)}
                                 type="button"
                             >
                                 <MessageCircle size={22}/>

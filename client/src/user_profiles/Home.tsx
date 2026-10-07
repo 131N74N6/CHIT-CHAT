@@ -1,5 +1,5 @@
 import Loading from "../components/Loading";
-import Navbar from "../components/Navbar";
+import Navbar from "../navbar/Navbar";
 import useUserChatService from "../user_chats/service";
 import UserList from "./UserList";
 import useUserProfileService from "./service";
@@ -11,16 +11,14 @@ import Alert from "../components/Alert";
 import PopUpOption from "../user_chats/PopUpOption";
 import { useUserStore } from "./store";
 import UserChatPopUp from "../user_chats/UserChatPopUp";
-import type { FetchNextPageOptions, InfiniteQueryObserverResult, InfiniteData } from "@tanstack/react-query";
 import cn from "../utils/cn";
 import UserProfilePopUp from "./UserProfilePopUp";
+import UserChatFilesPreviewPopUp from "../user_chats/UserChatFilesPreviewPopUp";
+import UserChatFilesPopUp from "../user_chats/UserChatFilesPopUp";
 
 export default function Home() {
     const message = useMessageStore((state) => state.message);
     const setMessage = useMessageStore((state) => state.setMessage);
-    
-    const showUserProfile = useUserChatStore((state) => state.showUserProfile);
-    const setShowUserProfile = useUserChatStore((state) => state.setShowUserProfile);
 
     const openPopUpOption = useUserChatStore((state) => state.openPopUpOption);
     const chosenMessageIds = useUserChatStore((state) => state.chosenMessageIds);
@@ -30,11 +28,7 @@ export default function Home() {
     const showUserMedia = useUserChatStore((state) => state.showUserMedia);
     const showUserChatFilesPopUp = useUserChatStore((state) => state.showUserChatFilesPopUp);
     
-    const text = useUserChatStore((state) => state.text);
-    const setText = useUserChatStore((state) => state.setText);
-    
     const receiverId = useUserChatStore((state) => state.receiverId);
-    const setReceiverId = useUserChatStore((state) => state.setReceiverId);
 
     const showUserProfilePopUp = useUserStore((state) => state.showUserProfilePopUp);
 
@@ -87,37 +81,54 @@ export default function Home() {
             {receiverId && receiverId !== "" ? (
                 <>
                     {showUserChatPopUp ? (
-                        <UserChatPopUp isProcessing={false} 
+                        <UserChatPopUp isProcessing={userChat.isProcessing || userProfile.isProcessing} 
                             userChat={{
-                                data: [],
-                                error: null,
+                                data: userChat.showAllUserChats.data ? 
+                                userChat.showAllUserChats.data.pages.flatMap(page => page).reverse() : [],
+
+                                error: userChat.showAllUserChats.error,
                                 fetchNextPage: userChat.showAllUserChats.fetchNextPage,
-                                hasNextPage: false,
-                                isFetchingNextPage: false,
-                                isLoading: false
+                                hasNextPage: userChat.showAllUserChats.hasNextPage,
+                                isFetchingNextPage: userChat.showAllUserChats.isFetchingNextPage,
+                                isLoading: userChat.showAllUserChats.isLoading
                             }} 
                             userProfile={{
-                                error: null,
-                                image: "",
-                                image_public_id: "",
-                                isLoading: false,
-                                name: ""
+                                error: userProfile.showOtherUser.error,
+                                image: userProfile.showOtherUser.data ? userProfile.showOtherUser.data.image : "-",
+                                image_public_id: userProfile.showOtherUser.data ? userProfile.showOtherUser.data.image_public_id : "-",
+                                isLoading: userProfile.showOtherUser.isLoading,
+                                name: userProfile.showOtherUser.data ? userProfile.showOtherUser.data.name : "-"
                             }}
                         />
                     ) : null}
-                    {showUserProfile ? (
+                    {showUserProfilePopUp ? (
                         <UserProfilePopUp 
-                            _id={""} 
-                            address={""} 
-                            error={null} 
-                            gender={""} 
-                            isLoading={false} 
-                            image={""} 
-                            image_public_id={""} 
-                            name={""}
+                            _id={userProfile.showOtherUser.data ? userProfile.showOtherUser.data._id : "-"}
+                            address={userProfile.showOtherUser.data ? userProfile.showOtherUser.data.address : "-"}
+                            description={userProfile.showOtherUser.data ? userProfile.showOtherUser.data.description : "-"}
+                            error={userProfile.showOtherUser.error}
+                            gender={userProfile.showOtherUser.data ? userProfile.showOtherUser.data.gender : "-"}
+                            isLoading={userProfile.showOtherUser.isLoading}
+                            image={userProfile.showOtherUser.data ? userProfile.showOtherUser.data.image : "-"}
+                            image_public_id={userProfile.showOtherUser.data ? userProfile.showOtherUser.data.image_public_id : "-"}
+                            name={userProfile.showOtherUser.data ? userProfile.showOtherUser.data.name : "-"} 
                         />
                     ) : null}
-                    {showUserMedia}
+                    {showUserMedia ? (
+                        <UserChatFilesPreviewPopUp 
+                            handleMediaPreview={userChat.handleMediaPreview} 
+                            isProcessing={userChat.isProcessing || userProfile.isProcessing} 
+                            inputMediaRef={userChat.inputMediaRef} 
+                            sendMessageMt={userChat.sendMessageMt}
+                        />
+                    ) : null}
+                    {showUserChatFilesPopUp ? (
+                        <UserChatFilesPopUp 
+                            error={userChat.showChosenMessageFiles.error} 
+                            files={userChat.showChosenMessageFiles.data ? userChat.showChosenMessageFiles.data.files : []} 
+                            isProcessing={userChat.isProcessing || userProfile.isProcessing} 
+                            isLoading={userChat.showChosenMessageFiles.isLoading}/>
+                    ) : null}
                 </>
             ) : (
                 <div 

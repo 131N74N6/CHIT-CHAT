@@ -1,23 +1,26 @@
-import { ArrowLeft, MessageCircle } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import Loading from "../components/Loading";
 import { useGroupChatStore } from "../group_chats/store";
 import UserList from "../user_profiles/UserList";
 import { useGroupMemberStore } from "./store";
 import { useGroupProfileStore } from "../group_profiles/store";
-import cn from "../utils/cn";
 import type { IGroupMemberPopUp } from "./model";
 
 export default function GroupMemberPopUp(props: IGroupMemberPopUp) {
     const setShowGroupChatPopUp = useGroupChatStore((state) => state.setShowGroupChatPopUp);
-    const setFilesPopUp = useGroupChatStore((state) => state.setFilesPopUp);
+    const setShowGroupChatFilesPopUp = useGroupChatStore((state) => state.setShowGroupChatFilesPopUp);
+
+    const setShowGroupChatFilePreviewPopUp = useGroupChatStore((state) => state.setShowGroupChatFilePreviewPopUp);
     const setShowMemberPopUp = useGroupMemberStore((state) => state.setShowMemberPopUp);
+
     const setShowProfile = useGroupProfileStore((state) => state.setShowProfile);
 
     const seeProfileGroup = () => {
         setShowGroupChatPopUp(false);
         setShowMemberPopUp(false);
         setShowProfile(true);
-        setFilesPopUp(false);
+        setShowGroupChatFilesPopUp(false);
+        setShowGroupChatFilePreviewPopUp(false);
     }
 
     return (
@@ -62,22 +65,6 @@ export default function GroupMemberPopUp(props: IGroupMemberPopUp) {
                         users={props.groupMembers.data}
                     />
                 )}
-            </div>
-            <div 
-                className={cn(
-                    "md:flex md:justify-center md:items-center md:h-full md:w-2/5", 
-                    "md:bg-white hidden inset-shadow-sm inset-shadow-gray-400",
-                    "border border-gray-400"
-                )}
-            >
-                <div className="flex flex-col gap-2">
-                    <div className="text-gray-500 font-medium flex justify-center">
-                        <MessageCircle size={34}/>
-                    </div>
-                    <div className="text-gray-700 font-medium text-center">
-                        Welcome to Chit Chat
-                    </div>
-                </div>
             </div>
         </section>
     );

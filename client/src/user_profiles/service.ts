@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useRoomStore } from "../stores/room.store";
 import { useUserChatStore } from "../user_chats/store";
 import { useUserStore } from "./store";
-import { useNavbarStore } from "../stores/navbar.store";
+import { useNavbarStore } from "../navbar/navbar.store";
 import { useRef } from "react";
 import { useMessageStore } from "../stores/message.store";
 import { apiRequest, apiUpload } from "../api";

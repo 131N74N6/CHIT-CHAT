@@ -34,6 +34,11 @@ export const useGroupChatStore = create<IGroupChatState>()(persist((set) => ({
     openPopUpOption: false,
     setOpenPopUpOption: (openPopUpOption) => set({ openPopUpOption }),
 
+
+    removeOneFile: (filename) => set((state) => ({
+        chosenFiles: state.chosenFiles.filter((chosenFile) => chosenFile.file_name !== filename)
+    })),
+    
     resetGroupMessageState: () => set({
         chosenFiles: [],
         chosenMessageFromGroup: null,
@@ -45,8 +50,8 @@ export const useGroupChatStore = create<IGroupChatState>()(persist((set) => ({
         openPopUpOption: false,
         selectMode: false,
         showGroupChatPopUp: false,
-        showFilesPopUp: false,
-        showFilePreviewPopUp: false,
+        showGroupChatFilesPopUp: false,
+        showGroupChatFilePreviewPopUp: false,
     }),
 
     selectMode: false,
@@ -55,11 +60,11 @@ export const useGroupChatStore = create<IGroupChatState>()(persist((set) => ({
     showGroupChatPopUp: false,
     setShowGroupChatPopUp: (showGroupChatPopUp) => set({ showGroupChatPopUp }),
 
-    showFilesPopUp: false,
-    setFilesPopUp: (showFilesPopUp) => set({ showFilesPopUp }),
+    showGroupChatFilesPopUp: false,
+    setShowGroupChatFilesPopUp: (showGroupChatFilesPopUp) => set({ showGroupChatFilesPopUp }),
 
-    showFilePreviewPopUp: false,
-    setFilePreviewPopUp: (showFilePreviewPopUp: boolean) => set({ showFilePreviewPopUp })
+    showGroupChatFilePreviewPopUp: false,
+    setShowGroupChatFilePreviewPopUp: (showGroupChatFilePreviewPopUp: boolean) => set({ showGroupChatFilePreviewPopUp })
 }), {
     name: "group_chats",
     partialize: (state: IGroupChatState) => ({ 

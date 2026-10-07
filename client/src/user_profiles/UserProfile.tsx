@@ -1,31 +1,58 @@
 import useUserProfileService from "./service";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useMessageStore } from "../stores/message.store";
 import { useEffect } from "react";
 import Alert from "../components/Alert";
 import Loading from "../components/Loading";
 import cn from "../utils/cn";
-import Navbar from "../components/Navbar";
-import { ArrowBigLeft, MessageCircle } from "lucide-react";
+import Navbar from "../navbar/Navbar";
+import { ArrowBigLeft, MessageCircle, X } from "lucide-react";
 import { useUserChatStore } from "../user_chats/store";
+import { useUserStore } from "./store";
 
 export default function UserProfile() {
+    const { receiver_id } = useParams();
     const navigate = useNavigate();
+    
     const receiverId = useUserChatStore((state) => state.receiverId);
-
+    const setReceiverId = useUserChatStore((state) => state.setReceiverId);
+    
     const message = useMessageStore((state) => state.message);
     const setMessage = useMessageStore((state) => state.setMessage);
+
+    const editMode = useUserStore((state) => state.editMode);
+    
+    const setAddress = useUserStore((state) => state.setAddress);
+    const setDescription = useUserStore((state) => state.setDescription);
+    const setGender = useUserStore((state) => state.setGender);
+    const setUserName = useUserStore((state) => state.setUserName);
 
     const userProfile = useUserProfileService();
     
     useEffect(() => {
         if (message) {
-            const timer = setTimeout(() => {
-                setMessage(null);
-            }, 1500);
+            const timer = setTimeout(() => setMessage(null), 1500);
             return () => clearTimeout(timer);
         }
     }, [message, setMessage]);
+
+    useEffect(() => {
+        if (editMode && userProfile.showOtherUser.data) {
+            setAddress(userProfile.showOtherUser.data.address || "-")
+            setDescription(userProfile.showOtherUser.data.description || "-");
+            setGender(userProfile.showOtherUser.data.gender || "-");
+            setUserName(userProfile.showOtherUser.data.name || "-");
+        } else {
+            setAddress("");
+            setDescription("");
+            setGender("");
+            setUserName("");
+        }
+    }, [editMode, receiverId, userProfile.showOtherUser.data]);
+
+    useEffect(() => {
+        if (receiver_id) setReceiverId(receiver_id);
+    }, [receiver_id, setReceiverId]);
 
     return (
         <section className="flex md:flex-row gap-2.5 p-2.5 flex-col relative h-dvh z-10">
@@ -40,6 +67,72 @@ export default function UserProfile() {
                     <div className="flex justify-center items-center h-full">
                         <div className="text-center font-medium text-4xl text-gray-800">
                             {userProfile.showOtherUser.error.message}
+                        </div>
+                    </div>
+                ) : editMode ? (
+                    <form 
+                        className="flex flex-col h-full p-2.5 gap-3 overflow-y-auto" 
+                        onSubmit={(event: React.SubmitEvent<HTMLFormElement>) => {
+                            event.preventDefault();
+                            userProfile.changeUserMt.mutate();
+                        }}
+                    >
+                        <input
+                            className="hidden"
+                            onChange={handleImagePreview}
+                            ref={fileInputRef}
+                            type="file"
+                        />
+                        <div className="flex justify-center">
+                            <div className="w-20 h-20 rounded-full">
+                                {selectedProfileRoom && selectedProfileRoomUrl ? (
+                                    <div className="w-full h-full relative group">
+                                        <img
+                                            alt={`room-img-${Date.now()}`}
+                                            className="w-full h-full object-cover rounded-full" 
+                                            src={selectedProfileRoomUrl}
+                                        />
+                                        <button
+                                            className={cn(
+                                                "font-medium w-8 h-8 rounded-full bg-red-600 text-white opacity-0 cursor-pointer",
+                                                "disabled:cursor-not-allowed group-hover:opacity-100 duration-300 transition-opacity",
+                                                "flex justify-center items-center p-1.5 absolute top-1 left-[46%]"
+                                            )}
+                                            disabled={isUserProfileProcessing || isRoomProfileProcessing}
+                                            onClick={(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+                                                event.stopPropagation();
+                                                if (selectedProfileRoomUrl) URL.revokeObjectURL(selectedProfileRoomUrl);
+                                                setSelectedProfileRoom(null);
+                                                setSelectedProfileRoomUrl(null);
+                                            }}
+                                            type="button"
+                                        >
+                                            <X size={1}/>
+                                        </button>
+                                    </div>
+                            ) : oldRoomPicture ? (
+                                <div className="w-full h-full relative group">
+                                    <img
+                                        alt={oldRoomPicture.public_id}
+                                        className="w-full h-full object-cover rounded-full" 
+                                        src={oldRoomPicture.url}
+                                    />
+                            <button
+                                className={cn(
+                                    "font-medium w-8 h-8 rounded-full bg-red-600 text-white opacity-0 cursor-pointer",
+                                    "disabled:cursor-not-allowed group-hover:opacity-100 duration-300 transition-opacity",
+                                    "flex justify-center items-center p-1.5 absolute top-1 left-[46%]"
+                                )}
+                                disabled={isUserProfileProcessing || isRoomProfileProcessing}
+                                onClick={(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+                                    event.stopPropagation();
+                                    setDeleteRoomImage(oldRoomPicture);
+                                    setOldRoomPicture(null);
+                                }}
+                                type="button"
+                            >
+                                <X size={1}/>
+                            </button>
                         </div>
                     </div>
                 ) : (
@@ -104,22 +197,6 @@ export default function UserProfile() {
                         </div>
                     </div>
                 )}
-            </div>
-            <div 
-                className={cn(
-                    "md:flex md:justify-center md:items-center md:h-full md:w-2/5", 
-                    "md:bg-white hidden inset-shadow-sm inset-shadow-gray-400",
-                    "border border-gray-400"
-                )}
-            >
-                <div className="flex flex-col gap-2">
-                    <div className="text-gray-500 font-medium flex justify-center">
-                        <MessageCircle size={34}/>
-                    </div>
-                    <div className="text-gray-700 font-medium text-center">
-                        Welcome to Chit Chat
-                    </div>
-                </div>
             </div>
         </section>
     );

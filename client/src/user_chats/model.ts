@@ -33,6 +33,19 @@ export interface IUserChatFiles {
         size: number;
         url: string;
     }[];
+    isLoading: boolean;
+}
+
+export interface IUserChatFile {
+    message_file: {
+        file_name: string;
+        file_type: string;
+        public_id: string;
+        resource_type: string;
+        size: number;
+        url: string;
+    };
+    isLoading: boolean;
 }
 
 export interface IFilePreview {
@@ -59,6 +72,7 @@ export interface IUserChatState {
     receiverId: string;
     setReceiverId: (receiverId: string) => void;
 
+    removeOneFile: (filename: string) => void;
     resetChatState: () => void;
     
     showUserChatFilesPopUp: boolean;
@@ -106,4 +120,25 @@ export interface IUserChatPopUp {
         isLoading: boolean;
         name: string;
     }
+}
+
+export interface IUserChatFilesPreviewPopUp {
+    handleMediaPreview: (event: React.ChangeEvent<HTMLInputElement, Element>) => void;
+    isProcessing: boolean;
+    inputMediaRef: React.RefObject<HTMLInputElement | null>;
+    sendMessageMt: UseMutationResult<void, Error, void, unknown>
+}
+
+export interface IUserChatFilesPopUp {
+    error: Error | null;
+    files: {
+        file_name: string;
+        file_type: string;
+        public_id: string;
+        resource_type: string;
+        size: number;
+        url: string;
+    }[];
+    isProcessing: boolean;
+    isLoading: boolean;
 }

@@ -1,98 +1,72 @@
 import { MessageCircle, FilesIcon, SendIcon, X } from "lucide-react";
 import FileViewer from "../components/FileViewer";
 import cn from "../utils/cn";
-import Navbar from "../components/Navbar";
-import useUserChatService from "./service";
-import { useMessageStore } from "../stores/message.store";
-import { useEffect } from "react";
-import { useChatStore } from "./store";
-import { useNavigate } from "react-router-dom";
-import Alert from "../components/Alert";
+import { useUserChatStore } from "./store";
+import type { IUserChatFilesPreviewPopUp } from "./model";
+import { useUserStore } from "../user_profiles/store";
 
-export default function UserMediaPreview() {
-    const navigate = useNavigate();
-    const receiverId = useChatStore((state) => state.receiverId);
-    const setReceiverId = useChatStore((state) => state.setReceiverId);
+export default function UserChatFilesPreviewPopUp(props: IUserChatFilesPreviewPopUp) {
+    const text = useUserChatStore((state) => state.text);
+    const setText = useUserChatStore((state) => state.setText);
+
+    const chosenFiles = useUserChatStore((state) => state.chosenFiles);
+    const removeOneFile = useUserChatStore((state) => state.removeOneFile);
     
-    const message = useMessageStore((state) => state.message);
-    const setMessage = useMessageStore((state) => state.setMessage);
+    const setShowUserChatPopUp = useUserChatStore((state) => state.setShowUserChatPopUp);
+    const setShowUserChatFilesPopUp = useUserChatStore((state) => state.setShowUserChatFilesPopUp);
+    const setShowUserMedia = useUserChatStore((state) => state.setShowUserMedia);
+    const setShowUserProfilePopUp = useUserStore((state) => state.setShowUserProfilePopUp);
 
-    const { 
-        handleMediaPreview, 
-        inputMediaRef, 
-        isUserChatProcessing,
-        media,
-        sendChatToUserMt,
-        removeOnePreviewFile,
-        setText,
-        text 
-    } = useUserChatService();
-
-    useEffect(() => {
-        const savedReceiverId = localStorage.getItem("receiver_id");
-        if (savedReceiverId && !receiverId) setReceiverId(savedReceiverId);
-    }, []); 
-
-    useEffect(() => {
-        if (receiverId) {
-            localStorage.setItem("receiver_id", receiverId);
-        } else {
-            localStorage.removeItem("receiver_id");
-        }
-    }, [receiverId]);
-
-    useEffect(() => {
-        if (message) {
-            const timer = setTimeout(() => setMessage(null), 1500);
-            return () => clearTimeout(timer);
-        }
-    }, [message, setMessage]);
+    const seeUserChat = () => {
+        setShowUserMedia(false);
+        setShowUserChatPopUp(true);
+        setShowUserChatFilesPopUp(false);
+        setShowUserProfilePopUp(false);
+    }
 
     return (
-        <section className="flex md:flex-row flex-col h-dvh gap-2.5 p-2.5 relative z-10">
-            {message ? <Alert message={message}/> : null}
-            <Navbar isProcessing={isUserChatProcessing}/>
+        <section className="h-full overflow-y-auto p-2.5 md:flex hidden flex-col w-full md:w-2/5">
             <form 
                 className="flex flex-col h-full gap-2.5 p-2.5 md:w-2/5 w-full inset-shadow-sm inset-shadow-gray-400 border border-gray-400 overflow-y-auto"
                 onSubmit={(event: React.SubmitEvent<HTMLFormElement>) => {
                     event.preventDefault();
-                    sendChatToUserMt.mutate();
+                    props.sendMessageMt.mutate();
                 }}
             >
                 <input
                     className="hidden"
-                    id="room-file"
+                    id="user-chat-file"
                     multiple
-                    name="room-file"
-                    onChange={handleMediaPreview}
-                    ref={inputMediaRef}
+                    name="user-chat-file"
+                    onChange={props.handleMediaPreview}
+                    ref={props.inputMediaRef}
                     type="file"
                 />
                 <div 
                     className="border border-dashed cursor-pointer border-gray-600 h-[80%] overflow-y-auto" 
-                    onClick={() => inputMediaRef.current?.click()}
+                    onClick={() => props.inputMediaRef.current?.click()}
                 >
-                    {media.length > 0 ? (
+                    {chosenFiles.length > 0 ? (
                         <div className="rounded p-2 grid gap-2 md:grid-cols-3 sm:grid-cols-2 grid-cols-1">
-                            {media.map((media, index) => {
+                            {chosenFiles.map((chosenFile, index) => {
                                 return (
                                     <div className=" relative group">
                                         <FileViewer
-                                            file={media.file}
-                                            fileName={media.fileName}
-                                            fileType={media.fileType}
+                                            file={chosenFile.file}
+                                            fileName={chosenFile.file_type}
+                                            fileType={chosenFile.file_type}
                                             key={`file-in-room-${index}`}
-                                            previewUrl={media.previewUrl}
+                                            previewUrl={chosenFile.url}
                                         />
                                         <button
                                             className={cn(
                                                 "transition-opacity duration-300 ease-in-out cursor-pointer absolute top-1 right-1", 
                                                 "text-white font-medium bg-red-600 w-6 h-6 rounded-full flex justify-center items-center"
                                             )}
-                                            disabled={isUserChatProcessing}
+                                            disabled={props.isProcessing}
                                             onClick={(event) => {
                                                 event.stopPropagation();
-                                                removeOnePreviewFile(media.fileName)
+                                                removeOneFile(chosenFile.file_type)
                                             }}
                                             type="button"
                                         >
@@ -123,15 +97,15 @@ export default function UserMediaPreview() {
                         <div className="flex flex-col gap-2.5">
                             <button
                                 className="text-blue-500 font-medium cursor-pointer disabled:cursor-not-allowed"
-                                disabled={isUserChatProcessing}
+                                disabled={props.isProcessing}
                                 type="submit"
                             >
                                 <SendIcon size={22}/>
                             </button>
                             <button 
                                 className="text-blue-500 font-medium cursor-pointer disabled:cursor-not-allowed"
-                                disabled={isUserChatProcessing}
-                                onClick={() => navigate(`/user/chat/${receiverId}`)}
+                                disabled={props.isProcessing}
+                                onClick={seeUserChat}
                                 type="button"
                             >
                                 <MessageCircle size={22}/>
@@ -140,22 +114,6 @@ export default function UserMediaPreview() {
                     </div>
                 </div>
             </form>
-            <div 
-                className={cn(
-                    "md:flex md:justify-center md:items-center md:h-full md:w-2/5", 
-                    "md:bg-white hidden inset-shadow-sm inset-shadow-gray-400",
-                    "border border-gray-400"
-                )}
-            >
-                <div className="flex flex-col gap-2">
-                    <div className="text-gray-500 font-medium flex justify-center">
-                        <MessageCircle size={34}/>
-                    </div>
-                    <div className="text-gray-700 font-medium text-center">
-                        Welcome to Chit Chat
-                    </div>
-                </div>
-            </div>
         </section>
     );
 }

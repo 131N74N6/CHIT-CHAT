@@ -25,6 +25,10 @@ export const useUserChatStore = create<IUserChatState>()(persist((set) => ({
     receiverId: "",
     setReceiverId: (receiverId) => set({ receiverId }),
 
+    removeOneFile: (filename) => set((state) => ({
+        chosenFiles: state.chosenFiles.filter((chosenFile) => chosenFile.file_name !== filename)
+    })),
+    
     resetChatState: () => {
         set({
             chosenMessage: null,

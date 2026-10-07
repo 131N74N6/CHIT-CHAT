@@ -5,7 +5,7 @@ import { File, MessageCircle, SendIcon, Settings2 } from "lucide-react";
 import { useEffect } from "react";
 import { useMessageStore } from "../stores/message.store";
 import { useNavigate, useParams } from "react-router-dom";
-import Navbar from "../components/Navbar";
+import Navbar from "../navbar/Navbar";
 import useGroupChatService from "./service";
 import { useGroupChatStore } from "./store";
 import PopUpOption from "./PopUpOption";

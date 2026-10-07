@@ -1,5 +1,5 @@
 import cn from "../utils/cn";
-import Navbar from "../components/Navbar";
+import Navbar from "../navbar/Navbar";
 import { useMessageStore } from "../stores/message.store";
 import { useEffect } from "react";
 import Alert from "../components/Alert";

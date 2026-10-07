@@ -309,7 +309,7 @@ export default function useUserChatService() {
                 headers: { "Content-Type": "application/json" },
                 method: "GET"
             });
-            return request;
+            return request.data;
         },
         queryKey: [`user-chat-media-${chosenMessageId}`],
         staleTime: Infinity

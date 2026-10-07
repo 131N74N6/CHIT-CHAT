@@ -1,6 +1,6 @@
 import Alert from "../components/Alert";
 import cn from "../utils/cn";
-import Navbar from "../components/Navbar";
+import Navbar from "../navbar/Navbar";
 import { ArrowBigLeft, Camera, MessageCircle, X } from "lucide-react";
 import { useMessageStore } from "../stores/message.store";
 import { useEffect } from "react";

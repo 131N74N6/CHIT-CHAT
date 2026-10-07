@@ -95,6 +95,7 @@ export interface UsersMarks {
 export interface IUserProfilePopUp {
     _id: string;
     address: string;
+    description: string;
     error: Error | null;
     gender: string;
     isLoading: boolean;

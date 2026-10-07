@@ -33,6 +33,7 @@ export interface IGroupChatState {
     openPopUpOption: boolean;
     setOpenPopUpOption: (openPopUpOption: boolean) => void;
     
+    removeOneFile: (filename: string) => void;
     resetGroupMessageState: () => void;
 
     selectMode: boolean;
@@ -41,11 +42,11 @@ export interface IGroupChatState {
     showGroupChatPopUp: boolean;
     setShowGroupChatPopUp: (showGroupChatPopUp: boolean) => void;
 
-    showFilesPopUp: boolean;
-    setFilesPopUp: (showFilesPopUp: boolean) => void;
+    showGroupChatFilesPopUp: boolean;
+    setShowGroupChatFilesPopUp: (showGroupChatFilesPopUp: boolean) => void;
 
-    showFilePreviewPopUp: boolean;
-    setFilePreviewPopUp: (showFilePreviewPopUp: boolean) => void;
+    showGroupChatFilePreviewPopUp: boolean;
+    setShowGroupChatFilePreviewPopUp: (showGroupChatFilePreviewPopUp: boolean) => void;
 }
 
 export interface IGroupMessage {
@@ -115,4 +116,25 @@ export interface IGroupChatPopUp {
         };
         group_name: string;
     }
+}
+
+export interface IGroupChatFilesPopUp {
+    error: Error | null;
+    files: {
+        file_name: string;
+        file_type: string;
+        public_id: string;
+        resource_type: string;
+        size: number;
+        url: string;
+    }[];
+    isLoading: boolean;
+    isProcessing: boolean;
+}
+
+export interface IGroupChatFilesPreviewPopUp {
+    handleMediaPreview: (event: React.ChangeEvent<HTMLInputElement, Element>) => void;
+    inputMediaRef: React.RefObject<HTMLInputElement | null>;
+    isProcessing: boolean;
+    sendChatToGroup: UseMutationResult<void, Error, void, unknown>;
 }

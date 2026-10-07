@@ -93,7 +93,7 @@ export default function UserProfilePopUp(props: IUserProfilePopUp) {
                                 </div>
                             </div>
                             <div className="flex flex-col gap-1.5">
-                                <div className="text-[1rem] font-medium text-gray-800">name</div>
+                                <div className="text-[1rem] font-medium text-gray-800">Name</div>
                                 <div className="text-[1rem] font-medium text-gray-800">
                                     {props.name}
                                 </div>
@@ -108,6 +108,12 @@ export default function UserProfilePopUp(props: IUserProfilePopUp) {
                                 <div className="text-[1rem] font-medium text-gray-800">Address</div>
                                 <div className="text-[1rem] font-medium text-gray-800">
                                     {props.address}
+                                </div>
+                            </div>
+                            <div className="flex flex-col gap-1.5">
+                                <div className="text-[1rem] font-medium text-gray-800">Address</div>
+                                <div className="text-[1rem] font-medium text-gray-800">
+                                    {props.description}
                                 </div>
                             </div>
                         </div>

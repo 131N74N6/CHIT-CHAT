@@ -1,5 +1,5 @@
 import Loading from "../components/Loading";
-import Navbar from "../components/Navbar";
+import Navbar from "../navbar/Navbar";
 import UserList from "../user_profiles/UserList";
 import cn from "../utils/cn";
 import { useMessageStore } from "../stores/message.store";

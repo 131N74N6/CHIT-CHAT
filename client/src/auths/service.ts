@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { useRoomStore } from "../stores/room.store";
 import { useUserChatStore } from "../user_chats/store";
-import { useNavbarStore } from "../stores/navbar.store";
+import { useNavbarStore } from "../navbar/navbar.store";
 import { useChatbotStore } from "../chatbot/store";
 import { useMessageStore } from "../stores/message.store";
 import { createAuthClient } from "better-auth/client";

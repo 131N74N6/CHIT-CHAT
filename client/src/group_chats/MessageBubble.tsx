@@ -4,20 +4,39 @@ import cn from "../utils/cn";
 import { useGroupChatStore } from "./store";
 import { useNavigate } from "react-router-dom";
 import { useUserChatStore } from "../user_chats/store";
+import { useGroupMemberStore } from "../group_member/store";
+import { useGroupProfileStore } from "../group_profiles/store";
 
 export default function MessageBubble(props: IGroupMessageData) {
     const navigate = useNavigate();
+    
+    const setShowGroupChatFilesPopUp = useGroupChatStore((state) => state.setShowGroupChatFilesPopUp);
+    const setShowGroupChatFilePreviewPopUp = useGroupChatStore((state) => state.setShowGroupChatFilePreviewPopUp);
 
     const chosenMessageIdsFromGroup = useGroupChatStore((state) => state.chosenMessageIdsFromGroup);
     const setChosenMessageIdsFromGroup = useGroupChatStore((state) => state.setChosenMessageIdsFromGroup);
 
     const setGroupMessageId = useGroupChatStore((state) => state.setGroupMessageId);
+    const setShowGroupChatPopUp = useGroupChatStore((state) => state.setShowGroupChatPopUp);
 
     const selectMode = useGroupChatStore((state) => state.selectMode);
 
     const setReceiverId = useUserChatStore((state) => state.setReceiverId);
+        
+    const setShowMemberPopUp = useGroupMemberStore((state) => state.setShowMemberPopUp);
+
+    const setShowProfile = useGroupProfileStore((state) => state.setShowProfile);
 
     const isSelected = chosenMessageIdsFromGroup.includes(props.chat._id);
+
+    const seeFiles = () => {
+        setGroupMessageId(props.chat._id);
+        setShowGroupChatPopUp(false);
+        setShowMemberPopUp(false);
+        setShowProfile(false);
+        setShowGroupChatFilesPopUp(false);
+        setShowGroupChatFilePreviewPopUp(true);
+    }
 
     return (
         <div 
@@ -34,7 +53,7 @@ export default function MessageBubble(props: IGroupMessageData) {
                 <div className="cursor-pointer bg-gray-100 p-2 rounded-md">
                     <div 
                         className="items-center gap-2.5 md:flex hidden" 
-                        onClick={() => setGroupMessageId(props.chat._id)}
+                        onClick={seeFiles}
                     >
                         <FileIcon size={16}/>
                         <div>{props.chat.files_total} files</div>
@@ -58,7 +77,7 @@ export default function MessageBubble(props: IGroupMessageData) {
                     className="text-left font-medium text-[0.7rem] cursor-pointer disabled:cursor-not-allowed" 
                     disabled={props.isProcessing}
                     onClick={() => {
-                        if (setReceiverId) setReceiverId(props.chat.sender_id);
+                        setReceiverId(props.chat.sender_id);
                         navigate(`/user/chat/${props.chat.sender_id}`);
                     }}
                     type="button"

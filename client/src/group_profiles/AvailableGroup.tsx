@@ -1,5 +1,5 @@
 import Loading from "../components/Loading";
-import Navbar from "../components/Navbar";
+import Navbar from "../navbar/Navbar";
 import { MessageCircle } from "lucide-react";
 import cn from "../utils/cn";
 import { useEffect } from "react";
@@ -17,6 +17,8 @@ import GroupMemberPopUp from "../group_member/GroupMemberPopUp";
 import { useUserStore } from "../user_profiles/store";
 import { useGroupProfileStore } from "./store";
 import GroupDetailPopUp from "./GroupDetailPopUp";
+import GroupChatFilesPopUp from "../group_chats/GroupChatFilesPopUp";
+import GroupChatFilesPreviewPopUp from "../group_chats/GroupChatFilesPreviewPopUp";
 
 export default function AvailableGroup() {
     const groupId = useGroupChatStore((state) => state.groupId);
@@ -28,14 +30,21 @@ export default function AvailableGroup() {
     const chosenMessageIdsFromGroup = useGroupChatStore((state) => state.chosenMessageIdsFromGroup);
 
     const showGroupChatPopUp = useGroupChatStore((state) => state.showGroupChatPopUp);
-    const showMemberPopUp = useGroupMemberStore((state) => state.showMemberPopUp);
-
+    
     const editMode = useGroupProfileStore((state) => state.editMode);
     const setGroupDescription = useGroupProfileStore((state) => state.setGroupDescription);
+
     const setGroupName = useGroupProfileStore((state) => state.setGroupName);
     const setOldGroupProfilePicture = useGroupProfileStore((state) => state.setOldGroupProfilePicture);
+    
     const setSelectedProfileGroup = useGroupProfileStore((state) => state.setSelectedProfileGroup);
     const setSelectedProfileGroupUrl = useGroupProfileStore((state) => state.setSelectedProfileGroupUrl);
+
+    const showGroupChatFilesPopUp = useGroupChatStore((state) => state.showGroupChatFilesPopUp);
+    const showGroupChatFilePreviewPopUp = useGroupChatStore((state) => state.showGroupChatFilePreviewPopUp);
+    
+    const showMemberPopUp = useGroupMemberStore((state) => state.showMemberPopUp);
+
     const showProfile = useGroupProfileStore((state) => state.showProfile);
 
     const groupChat = useGroupChatService();
@@ -242,6 +251,22 @@ export default function AvailableGroup() {
                                 isGroupOwner: isGroupOwner
                             }} 
                             isProcessing={groupChat.isProcessing || groupMember.isProcessing || groupProfile.isProcessing}
+                        />
+                    ) : null}
+                    {showGroupChatFilesPopUp ? (
+                        <GroupChatFilesPopUp 
+                            error={groupChat.showFilesThatSentToGroup.error} 
+                            files={groupChat.showFilesThatSentToGroup.data ? groupChat.showFilesThatSentToGroup.data.files : []}
+                            isLoading={groupChat.showFilesThatSentToGroup.isLoading} 
+                            isProcessing={groupChat.isProcessing || groupMember.isProcessing || groupProfile.isProcessing}
+                        />
+                    ) : null}
+                    {showGroupChatFilePreviewPopUp ? (
+                        <GroupChatFilesPreviewPopUp 
+                            handleMediaPreview={groupChat.handleMediaPreview} 
+                            inputMediaRef={groupChat.inputMediaRef} 
+                            isProcessing={groupChat.isProcessing || groupMember.isProcessing || groupProfile.isProcessing} 
+                            sendChatToGroup={groupChat.sendChatToGroup}
                         />
                     ) : null}
                 </>
