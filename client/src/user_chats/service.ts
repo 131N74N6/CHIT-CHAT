@@ -64,6 +64,7 @@ export default function useUserChatService() {
                 setMessage(payload.message);
                 return;
             }
+            
             const queryKey = [`user-chat-${receiverId}`];
             
             if (payload.type === "user-message:sent") {

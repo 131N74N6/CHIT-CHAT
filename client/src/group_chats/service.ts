@@ -1,9 +1,11 @@
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useGroupChatStore } from "./store";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import type { IGroupMessage, IGroupMessageFiles, IGroupFilePreview } from "./model";
 import { useMessageStore } from "../stores/message.store";
 import { apiRequest, apiUpload } from "../api";
+import { useUserStore } from "../user_profiles/store";
+import { groupChatWebSocket } from "./event";
 
 export default function useGroupChatService() {
     const queryClient = useQueryClient();
@@ -27,6 +29,153 @@ export default function useGroupChatService() {
 
     const resetChosenMessageIdsFromGroup = useGroupChatStore((state) => state.resetChosenMessageIdsFromGroup);
     const setOpenPopUpOption = useGroupChatStore((state) => state.setOpenPopUpOption);
+
+    const currentUserId = useUserStore((state) => state.currentUserId);
+
+    const getSessionToken = useQuery({
+        enabled: !!currentUserId,
+        queryFn: async () => {
+            const response = await apiRequest<string>("/api/v1/users/session", { method: "GET" });
+            return response.data;
+        },
+        queryKey: [`user-session-token-${currentUserId}`],
+        retry: 3,
+        retryDelay: 1000,
+    });
+
+    useEffect(() => {
+        if (!groupId || !currentUserId) return;
+        if (getSessionToken.isLoading && !getSessionToken.data) return;
+
+        const token = getSessionToken.data;
+
+        if (!token || typeof token !== "string") {
+            setMessage("authentication failed");
+            return;
+        }
+
+        const baseApiUrl = import.meta.env.VITE_BASE_API_URL;
+        groupChatWebSocket.enableReconnect();
+        groupChatWebSocket.connect(baseApiUrl, groupId, token);
+
+        const handleConnectionToGroup = (payload: any) => {
+            setMessage(payload.message);
+        }
+
+        const handleGroupMessage = (payload: any) => {
+            if (payload.type === "error") {
+                setMessage(payload.message);
+                return;
+            }
+
+            const queryKey = [`group-chat-${groupId}`];
+
+            if (payload.type === "group-message:changed") {
+                queryClient.setQueryData(queryKey, (old: any) => {
+                    if (!old) return old;
+
+                    const newMessagePage = old.pages.map((page: any[]) => {
+                        return page.map((message) => {
+                            return message._id === payload.data._id ? payload.data : message
+                        });
+                    });
+
+                    return { ...old, pages: newMessagePage };
+                });
+            } else if (payload.type === "group-message:deleted") {
+                queryClient.setQueryData(queryKey, (old: any) => {
+                    if (!old) return;
+
+                    const newMessagePage = old.pages.map((page: any[]) => {
+                        return page.map((message) => {
+                            if (payload.data.includes(message._id)) {
+                                return {
+                                    ...message, 
+                                    files: [], 
+                                    files_total: 0, 
+                                    text: "This message has been deleted"
+                                }
+                            }
+                            return message;
+                        });
+                    });
+
+                    return { ...old, pages: newMessagePage };
+                });
+            } else if (payload.type === "group-message:sent") {
+                queryClient.setQueryData(queryKey, (old: any) => {
+                    if (!old) return;
+                    const newMessagePage = [...old.pages];
+                    newMessagePage[0] = [payload.data, ...newMessagePage[0]];
+                    return { ...old, pages: newMessagePage };
+                });
+            } else if (payload.type === "group-message-owner:changed") {
+                queryClient.setQueryData(queryKey, (old: any) => {
+                    if (!old) return old;
+
+                    const newMessagePage = old.pages.map((page: any[]) => {
+                        return page.map((message) => {
+                            return message._id === payload.data._id ? payload.data : message
+                        });
+                    });
+
+                    return { ...old, pages: newMessagePage };
+                });
+            } else if (payload.message === "group-message-owner:deleted") {
+                queryClient.setQueryData(queryKey, (old: any) => {
+                    if (!old) return;
+
+                    const newMessagePage = old.pages.map((page: any[]) => {
+                        return page.filter((message) => {
+                            return message.sender_id !== payload.data
+                        });
+                    });
+
+                    return { ...old, pages: newMessagePage };
+                });
+            }
+        }
+
+        const handleError = (payload: any) => {
+            const message = payload.message;
+            setMessage(message);
+
+            if (message.includes("not allowed") || message.includes("Invalid user")) {
+                groupChatWebSocket.disconnect();
+            }
+        }
+
+        const handleReconnecting = (payload: any) => {
+            setMessage(payload.message);
+        }
+
+        const handleMaxRetries = (payload: any) => {
+            setMessage(payload.message);
+            groupChatWebSocket.disconnect();
+        }
+
+        groupChatWebSocket.on("connect", handleConnectionToGroup);
+        groupChatWebSocket.on("error", handleError);
+        groupChatWebSocket.on("max_retries", handleMaxRetries);
+        groupChatWebSocket.on("message", handleGroupMessage);
+        groupChatWebSocket.on("reconnecting", handleReconnecting);
+
+        return () => {
+            groupChatWebSocket.off("connect", handleConnectionToGroup);
+            groupChatWebSocket.off("error", handleError);
+            groupChatWebSocket.off("max_retries", handleMaxRetries);
+            groupChatWebSocket.off("message", handleGroupMessage);
+            groupChatWebSocket.off("reconnecting", handleReconnecting);
+        }
+    }, [
+        currentUserId, 
+        getSessionToken.data, 
+        getSessionToken.error, 
+        getSessionToken.error, 
+        groupId, 
+        queryClient, 
+        setMessage
+    ]);
 
     const changeChosenMessageMt = useMutation({
         mutationFn: async (id: string) => {

@@ -16,7 +16,66 @@ class GroupChatWebSocket extends EventEmitter {
     private backendUrl = "";
     private groupId = "";
 
-    private bindEvents() {}
+    connect(backendUrl: string, groupId: string, token: string) {
+        if (this.isConnecting) return;
+        if (this.ws && (this.ws.readyState !== WebSocket.CONNECTING && this.ws.readyState !== WebSocket.OPEN)) return;
+
+        const newWsUrl = this.buildWsUrl(backendUrl, groupId, token);
+        
+        if (this.url && this.url !== newWsUrl) this.disconnect();
+
+        this.url = newWsUrl;
+        this.isConnecting = true;
+        this.bindEvents();
+    }
+
+    private bindEvents() {
+        if (!this.ws) return;
+
+        this.ws.onopen = () => {
+            this.reconnectAttemps = 0;
+            this.isConnecting = false;
+            this.emit("connect", { type: "connect", message: "Connected to group" });
+
+            this.messageQueue.forEach((message) => this.ws?.send(message));
+            this.messageQueue = [];
+        }
+
+        this.ws.onmessage = (event) => {
+            try {
+                const payload = JSON.parse(event.data);
+
+                if (payload.type === "error") {
+                    this.emit("error", { message: payload.message, type: "error" });
+                    return;
+                }
+
+                this.emit("message", payload);
+            } catch (error) {
+                this.emit("error", { type: "error", message: "Failed to parse message" });
+            }
+        }
+
+        this.ws.onerror = () => {
+            this.emit("error", { type: "error", message: "Connection failed" });
+        }
+
+        this.ws.onclose = () => {
+            this.isConnecting = false;
+            this.emit("disconnected");
+
+            if (this.shouldReconnect && (this.reconnectAttemps < this.maxReconnectAttemps)) {
+                this.reconnectAttemps++;
+                const delay = this.reconnectDelay * Math.pow(2, this.reconnectAttemps - 1);
+                this.emit("reconnecting", { message: "Reconnecting...", attempt: this.reconnectAttemps });
+                setTimeout(() => {
+                    if (this.url) this.connectWithUrl();
+                }, delay);
+            } else if (this.shouldReconnect) {
+                this.emit("max_retries", { message: "Connection lost. Please refresh the page." });
+            }
+        }
+    }
 
     private buildWsUrl(backendUrl: string, groupId: string, token: string) {
         const wsProtocol = backendUrl.startsWith("https") ? "wss:" : "ws:";
@@ -45,6 +104,18 @@ class GroupChatWebSocket extends EventEmitter {
 
     enableReconnect() {
         this.shouldReconnect = true;
+    }
+
+    isConnected() {
+        return this.ws?.readyState === WebSocket.OPEN;
+    }
+
+    send(message: any) {
+        if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+            this.ws.send(JSON.stringify(message));
+        } else {
+            this.messageQueue.push(message);
+        }
     }
 }
 

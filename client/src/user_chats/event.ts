@@ -40,6 +40,7 @@ class UserChatWebSocket extends EventEmitter {
 
     private bindEvents() {
         if (!this.ws) return;
+
         this.ws.onopen = () => {
             this.reconnectAttempts = 0;
             this.isConnecting = false;
@@ -60,7 +61,7 @@ class UserChatWebSocket extends EventEmitter {
 
                 this.emit("message", payload);
             } catch (err) {
-                this.emit("error", { type: "error", message: "Failed to parse message" });
+                this.emit("error", { type: "error", message: "Failed to get message" });
             }
         }
 
@@ -72,7 +73,7 @@ class UserChatWebSocket extends EventEmitter {
             this.isConnecting = false;
             this.emit('disconnected');
 
-            if (this.shouldReconnect && this.reconnectAttempts < this.maxReconnectAttempts) {
+            if (this.shouldReconnect && (this.reconnectAttempts < this.maxReconnectAttempts)) {
                 this.reconnectAttempts++;
                 const delay = this.reconnectDelay * Math.pow(2, this.reconnectAttempts - 1);
 

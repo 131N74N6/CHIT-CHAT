@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useUserChatStore } from "../user_chats/store";
 import { useUserStore } from "./store";
 import { useNavbarStore } from "../navbar/navbar.store";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { useMessageStore } from "../stores/message.store";
 import { apiRequest, apiUpload } from "../api";
 import type { UserDetail, Users } from "./model";
@@ -57,6 +57,30 @@ export default function useUserProfileService() {
     const receiverId = useUserChatStore((state) => state.receiverId);
 
     const resetNavbarState = useNavbarStore((state) => state.resetNavbarState);
+
+    const getSessionToken = useQuery({
+        enabled: !!currentUserId,
+        queryFn: async () => {
+            const response = await apiRequest<string>("/api/v1/users/session", { method: "GET" });
+            return response.data;
+        },
+        queryKey: [`user-session-token-${currentUserId}`],
+        retry: 3,
+        retryDelay: 1000,
+    });
+
+    useEffect(() => {
+        if (!currentUserId) return;
+        if (!getSessionToken.isLoading || !getSessionToken.data) return;
+        
+    }, [
+        currentUserId, 
+        getSessionToken.data, 
+        getSessionToken.isLoading, 
+        getSessionToken.error, 
+        queryClient, 
+        setMessage
+    ]);
 
     const changeUserMt = useMutation({
         mutationFn: async () => {
