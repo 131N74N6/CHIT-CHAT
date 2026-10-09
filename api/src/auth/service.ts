@@ -48,14 +48,14 @@ export const authServiceApi = betterAuth({
 
     user: {
         additionalFields: {
-            address: { type: "string", required: false },
-            description: { type: "string", required: false },
-            gender: { type: "string", required: false },
-            group_ids: { type: "string[]", required: false },
-            image_public_id: { type: "string", required: false },
-            image_filename: { type: "string", required: false },
-            image_filetype: { type: "string", required: false },
-            image_resource_type: { type: "string", required: false }
+            address: { default: "-", type: "string", required: false },
+            description: { default: "-", type: "string", required: false },
+            gender: { default: "-", type: "string", required: false },
+            group_ids: { default: [], type: "string[]", required: false },
+            image_public_id: { default: "-", type: "string", required: false },
+            image_filename: { default: "-", type: "string", required: false },
+            image_filetype: { default: "-", type: "string", required: false },
+            image_resource_type: { default: "-", type: "string", required: false }
         }
     }
 });

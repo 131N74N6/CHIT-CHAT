@@ -49,6 +49,22 @@ class UserProfileRepository {
         return id;
     }
 
+    async deleteUserProfilePicture(id: string) {
+        await this.users.updateOne(
+            { $or: [{ sender_id: new ObjectId(id) }, { receiver_id: new ObjectId(id) }] },
+            { $set: {
+                image: "-",
+                image_filename: "-",
+                image_filetype: "-",
+                image_public_id: "-",
+                image_resource_type: "-",
+            }}
+        ),
+        this.users.deleteOne({ _id: new ObjectId(id) });
+
+        return id;
+    }
+
     async findMessageOwnerIds(user_id: string): Promise<string[]> {
         const userChats = await this.user_chats.find({
             $or: [

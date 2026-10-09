@@ -146,8 +146,10 @@ class UserProfileService {
         if (user.group_ids && user.group_ids.length > 0) {
             user.group_ids.map((group_id) => {
                 const room = `member-from-group-${group_id.toString()}`;
-                groupChatEvent.emit(group_id.toString(), { data: forGroupChatRoom, type: "group-message:changed" });
-                groupMemberEvent.emit(room, { data: forGroupMemberRoom, type: "member:changed" });
+                groupChatEvent.emit(group_id.toString(), { 
+                    data: forGroupChatRoom, type: "group-message-owner:changed" 
+                });
+                groupMemberEvent.emit(room, { data: forGroupMemberRoom, type: "member-profile:changed" });
             });
         }
 
@@ -185,7 +187,7 @@ class UserProfileService {
         if (user.group_ids && user.group_ids.length > 0) {
             user.group_ids.map((group_id) => {
                 const room = `member-from-group-${group_id}`;
-                groupChatEvent.emit(group_id, { data: result, type: "group-message:deleted" });
+                groupChatEvent.emit(group_id, { data: result, type: "group-message-owner:deleted" });
                 groupMemberEvent.emit(room, { data: result, type: "member:left" });
             });
         }
@@ -196,6 +198,43 @@ class UserProfileService {
 
         userProfileEvent.emit(availableRoom, { data: result, type: "available-user:deleted" });
         userProfileEvent.emit(currentUserProfileRoom, { data: result, type: "user-profile:deleted" });
+    }
+
+    async deleteUserProfilePicture(id: string) {
+        const userId = this.checkIsIdIsValid("user", id);
+        const user = await userProfileRepository.findUserById({ id: userId });
+
+        if (!user) throw new ChitChatApiError("user not found", 404);
+        if (user._id.toString() !== userId) throw new ChitChatApiError("you are not allowed", 403);
+
+        if (user.image_public_id && user.image_resource_type) {
+            if (user.image_public_id !== "" && user.image_resource_type!== "" ) {
+                await v2.uploader.destroy(user.image_public_id, { 
+                    resource_type: user.image_resource_type 
+                });
+            }
+        }
+
+        const result = await userProfileRepository.deleteUserProfilePicture(userId);
+        const availableRoom = `available-user-${userId}`;
+        const currentUserProfileRoom = `current-user-profile-${userId}`;
+        const oneToOneMessageRoom = await userProfileRepository.findMessageOwnerIds(userId);
+
+        if (user.group_ids && user.group_ids.length > 0) {
+            user.group_ids.map((group_id) => {
+                const room = `member-from-group-${group_id}`;
+                groupMemberEvent.emit(room, { data: result, type: "member-profile-picture:deleted" });
+            });
+        }
+
+        for (let a = 0; a < oneToOneMessageRoom.length; a++) {
+            userChatEvent.emit(oneToOneMessageRoom[a], { 
+                data: result, type: "interlocutors-profile-picture:deleted" 
+            });
+        }
+
+        userProfileEvent.emit(availableRoom, { data: result, type: "available-user-profile-picture:deleted" });
+        userProfileEvent.emit(currentUserProfileRoom, { data: result, type: "user-profile-picture:deleted" });
     }
 
     async showAllUsers(props: TUserProfile["showAllUser"]) {

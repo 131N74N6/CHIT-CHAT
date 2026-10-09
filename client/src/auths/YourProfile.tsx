@@ -6,47 +6,52 @@ import Navbar from "../navbar/Navbar";
 import { ArrowBigLeft, MessageCircle, Pen, X } from "lucide-react";
 import Alert from "../components/Alert";
 import cn from "../utils/cn";
+import useAuthService from "./service";
+import { useUserStore } from "../user_profiles/store";
 
 export default function YourProfile() {
     const message = useMessageStore((state) => state.message);
     const setMessage = useMessageStore((state) => state.setMessage);
-    
-    const { 
-        address,
-        changeUserMt, 
-        currentUser, 
-        editMode,
-        fileInputRef,
-        gender,
-        handleImagePreview,
-        isUserProfileProcessing, 
-        oldProfile,
-        profilePicture,
-        profilePictureUrl,
-        setAddress,
-        setDeleteProfilePicture,
-        setEditMode,
-        setGender,
-        setOldProfilePicture,
-        setProfilePicture,
-        setProfilePictureUrl,
-        setUserName,
-        username, 
-    } = useUserProfileService();
 
+    const editMode = useUserStore((state) => state.editMode);
+    const setEditMode = useUserStore((state) => state.setEditMode);
+    
+    const address = useUserStore((state) => state.address);
+    const setAddress = useUserStore((state) => state.setAddress);
+
+    const description = useUserStore((state) => state.description);
+    const setDescription = useUserStore((state) => state.setDescription);
+
+    const gender = useUserStore((state) => state.gender);
+    const setGender = useUserStore((state) => state.setGender);
+
+    const profilePicture = useUserStore((state) => state.profilePicture);
+    const setProfilePicture = useUserStore((state) => state.setProfilePicture);
+
+    const profilePictureUrl = useUserStore((state) => state.profilePictureUrl);
+    const setProfilePictureUrl = useUserStore((state) => state.setProfilePictureUrl);
+
+    const oldProfilePicture = useUserStore((state) => state.oldProfilePicture);
+
+    const username = useUserStore((state) => state.username);
+    const setUserName = useUserStore((state) => state.setUserName);
+    
+    const owner = useAuthService();
+    const userProfile = useUserProfileService();
+    
     useEffect(() => {
-        if (editMode) {
-            currentUser.data && currentUser.data.address ? setAddress(currentUser.data.address) : setAddress("-");
-            currentUser.data && currentUser.data.gender ? setGender(currentUser.data.gender) : setGender("-");
-            currentUser.data && currentUser.data.username ? setUserName(currentUser.data.username) : setUserName("-");
-            currentUser.data && currentUser.data.profile_picture ? setOldProfilePicture(currentUser.data.profile_picture) : setOldProfilePicture(null);
+        if (editMode && userProfile.showOtherUser.data) {
+            setAddress(userProfile.showOtherUser.data.address || "-")
+            setDescription(userProfile.showOtherUser.data.description || "-");
+            setGender(userProfile.showOtherUser.data.gender || "-");
+            setUserName(userProfile.showOtherUser.data.name || "-");
         } else {
             setAddress("");
+            setDescription("");
             setGender("");
             setUserName("");
-            setOldProfilePicture(null);
         }
-    }, [editMode, currentUser.data]);
+    }, [editMode]);
 
     useEffect(() => {
         if (message) {
@@ -60,15 +65,15 @@ export default function YourProfile() {
     return (
         <section className="flex md:flex-row gap-2.5 p-2.5 flex-col relative h-dvh z-10">
             {message ? <Alert message={message}/> : null}
-            <Navbar isProcessing={isUserProfileProcessing}/>
-            {currentUser.isLoading ? (
+            <Navbar isProcessing={owner.isProcessing || userProfile.isProcessing}/>
+            {owner.getCurrentUser.isLoading ? (
                 <div className="flex justify-center items-center h-full">
                     <Loading/>
                 </div>
-            ) : currentUser.error ? (
+            ) : owner.getCurrentUser.error ? (
                 <div className="flex justify-center items-center h-full">
                     <div className="text-center font-medium text-4xl text-gray-800">
-                        {currentUser.error.message}
+                        {owner.getCurrentUser.error.message}
                     </div>
                 </div>
             ) : editMode ? (
@@ -76,14 +81,14 @@ export default function YourProfile() {
                     className="flex w-full md:w-2/5 flex-col h-full p-2.5 inset-shadow-sm inset-shadow-gray-400 border border-gray-400"
                     onSubmit={(event: React.SubmitEvent<HTMLFormElement>) => {
                         event.preventDefault();
-                        changeUserMt.mutate();
+                        userProfile.changeUserMt.mutate();
                     }}
                 >                
                     <div className="bg-white flex flex-col gap-2.5">
                         <input
                             className="hidden"
-                            onChange={handleImagePreview}
-                            ref={fileInputRef}
+                            onChange={userProfile.handleImagePreview}
+                            ref={userProfile.fileInputRef}
                             type="file"
                         />
                         <div className="flex gap-1.5">
@@ -92,7 +97,7 @@ export default function YourProfile() {
                                     "disabled:cursor-not-allowed cursor-pointer", 
                                     "hover:text-gray-500 transition-colors text-gray-800 font-medium"
                                 )}
-                                disabled={isUserProfileProcessing}
+                                disabled={owner.isProcessing || userProfile.isProcessing}
                                 onClick={() => setEditMode(false)}
                                 type="button"
                             >
@@ -114,7 +119,7 @@ export default function YourProfile() {
                                                 "disabled:cursor-not-allowed group-hover:opacity-100 duration-300 transition-opacity",
                                                 "flex justify-center items-center p-1.5 absolute top-1 left-[46%]"
                                             )}
-                                            disabled={isUserProfileProcessing}
+                                            disabled={owner.isProcessing || userProfile.isProcessing}
                                             onClick={(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
                                                 event.stopPropagation();
                                                 if (profilePictureUrl) URL.revokeObjectURL(profilePictureUrl);
@@ -126,12 +131,12 @@ export default function YourProfile() {
                                             <X size={1}/>
                                         </button>
                                     </div>
-                                ) : oldProfile !== null ? (
+                                ) : oldProfilePicture && oldProfilePicture.public_id !== "-" ? (
                                     <div className="w-full h-full relative group">
                                         <img
-                                            alt={oldProfile.public_id}
+                                            alt={oldProfilePicture.public_id}
                                             className="w-full h-full object-cover rounded-full"
-                                            src={oldProfile.url}
+                                            src={oldProfilePicture.url}
                                         />
                                         <button
                                             className={cn(
@@ -139,11 +144,10 @@ export default function YourProfile() {
                                                 "disabled:cursor-not-allowed group-hover:opacity-100 duration-300 transition-opacity",
                                                 "flex justify-center items-center p-1.5 absolute top-1 left-[46%]"
                                             )}
-                                            disabled={isUserProfileProcessing}
+                                            disabled={owner.isProcessing || userProfile.isProcessing}
                                             onClick={(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
                                                 event.stopPropagation();
-                                                setDeleteProfilePicture(oldProfile);
-                                                setOldProfilePicture(null);
+                                                userProfile.deleteUserProfilePictureMt.mutate();
                                             }}
                                             type="button"
                                         >
@@ -156,9 +160,9 @@ export default function YourProfile() {
                                             "border-dashed border-gray-500 flex justify-center items-center bg-purple-400",
                                             "w-full text-white h-full rounded-full cursor-pointer font-medium text-[1.2rem]"
                                         )}
-                                        onClick={() => fileInputRef.current?.click()}
+                                        onClick={() => userProfile.fileInputRef.current?.click()}
                                     >
-                                        {currentUser.data?.username[0]}
+                                        {owner.getCurrentUser.data?.user_name[0]}
                                     </div>
                                 )}
                             </div>
@@ -167,7 +171,7 @@ export default function YourProfile() {
                             <div className="flex flex-col gap-1.5">
                                 <label htmlFor="new-username" className="text-gray-900 font-medium text-[1rem]">Username</label>
                                 <input
-                                    className={cn("focus:outline-0 bg-blue-200 text-gray-900 font-medium p-1.5 text-[1rem] w-full")}
+                                    className={cn("outline-0 bg-blue-200 text-gray-900 font-medium p-1.5 text-[1rem] w-full")}
                                     id="new-username"
                                     name="new-username"
                                     onChange={(event) => setUserName(event.target.value)}
@@ -176,9 +180,19 @@ export default function YourProfile() {
                                 />
                             </div>
                             <div className="flex flex-col gap-1.5">
+                                <label htmlFor="new-description" className="text-gray-900 font-medium text-[1rem]">Username</label>
+                                <textarea
+                                    className={cn("outline-0 resize-none bg-blue-200 text-gray-900 font-medium p-1.5 text-[1rem] w-full")}
+                                    id="new-description"
+                                    name="new-description"
+                                    onChange={(event) => setDescription(event.target.value)}
+                                    value={description}
+                                />
+                            </div>
+                            <div className="flex flex-col gap-1.5">
                                 <label htmlFor="new-gender" className="text-gray-900 font-medium text-[1rem]">Gender</label>
                                 <select 
-                                    disabled={isUserProfileProcessing}
+                                    disabled={owner.isProcessing || userProfile.isProcessing}
                                     value={gender}
                                     onChange={(event) => setGender(event.target.value)}
                                     className="bg-blue-200 text-gray-900 p-2 outline-none"
@@ -192,7 +206,7 @@ export default function YourProfile() {
                             <div className="flex flex-col gap-1.5">
                                 <label htmlFor="new-address" className="text-gray-900 font-medium text-[1rem]">Address</label>
                                 <input
-                                    className={cn("focus:outline-0 bg-blue-200 text-gray-900 font-medium p-1.5 text-[1rem] w-full")}
+                                    className={cn("outline-0 bg-blue-200 text-gray-900 font-medium p-1.5 text-[1rem] w-full")}
                                     id="new-address"
                                     name="new-address"
                                     onChange={(event) => setAddress(event.target.value)}
@@ -205,10 +219,10 @@ export default function YourProfile() {
                                     "bg-purple-400 text-white font-medium text-[1rem] p-1.5 cursor-pointer", 
                                     "rounded disabled:cursor-not-allowed hover:bg-purple-600 transition-colors"
                                 )}
-                                disabled={isUserProfileProcessing || isUserProfileProcessing}
+                                disabled={owner.isProcessing || userProfile.isProcessing}
                                 type="submit"
                             >
-                                {isUserProfileProcessing ? "Saving..." : "Save"}
+                                {userProfile.isProcessing ? "Saving..." : "Save"}
                             </button>
                         </div>
                     </div>
@@ -230,12 +244,14 @@ export default function YourProfile() {
                         </div>
                         <div className="flex justify-center">
                             <div className="w-20 h-20 rounded-full">
-                                {currentUser.data && currentUser.data.profile_picture !== null && currentUser.data.profile_picture.public_id !== null ? (
+                                {owner.getCurrentUser.data && 
+                                owner.getCurrentUser.data.profile_picture.public_id !== null && 
+                                owner.getCurrentUser.data.profile_picture.url !== null ? (
                                     <div className="w-full h-full rounded-full">
                                         <img
-                                            alt={currentUser.data.profile_picture.public_id}
+                                            alt={owner.getCurrentUser.data.profile_picture.public_id}
                                             className="w-full h-full object-cover rounded-full"
-                                            src={currentUser.data.profile_picture.url}
+                                            src={owner.getCurrentUser.data.profile_picture.url}
                                         />
                                     </div>
                                 ) : (
@@ -243,7 +259,7 @@ export default function YourProfile() {
                                         "bg-purple-400 text-white font-medium text-2xl text-[1.2rem]",
                                         "flex justify-center items-center w-full h-full rounded-full"
                                     )}>
-                                        {currentUser.data?.username[0]}
+                                        {owner.getCurrentUser.data?.user_name[0]}
                                     </div>
                                 )}
                             </div>
@@ -252,25 +268,31 @@ export default function YourProfile() {
                             <div className="flex flex-col gap-1.5">
                                 <div className="text-[1rem] font-medium text-gray-800">User ID</div>
                                 <div className="text-[1rem] font-medium text-gray-800">
-                                    {currentUser.data && currentUser.data.user_id ? currentUser.data.user_id : "-"}
+                                    {owner.getCurrentUser.data ? owner.getCurrentUser.data.user_id : "-"}
                                 </div>
                             </div>
                             <div className="flex flex-col gap-1.5">
                                 <div className="text-[1rem] font-medium text-gray-800">Username</div>
                                 <div className="text-[1rem] font-medium text-gray-800">
-                                    {currentUser.data && currentUser.data.username ? currentUser.data.username : "-"}
+                                    {owner.getCurrentUser.data ? owner.getCurrentUser.data.user_name : "-"}
                                 </div>
                             </div>
                             <div className="flex flex-col gap-1.5">
                                 <div className="text-[1rem] font-medium text-gray-800">Gender</div>
                                 <div className="text-[1rem] font-medium text-gray-800">
-                                    {currentUser.data && currentUser.data.gender !== null ? currentUser.data.gender : "-"}
+                                    {owner.getCurrentUser.data ? owner.getCurrentUser.data.gender : "-"}
+                                </div>
+                            </div>
+                            <div className="flex flex-col gap-1.5">
+                                <div className="text-[1rem] font-medium text-gray-800">Gender</div>
+                                <div className="text-[1rem] font-medium text-gray-800">
+                                    {owner.getCurrentUser.data ? owner.getCurrentUser.data.description : "-"}
                                 </div>
                             </div>
                             <div className="flex flex-col gap-1.5">
                                 <div className="text-[1rem] font-medium text-gray-800">Address</div>
                                 <div className="text-[1rem] font-medium text-gray-800">
-                                    {currentUser.data && currentUser.data.address ? currentUser.data.address : "-"}
+                                    {owner.getCurrentUser.data ? owner.getCurrentUser.data.address : "-"}
                                 </div>
                             </div>
                         </div>

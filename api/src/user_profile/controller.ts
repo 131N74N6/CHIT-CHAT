@@ -12,6 +12,11 @@ class UserProfileController {
         return { message: "your profile has been deleted successfully" }
     }
 
+    async deleteUserProfilePicture(id: string) {
+        await userProfileService.deleteUserProfilePicture(id);
+        return { message: "your profile picture has been deleted successfully" }
+    }
+
     async showAllUsers(props: TUserProfile["showAllUser"]) {
         const result = await userProfileService.showAllUsers(props);
         return { data: result }

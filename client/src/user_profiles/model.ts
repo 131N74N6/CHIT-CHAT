@@ -29,16 +29,8 @@ export interface UserState {
     profilePictureUrl: string | null;
     setProfilePictureUrl: (profilePictureUrl: string | null) => void;
 
-    oldProfile: {
-        public_id: string;
-        resource_type: string;
-        url: string;
-    } | null;
-    setOldProfilePicture: (oldProfile: {
-        public_id: string;
-        resource_type: string;
-        url: string;
-    } | null) => void;
+    oldProfilePicture: { public_id: string; url: string; } | null;
+    setOldProfilePicture: (oldProfilePicture: { public_id: string; url: string; } | null) => void;
 
     resetUserState: () => void;
 

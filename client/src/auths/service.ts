@@ -1,6 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
-import { useRoomStore } from "../stores/room.store";
 import { useUserChatStore } from "../user_chats/store";
 import { useNavbarStore } from "../navbar/navbar.store";
 import { useChatbotStore } from "../chatbot/store";
@@ -11,6 +10,9 @@ import { inferAdditionalFields } from "better-auth/client/plugins";
 import { useAuthStore } from "./store";
 import { useEffect } from "react";
 import { useUserStore } from "../user_profiles/store";
+import { useGroupChatStore } from "../group_chats/store";
+import { useGroupMemberStore } from "../group_member/store";
+import { useGroupProfileStore } from "../group_profiles/store";
 
 export default function useAuthService() {
     const navigate = useNavigate();
@@ -27,14 +29,22 @@ export default function useAuthService() {
     
     const resetSignInState = useAuthStore((state) => state.resetSignInState);
     const resetSignUpState = useAuthStore((state) => state.resetSignUpState);
+        
+    const resetGroupMessageState = useGroupChatStore((state) => state.resetGroupMessageState);
+    
+    const resetGroupMemberState = useGroupMemberStore((state) => state.resetGroupMemberState);
+    
+    const resetGroupProfileState = useGroupProfileStore((state) => state.resetGroupProfileState);
 
-    const resetRoomState = useRoomStore((state) => state.resetRoomState);
     const resetChatState = useUserChatStore((state) => state.resetChatState);
-    const clearChatBotState = useChatbotStore((state) => state.clearChatBotState);
+    const resetChatBotState = useChatbotStore((state) => state.resetChatBotState);
     
     const resetNavbarState = useNavbarStore((state) => state.resetNavbarState);
     
     const setCurrentUserId = useUserStore((state) => state.setCurrentUserId);
+
+    const resetUserState = useUserStore((state) => state.resetUserState);
+
     const setGroupIds = useUserStore((state) => state.setGroupIds);
 
     const authServiceClient = createAuthClient({
@@ -52,9 +62,11 @@ export default function useAuthService() {
             if (request.error || !request.data) return null;
 
             return { 
+                address: request.data.user.address, 
                 created_at: request.data.user.createdAt,
                 description: request.data.user.description,
-                email: request.data.user.email, 
+                email: request.data.user.email,
+                gender: request.data.user.gender, 
                 group_ids: request.data.user.group_ids,
                 profile_picture: {
                     public_id: request.data.user.image_public_id,
@@ -115,14 +127,16 @@ export default function useAuthService() {
         onSuccess: () => {
             queryClient.setQueryData(['current-user'], null);
             queryClient.clear();
-            resetSignInState();
-            resetSignUpState();
-            clearChatBotState();
-            resetChatState();
-            resetRoomState();
-            resetNavbarState();
+            useGroupChatStore.persist.clearStorage();
             useUserStore.persist.clearStorage();
             useUserChatStore.persist.clearStorage();
+            resetChatState();
+            resetGroupMemberState();
+            resetGroupMessageState();
+            resetGroupProfileState();
+            resetChatBotState();
+            resetUserState();
+            resetNavbarState();
             navigate("/sign-in");
         }
     });

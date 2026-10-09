@@ -5,7 +5,7 @@ export const useChatbotStore = create<ChatbotState>((set) => ({
     answer: "",
     setAnswer: (answer) => set({ answer }),
     
-    clearChatBotState: () => set({
+    resetChatBotState: () => set({
         question: "",
         selectedChatBotIds: [],
     }),

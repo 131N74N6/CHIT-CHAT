@@ -24,8 +24,8 @@ export const useUserStore = create<UserState>()(persist((set) => ({
     groupIds: [],
     setGroupIds: (groupIds: string[]) => set({ groupIds }),
 
-    oldProfile: null,
-    setOldProfilePicture: (oldProfile) => set({ oldProfile }),
+    oldProfilePicture: null,
+    setOldProfilePicture: (oldProfilePicture) => set({ oldProfilePicture }),
 
     profilePicture: null,
     setProfilePicture: (profilePicture) => set({ profilePicture }),
@@ -39,7 +39,7 @@ export const useUserStore = create<UserState>()(persist((set) => ({
         currentUserRoomIds: undefined,
         description: "",
         editMode: false,
-        oldProfile: null,
+        oldProfilePicture: null,
         profilePicture: null,
         profilePictureUrl: null,
         roomCode: "",

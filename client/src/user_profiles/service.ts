@@ -1,6 +1,5 @@
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
-import { useRoomStore } from "../stores/room.store";
 import { useUserChatStore } from "../user_chats/store";
 import { useUserStore } from "./store";
 import { useNavbarStore } from "../navbar/navbar.store";
@@ -8,6 +7,10 @@ import { useRef } from "react";
 import { useMessageStore } from "../stores/message.store";
 import { apiRequest, apiUpload } from "../api";
 import type { UserDetail, Users } from "./model";
+import { useGroupChatStore } from "../group_chats/store";
+import { useGroupMemberStore } from "../group_member/store";
+import { useGroupProfileStore } from "../group_profiles/store";
+import { useChatbotStore } from "../chatbot/store";
 
 export default function useUserProfileService() {
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -15,7 +18,13 @@ export default function useUserProfileService() {
     const queryClient = useQueryClient();
     
     const setMessage = useMessageStore((state) => state.setMessage);
-    const allowedFiles = ["image/png", "image/jpeg", "image/avif", "image/webp"]
+    const allowedFiles = ["image/png", "image/jpeg", "image/avif", "image/webp"];
+    
+    const resetGroupMessageState = useGroupChatStore((state) => state.resetGroupMessageState);
+    
+    const resetGroupMemberState = useGroupMemberStore((state) => state.resetGroupMemberState);
+    
+    const resetGroupProfileState = useGroupProfileStore((state) => state.resetGroupProfileState);
 
     const address = useUserStore((state) => state.address);
     const setAddress = useUserStore((state) => state.setAddress);
@@ -40,10 +49,11 @@ export default function useUserProfileService() {
     const setUserName = useUserStore((state) => state.setUserName);
 
     const resetUserState = useUserStore((state) => state.resetUserState);
-    
-    const resetRoomState = useRoomStore((state) => state.resetRoomState);
 
     const resetChatState = useUserChatStore((state) => state.resetChatState);
+    
+    const resetChatBotState = useChatbotStore((state) => state.resetChatBotState);
+
     const receiverId = useUserChatStore((state) => state.receiverId);
 
     const resetNavbarState = useNavbarStore((state) => state.resetNavbarState);
@@ -93,6 +103,8 @@ export default function useUserProfileService() {
             setDescription("");
             setEditMode(false);
             setGender("");
+            setProfilePicture(null);
+            setProfilePictureUrl(null);
             setUserName("");
         }
     });
@@ -109,10 +121,39 @@ export default function useUserProfileService() {
         onSuccess: () => {
             queryClient.setQueryData(['current-user'], null);
             queryClient.clear();
+            useGroupChatStore.persist.clearStorage();
             useUserStore.persist.clearStorage();
             useUserChatStore.persist.clearStorage();
             resetChatState();
-            resetRoomState();
+            resetGroupMemberState();
+            resetGroupMessageState();
+            resetGroupProfileState();
+            resetUserState();
+            resetChatBotState();
+            resetNavbarState();
+            navigate("/sign-in");
+        }
+    });
+
+    const deleteUserProfilePictureMt = useMutation({
+        mutationFn: async () => {
+            const endpoint = `${import.meta.env.VITE_BASE_API_URL}/api/v1/users/${currentUserId}`;
+            const request = await apiRequest(endpoint, { method: "PUT" });
+            return request.data;
+        },
+        onError: (error) => {
+            setMessage(error.message);
+        },
+        onSuccess: () => {
+            queryClient.setQueryData(['current-user'], null);
+            queryClient.clear();
+            useGroupChatStore.persist.clearStorage();
+            useUserStore.persist.clearStorage();
+            useUserChatStore.persist.clearStorage();
+            resetChatState();
+            resetGroupMemberState();
+            resetGroupMessageState();
+            resetGroupProfileState();
             resetUserState();
             resetNavbarState();
             navigate("/sign-in");
@@ -159,12 +200,15 @@ export default function useUserProfileService() {
         staleTime: Infinity
     });
 
-    const isProcessing = [changeUserMt, deleteUserMt].some((feature => feature.isPending));
+    const isProcessing = [
+        changeUserMt, deleteUserMt, deleteUserProfilePictureMt
+    ].some((a => a.isPending));
 
     return {
         showUsers,
         changeUserMt,
         deleteUserMt,
+        deleteUserProfilePictureMt,
         fileInputRef,
         handleImagePreview,
         isProcessing,

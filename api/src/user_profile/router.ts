@@ -30,6 +30,11 @@ const userProfileRouters = new Elysia({ prefix: "/api/v1/users" })
     return await userProfileController.changeUser({ id: context.user.id, ...context.body });
 }, {
     body: t.Omit(userProfileSchema.changeRaw, ["id"])
+})
+.put("/:id", async (context) => {
+    return await userProfileController.deleteUserProfilePicture(context.params.id);
+}, {
+    params: t.Pick(userProfileSchema.changeRaw, ["id"])
 }).ws("/ws", {
     async open (ws) {
         try {
