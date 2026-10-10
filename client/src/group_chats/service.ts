@@ -145,6 +145,10 @@ export default function useGroupChatService() {
             }
         }
 
+        const handleDisconnect = () => {
+            //
+        }
+
         const handleReconnecting = (payload: any) => {
             setMessage(payload.message);
         }
@@ -155,6 +159,7 @@ export default function useGroupChatService() {
         }
 
         groupChatWebSocket.on("connect", handleConnectionToGroup);
+        groupChatWebSocket.on("disconnected", handleDisconnect);
         groupChatWebSocket.on("error", handleError);
         groupChatWebSocket.on("max_retries", handleMaxRetries);
         groupChatWebSocket.on("message", handleGroupMessage);
@@ -162,6 +167,7 @@ export default function useGroupChatService() {
 
         return () => {
             groupChatWebSocket.off("connect", handleConnectionToGroup);
+            groupChatWebSocket.off("disconnected", handleDisconnect);
             groupChatWebSocket.off("error", handleError);
             groupChatWebSocket.off("max_retries", handleMaxRetries);
             groupChatWebSocket.off("message", handleGroupMessage);

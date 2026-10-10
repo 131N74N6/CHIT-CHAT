@@ -1,6 +1,6 @@
 import Alert from "../components/Alert";
 import cn from "../utils/cn";
-import Loading from "../components/Loading";
+import Loading from "../loading/Loading";
 import { File, MessageCircle, SendIcon, Settings2 } from "lucide-react";
 import { useEffect } from "react";
 import { useMessageStore } from "../stores/message.store";

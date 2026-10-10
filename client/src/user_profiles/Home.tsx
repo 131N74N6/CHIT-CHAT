@@ -1,4 +1,4 @@
-import Loading from "../components/Loading";
+import Loading from "../loading/Loading";
 import Navbar from "../navbar/Navbar";
 import useUserChatService from "../user_chats/service";
 import UserList from "./UserList";

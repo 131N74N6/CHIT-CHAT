@@ -1,4 +1,4 @@
-import Loading from "../components/Loading";
+import Loading from "../loading/Loading";
 import { ArrowLeft, File, SendIcon, Settings2 } from "lucide-react";
 import useGroupChatService from "./service";
 import { useGroupChatStore } from "./store";

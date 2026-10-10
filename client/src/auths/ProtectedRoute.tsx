@@ -1,5 +1,5 @@
 import { Navigate } from "react-router-dom";
-import Loading from "../components/Loading";
+import Loading from "../loading/Loading";
 import useAuthService from "./service";
 
 interface ProtectedRouteIntrf {

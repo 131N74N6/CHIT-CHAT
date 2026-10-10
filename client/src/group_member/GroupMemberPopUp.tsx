@@ -1,5 +1,5 @@
 import { ArrowLeft } from "lucide-react";
-import Loading from "../components/Loading";
+import Loading from "../loading/Loading";
 import { useGroupChatStore } from "../group_chats/store";
 import UserList from "../user_profiles/UserList";
 import { useGroupMemberStore } from "./store";

@@ -1,7 +1,7 @@
 import { MessageCircle } from "lucide-react";
 import UserChatFileList from "../user_chats/UserChatFileList";
 import { useGroupChatStore } from "./store";
-import Loading from "../components/Loading";
+import Loading from "../loading/Loading";
 import { useGroupProfileStore } from "../group_profiles/store";
 import { useGroupMemberStore } from "../group_member/store";
 import type { IGroupChatFilesPopUp } from "./model";

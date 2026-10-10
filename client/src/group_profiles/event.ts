@@ -1,28 +1,28 @@
-import { EventEmitter } from "eventemitter3";
+import EventEmitter from "eventemitter3";
 
-class GroupChatWebSocket extends EventEmitter {
+class GroupProfileWebSocket extends EventEmitter {
     private ws: WebSocket | null = null;
     private url: string | null = null;
 
     private reconnectAttemps = 0;
     private maxReconnectAttemps = 5;
-    private reconnectDelay = 2000;
+    private reconnectDelay = 1000;
 
-    private messageQueue: any[] = [];
-    private isConnecting = false;
-    private shouldReconnect = true;
-
-    private token = "";
-    private backendUrl = "";
     private groupId = "";
+    private backendUrl = "";
+    private token = "";
+
+    private isConnecting = false;
+    private messageQueue: any[] = [];
+    private shouldReconnect = true;
 
     private bindEvents() {
         if (!this.ws) return;
 
         this.ws.onopen = () => {
-            this.reconnectAttemps = 0;
             this.isConnecting = false;
-            this.emit("connect", { type: "connect", message: "Connected to group" });
+            this.reconnectAttemps = 0;
+            this.emit("connect", { type: "connect", message: "You're connected" });
 
             this.messageQueue.forEach((message) => this.ws?.send(message));
             this.messageQueue = [];
@@ -39,12 +39,12 @@ class GroupChatWebSocket extends EventEmitter {
 
                 this.emit("message", payload);
             } catch (error) {
-                this.emit("error", { type: "error", message: "Failed to parse message" });
+                this.emit("error", { message: "failed to get data", type: "error" });
             }
         }
 
         this.ws.onerror = () => {
-            this.emit("error", { type: "error", message: "Connection failed" });
+            this.emit("error", { message: "connection failed", type: "error" });
         }
 
         this.ws.onclose = () => {
@@ -53,41 +53,40 @@ class GroupChatWebSocket extends EventEmitter {
 
             if (this.shouldReconnect && (this.reconnectAttemps < this.maxReconnectAttemps)) {
                 this.reconnectAttemps++;
-                const delay = this.reconnectDelay * Math.pow(2, this.reconnectAttemps - 1);
-                this.emit("reconnecting", { message: "Reconnecting...", attempt: this.reconnectAttemps });
+                const delay = this.reconnectDelay * Math.pow(2, (this.reconnectDelay - 1));
+
+                this.emit("reconnecting", { message: "Reconnecting..." });
                 setTimeout(() => {
-                    if (this.url) this.connectWithUrl();
+                    if (this.url) this.connectUrl();
                 }, delay);
             } else if (this.shouldReconnect) {
-                this.emit("max_retries", { message: "Connection lost. Please refresh the page." });
+                this.emit("max_retried", { message: "Connection lost. Please refresh the page." });
             }
         }
     }
 
     private buildWsUrl(backendUrl: string, groupId: string, token: string) {
-        const wsProtocol = backendUrl.startsWith("https") ? "wss:" : "ws:";
+        const wsProtocol = backendUrl.includes("https") ? "wss:" : "ws:";
         const backendHost = backendUrl.replace(/^https?:\/\//, "");
         const encodedToken = encodeURIComponent(token);
-        const wsUrl =  `${wsProtocol}//${backendHost}/api/v1/groups/chats/ws?group_id=${groupId}&token=${encodedToken}`;
-        return wsUrl;
+        return `${wsProtocol}//${backendHost}/api/v1/groups/ws?group_id=${groupId}&token=${encodedToken}`;
     }
-
+    
     connect(backendUrl: string, groupId: string, token: string) {
         if (this.isConnecting) return;
-        if (this.ws && (this.ws.readyState !== WebSocket.CONNECTING && this.ws.readyState !== WebSocket.OPEN)) return;
+        if (this.ws && (this.ws.readyState !== WebSocket.OPEN && this.ws.readyState !== WebSocket.CONNECTING)) return;
 
         const newWsUrl = this.buildWsUrl(backendUrl, groupId, token);
-        
         if (this.url && this.url !== newWsUrl) this.disconnect();
 
         this.url = newWsUrl;
-        this.isConnecting = true;
+        this.isConnecting = true
         this.bindEvents();
     }
-
-    private connectWithUrl() {
-        if (this.token && this.url && this.groupId && this.backendUrl) {
-            this.isConnecting = true;
+    
+    private connectUrl() {
+        if (this.backendUrl && this.token && this.groupId && this.url) {
+            this.isConnecting = false;
             this.ws = new WebSocket(this.url);
             this.bindEvents();
         }
@@ -119,4 +118,4 @@ class GroupChatWebSocket extends EventEmitter {
     }
 }
 
-export const groupChatWebSocket = new GroupChatWebSocket();
+export const groupProfileWebSocket = new GroupProfileWebSocket();

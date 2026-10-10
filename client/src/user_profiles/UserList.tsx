@@ -1,5 +1,5 @@
 import cn from "../utils/cn";
-import Loading from "../components/Loading";
+import Loading from "../loading/Loading";
 import UserData from "./UserData";
 import type { UserList } from "./model";
 import { useUserStore } from "./store";

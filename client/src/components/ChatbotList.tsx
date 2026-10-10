@@ -1,6 +1,6 @@
 import type { IChatbotList } from "../models/chatbot.model";
 import ChatbotBubble from "./ChatbotBubble";
-import Loading from "./Loading";
+import Loading from "../loading/Loading";
 import useReverseScroll from "../hooks/useReverseScroll";
 import { useRef } from "react";
 

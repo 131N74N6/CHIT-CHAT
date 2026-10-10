@@ -1,5 +1,5 @@
 import cn from "../utils/cn";
-import Loading from "./Loading";
+import Loading from "../loading/Loading";
 import UserList from "../user_profiles/UserList";
 import type { IRoomMemberWindow } from "../models/room.model";
 import { ArrowLeft } from "lucide-react";

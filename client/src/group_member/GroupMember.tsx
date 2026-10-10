@@ -1,4 +1,4 @@
-import Loading from "../components/Loading";
+import Loading from "../loading/Loading";
 import Navbar from "../navbar/Navbar";
 import UserList from "../user_profiles/UserList";
 import cn from "../utils/cn";

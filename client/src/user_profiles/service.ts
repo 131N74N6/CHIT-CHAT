@@ -73,6 +73,7 @@ export default function useUserProfileService() {
         if (!currentUserId) return;
         if (!getSessionToken.isLoading || !getSessionToken.data) return;
         
+        return () => {}
     }, [
         currentUserId, 
         getSessionToken.data, 

@@ -1,6 +1,6 @@
 import { MessageCircle } from "lucide-react";
 import Navbar from "../navbar/Navbar";
-import Loading from "../components/Loading";
+import Loading from "../loading/Loading";
 import { useUserChatStore } from "./store";
 import { useUserStore } from "../user_profiles/store";
 import type { IUserChatFilesPopUp } from "./model";

@@ -24,7 +24,7 @@ class GroupMemberRepository {
 
     async kickMember(props: TGroupMember["leftGroup"]) {
         await this.users.updateOne({ _id: new ObjectId(props.user_id) }, {
-            $pull: { group_ids: [props.group_id] }
+            $pull: { group_ids: [new ObjectId(props.group_id)] }
         });
 
         return props.user_id;
@@ -32,7 +32,7 @@ class GroupMemberRepository {
 
     async leftGroup(props: TGroupMember["leftGroup"]) {
         await this.users.updateOne({ _id: new ObjectId(props.user_id) }, {
-            $pull: { group_ids: [props.group_id] }
+            $pull: { group_ids: [new ObjectId(props.group_id)] }
         });
 
         return props.user_id;

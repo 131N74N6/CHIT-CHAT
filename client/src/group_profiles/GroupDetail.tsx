@@ -5,7 +5,7 @@ import { ArrowBigLeft, Camera, MessageCircle, X } from "lucide-react";
 import { useMessageStore } from "../stores/message.store";
 import { useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import Loading from "../components/Loading";
+import Loading from "../loading/Loading";
 import useGroupProfileService from "./service";
 import useGroupMemberService from "../group_member/service";
 import { useUserStore } from "../user_profiles/store";

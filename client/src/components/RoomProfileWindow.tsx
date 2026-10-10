@@ -1,6 +1,6 @@
 import { ArrowBigLeft, Camera, X } from "lucide-react";
 import cn from "../utils/cn";
-import Loading from "./Loading";
+import Loading from "../loading/Loading";
 import type { IRoomProfileWindow } from "../models/room.model";
 
 export default function RoomProfileWindow(props: IRoomProfileWindow) {

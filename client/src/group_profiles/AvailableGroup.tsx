@@ -1,4 +1,4 @@
-import Loading from "../components/Loading";
+import Loading from "../loading/Loading";
 import Navbar from "../navbar/Navbar";
 import { MessageCircle } from "lucide-react";
 import cn from "../utils/cn";

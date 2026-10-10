@@ -1,6 +1,6 @@
 import ChatList from "./MessageList";
 import useUserChatService from "./service";
-import Loading from "../components/Loading";
+import Loading from "../loading/Loading";
 import { File, SendIcon, Settings2, X } from "lucide-react";
 import { useUserChatStore } from "./store";
 import useUserProfileService from "../user_profiles/service";

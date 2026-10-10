@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useMessageStore } from "../stores/message.store";
 import { useEffect } from "react";
 import Alert from "../components/Alert";
-import Loading from "../components/Loading";
+import Loading from "../loading/Loading";
 import cn from "../utils/cn";
 import Navbar from "../navbar/Navbar";
 import { ArrowBigLeft } from "lucide-react";

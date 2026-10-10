@@ -1,7 +1,7 @@
 import { ArrowBigLeft } from "lucide-react";
 import type { IUserProfileWindow } from "../models/user.model";
 import cn from "../utils/cn";
-import Loading from "./Loading";
+import Loading from "../loading/Loading";
 
 export default function UserProfileWindow(props: IUserProfileWindow) {
     return (

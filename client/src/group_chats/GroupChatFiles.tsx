@@ -6,7 +6,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import useGroupChatService from "./service";
 import { useGroupChatStore } from "./store";
 import { useEffect } from "react";
-import Loading from "../components/Loading";
+import Loading from "../loading/Loading";
 
 export default function GroupChatFiles() {
     const { chat_id } = useParams();

@@ -4,7 +4,7 @@ import Navbar from "../navbar/Navbar";
 import useUserChatService from "./service";
 import UserChatFileList from "./UserChatFileList";
 import { useNavigate, useParams } from "react-router-dom";
-import Loading from "../components/Loading";
+import Loading from "../loading/Loading";
 import { useUserChatStore } from "./store";
 import { useEffect } from "react";
 

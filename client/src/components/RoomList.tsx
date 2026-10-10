@@ -1,5 +1,5 @@
 import type { RoomListIntrf } from "../models/room.model";
-import Loading from "./Loading";
+import Loading from "../loading/Loading";
 import RoomItem from "./RoomItem";
 
 export default function RoomList(props: RoomListIntrf) {
