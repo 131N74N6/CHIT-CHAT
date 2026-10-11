@@ -4,7 +4,7 @@ import { MessageCircle } from "lucide-react";
 import cn from "../utils/cn";
 import { useEffect } from "react";
 import { useMessageStore } from "../stores/message.store";
-import Alert from "../components/Alert";
+import Alert from "../alert/Alert";
 import GroupList from "./GroupList";
 import useGroupProfileService from "./service";
 import useGroupChatService from "../group_chats/service";

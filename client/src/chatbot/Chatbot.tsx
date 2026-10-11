@@ -4,7 +4,7 @@ import cn from "../utils/cn";
 import Navbar from "../navbar/Navbar";
 import { useEffect } from "react";
 import { useMessageStore } from "../stores/message.store";
-import Alert from "../components/Alert";
+import Alert from "../alert/Alert";
 import ChatbotList from "../components/ChatbotList";
 import Loading from "../loading/Loading";
 

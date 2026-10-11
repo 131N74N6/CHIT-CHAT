@@ -4,7 +4,7 @@ import UserList from "../user_profiles/UserList";
 import cn from "../utils/cn";
 import { useMessageStore } from "../stores/message.store";
 import { useEffect } from "react";
-import Alert from "../components/Alert";
+import Alert from "../alert/Alert";
 import { MessageCircle } from "lucide-react";
 import { useParams } from "react-router-dom";
 import { useGroupChatStore } from "../group_chats/store";

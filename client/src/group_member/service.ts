@@ -60,21 +60,55 @@ export default function useGroupMemberService() {
                 queryClient.setQueryData(queryKey, (old: any) => {
                     if (!old) return;
 
-                    const newMessagePage = old.pages.map((page: any[]) => {
+                    const newMemberData = old.pages.map((page: any[]) => {
                         return page.map((message) => message.group_ids.push(payload.data));
                     });
 
-                    return { ...old, pages: newMessagePage };
+                    return { ...old, pages: newMemberData };
                 });
             } else if (payload.type === "member:kicked" || payload.type === "member:left") {
                 queryClient.setQueryData(queryKey, (old: any) => {
                     if (!old) return;
 
-                    const newMessagePage = old.pages.map((page: any[]) => {
+                    const newMemberData = old.pages.map((page: any[]) => {
                         return page.filter((message) => message._id !== payload.data);
                     });
 
-                    return { ...old, pages: newMessagePage };
+                    return { ...old, pages: newMemberData };
+                });
+            } else if (payload.type === "member-profile:changed") {
+                queryClient.setQueryData(queryKey, (old: any) => {
+                    if (!old) return old;
+
+                    const newMemberData = old.pages.map((page: any[]) => {
+                        return page.map((message: any) => {
+                            if (payload.data.includes(message._id)) {
+                                return { ...message, name: payload.data.name }
+                            }
+                            return message;
+                        });
+                    });
+                    
+                    return { ...old, pages: newMemberData };
+                });
+            } else if (payload.type === "member-profile-picture:deleted") {
+                queryClient.setQueryData(queryKey, (old: any) => {
+                    if (!old) return old;
+
+                    const newMemberData = old.pages.map((page: any[]) => {
+                        return page.map((message: any) => {
+                            if (payload.data.includes(message._id)) {
+                                return { 
+                                    ...message, 
+                                    image: payload.data.image,
+                                    image_public_id: payload.data.image_public_id 
+                                }
+                            }
+                            return message;
+                        });
+                    });
+                    
+                    return { ...old, pages: newMemberData };
                 });
             }
 

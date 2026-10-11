@@ -4,7 +4,6 @@ import userProfileRepository from "./repository";
 import { v2 } from "cloudinary";
 import { groupChatEvent } from "../group_chats/event";
 import { groupMemberEvent } from "../group_members/event";
-import { userChatEvent } from "../user_chats/event";
 import { userProfileEvent } from "./event";
 import { TUserProfile } from "./model";
 import { CloudinaryUploadResult } from "../cloudinary/model";
@@ -25,10 +24,6 @@ class UserProfileService {
         }
 
         return value;
-    }
-
-    private getRoomId(receiver_id: string, sender_id: string) {
-        return [receiver_id, sender_id].sort().join("_");
     }
 
     async changeUser(props: TUserProfile["changeRaw"]) {
@@ -100,20 +95,6 @@ class UserProfileService {
 
         const availableUserRoom = `available-user-${userId}`;
         const currentUserProfileRoom = `current-user-profile-${userId}`;
-        const oneToOneMessageRoom = await userProfileRepository.findMessageOwnerIds(userId);
-
-        for (let a = 0; a < oneToOneMessageRoom.length; a++) {
-            const room = this.getRoomId(userId, oneToOneMessageRoom[a]);
-            userChatEvent.emit(room, {
-                data: {
-                    _id: result.id, 
-                    name: result.name, 
-                    image: result.image, 
-                    image_public_id: result.image_public_id
-                },
-                type: "interlocutors:changed"
-            });
-        }
 
         const forAvailableUserRoom = {
             _id: result.id, 
@@ -132,15 +113,14 @@ class UserProfileService {
         }
 
         const forGroupChatRoom = { 
-            image: result.image, 
-            image_public_id: result.image_public_id,
+            _id: result.id, 
             sender_id: result.id, 
             sender_name: result.name
         }
 
         const forGroupMemberRoom = { 
-            sender_id: result.id, 
-            sender_name: result.name
+            _id: result.id, 
+            name: result.name
         }
 
         if (user.group_ids && user.group_ids.length > 0) {
@@ -180,9 +160,8 @@ class UserProfileService {
         }
 
         const result = await userProfileRepository.deleteUser(userId);
-        const availableRoom = `available-user-${userId}`;
+        const availableUserRoom = `available-user-${userId}`;
         const currentUserProfileRoom = `current-user-profile-${userId}`;
-        const oneToOneMessageRoom = await userProfileRepository.findMessageOwnerIds(userId);
 
         if (user.group_ids && user.group_ids.length > 0) {
             user.group_ids.map((group_id) => {
@@ -192,11 +171,7 @@ class UserProfileService {
             });
         }
 
-        for (let a = 0; a < oneToOneMessageRoom.length; a++) {
-            userChatEvent.emit(oneToOneMessageRoom[a], { data: result, type: "interlocutors:deleted" });
-        }
-
-        userProfileEvent.emit(availableRoom, { data: result, type: "available-user:deleted" });
+        userProfileEvent.emit(availableUserRoom, { data: result, type: "available-user:deleted" });
         userProfileEvent.emit(currentUserProfileRoom, { data: result, type: "user-profile:deleted" });
     }
 
@@ -216,25 +191,24 @@ class UserProfileService {
         }
 
         const result = await userProfileRepository.deleteUserProfilePicture(userId);
-        const availableRoom = `available-user-${userId}`;
+        const availableUserRoom = `available-user-${userId}`;
         const currentUserProfileRoom = `current-user-profile-${userId}`;
-        const oneToOneMessageRoom = await userProfileRepository.findMessageOwnerIds(userId);
+
+        const broadcastedData = {
+            _id: result?._id,
+            image: result?.image,
+            image_public_id: result?.image_public_id,
+        }
 
         if (user.group_ids && user.group_ids.length > 0) {
             user.group_ids.map((group_id) => {
                 const room = `member-from-group-${group_id}`;
-                groupMemberEvent.emit(room, { data: result, type: "member-profile-picture:deleted" });
+                groupMemberEvent.emit(room, { data: broadcastedData, type: "member-profile-picture:deleted" });
             });
         }
 
-        for (let a = 0; a < oneToOneMessageRoom.length; a++) {
-            userChatEvent.emit(oneToOneMessageRoom[a], { 
-                data: result, type: "interlocutors-profile-picture:deleted" 
-            });
-        }
-
-        userProfileEvent.emit(availableRoom, { data: result, type: "available-user-profile-picture:deleted" });
-        userProfileEvent.emit(currentUserProfileRoom, { data: result, type: "user-profile-picture:deleted" });
+        userProfileEvent.emit(availableUserRoom, { data: broadcastedData, type: "available-user-profile-picture:deleted" });
+        userProfileEvent.emit(currentUserProfileRoom, { data: broadcastedData, type: "user-profile-picture:deleted" });
     }
 
     async showAllUsers(props: TUserProfile["showAllUser"]) {

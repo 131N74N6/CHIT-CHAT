@@ -4,7 +4,7 @@ import { useMessageStore } from "../stores/message.store";
 import Loading from "../loading/Loading";
 import Navbar from "../navbar/Navbar";
 import { ArrowBigLeft, MessageCircle, Pen, X } from "lucide-react";
-import Alert from "../components/Alert";
+import Alert from "../alert/Alert";
 import cn from "../utils/cn";
 import useAuthService from "./service";
 import { useUserStore } from "../user_profiles/store";

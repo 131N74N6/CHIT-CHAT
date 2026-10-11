@@ -7,7 +7,7 @@ import { useMessageStore } from "../stores/message.store";
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect } from "react";
 import Navbar from "../navbar/Navbar";
-import Alert from "../components/Alert";
+import Alert from "../alert/Alert";
 import { useUserChatStore } from "./store";
 import PopUpOption from "./PopUpOption";
 import useUserProfileService from "../user_profiles/service";

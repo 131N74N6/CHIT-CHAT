@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { FilesIcon, MessageCircle, SendIcon, X } from "lucide-react";
 import cn from "../utils/cn";
 import FileViewer from "../components/FileViewer";
-import Alert from "../components/Alert";
+import Alert from "../alert/Alert";
 import { useNavigate, useParams } from "react-router-dom";
 import useGroupChatService from "./service";
 import { useGroupChatStore } from "./store";

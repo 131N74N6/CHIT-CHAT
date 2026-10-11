@@ -50,7 +50,7 @@ class UserProfileRepository {
     }
 
     async deleteUserProfilePicture(id: string) {
-        await this.users.updateOne(
+        const result = await this.users.findOneAndUpdate(
             { $or: [{ sender_id: new ObjectId(id) }, { receiver_id: new ObjectId(id) }] },
             { $set: {
                 image: "-",
@@ -58,33 +58,10 @@ class UserProfileRepository {
                 image_filetype: "-",
                 image_public_id: "-",
                 image_resource_type: "-",
-            }}
-        ),
-        this.users.deleteOne({ _id: new ObjectId(id) });
+            }
+        }, { returnDocument: "after" });
 
-        return id;
-    }
-
-    async findMessageOwnerIds(user_id: string): Promise<string[]> {
-        const userChats = await this.user_chats.find({
-            $or: [
-                { sender_id: new ObjectId(user_id) },
-                { receiver_id: new ObjectId(user_id) }
-            ]
-        }, { projection: { sender_id: 1, receiver_id: 1 }}).toArray();
-
-        const userIdGot = new Set<string>();
-        const selfId = user_id;
-
-        userChats.forEach(chat => {
-            const senderId = chat.sender_id.toString();
-            const receiverId = chat.receiver_id.toString();
-            
-            if (senderId !== selfId) userIdGot.add(senderId);
-            if (receiverId !== selfId) userIdGot.add(receiverId);
-        });
-
-        return Array.from(userIdGot);
+        return result;
     }
 
     async findUserById(props: TUserProfile["showUser"]) {

@@ -2,7 +2,7 @@ import useUserProfileService from "./service";
 import { useNavigate, useParams } from "react-router-dom";
 import { useMessageStore } from "../stores/message.store";
 import { useEffect } from "react";
-import Alert from "../components/Alert";
+import Alert from "../alert/Alert";
 import Loading from "../loading/Loading";
 import cn from "../utils/cn";
 import Navbar from "../navbar/Navbar";

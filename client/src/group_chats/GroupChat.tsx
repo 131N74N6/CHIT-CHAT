@@ -1,4 +1,4 @@
-import Alert from "../components/Alert";
+import Alert from "../alert/Alert";
 import cn from "../utils/cn";
 import Loading from "../loading/Loading";
 import { File, MessageCircle, SendIcon, Settings2 } from "lucide-react";

@@ -4,7 +4,7 @@ import useUserProfileService from "../user_profiles/service";
 import cn from "../utils/cn";
 import { useMessageStore } from "../stores/message.store";
 import { useEffect } from "react";
-import Alert from "../components/Alert";
+import Alert from "../alert/Alert";
 import useRoomProfileService from "../services/useRoomProfileService";
 
 export default function CreateGroup() {

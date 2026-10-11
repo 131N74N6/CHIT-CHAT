@@ -1,4 +1,4 @@
-import Alert from "../components/Alert";
+import Alert from "../alert/Alert";
 import cn from "../utils/cn";
 import Navbar from "../navbar/Navbar";
 import { ArrowBigLeft, Camera, MessageCircle, X } from "lucide-react";

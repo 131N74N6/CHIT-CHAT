@@ -7,7 +7,7 @@ import { useMessageStore } from "../stores/message.store";
 import { useEffect } from "react";
 import { useUserChatStore } from "./store";
 import { useNavigate, useParams } from "react-router-dom";
-import Alert from "../components/Alert";
+import Alert from "../alert/Alert";
 
 export default function UserChatFilesPreview() {
     const { receiver_id } = useParams();

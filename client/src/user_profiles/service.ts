@@ -2,7 +2,7 @@ import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tansta
 import { useNavigate } from "react-router-dom";
 import { useUserChatStore } from "../user_chats/store";
 import { useUserStore } from "./store";
-import { useNavbarStore } from "../navbar/navbar.store";
+import { useNavbarStore } from "../navbar/store";
 import { useEffect, useRef } from "react";
 import { useMessageStore } from "../stores/message.store";
 import { apiRequest, apiUpload } from "../api";
@@ -11,6 +11,7 @@ import { useGroupChatStore } from "../group_chats/store";
 import { useGroupMemberStore } from "../group_member/store";
 import { useGroupProfileStore } from "../group_profiles/store";
 import { useChatbotStore } from "../chatbot/store";
+import { userProfileWebSocket } from "./event";
 
 export default function useUserProfileService() {
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -70,16 +71,150 @@ export default function useUserProfileService() {
     });
 
     useEffect(() => {
-        if (!currentUserId) return;
-        if (!getSessionToken.isLoading || !getSessionToken.data) return;
+        if (!currentUserId && !receiverId) return;
+        if (getSessionToken.isLoading || !getSessionToken.data) return;
         
-        return () => {}
+        const token = getSessionToken.data;
+
+        if (!token || typeof token !== "string") {
+            setMessage("authentication failed");
+            return;
+        }
+
+        const apiUrl = import.meta.env.VITE_BASE_API_URL;
+        userProfileWebSocket.enableReconnect();
+        userProfileWebSocket.connect(token, apiUrl);
+
+        const handleConnected = (payload: any) => {
+            setMessage(payload.message);
+        }
+
+        const handleDisconnected = () => {
+            //
+        }
+
+        const handleError = (payload: any) => {
+            const message = payload.message;
+            setMessage(message);
+
+            if (message.includes("not allowed") || message.includes("Invalid user")) {
+                userProfileWebSocket.disconnected();
+            }
+        }
+
+        const handleMaxRetries = (payload: any) => {
+            setMessage(payload.message);
+            userProfileWebSocket.disconnected();
+        }
+
+        const handleMessage = (payload: any) => {
+            if (payload.type === "error") {
+                setMessage(payload.message);
+                return;
+            }
+
+            const queryKey1 = ['all-users'];
+            const queryKey2 = [`other-user-${receiverId}`];
+
+            if (payload.type === "available-user:changed") {
+                queryClient.setQueryData(queryKey1, (old: any) => {
+                    if (!old) return old;
+
+                    const newMessagePage = old.pages.map((page: any[]) => {
+                        return page.map((user) => {
+                            return user._id === payload.data._id ? payload.data : user
+                        });
+                    });
+
+                    return { ...old, pages: newMessagePage }
+                });
+            } else if (payload.type === "user-profile:changed") {
+                queryClient.setQueryData(queryKey2, (old: any) => {
+                    if (!old) return old;
+
+                    const newMessagePage = old.pages.map((page: any[]) => {
+                        return page.map((user) => {
+                            return user._id === payload.data._id ? payload.data : user
+                        });
+                    });
+
+                    return { ...old, pages: newMessagePage }
+                });
+            } else if (payload.type === "available-user:deleted") {
+                queryClient.setQueryData(queryKey1, (old: any) => {
+                    if (!old) return old;
+
+                    const newMessagePage = old.pages.map((page: any[]) => {
+                        return page.filter((user) => user._id !== payload.data);
+                    });
+
+                    return { ...old, pages: newMessagePage }
+                });
+            } else if (payload.type === "user-profile:deleted") {
+                queryClient.setQueryData(queryKey2, (old: any) => {
+                    if (!old) return old;
+
+                    const newMessagePage = old.pages.map((page: any[]) => {
+                        return page.filter((user) => user._id !== payload.data);
+                    });
+
+                    return { ...old, pages: newMessagePage }
+                });
+            } else if (payload.type === "available-user-profile-picture:deleted") {
+                queryClient.setQueryData(queryKey1, (old: any) => {
+                    if (!old) return;
+                    const newUserData = old.pages.map((page: any[]) => {
+                        return page.map((user: any) => {
+                            if (payload.data.includes(user._id)) {
+                                return { ...user, image: "-", image_public_id: "-" }
+                            }
+                            return user;
+                        });
+                    });
+                    return { ...old, pages: newUserData };
+                });
+            } else if (payload.type === "user-profile-picture:deleted") {
+                queryClient.setQueryData(queryKey2, (old: any) => {
+                    if (!old) return;
+                    const newUserData = old.pages.map((page: any[]) => {
+                        return page.map((user: any) => {
+                            if (payload.data.includes(user._id)) {
+                                return { ...user, image: "-", image_public_id: "-" }
+                            }
+                            return user;
+                        });
+                    });
+                    return { ...old, pages: newUserData };
+                });
+            }
+        }
+
+        const handleReconnecting = (payload: any) => {
+            setMessage(payload.message);
+        }
+
+        userProfileWebSocket.on("connected", handleConnected);
+        userProfileWebSocket.on("disconnected", handleDisconnected);
+        userProfileWebSocket.on("error", handleError);
+        userProfileWebSocket.on("max_retries", handleMaxRetries);
+        userProfileWebSocket.on("message", handleMessage);
+        userProfileWebSocket.on("reconnecting", handleReconnecting);
+
+        return () => {
+            userProfileWebSocket.off("connected", handleConnected);
+            userProfileWebSocket.off("disconnected", handleDisconnected);
+            userProfileWebSocket.off("error", handleError);
+            userProfileWebSocket.off("max_retries", handleMaxRetries);
+            userProfileWebSocket.off("message", handleMessage);
+            userProfileWebSocket.off("reconnecting", handleReconnecting);
+        }
     }, [
         currentUserId, 
         getSessionToken.data, 
         getSessionToken.isLoading, 
         getSessionToken.error, 
         queryClient, 
+        receiverId,
         setMessage
     ]);
 
@@ -206,7 +341,7 @@ export default function useUserProfileService() {
             return request.data ?? [];
         },
         initialPageParam: 1,
-        queryKey: [`all-users`],
+        queryKey: ['all-users'],
         refetchOnMount: false,
         refetchOnWindowFocus: false,
         staleTime: Infinity

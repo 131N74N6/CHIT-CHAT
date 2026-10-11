@@ -7,7 +7,7 @@ import { MessageCircle } from "lucide-react";
 import { useEffect } from "react";
 import { useMessageStore } from "../stores/message.store";
 import { useUserChatStore } from "../user_chats/store";
-import Alert from "../components/Alert";
+import Alert from "../alert/Alert";
 import PopUpOption from "../user_chats/PopUpOption";
 import { useUserStore } from "./store";
 import UserChatPopUp from "../user_chats/UserChatPopUp";
