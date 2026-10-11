@@ -1,0 +1,43 @@
+import type { IChatbotList } from "../models/chatbot.model";
+import ChatbotBubble from "./ChatbotBubble";
+import Loading from "../loading/Loading";
+import useReverseScroll from "../hooks/useReverseScroll";
+import { useRef } from "react";
+
+export default function MessageList() {
+    if (props.results.length === 0) {
+        return (
+            <div className="flex justify-center items-center h-full">
+                <div className="bg-white">
+                    <span className="text-gray-700 font-semibold text-[1rem]">No results found...</span>
+                </div>
+            </div>
+        );
+    }
+
+    return (
+        <div className="overflow-y-auto flex flex-col gap-2 py-2.5">
+            <div ref={topSentinelRef} className="h-1 w-full flex justify-center items-center">
+                {props.isFetchingNextPage ? (
+                    <Loading/>
+                ) : !props.hasNextPage ? (
+                    <div className="text-center text-[0.8rem] text-gray-950 font-medium">No more older chat to show</div>
+                ) : null}
+            </div>
+            <div className="flex flex-col gap-2">
+                {props.results.map(result => {
+                    return (
+                        <ChatbotBubble 
+                            isProcessing={props.isProcessing}
+                            isSelectMode={props.isSelectMode}
+                            key={result._id} 
+                            result={result}
+                            selectedChatBotIds={props.selectedChatBotIds}
+                            toggleSelect={props.toggleSelect}
+                        />
+                    );
+                })}
+            </div>
+        </div>
+    );
+}

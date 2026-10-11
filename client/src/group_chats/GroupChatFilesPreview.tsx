@@ -3,7 +3,7 @@ import { useMessageStore } from "../stores/message.store";
 import { useEffect } from "react";
 import { FilesIcon, MessageCircle, SendIcon, X } from "lucide-react";
 import cn from "../utils/cn";
-import FileViewer from "../components/FileViewer";
+import FileViewer from "../user_chats/FileViewer";
 import Alert from "../alert/Alert";
 import { useNavigate, useParams } from "react-router-dom";
 import useGroupChatService from "./service";
@@ -69,7 +69,7 @@ export default function GroupChatFilesPreview() {
                                     <div className=" relative group">
                                         <FileViewer
                                             file={chosenFile.file}
-                                            fileName={chosenFile.file_name}
+                                            fileName={chosenFile.file_type}
                                             fileType={chosenFile.file_type}
                                             key={`file-in-room-${index}`}
                                             previewUrl={chosenFile.url}

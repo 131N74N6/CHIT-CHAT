@@ -15,3 +15,7 @@ export interface ChatbotState {
     
     resetChatBotState: () => void;
 }
+
+export interface IChatBot {
+    
+}
