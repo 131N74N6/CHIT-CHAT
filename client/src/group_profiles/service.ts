@@ -157,7 +157,7 @@ export default function useGroupProfileService() {
 
     const changeGroupMt = useMutation({
         mutationFn: async () => {
-            const endpoint = `${import.meta.env.VITE_BASE_API_URL}/api/v1/groups`;
+            const endpoint = `/api/v1/groups`;
             const newGroupProfileInfo = new FormData();
             newGroupProfileInfo.append("_id", groupId.trim());
             if (groupDescription) newGroupProfileInfo.append("group_description", groupDescription.trim());
@@ -191,7 +191,7 @@ export default function useGroupProfileService() {
         
     const createGroupMt = useMutation({
         mutationFn: async () => {
-            const endpoint = `${import.meta.env.VITE_BASE_API_URL}/api/v1/groups`;
+            const endpoint = `/api/v1/groups`;
             const formData = new FormData();
             formData.append("group_name", groupName.trim());
             if (groupDescription) formData.append("group_description", groupDescription.trim());
@@ -224,7 +224,7 @@ export default function useGroupProfileService() {
 
     const deleteGroupMt = useMutation({
         mutationFn: async () => {
-            const endpoint = `${import.meta.env.VITE_BASE_API_URL}/api/v1/groups?group_id=${groupId}`;
+            const endpoint = `/api/v1/groups?group_id=${groupId}`;
             await apiRequest(endpoint, { method: "DELETE" });
         },
         onError: (error) => {
@@ -248,7 +248,7 @@ export default function useGroupProfileService() {
 
     const deleteGroupProfilePictureMt = useMutation({
         mutationFn: async () => {
-            const endpoint = `${import.meta.env.VITE_BASE_API_URL}/api/v1/groups/${groupId}`;
+            const endpoint = `/api/v1/groups/${groupId}`;
             await apiRequest(endpoint, { method: "PUT" });
         },
         onError: (error) => {
@@ -285,7 +285,7 @@ export default function useGroupProfileService() {
             return allPages.length + 1;
         },
         queryFn: async ({ pageParam = 1 }: { pageParam?: number }) => {
-            const endpoint = `${import.meta.env.VITE_BASE_API_URL}/api/v1/groups?limit=${16}&page=${pageParam}`;
+            const endpoint = `/api/v1/groups?limit=${16}&page=${pageParam}`;
             const request = await apiRequest<IGroups[]>(endpoint, { method: "GET" });
             return request.data ?? [];
         },
@@ -298,7 +298,7 @@ export default function useGroupProfileService() {
     const showGroupDetail = useQuery({
         enabled: !!groupId,
         queryFn: async () => {
-            const endpoint = `${import.meta.env.VITE_BASE_API_URL}/api/v1/groups/${groupId}`;
+            const endpoint = `/api/v1/groups/${groupId}`;
             const request = await apiRequest<IGroupProfileDetail>(endpoint, { method: "GET" });
             return request.data;
         },

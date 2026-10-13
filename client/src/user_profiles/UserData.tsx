@@ -9,10 +9,10 @@ export default function UserData(props: UserData) {
     const setReceiverId = useUserChatStore((state) => state.setReceiverId);
 
     return (
-        <div className="border-b border-gray-600 p-1.5">
+        <div className="bg-gray-50  p-1.5">
             {props.place.name === "group-member" ? (
                 <div 
-                    className="bg-white justify-between items-center flex cursor-pointer"
+                    className="justify-between items-center flex cursor-pointer"
                     onClick={() => {
                         if (props.isOwnData) {
                             navigate("/profile");
@@ -60,7 +60,7 @@ export default function UserData(props: UserData) {
                     ) : null}
                 </div>
             ) : (
-                <div className="bg-white items-center cursor-pointer">
+                <div className="items-center cursor-pointer">
                     <div 
                         className="md:flex items-center gap-1.5 hidden"
                         onClick={() => setReceiverId(props.user._id)}

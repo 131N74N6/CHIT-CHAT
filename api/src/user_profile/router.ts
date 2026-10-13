@@ -13,18 +13,18 @@ const userProfileRouters = new Elysia({ prefix: "/api/v1/users" })
     return await userProfileController.deleteUser(context.user.id);
 })
 .get("/all", async (context) => {
-    return await userProfileController.showAllUsers(context.query);
+    return await userProfileController.showAllUsers({ id: context.user.id, ...context.query });
 }, {
-    query: userProfileSchema.showAllUser
+    query: t.Pick(userProfileSchema.showAllUser, ["limit", "page"])
+})
+.get("/session", async (context) => {
+    const token = context.cookie['better-auth.session_token'].value;
+    return { data: token };
 })
 .get("/", async (context) => {
     return await userProfileController.showUser({ id: context.query.id });
 }, {
     query: userProfileSchema.showUser
-})
-.get("/session", async (context) => {
-    const token = context.cookie['better-auth.session_token'].value;
-    return { data: token };
 })
 .put("/", async (context) => {
     return await userProfileController.changeUser({ id: context.user.id, ...context.body });

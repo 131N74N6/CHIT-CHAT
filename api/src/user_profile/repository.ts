@@ -84,7 +84,7 @@ class UserProfileRepository {
         const page = props.page;
         const skip = (page - 1) * limit;
 
-        return await this.users.find({ _id: { $neq: new ObjectId(props.id)} }, {
+        return await this.users.find({ _id: { $ne: new ObjectId(props.id)} }, {
             projection: {
                 _id: 1,
                 name: 1,

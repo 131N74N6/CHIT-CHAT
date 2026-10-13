@@ -155,7 +155,7 @@ export default function useGroupMemberService() {
     const isGroupOwner = useQuery({
         enabled: !!currentUserId && !!groupId,
         queryFn: async () => {
-            const endpoint = `${import.meta.env.VITE_BASE_API_URL}/api/v1/groups/members/owner?group_id=${groupId}`;
+            const endpoint = `/api/v1/groups/members/owner?group_id=${groupId}`;
             const request = await apiRequest<boolean>(endpoint, { method: "GET" });
             return request.data ?? false;
         },
@@ -166,7 +166,7 @@ export default function useGroupMemberService() {
 
     const joinGroupMt = useMutation({
         mutationFn: async () => {
-            const endpoint = `${import.meta.env.VITE_BASE_API_URL}/api/v1/groups/members`;
+            const endpoint = `/api/v1/groups/members`;
             const request = await apiRequest(endpoint, {
                 body: JSON.stringify({ group_id: roomCode.trim() }),
                 method: "POST"
@@ -186,7 +186,7 @@ export default function useGroupMemberService() {
 
     const kickMemberMt = useMutation({
         mutationFn: async (userId: string) => {
-            const endpoint = `${import.meta.env.VITE_BASE_API_URL}/api/v1/groups/members/kick`;
+            const endpoint = `/api/v1/groups/members/kick`;
             const request = await apiRequest(endpoint, {
                 body: JSON.stringify({ group_id: groupId, user_id: userId }), 
                 method: "DELETE"
@@ -213,7 +213,7 @@ export default function useGroupMemberService() {
 
     const leftGroupMt = useMutation({
         mutationFn: async () => {
-            const endpoint = `${import.meta.env.VITE_BASE_API_URL}/api/v1/groups/members/left?group_id=${groupId}`;
+            const endpoint = `/api/v1/groups/members/left?group_id=${groupId}`;
             const request = await apiRequest(endpoint, { method: "PUT" });
             return request.data;
         },
@@ -243,7 +243,7 @@ export default function useGroupMemberService() {
         },
         initialPageParam: 1,
         queryFn: async ({ pageParam = 1 }: { pageParam?: number }) => {
-            const endpoint = `${import.meta.env.VITE_BASE_API_URL}/rooms/members?
+            const endpoint = `/rooms/members?
             group_id=${groupId}&page=${pageParam}&limit=${16}`;
 
             const request = await apiRequest<Users[]>(endpoint, { method: "GET" });

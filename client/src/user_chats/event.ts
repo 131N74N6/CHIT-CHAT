@@ -91,7 +91,7 @@ class UserChatWebSocket extends EventEmitter {
         const wsProtocol = backendUrl.startsWith("https") ? "wss:" : "ws:";
         const backendHost = backendUrl.replace(/^https?:\/\//, '');
         const encodedToken = encodeURIComponent(token);
-        const wsUrl = `${wsProtocol}//${backendHost}/api/chats/ws/${otherUserId}?token=${encodedToken}`;
+        const wsUrl = `${wsProtocol}//${backendHost}/api/v1/user-chats/ws/${otherUserId}?token=${encodedToken}`;
         return wsUrl;
     }
 

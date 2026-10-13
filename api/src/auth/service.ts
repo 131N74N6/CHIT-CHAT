@@ -41,9 +41,9 @@ export const authServiceApi = betterAuth({
     },
 
     session: {
-        cookieCache: { enabled: true, maxAge: 300000 },
-        expiresIn: 604800000,
-        updateAge: 86400000,
+        cookieCache: { enabled: true, maxAge: 300 },
+        expiresIn: 604800,
+        updateAge: 86400,
     },
 
     user: {

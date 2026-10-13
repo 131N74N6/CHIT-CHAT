@@ -220,7 +220,7 @@ export default function useUserProfileService() {
 
     const changeUserMt = useMutation({
         mutationFn: async () => {
-            const endpoint = `${import.meta.env.VITE_BASE_API_URL}/api/v1/users`;
+            const endpoint = `/api/v1/users`;
             const newUserInfo = new FormData();
             newUserInfo.append("address", address.trim());
             newUserInfo.append("description", description.trim());
@@ -271,7 +271,7 @@ export default function useUserProfileService() {
 
     const deleteUserMt = useMutation({
         mutationFn: async () => {
-            const endpoint = `${import.meta.env.VITE_BASE_API_URL}/api/v1/users`;
+            const endpoint = `/api/v1/users`;
             const request = await apiRequest(endpoint, { method: "DELETE" });
             return request.data;
         },
@@ -297,7 +297,7 @@ export default function useUserProfileService() {
 
     const deleteUserProfilePictureMt = useMutation({
         mutationFn: async () => {
-            const endpoint = `${import.meta.env.VITE_BASE_API_URL}/api/v1/users/${currentUserId}`;
+            const endpoint = `/api/v1/users/${currentUserId}`;
             const request = await apiRequest(endpoint, { method: "PUT" });
             return request.data;
         },
@@ -334,9 +334,7 @@ export default function useUserProfileService() {
             return allPages.length + 1;
         },
         queryFn: async ({pageParam = 1}: { pageParam?:number }) => {
-            const endpoint = `${import.meta.env.VITE_BASE_API_URL}/api/v1/users/all?
-            id=${currentUserId}&page=${pageParam}&limit=${16}`;
-
+            const endpoint = `/api/v1/users/all?page=${pageParam}&limit=${16}`;
             const request = await apiRequest<Users[]>(endpoint, { method: "GET" });
             return request.data ?? [];
         },
@@ -350,7 +348,7 @@ export default function useUserProfileService() {
     const showOtherUser = useQuery({
         enabled: !!receiverId && currentUserId !== receiverId,
         queryFn: async () => {
-            const endpoint = `${import.meta.env.VITE_BASE_API_URL}/api/v1/users?id=${receiverId}`;
+            const endpoint = `/api/v1/users?id=${receiverId}`;
             const request = await apiRequest<UserDetail>(endpoint, { method: "GET" });
             return request.data;
         },

@@ -185,7 +185,7 @@ export default function useGroupChatService() {
 
     const changeChosenMessageMt = useMutation({
         mutationFn: async (id: string) => {
-            const endpoint = `${import.meta.env.VITE_BASE_API_URL}/api/v1/groups/chats`;
+            const endpoint = `/api/v1/groups/chats`;
             await apiRequest(endpoint, {
                 body: JSON.stringify({ 
                     _id: id.trim(), 
@@ -208,7 +208,7 @@ export default function useGroupChatService() {
 
     const clearAllMessageFromGroupMt = useMutation({
         mutationFn: async () => {
-            const endpoint = `${import.meta.env.VITE_BASE_API_URL}/api/v1/groups/chats/clear?group_id=${groupId}`;
+            const endpoint = `/api/v1/groups/chats/clear?group_id=${groupId}`;
             await apiRequest(endpoint, { method: "DELETE" });
         },
         onError: (error) => {
@@ -225,7 +225,7 @@ export default function useGroupChatService() {
 
     const clearChosenMessageFromGroupMt = useMutation({
         mutationFn: async () => {
-            const endpoint = `${import.meta.env.VITE_BASE_API_URL}/api/v1/groups/chats/clear/bulk`;
+            const endpoint = `/api/v1/groups/chats/clear/bulk`;
             await apiRequest(endpoint, {
                 body: JSON.stringify({ group_id: groupId, message_ids: chosenMessageIdsFromGroup }),
                 method: "DELETE"
@@ -247,7 +247,7 @@ export default function useGroupChatService() {
 
     const deleteAllMessagesFromGroupMt = useMutation({
         mutationFn: async () => {
-            const endpoint = `${import.meta.env.VITE_BASE_API_URL}/api/v1/groups/chats?group_id=${groupId}`;
+            const endpoint = `/api/v1/groups/chats?group_id=${groupId}`;
             await apiRequest(endpoint, {  method: "DELETE" });
         },
         onError: (error) => {
@@ -266,7 +266,7 @@ export default function useGroupChatService() {
 
     const deleteChosenMessagesFromGroupMt = useMutation({
         mutationFn: async () => {
-            const endpoint = `${import.meta.env.VITE_BASE_API_URL}/api/v1/groups/chats/bulk`;
+            const endpoint = `/api/v1/groups/chats/bulk`;
             await apiRequest(endpoint, {
                 body: JSON.stringify({ group_id: groupId, message_ids: chosenMessageIdsFromGroup }),
                 method: "DELETE"
@@ -308,7 +308,7 @@ export default function useGroupChatService() {
     
     const sendChatToGroup = useMutation({
         mutationFn: async () => {
-            const endpoint = `${import.meta.env.VITE_BASE_API_URL}/api/v1/groups/chats`;
+            const endpoint = `/api/v1/groups/chats`;
             const newMessage = new FormData();
             newMessage.append("group_id", groupId);
 
@@ -335,7 +335,7 @@ export default function useGroupChatService() {
     const showFilesThatSentToGroup = useQuery({
         enabled: !!groupMessageId && !!groupId && groupMessageId !== "",
         queryFn: async () => {
-            const endpoint = `${import.meta.env.VITE_BASE_API_URL}/api/v1/groups/chats/files?_id=${groupMessageId}`;
+            const endpoint = `/api/v1/groups/chats/files?_id=${groupMessageId}`;
             const request = await apiRequest<IGroupMessageFiles>(endpoint, { method: "GET" });
             return request.data;
         },
@@ -352,7 +352,7 @@ export default function useGroupChatService() {
             return allPages.length + 1;
         },
         queryFn: async ({pageParam = 1}: { pageParam?: number }) => {
-            const endpoint = `${import.meta.env.VITE_BASE_API_URL}/api/v1/groups/chats?
+            const endpoint = `/api/v1/groups/chats?
             group_id=${groupId}?page=${pageParam}&limit=${52}`;
 
             const request = await apiRequest<IGroupMessage[]>(endpoint, { method: "GET" });

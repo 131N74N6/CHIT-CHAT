@@ -4,17 +4,14 @@ import userProfileService from "./service";
 class UserProfileController {
     async changeUser(props: TUserProfile["changeRaw"]) {
         await userProfileService.changeUser(props);
-        return { message: "your profile has been changed successfully" }
     }
 
     async deleteUser(id: string) {
         await userProfileService.deleteUser(id);
-        return { message: "your profile has been deleted successfully" }
     }
 
     async deleteUserProfilePicture(id: string) {
         await userProfileService.deleteUserProfilePicture(id);
-        return { message: "your profile picture has been deleted successfully" }
     }
 
     async showAllUsers(props: TUserProfile["showAllUser"]) {

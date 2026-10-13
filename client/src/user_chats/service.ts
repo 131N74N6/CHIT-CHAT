@@ -153,7 +153,7 @@ export default function useUserChatService() {
 
     const changeMessageMt = useMutation({
         mutationFn: async (id: string) => {
-            const endpoint = `${import.meta.env.VITE_BASE_API_URL}/api/v1/user-chats`;
+            const endpoint = `/api/v1/user-chats`;
             const newMessage = JSON.stringify({ _id: id, text: text.trim(), receiver_id: receiverId });
             return await apiRequest<IUserChat>(endpoint, { body: newMessage, method: "PUT" });
         },
@@ -173,7 +173,7 @@ export default function useUserChatService() {
 
     const clearAllMessagesMt = useMutation({
         mutationFn: async () => {
-            const endpoint = `${import.meta.env.VITE_BASE_API_URL}/api/v1/user-chats/clear`;
+            const endpoint = `/api/v1/user-chats/clear`;
             await apiRequest(endpoint, { method: "DELETE" });
         },
         onError: (error) => {
@@ -190,7 +190,7 @@ export default function useUserChatService() {
     
     const clearChosenMessagesMt = useMutation({
         mutationFn: async () => {
-            const endpoint = `${import.meta.env.VITE_BASE_API_URL}/api/v1/user-chats/clear/bulk`;
+            const endpoint = `/api/v1/user-chats/clear/bulk`;
             await apiRequest(endpoint, { method: "DELETE" });
         },
         onError: (error) => {
@@ -207,7 +207,7 @@ export default function useUserChatService() {
 
     const deleteAllMessagesMt = useMutation({
         mutationFn: async () => {
-            const endpoint = `${import.meta.env.VITE_BASE_API_URL}/api/v1/user-chats`;
+            const endpoint = `/api/v1/user-chats`;
             await apiRequest(endpoint, { method: "DELETE" });
         },
         onError: (error) => {
@@ -224,7 +224,7 @@ export default function useUserChatService() {
 
     const deleteChosenMessagesMt = useMutation({
         mutationFn: async () => {
-            const endpoint = `${import.meta.env.VITE_BASE_API_URL}/api/v1/user-chats/bulk`;
+            const endpoint = `/api/v1/user-chats/bulk`;
             await apiRequest(endpoint, { method: "DELETE" });
         },
         onError: (error) => {
@@ -271,7 +271,7 @@ export default function useUserChatService() {
                 }
             }
     
-            const endpoint = `${import.meta.env.VITE_BASE_API_URL}/api/v1/user-chats`;
+            const endpoint = `/api/v1/user-chats`;
             await apiUpload(endpoint, formData, "POST");
         },
         onError: (error) => {
@@ -294,7 +294,7 @@ export default function useUserChatService() {
         },
         initialPageParam: 1,
         queryFn: async ({ pageParam = 1 }: { pageParam?: number }) => {
-            const endpoint = `${import.meta.env.VITE_BASE_API_URL}/api/v1/user-chats?receiver_id=${receiverId}&page=${pageParam}&limit=${52}`;
+            const endpoint = `/api/v1/user-chats?receiver_id=${receiverId}&page=${pageParam}&limit=${52}`;
             const request = await apiRequest<IUserChat[]>(endpoint, { method: "GET" });
             return request.data ?? [];
         },
@@ -304,7 +304,7 @@ export default function useUserChatService() {
     const showChosenMessageFiles = useQuery({
         enabled: !!chosenMessageId && chosenMessageId !== "",
         queryFn: async () => {
-            const endpoint = `${import.meta.env.VITE_BASE_API_URL}/api/v1/user-chats/files/${chosenMessageId}`;
+            const endpoint = `/api/v1/user-chats/files/${chosenMessageId}`;
             const request = await apiRequest<IUserChatFiles>(endpoint, {
                 credentials: "include",
                 headers: { "Content-Type": "application/json" },

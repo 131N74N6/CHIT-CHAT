@@ -24,7 +24,7 @@ export default function useChatbotService() {
 
     const deleteAllMessagesMt = useMutation({
         mutationFn: async () => {
-            const endpoint = `${import.meta.env.VITE_BASE_API_URL}/api/v1/chatbots`;
+            const endpoint = `/api/v1/chatbots`;
             await apiRequest(endpoint, { method: "DELETE" });
         },
         onError: (response) => {
@@ -42,7 +42,7 @@ export default function useChatbotService() {
     const deleteChosenMessagesMt = useMutation({
         mutationFn: async () => {
             const data = JSON.stringify({ ids: selectedChatBotIds });
-            const endpoint = `${import.meta.env.VITE_BASE_API_URL}/api/v1/chatbots/bulk`;
+            const endpoint = `/api/v1/chatbots/bulk`;
             await apiRequest(endpoint, { body: data, method: "DELETE" });
         },
         onError: (response) => {
@@ -60,7 +60,7 @@ export default function useChatbotService() {
     const sendQuestionMt = useMutation({
         mutationFn: async () => {
             const data = JSON.stringify({ question: question });
-            const endpoint = `${import.meta.env.VITE_BASE_API_URL}/api/v1/chatbots`;
+            const endpoint = `/api/v1/chatbots`;
             return await apiRequest<string>(endpoint, { body: data, method: "POST" });
         },
         onError: (response) => {
@@ -82,7 +82,7 @@ export default function useChatbotService() {
         },
         queryKey: [`all-results-${currentUserId}`],
         queryFn: async ({ pageParam = 1}: { pageParam?: number }) => {
-            const endpoint = `${import.meta.env.VITE_BASE_API_URL}/api/v1/chatbots?page=${pageParam}&limit=${28}`;
+            const endpoint = `/api/v1/chatbots?page=${pageParam}&limit=${28}`;
             const request = await apiRequest<IMessageBot[]>(endpoint, { method: "GET" });
             return request.data ?? [];
         },
