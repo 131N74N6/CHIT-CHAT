@@ -23,7 +23,12 @@ class ChatBotService {
         await chatBotRepository.deleteAllMessages(userId);
     }
 
-    async sendQuestion(props: TChatBot["questionAndAnswer"]) {
+    async deleteChosenMessages(ids: string[]) {
+        const messageIds = ids.map((id) => this.checkIsIdValid("user", id));
+        await chatBotRepository.deleteChosenMessages(ids);
+    }
+
+    async sendQuestion(props: Pick<TChatBot["questionAndAnswer"], "question" | "user_id">) {
         const userId = this.checkIsIdValid("user", props.user_id);
         const question = this.checkInputIsAString("question", props.question);
         
@@ -31,11 +36,11 @@ class ChatBotService {
         const getAnswer = this.checkInputIsAString("answer", aiAnswer.result);
 
         const newQuestion = await chatBotRepository.sendQuestion({ 
-            question: question, role: "user/human", user_id: userId 
+            question: question, user_id: userId 
         });
 
         await chatBotRepository.sendAnswerToUser({
-            answer: aiAnswer.result, role: "ai/bot", user_id: userId, question_id: newQuestion.question_id
+            answer: aiAnswer.result, user_id: userId, question_id: newQuestion.question_id
         });
 
         return getAnswer;

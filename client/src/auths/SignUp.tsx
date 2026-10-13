@@ -80,7 +80,7 @@ export default function SignUp() {
                             id="password"
                             name="password"
                             onChange={(event) => setPasswordForSignUp(event.target.value)}
-                            type="password"
+                            type={showPasswordForSignUp ? "text" : "password"}
                             value={passwordForSignUp}
                         />
                         <button

@@ -6,24 +6,21 @@ export const useChatbotStore = create<ChatbotState>((set) => ({
     setAnswer: (answer) => set({ answer }),
     
     resetChatBotState: () => set({
+        answer: "",
         question: "",
         selectedChatBotIds: [],
     }),
-
-    clearSelectedResults: () => set({
-        selectedChatBotIds: []
-    }),
     
-    isSelectMode: false,
-    setIsSelectMode: (isSelectMode) => set({ isSelectMode }),
+    selectMode: false,
+    setSelectMode: (selectMode) => set({ selectMode }),
+
+    selectedChatBotIds: [],
+    resetSelectedChatBotIds: () => set({ selectedChatBotIds: [] }),
+    setSelectedChatBotIds: (id) => set((state) => ({
+        selectedChatBotIds: state.selectedChatBotIds.includes(id) ?
+        state.selectedChatBotIds.filter(chatBotId => chatBotId !== id) : [...state.selectedChatBotIds, id]
+    })),
 
     question: "",
     setQuestion: (question) => set({ question }),
-
-    selectedChatBotIds: [],
-
-    toggleSelect: (id) => set((state) => ({
-        selectedChatBotIds: state.selectedChatBotIds.includes(id) ?
-        state.selectedChatBotIds.filter(chatBotId => chatBotId !== id) : [...state.selectedChatBotIds, id]
-    }))
 }));

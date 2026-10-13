@@ -4,10 +4,13 @@ import chatBotService from "./service";
 class ChatBotController {
     async deleteAllMessages(user_id: string) {
         await chatBotService.deleteAllMessages(user_id);
-        return { message: "all message deleted successfully" }
+    }
+    
+    async deleteChosenMessages(ids: string[]) {
+        await chatBotService.deleteChosenMessages(ids);
     }
 
-    async sendQuestion(props: TChatBot["questionAndAnswer"]) {
+    async sendQuestion(props: Pick<TChatBot["questionAndAnswer"], "question" | "user_id">) {
         const result = await chatBotService.sendQuestion(props);
         return { data: result }
     }

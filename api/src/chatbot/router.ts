@@ -5,6 +5,11 @@ import { chatBotSchema } from "./model";
 
 const chatBotRouters = new Elysia({ prefix: "/api/v1/chatbots" })
 .use(apiAuthMiddleware)
+.delete("/bulk", async (ctx) => {
+    return await chatBotController.deleteChosenMessages(ctx.body.ids);
+}, {
+    body: chatBotSchema.deleteChosen
+})
 .delete("/", async (ctx) => {
     return await chatBotController.deleteAllMessages(ctx.user.id);
 })
@@ -16,7 +21,7 @@ const chatBotRouters = new Elysia({ prefix: "/api/v1/chatbots" })
 .post("/", async (ctx) => {
     return await chatBotController.sendQuestion({ user_id: ctx.user.id, ...ctx.body });
 }, {
-    body: t.Omit(chatBotSchema.questionAndAnswer, ["user_id"])
+    body: t.Pick(chatBotSchema.questionAndAnswer, ["question"])
 });
 
 export default chatBotRouters;

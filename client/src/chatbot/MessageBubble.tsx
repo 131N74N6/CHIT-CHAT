@@ -1,37 +1,43 @@
-import type { IChatbotBubble } from "../models/chatbot.model";
 import cn from "../utils/cn";
 import DOMPurify from "dompurify";
 import { useMemo } from "react";
 import ReactMarkdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
 import remarkGfm from "remark-gfm";
+import type { IEachMessageBot } from "./model";
+import { useChatbotStore } from "./store";
 
-export default function MessageBubble() {
-    const isSelected = props.selectedChatBotIds.includes(props.result._id);
+export default function MessageBubble(props: IEachMessageBot) {
+    const selectMode = useChatbotStore((state) => state.selectMode);
+
+    const selectedChatBotIds = useChatbotStore((state) => state.selectedChatBotIds);
+    const setSelectedChatBotIds = useChatbotStore((state) => state.setSelectedChatBotIds);
+
+    const isSelected = selectedChatBotIds.includes(props.results._id);
 
     const sanitizedAnswer = useMemo(() => {
-        if (!props.result.answer) return;
-        return DOMPurify.sanitize(props.result.answer, {
+        if (!props.results.answer) return;
+        return DOMPurify.sanitize(props.results.answer, {
             ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u', 'ol', 'ul', 'li', 'code', 'pre', 'blockquote', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'hr', 'table', 'thead', 'tbody', 'tr', 'th', 'td', 'del', 'sub', 'sup'],
             ALLOWED_ATTR: ['class', 'style']
         });
-    }, [props.result.answer, props.result._id]);
+    }, [props.results.answer, props.results._id]);
 
     return (
         <div
             className={cn(
                 "flex flex-col gap-2 p-2.5 transition-all duration-200",
-                props.result.role === "user/human" ? "ml-[40%] bg-blue-700 text-white rounded-t-2xl rounded-bl-2xl w-[60%]" : 
+                props.results.role === "user/human" ? "ml-[40%] bg-blue-700 text-white rounded-t-2xl rounded-bl-2xl w-[60%]" : 
                 "bg-gray-200 text-gray-900 rounded-t-2xl rounded-br-2xl w-full",
-                props.isSelectMode ? "cursor-pointer hover:opacity-80" : "",
+                selectMode ? "cursor-pointer hover:opacity-80" : "",
                 isSelected ? "ring-4 ring-orange-500 border-2 border-orange-600 bg-orange-50 text-gray-900" : ""
             )}
-            onClick={() => props.isSelectMode && props.toggleSelect(props.result._id)}
+            onClick={() => selectMode && setSelectedChatBotIds(props.results._id)}
         >
-            {props.result.role === "user/human" ? (
-                <div className="font-medium text-[0.9rem]">{props.result.question}</div>
+            {props.results.role === "user/human" ? (
+                <div className="font-medium text-base">{props.results.question}</div>
             ) : (
-                <div className="font-medium text-[0.9rem]">
+                <div className="font-medium text-base">
                     <ReactMarkdown
                         remarkPlugins={[remarkGfm]}
                         rehypePlugins={[rehypeRaw]}
@@ -88,6 +94,9 @@ export default function MessageBubble() {
                     </ReactMarkdown>
                 </div>
             )}
+            <div className="flex flex-col gap-2">
+                <div className="font-medium text-sm">{new Date(props.results.created_at).toLocaleString()}</div>
+            </div>
         </div>
     );
 }

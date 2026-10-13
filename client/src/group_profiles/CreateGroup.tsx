@@ -1,45 +1,40 @@
 import { Camera, MessageCircle, X } from "lucide-react";
 import Navbar from "../navbar/Navbar";
-import useUserProfileService from "../user_profiles/service";
 import cn from "../utils/cn";
 import { useMessageStore } from "../stores/message.store";
 import { useEffect } from "react";
 import Alert from "../alert/Alert";
-import useRoomProfileService from "../services/useRoomProfileService";
+import useGroupProfileService from "./service";
+import { useGroupProfileStore } from "./store";
 
 export default function CreateGroup() {
     const message = useMessageStore((state) => state.message);
     const setMessage = useMessageStore((state) => state.setMessage);
 
-    const { isUserProfileProcessing } = useUserProfileService();
+    const groupDescription = useGroupProfileStore((state) => state.groupDescription);
+    const setGroupDescription = useGroupProfileStore((state) => state.setGroupDescription);
 
-    const { 
-        description,
-        fileInputRef, 
-        handleImagePreview,
-        isRoomProfileProcessing, 
-        makeRoomMt, 
-        roomName,
-        selectedProfileRoom, 
-        selectedProfileRoomUrl, 
-        setDescription, 
-        setRoomName, 
-        setSelectedProfileRoom, 
-        setSelectedProfileRoomUrl 
-    } = useRoomProfileService();
+    const groupName = useGroupProfileStore((state) => state.groupName);
+    const setGroupName = useGroupProfileStore((state) => state.setGroupName);
+
+    const selectedProfileGroup = useGroupProfileStore((state) => state.selectedProfileGroup);
+    const setSelectedProfileGroup = useGroupProfileStore((state) => state.setSelectedProfileGroup);
+
+    const selectedProfileGroupUrl = useGroupProfileStore((state) => state.selectedProfileGroupUrl);
+    const setSelectedProfileGroupUrl = useGroupProfileStore((state) => state.setSelectedProfileGroupUrl);
+
+    const groupProfile = useGroupProfileService();
 
     useEffect(() => {
         if (message) {
-            const timer = setTimeout(() => {
-                setMessage(null);
-            }, 1500);
+            const timer = setTimeout(() => setMessage(null), 1500);
             return () => clearTimeout(timer);
         }
     }, [message, setMessage]);
 
     return (
         <section className="flex md:flex-row p-2.5 gap-2.5 flex-col h-dvh relative z-10">
-            <Navbar isProcessing={isUserProfileProcessing}/>
+            <Navbar isProcessing={groupProfile.isProcessing}/>
             {message ? <Alert message={message}/> : null}
             <form 
                 className={cn(
@@ -48,23 +43,23 @@ export default function CreateGroup() {
                 )} 
                 onSubmit={(event: React.SubmitEvent<HTMLFormElement>) => {
                     event.preventDefault();
-                    makeRoomMt.mutate();
+                    groupProfile.createGroupMt.mutate();
                 }}
             >
                 <input
                     className="hidden"
-                    onChange={handleImagePreview}
-                    ref={fileInputRef}
+                    onChange={groupProfile.handleImagePreview}
+                    ref={groupProfile.fileInputRef}
                     type="file"
                 />
                 <div className="flex justify-center">
                     <div className="w-30 h-30 rounded-full">
-                        {selectedProfileRoom ? (
+                        {selectedProfileGroup && selectedProfileGroupUrl ? (
                             <div className="w-full h-full relative group">
                                 <img
                                     alt={`room-img-${Date.now()}`}
                                     className="w-full h-full object-cover" 
-                                    src={selectedProfileRoomUrl!}
+                                    src={selectedProfileGroupUrl}
                                 />
                                 <button
                                     className={cn(
@@ -72,12 +67,12 @@ export default function CreateGroup() {
                                         "disabled:cursor-not-allowed group-hover:opacity-100 duration-300 transition-opacity",
                                         "flex justify-center items-center p-1.5 absolute top-1 left-[46%]"
                                     )}
-                                    disabled={isUserProfileProcessing || isRoomProfileProcessing}
+                                    disabled={groupProfile.isProcessing}
                                     onClick={(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
                                         event.stopPropagation();
-                                        if (selectedProfileRoomUrl) URL.revokeObjectURL(selectedProfileRoomUrl);
-                                        setSelectedProfileRoom(null);
-                                        setSelectedProfileRoomUrl(null);
+                                        if (selectedProfileGroupUrl) URL.revokeObjectURL(selectedProfileGroupUrl);
+                                        setSelectedProfileGroup(null);
+                                        setSelectedProfileGroupUrl(null);
                                     }}
                                     type="button"
                                 >
@@ -90,7 +85,7 @@ export default function CreateGroup() {
                                     "flex justify-center items-center bg-blue-300 text-white",
                                     "w-full h-full rounded-full cursor-pointer font-medium"
                                 )}
-                                onClick={() => fileInputRef.current?.click()}
+                                onClick={() => groupProfile.fileInputRef.current?.click()}
                             >
                                 <Camera size={30}/>
                             </div>
@@ -103,9 +98,9 @@ export default function CreateGroup() {
                         className={cn("focus:outline-0 w-full bg-gray-200 text-gray-900 font-medium p-1.5 text-[1rem]")}
                         id="room_name"
                         name="room_name"
-                        onChange={(event: React.ChangeEvent<HTMLInputElement, HTMLInputElement>) => setRoomName(event.target.value)}
+                        onChange={(event: React.ChangeEvent<HTMLInputElement, HTMLInputElement>) => setGroupName(event.target.value)}
                         type="text"
-                        value={roomName}
+                        value={groupName}
                     />
                 </div>
                 <div className="flex flex-col gap-1.5">
@@ -117,9 +112,9 @@ export default function CreateGroup() {
                         )}
                         id="room_description"
                         name="room_description"
-                        onChange={(event: React.ChangeEvent<HTMLInputElement, HTMLInputElement>) => setDescription(event.target.value)}
+                        onChange={(event: React.ChangeEvent<HTMLInputElement, HTMLInputElement>) => setGroupDescription(event.target.value)}
                         type="text"
-                        value={description}
+                        value={groupDescription}
                     />
                 </div>
                 <button
@@ -127,10 +122,10 @@ export default function CreateGroup() {
                         "bg-blue-600 text-white font-medium cursor-pointer p-1.5 text-[1rem]",
                         "hover:bg-blue-800 transition-colors disabled:cursor-not-allowed"
                     )}
-                    disabled={isUserProfileProcessing || isRoomProfileProcessing}
+                    disabled={groupProfile.isProcessing}
                     type="submit"
                 >
-                    Create room
+                    Create group
                 </button>
             </form>
             <div 

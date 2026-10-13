@@ -8,11 +8,16 @@ class ChatBotRepository {
     async deleteAllMessages(user_id: string) {
         return await this.chatbots.deleteMany({ user_id: new ObjectId(user_id) });
     }
+
+    async deleteChosenMessages(ids: string[]) {
+        const messageIds = ids.map((id) => new ObjectId(id));
+        return await this.chatbots.deleteMany({ _id: { $in: messageIds } });
+    }
     
     async sendAnswerToUser(props: TChatBot["questionAndAnswer"]) {
         return await this.chatbots.insertOne({
             created_at: new Date(),
-            role: props.role,
+            role: "ai/bot",
             answer: props.answer,
             user_id: new ObjectId(props.user_id),
             question_id: new ObjectId(props.question_id)
@@ -22,7 +27,7 @@ class ChatBotRepository {
     async sendQuestion(props: TChatBot["questionAndAnswer"]) {
         const newData = {
             created_at: new Date(),
-            role: props.role,
+            role: "user/human",
             question: props.question,
             user_id: new ObjectId(props.user_id)
         }

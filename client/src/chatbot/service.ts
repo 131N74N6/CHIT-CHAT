@@ -2,10 +2,11 @@ import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-q
 import { useChatbotStore } from "./store";
 import { useUserStore } from "../stores/user.store";
 import { useMessageStore } from "../stores/message.store";
+import { apiRequest } from "../api";
+import type { IMessageBot } from "./model";
 
 export default function useChatbotService() {
     const queryClient = useQueryClient();
-    const baseUrl = `${import.meta.env.VITE_BASE_API_URL}/chatbots`;
     
     const currentUserId = useUserStore((state) => state.currentUserId);
     const setMessage = useMessageStore((state) => state.setMessage);
@@ -16,14 +17,62 @@ export default function useChatbotService() {
     const question = useChatbotStore((state) => state.question);
     const setQuestion = useChatbotStore((state) => state.setQuestion);
 
-    const clearSelectedResults = useChatbotStore((state) => state.clearSelectedResults);
-
-    const isSelectMode = useChatbotStore((state) => state.isSelectMode);
-    const setIsSelectMode = useChatbotStore((state) => state.setIsSelectMode);
-
     const selectedChatBotIds = useChatbotStore((state) => state.selectedChatBotIds);
+    const setSelectMode = useChatbotStore((state) => state.setSelectMode);
 
-    const toggleSelect = useChatbotStore((state) => state.toggleSelect);
+    const resetSelectedChatBotIds = useChatbotStore((state) => state.resetSelectedChatBotIds);
+
+    const deleteAllMessagesMt = useMutation({
+        mutationFn: async () => {
+            const endpoint = `${import.meta.env.VITE_BASE_API_URL}/api/v1/chatbots`;
+            await apiRequest(endpoint, { method: "DELETE" });
+        },
+        onError: (response) => {
+            setMessage(response.message);
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: [`all-results-${currentUserId}`] });
+            resetSelectedChatBotIds();
+            setSelectMode(false);
+            setAnswer("");
+            setQuestion("");
+        }
+    });
+
+    const deleteChosenMessagesMt = useMutation({
+        mutationFn: async () => {
+            const data = JSON.stringify({ ids: selectedChatBotIds });
+            const endpoint = `${import.meta.env.VITE_BASE_API_URL}/api/v1/chatbots/bulk`;
+            await apiRequest(endpoint, { body: data, method: "DELETE" });
+        },
+        onError: (response) => {
+            setMessage(response.message);
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: [`all-results-${currentUserId}`] });
+            resetSelectedChatBotIds();
+            setSelectMode(false)
+            setAnswer("");
+            setQuestion("");
+        }
+    });
+
+    const sendQuestionMt = useMutation({
+        mutationFn: async () => {
+            const data = JSON.stringify({ question: question });
+            const endpoint = `${import.meta.env.VITE_BASE_API_URL}/api/v1/chatbots`;
+            return await apiRequest<string>(endpoint, { body: data, method: "POST" });
+        },
+        onError: (response) => {
+            setMessage(response.message);
+        },
+        onSuccess: (response) => {
+            queryClient.invalidateQueries({ queryKey: [`all-results-${currentUserId}`] });
+            if (response && response.data) setAnswer(response.data);
+            setQuestion("");
+            setSelectMode(false)
+        }
+    });
     
     const showAllBotResults = useInfiniteQuery({
         enabled: !!currentUserId,
@@ -33,120 +82,23 @@ export default function useChatbotService() {
         },
         queryKey: [`all-results-${currentUserId}`],
         queryFn: async ({ pageParam = 1}: { pageParam?: number }) => {
-            try {
-                const request = await fetch(`${baseUrl}/show-all?page=${pageParam}&limit=${14}`, {
-                    credentials: "include",
-                    headers: { 'Content-Type': 'application/json' },
-                    method: "GET"
-                });
-
-                const response = await request.json();
-                if (!request.ok) throw new Error(response.message);
-                return response;
-            } catch (error) {
-                throw error;
-            }
+            const endpoint = `${import.meta.env.VITE_BASE_API_URL}/api/v1/chatbots?page=${pageParam}&limit=${28}`;
+            const request = await apiRequest<IMessageBot[]>(endpoint, { method: "GET" });
+            return request.data ?? [];
         },
         initialPageParam: 1,
         refetchOnReconnect: true,
         staleTime: Infinity
     });
 
-    const askAiMt = useMutation({
-        mutationFn: async () => {
-            try {
-                const request = await fetch(`${baseUrl}/ask-ai`, {
-                    body: JSON.stringify({ question: question.trim() }),
-                    credentials: "include",
-                    headers: { 'Content-Type': 'application/json' },
-                    method: "POST"
-                });
-
-                const response = await request.json();
-                if (!request.ok) throw new Error(response.message);
-                return response;
-            } catch (error) {
-                throw error;
-            }
-        },
-        onError: (response) => {
-            setMessage(response.message);
-        },
-        onSuccess: (response) => {
-            queryClient.invalidateQueries({ queryKey: [`all-results-${currentUserId}`] });
-            setAnswer(response.message);
-            setQuestion("");
-        }
-    });
-
-    const deleteAllResultsMt = useMutation({
-        mutationFn: async () => {
-            try {
-                const request = await fetch(`${baseUrl}/rm-all`, {
-                    credentials: "include",
-                    headers: { 'Content-Type': 'application/json' },
-                    method: "DELETE"
-                });
-
-                const response = await request.json();
-                if (!request.ok) throw new Error(response.message);
-                return response;
-            } catch (error) {
-                throw error;
-            }
-        },
-        onError: (response) => {
-            setMessage(response.message);
-        },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: [`all-results-${currentUserId}`] });
-            setQuestion("");
-        }
-    });
-
-    const deleteChosenResultsMt = useMutation({
-        mutationFn: async () => {
-            try {
-                const request = await fetch(`${baseUrl}/rm-chosen`, {
-                    body: JSON.stringify({ selectedIds: selectedChatBotIds }),
-                    credentials: "include",
-                    headers: { 'Content-Type': 'application/json' },
-                    method: "DELETE"
-                });
-
-                const response = await request.json();
-                if (!request.ok) throw new Error(response.message);
-                return response;
-            } catch (error) {
-                throw error;
-            }
-        },
-        onError: (response) => {
-            setMessage(response.message);
-        },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: [`all-results-${currentUserId}`] });
-            setQuestion("");
-        }
-    });
-
-    const isChatbotProcessing = showAllBotResults.isLoading || askAiMt.isPending ||
-    deleteAllResultsMt.isPending || deleteChosenResultsMt.isPending;
+    const isProcessing = [sendQuestionMt, deleteAllMessagesMt, deleteChosenMessagesMt].some((f) => f.isPending);
 
     return { 
         showAllBotResults, 
         answer, 
-        askAiMt, 
-        clearSelectedResults,
-        deleteAllResultsMt, 
-        deleteChosenResultsMt, 
-        isChatbotProcessing, 
-        isSelectMode,
-        question, 
-        selectedChatBotIds,
-        setAnswer, 
-        setIsSelectMode,
-        setQuestion, 
-        toggleSelect,
+        sendQuestionMt, 
+        deleteAllMessagesMt, 
+        deleteChosenMessagesMt, 
+        isProcessing, 
     }
 }
