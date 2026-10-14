@@ -1,5 +1,5 @@
 import { Elysia } from "elysia";
-import { setupErrorHandler } from "./error/handler";
+import { setupErrorHandler } from "./error/service";
 import cors from "@elysiajs/cors";
 import { authServiceApi } from "./auth/service";
 import { v2 } from "cloudinary";

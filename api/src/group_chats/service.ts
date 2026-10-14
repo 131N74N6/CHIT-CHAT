@@ -2,7 +2,7 @@ import { TGroupChats } from "./model";
 import groupChatRepository from "./repository";
 import { groupChatEvent } from "./event";
 import { ObjectId } from "mongodb";
-import { ChitChatApiError } from "../error/handler";
+import { ChitChatApiError } from "../error/service";
 import { v2 } from "cloudinary";
 import { uploadToCloudinary } from "../cloudinary/service";
 import { CloudinaryUploadResult } from "../cloudinary/model";

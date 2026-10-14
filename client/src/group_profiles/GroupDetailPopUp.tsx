@@ -49,7 +49,7 @@ export default function GroupDetailPopUp(props: IGroupProfileDetailPopUp) {
     }
 
     return (
-        <section className="h-full overflow-y-auto p-2.5 md:flex hidden flex-col w-full md:w-2/5 border border-gray-400">
+        <section className="h-full overflow-y-auto p-2.5 md:flex hidden flex-col w-full md:w-3/4 border border-gray-400">
             {props.groupProfile.isLoading ? (
                 <div className="flex justify-center items-center h-full">
                     <Loading/>

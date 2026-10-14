@@ -16,28 +16,6 @@ class UserChatWebSocket extends EventEmitter {
     private backendUrl: string = "";
     private otherUserId: string = "";
 
-    connect (token: string, otherUserId: string, backendUrl: string) {
-        if (this.isConnecting) {
-            return;
-        }
-
-        if (this.ws && (this.ws.readyState === WebSocket.CONNECTING || this.ws.readyState === WebSocket.OPEN)) {
-            return;
-        }
-
-        const newWsUrl = this.buildWsUrl(token, otherUserId, backendUrl);
-        
-        if (this.url && this.url !== newWsUrl) {
-            this.disconnect();
-        }
-
-        this.url = newWsUrl;
-        this.isConnecting = true;
-        this.ws = new WebSocket(this.url);
-        
-        this.bindEvents();
-    }
-
     private bindEvents() {
         if (!this.ws) return;
 
@@ -93,6 +71,26 @@ class UserChatWebSocket extends EventEmitter {
         const encodedToken = encodeURIComponent(token);
         const wsUrl = `${wsProtocol}//${backendHost}/api/v1/user-chats/ws/${otherUserId}?token=${encodedToken}`;
         return wsUrl;
+    }
+
+    connect (token: string, otherUserId: string, backendUrl: string) {
+        if (this.isConnecting) return;
+
+        if (this.ws && (this.ws.readyState === WebSocket.CONNECTING || this.ws.readyState === WebSocket.OPEN)) {
+            return;
+        }
+
+        const newWsUrl = this.buildWsUrl(token, otherUserId, backendUrl);
+        
+        if (this.url && this.url !== newWsUrl) {
+            this.disconnect();
+        }
+
+        this.url = newWsUrl;
+        this.isConnecting = true;
+        this.ws = new WebSocket(this.url);
+        
+        this.bindEvents();
     }
 
     private connectFromUrl() {

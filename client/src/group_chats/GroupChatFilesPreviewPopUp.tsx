@@ -30,9 +30,9 @@ export default function GroupChatFilesPreviewPopUp(props: IGroupChatFilesPreview
     }
 
     return (
-        <section className="h-full overflow-y-auto p-2.5 md:flex hidden flex-col w-full md:w-2/5">
+        <section className="h-full  p-2.5 md: md:w-2/5">
             <form 
-                className="flex flex-col h-full gap-2.5 p-2.5 md:w-2/5 w-full inset-shadow-sm inset-shadow-gray-400 border border-gray-400"
+                className="flex overflow-y-auto flex-col h-full gap-2.5 p-2.5 md:w-3/4 w-full inset-shadow-sm inset-shadow-gray-400 border border-gray-400"
                 onSubmit={(event: React.SubmitEvent<HTMLFormElement>) => {
                     event.preventDefault();
                     props.sendChatToGroup.mutate();

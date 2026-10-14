@@ -1,6 +1,6 @@
 import { ObjectId } from "mongodb";
 import { TGroupProfile } from "./model";
-import { ChitChatApiError } from "../error/handler";
+import { ChitChatApiError } from "../error/service";
 import groupProfileRepository from "./repository";
 import { uploadToCloudinary } from "../cloudinary/service";
 import { groupProfileEvent } from "./event";

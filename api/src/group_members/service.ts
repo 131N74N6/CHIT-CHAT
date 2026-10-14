@@ -1,6 +1,6 @@
 import { ObjectId } from "mongodb";
 import { TGroupMember } from "./model";
-import { ChitChatApiError } from "../error/handler";
+import { ChitChatApiError } from "../error/service";
 import groupMemberRepository from "./repository";
 import { groupMemberEvent } from "./event";
 

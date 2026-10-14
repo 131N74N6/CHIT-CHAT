@@ -1,7 +1,7 @@
 import { TUserChat } from "./model";
 import userChatRepository from "./repository";
 import { userChatEvent } from "./event";
-import { ChitChatApiError } from "../error/handler";
+import { ChitChatApiError } from "../error/service";
 import { ObjectId } from "mongodb";
 import { v2 } from "cloudinary";
 import { uploadToCloudinary } from "../cloudinary/service";

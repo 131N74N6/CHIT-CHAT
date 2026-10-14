@@ -20,9 +20,9 @@ export default function UserChatFilesPopUp(props: IUserChatFilesPopUp) {
     }
     
     return (
-        <section className="h-dvh flex md:flex-row flex-col p-2.5 gap-2.5 relative z-10">
+        <section className="flex flex-col h-full gap-2.5 p-2.5 w-full md:w-3/4 inset-shadow-sm inset-shadow-gray-400 border border-gray-400 overflow-y-auto">
             <Navbar isProcessing={props.isProcessing}/>
-            <div className="h-full flex flex-col w-full md:w-2/5 border border-gray-400 inset-shadow-sm inset-shadow-gray-400 overflow-y-auto">
+            <main className="h-full flex flex-col w-full md:w-2/5 border border-gray-400 inset-shadow-sm inset-shadow-gray-400 overflow-y-auto">
                 <div className="flex px-2.5 pt-2.5">
                     <button
                         className="cursor-pointer disabled:cursor-not-allowed font-medium text-gray-700 hover:text-gray-500 transition-colors"
@@ -44,7 +44,7 @@ export default function UserChatFilesPopUp(props: IUserChatFilesPopUp) {
                 ) : (
                     <UserChatFileList files={props.files} isLoading={props.isLoading}/>
                 )}
-            </div>
+            </main>
         </section>
     );
 }

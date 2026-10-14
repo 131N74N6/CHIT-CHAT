@@ -2,14 +2,12 @@ import { FileIcon } from "lucide-react";
 import type { IGroupMessageData } from "./model";
 import cn from "../utils/cn";
 import { useGroupChatStore } from "./store";
-import { useNavigate } from "react-router-dom";
 import { useUserChatStore } from "../user_chats/store";
 import { useGroupMemberStore } from "../group_member/store";
 import { useGroupProfileStore } from "../group_profiles/store";
+import { useUserStore } from "../user_profiles/store";
 
 export default function MessageBubble(props: IGroupMessageData) {
-    const navigate = useNavigate();
-    
     const setShowGroupChatFilesPopUp = useGroupChatStore((state) => state.setShowGroupChatFilesPopUp);
     const setShowGroupChatFilePreviewPopUp = useGroupChatStore((state) => state.setShowGroupChatFilePreviewPopUp);
 
@@ -27,15 +25,29 @@ export default function MessageBubble(props: IGroupMessageData) {
 
     const setShowProfile = useGroupProfileStore((state) => state.setShowProfile);
 
+    const setShowUserMedia = useUserChatStore((state) => state.setShowUserMedia);
+    const setShowUserChatPopUp = useUserChatStore((state) => state.setShowUserChatPopUp);
+    const setShowUserChatFilesPopUp = useUserChatStore((state) => state.setShowUserChatFilesPopUp);
+    
+    const setShowUserProfilePopUp = useUserStore((state) => state.setShowUserProfilePopUp);
+
     const isSelected = chosenMessageIdsFromGroup.includes(props.chat._id);
 
-    const seeFiles = () => {
+    const seeGroupChatFiles = () => {
         setGroupMessageId(props.chat._id);
         setShowGroupChatPopUp(false);
         setShowMemberPopUp(false);
         setShowProfile(false);
         setShowGroupChatFilesPopUp(false);
         setShowGroupChatFilePreviewPopUp(true);
+    }
+
+    const seeUserChat = () => {
+        setReceiverId(props.chat.sender_id);
+        setShowUserMedia(false);
+        setShowUserChatPopUp(false);
+        setShowUserChatFilesPopUp(true);
+        setShowUserProfilePopUp(false);
     }
 
     return (
@@ -53,17 +65,14 @@ export default function MessageBubble(props: IGroupMessageData) {
                 <div className="cursor-pointer bg-gray-100 p-2 rounded-md">
                     <div 
                         className="items-center gap-2.5 md:flex hidden" 
-                        onClick={seeFiles}
+                        onClick={seeGroupChatFiles}
                     >
                         <FileIcon size={16}/>
                         <div>{props.chat.files_total} files</div>
                     </div>
                     <div 
                         className="items-center gap-2.5 cursor-pointer md:hidden flex" 
-                        onClick={() => {
-                            setGroupMessageId(props.chat._id);
-                            navigate(`/room/media/detail/${props.chat._id}`);
-                        }}
+                        onClick={seeGroupChatFiles}
                     >
                         <FileIcon size={16}/>
                         <div>{props.chat.files_total} files</div>
@@ -76,10 +85,7 @@ export default function MessageBubble(props: IGroupMessageData) {
                 <button 
                     className="text-left font-medium text-[0.7rem] cursor-pointer disabled:cursor-not-allowed" 
                     disabled={props.isProcessing}
-                    onClick={() => {
-                        setReceiverId(props.chat.sender_id);
-                        navigate(`/user/chat/${props.chat.sender_id}`);
-                    }}
+                    onClick={seeUserChat}
                     type="button"
                 >
                     {props.chat.sender_name}

@@ -1,5 +1,5 @@
 import { OpenRouter } from "@openrouter/sdk";
-import { ChitChatApiError } from "../error/handler";
+import { ChitChatApiError } from "../error/service";
 
 const model = process.env.OPEN_ROUTER_AI_MODEL;
 const openRouterAi = new OpenRouter({ apiKey: process.env.OPEN_ROUTER_API_KEY });

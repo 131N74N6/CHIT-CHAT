@@ -19,9 +19,9 @@ export default function Navbar(props?: INavbar) {
 
     return (
         <>
-            <nav 
+            <aside 
                 className={cn(
-                    "bg-white md:w-1/5 w-full inset-shadow-sm inset-shadow-gray-400", 
+                    "bg-white md:w-1/4 w-full inset-shadow-sm inset-shadow-gray-400", 
                     "md:flex hidden flex-col gap-2.5 p-2.5 border border-gray-400"
             )}>
                 <button
@@ -108,7 +108,7 @@ export default function Navbar(props?: INavbar) {
                     <Power size={23}/>
                     <div>Sign Out</div>
                 </button>
-            </nav>
+            </aside>
             <nav className="md:hidden flex p-2.5 inset-shadow-sm inset-shadow-gray-400 border border-gray-400">
                 <button
                     className="disabled:cursor-not-allowed cursor-pointer text-gray-400 font-medium"

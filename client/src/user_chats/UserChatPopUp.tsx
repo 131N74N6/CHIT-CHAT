@@ -72,7 +72,7 @@ export default function UserChatPopUp(props: IUserChatPopUp) {
     }
 
     return (
-        <section className="h-full overflow-y-auto p-2.5 md:flex hidden flex-col w-full md:w-2/5">
+        <section className="h-full overflow-y-auto flex flex-col w-full md:w-3/4">
             <header className="bg-zinc-800 flex justify-between p-2.5">
                 {props.userProfile.error ? (
                     <div className="flex justify-center items-center h-full">

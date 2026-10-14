@@ -24,8 +24,8 @@ export default function GroupChatFilesPopUp(props: IGroupChatFilesPopUp) {
     }
 
     return (
-        <section className="h-full overflow-y-auto p-2.5 md:flex hidden flex-col w-full md:w-2/5">
-            <div className="border-gray-400 inset-shadow-sm inset-shadow-gray-400">
+        <section className="">
+            <div className="border-gray-400 inset-shadow-sm inset-shadow-gray-400 h-full overflow-y-auto p-2.5 flex flex-col w-full md:w-3/4">
                 <div className="flex px-2.5 pt-2.5">
                     <button
                         className="cursor-pointer disabled:cursor-not-allowed font-medium text-gray-700 hover:text-gray-500 transition-colors"

@@ -1,5 +1,5 @@
 import { ObjectId } from "mongodb";
-import { ChitChatApiError } from "../error/handler";
+import { ChitChatApiError } from "../error/service";
 import userProfileRepository from "./repository";
 import { v2 } from "cloudinary";
 import { groupChatEvent } from "../group_chats/event";

@@ -1,6 +1,6 @@
 import { ObjectId } from "mongodb";
 import chatBotRepository from "./repository";
-import { ChitChatApiError } from "../error/handler";
+import { ChitChatApiError } from "../error/service";
 import { TChatBot } from "./model";
 import { getAndShowResponse } from "../open_router/service";
 
