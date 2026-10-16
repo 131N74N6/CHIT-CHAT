@@ -27,7 +27,6 @@ export default function Home() {
     const showUserChatFilesPopUp = useUserChatStore((state) => state.showUserChatFilesPopUp);
     
     const receiverId = useUserChatStore((state) => state.receiverId);
-
     const showUserProfilePopUp = useUserStore((state) => state.showUserProfilePopUp);
 
     const userChat = useUserChatService();

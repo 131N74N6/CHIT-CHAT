@@ -6,8 +6,11 @@ import { useUserChatStore } from "./store";
 import useUserProfileService from "../user_profiles/service";
 import { useUserStore } from "../user_profiles/store";
 import type { IUserChatPopUp } from "./model";
+import { useEffect } from "react";
 
 export default function UserChatPopUp(props: IUserChatPopUp) {
+    const chosenMessageIds = useUserChatStore((state) => state.chosenMessageIds);
+
     const text = useUserChatStore((state) => state.text);
     const setText = useUserChatStore((state) => state.setText);
 
@@ -29,6 +32,19 @@ export default function UserChatPopUp(props: IUserChatPopUp) {
 
     const userChat = useUserChatService();
     const user = useUserProfileService();
+    
+    useEffect(() => {
+        const canEdit = selectMode && 
+        chosenMessageIds.length === 1 && 
+        chosenMessage && 
+        chosenMessage.text !== "This message has been deleted";
+        
+        if (canEdit) {
+            setText(chosenMessage.text);
+        } else {
+            setText("");
+        }
+    }, [selectMode, chosenMessageIds, chosenMessage, setText]);
 
     const sendMessage = (event: React.SubmitEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -55,6 +71,7 @@ export default function UserChatPopUp(props: IUserChatPopUp) {
         setShowUserChatPopUp(false);
         setShowUserChatFilesPopUp(false);
         setShowUserProfilePopUp(false);
+        setChosenMessage(null);
     }
 
     const seeUserProfile = () => {

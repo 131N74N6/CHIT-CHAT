@@ -69,10 +69,11 @@ export default function useUserChatService() {
             
             if (payload.type === "user-message:sent") {
                 queryClient.setQueryData(queryKey, (old: any) => {
-                    if (!old) return;
-                    const newMessagePage = [...old.pages];
-                    newMessagePage[0] = [payload.data, ...newMessagePage[0]];
-                    return { ...old, pages: newMessagePage }
+                    if (!old) return old;
+                    const newPages = [...old.pages];
+                    
+                    newPages[0] = [payload.data, ...newPages[0]];
+                    return { ...old, pages: newPages };
                 });
             } else if (payload.type === "user-message:deleted") {
                 queryClient.setQueryData(queryKey, (old: any) => {
@@ -180,7 +181,7 @@ export default function useUserChatService() {
             setMessage(error.message);
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: [`user-chat-${receiverId}`] });
+            // queryClient.invalidateQueries({ queryKey: [`user-chat-${receiverId}`] });
             setText("");
             setChosenFiles([]);
             resetChosenMessageIds();
@@ -197,7 +198,7 @@ export default function useUserChatService() {
             setMessage(error.message);
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: [`user-chat-${receiverId}`] });
+            // queryClient.invalidateQueries({ queryKey: [`user-chat-${receiverId}`] });
             setText("");
             setChosenFiles([]);
             resetChosenMessageIds();
@@ -214,7 +215,7 @@ export default function useUserChatService() {
             setMessage(error.message);
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: [`user-chat-${receiverId}`] });
+            // queryClient.invalidateQueries({ queryKey: [`user-chat-${receiverId}`] });
             setText("");
             setChosenFiles([]);
             resetChosenMessageIds();
@@ -231,7 +232,7 @@ export default function useUserChatService() {
             setMessage(error.message);
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: [`user-chat-${receiverId}`] });
+            // queryClient.invalidateQueries({ queryKey: [`user-chat-${receiverId}`] });
             setText("");
             setChosenFiles([]);
             resetChosenMessageIds();
@@ -278,7 +279,7 @@ export default function useUserChatService() {
             setMessage(error.message);
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: [`user-chat-${receiverId}`] });
+            // queryClient.invalidateQueries({ queryKey: [`user-chat-${receiverId}`] });
             setText("");
             setChosenFiles([]);
             resetChosenMessageIds();

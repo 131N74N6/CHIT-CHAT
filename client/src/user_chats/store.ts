@@ -15,7 +15,11 @@ export const useUserChatStore = create<IUserChatState>()(persist((set) => ({
     setChosenMessageId: (chosenMessageId) => set({ chosenMessageId }),
 
     chosenMessageIds: [],
-    resetChosenMessageIds: () => set({ chosenMessageIds: [] }),
+    resetChosenMessageIds: () => set({ 
+        chosenMessage: null,
+        chosenMessageId: "",
+        chosenMessageIds: []
+    }),
     setChosenMessageIds: (messageId: string) => set((state) => ({
         chosenMessageIds: state.chosenMessageIds.includes(messageId) ?
         state.chosenMessageIds.filter(chosenMessageId => chosenMessageId !== messageId) : 

@@ -9,6 +9,8 @@ export default function MessageBubble(props: IUserMessageData) {
     const navigate = useNavigate();
     const setShowUserMedia = useUserChatStore((state) => state.setShowUserMedia);
 
+    const setChosenMessage = useUserChatStore((state) => state.setChosenMessage);
+
     const chosenMessageIds = useUserChatStore((state) => state.chosenMessageIds);
     const setChosenMessageIds = useUserChatStore((state) => state.setChosenMessageIds);
 
@@ -34,6 +36,16 @@ export default function MessageBubble(props: IUserMessageData) {
         navigate(`/user/media/detail/${props.chat._id}`);
     }
 
+    const selectMessage = () => {
+        if (!selectMode) return;
+        setChosenMessageIds(props.chat._id);
+        if (props.own) {
+            setChosenMessage(props.chat);
+        } else {
+            setChosenMessage(null);
+        }
+    }
+
     return (
         <div 
             className={cn(
@@ -41,9 +53,9 @@ export default function MessageBubble(props: IUserMessageData) {
                 props.own ? "ml-[40%] bg-blue-700 text-white rounded-t-2xl rounded-bl-2xl" : 
                 "mr-[50%] bg-gray-200 text-gray-900 rounded-t-2xl rounded-br-2xl",
                 selectMode ? "cursor-pointer hover:opacity-80" : "",
-                isSelected ? "ring-4 ring-orange-500 border-2 border-orange-600 bg-orange-50 text-gray-900" : ""
+                isSelected ? "border border-orange-500 bg-orange-50 text-gray-900" : ""
             )}
-            onClick={() => selectMode && setChosenMessageIds(props.chat._id)}
+            onClick={selectMessage}
         >
             {props.chat.files_total > 0 ? (
                 <div className="cursor-pointer bg-gray-100 p-2 rounded-md">
