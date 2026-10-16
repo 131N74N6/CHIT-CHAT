@@ -181,7 +181,7 @@ export default function useUserChatService() {
             setMessage(error.message);
         },
         onSuccess: () => {
-            // queryClient.invalidateQueries({ queryKey: [`user-chat-${receiverId}`] });
+            queryClient.invalidateQueries({ queryKey: [`user-chat-${receiverId}`] });
             setText("");
             setChosenFiles([]);
             resetChosenMessageIds();
@@ -198,7 +198,7 @@ export default function useUserChatService() {
             setMessage(error.message);
         },
         onSuccess: () => {
-            // queryClient.invalidateQueries({ queryKey: [`user-chat-${receiverId}`] });
+            queryClient.invalidateQueries({ queryKey: [`user-chat-${receiverId}`] });
             setText("");
             setChosenFiles([]);
             resetChosenMessageIds();
@@ -215,7 +215,7 @@ export default function useUserChatService() {
             setMessage(error.message);
         },
         onSuccess: () => {
-            // queryClient.invalidateQueries({ queryKey: [`user-chat-${receiverId}`] });
+            queryClient.invalidateQueries({ queryKey: [`user-chat-${receiverId}`] });
             setText("");
             setChosenFiles([]);
             resetChosenMessageIds();
@@ -232,7 +232,7 @@ export default function useUserChatService() {
             setMessage(error.message);
         },
         onSuccess: () => {
-            // queryClient.invalidateQueries({ queryKey: [`user-chat-${receiverId}`] });
+            queryClient.invalidateQueries({ queryKey: [`user-chat-${receiverId}`] });
             setText("");
             setChosenFiles([]);
             resetChosenMessageIds();
@@ -279,7 +279,7 @@ export default function useUserChatService() {
             setMessage(error.message);
         },
         onSuccess: () => {
-            // queryClient.invalidateQueries({ queryKey: [`user-chat-${receiverId}`] });
+            queryClient.invalidateQueries({ queryKey: [`user-chat-${receiverId}`] });
             setText("");
             setChosenFiles([]);
             resetChosenMessageIds();
