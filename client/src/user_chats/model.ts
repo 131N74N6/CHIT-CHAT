@@ -1,4 +1,5 @@
 import type { FetchNextPageOptions, InfiniteData, InfiniteQueryObserverResult, UseMutationResult } from "@tanstack/react-query";
+import type { ApiResponse } from "../api";
 
 export interface IUserChat {
     _id: string;
@@ -106,12 +107,15 @@ export interface iPopUpOptionForUser {
 export interface IUserChatPopUp {
     isProcessing: boolean;
     userChat: {
+        changeMessageMt: UseMutationResult<ApiResponse<IUserChat>, Error, string, unknown>;
         data: IUserChat[];
         error: Error | null;
         fetchNextPage: (options?: FetchNextPageOptions | undefined) => Promise<InfiniteQueryObserverResult<InfiniteData<any, unknown>, Error>>;
         hasNextPage: boolean;
         isFetchingNextPage: boolean;
         isLoading: boolean;
+        isProcessing: boolean;
+        sendMessageMt: UseMutationResult<void, Error, void, unknown>;
     }
     userProfile: {
         error: Error | null;

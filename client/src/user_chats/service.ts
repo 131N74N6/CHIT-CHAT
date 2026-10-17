@@ -65,7 +65,7 @@ export default function useUserChatService() {
                 return;
             }
             
-            const queryKey = [`user-chat-${receiverId}`];
+            const queryKey = [`user-messages-${receiverId}`];
             
             if (payload.type === "user-message:sent") {
                 queryClient.setQueryData(queryKey, (old: any) => {
@@ -162,7 +162,7 @@ export default function useUserChatService() {
             setMessage(error.message || "Failed to edit message");
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: [`user-chats-${receiverId}`] });
+            queryClient.invalidateQueries({ queryKey: [`user-messages-${receiverId}`] });
             setText("");
             setSelectMode(false);
             setChosenMessage(null);
@@ -181,7 +181,7 @@ export default function useUserChatService() {
             setMessage(error.message);
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: [`user-chat-${receiverId}`] });
+            queryClient.invalidateQueries({ queryKey: [`user-messages-${receiverId}`] });
             setText("");
             setChosenFiles([]);
             resetChosenMessageIds();
@@ -199,7 +199,7 @@ export default function useUserChatService() {
             setMessage(error.message);
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: [`user-chat-${receiverId}`] });
+            queryClient.invalidateQueries({ queryKey: [`user-messages-${receiverId}`] });
             setText("");
             setChosenFiles([]);
             resetChosenMessageIds();
@@ -216,7 +216,7 @@ export default function useUserChatService() {
             setMessage(error.message);
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: [`user-chat-${receiverId}`] });
+            queryClient.invalidateQueries({ queryKey: [`user-messages-${receiverId}`] });
             setText("");
             setChosenFiles([]);
             resetChosenMessageIds();
@@ -234,7 +234,7 @@ export default function useUserChatService() {
             setMessage(error.message);
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: [`user-chat-${receiverId}`] });
+            queryClient.invalidateQueries({ queryKey: [`user-messages-${receiverId}`] });
             setText("");
             setChosenFiles([]);
             resetChosenMessageIds();
@@ -281,7 +281,7 @@ export default function useUserChatService() {
             setMessage(error.message);
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: [`user-chat-${receiverId}`] });
+            queryClient.invalidateQueries({ queryKey: [`user-messages-${receiverId}`] });
             setText("");
             setChosenFiles([]);
             resetChosenMessageIds();
@@ -301,7 +301,7 @@ export default function useUserChatService() {
             const request = await apiRequest<IUserChat[]>(endpoint, { method: "GET" });
             return request.data ?? [];
         },
-        queryKey: [`user-chat-${receiverId}`]
+        queryKey: [`user-messages-${receiverId}`]
     });
 
     const showChosenMessageFiles = useQuery({
@@ -315,7 +315,7 @@ export default function useUserChatService() {
             });
             return request.data;
         },
-        queryKey: [`user-chat-media-${chosenMessageId}`],
+        queryKey: [`user-messages-media-${chosenMessageId}`],
         staleTime: Infinity
     });
 

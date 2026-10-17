@@ -69,10 +69,10 @@ export default function UserChatFilesPreview() {
                                     <div className=" relative group">
                                         <FileViewer
                                             file={chosenFile.file}
-                                            fileName={chosenFile.file_type}
-                                            fileType={chosenFile.file_type}
+                                            file_name={chosenFile.file_type}
+                                            file_type={chosenFile.file_type}
                                             key={`file-in-room-${index}`}
-                                            previewUrl={chosenFile.url}
+                                            url={chosenFile.url}
                                         />
                                         <button
                                             className={cn(

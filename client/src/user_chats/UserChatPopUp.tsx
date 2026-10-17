@@ -1,9 +1,7 @@
 import ChatList from "./MessageList";
-import useUserChatService from "./service";
 import Loading from "../loading/Loading";
 import { File, SendIcon, Settings2, X } from "lucide-react";
 import { useUserChatStore } from "./store";
-import useUserProfileService from "../user_profiles/service";
 import { useUserStore } from "../user_profiles/store";
 import type { IUserChatPopUp } from "./model";
 import { useEffect } from "react";
@@ -29,9 +27,6 @@ export default function UserChatPopUp(props: IUserChatPopUp) {
     const setSelectMode = useUserChatStore((state) => state.setSelectMode);
 
     const setShowUserProfilePopUp = useUserStore((state) => state.setShowUserProfilePopUp);
-
-    const userChat = useUserChatService();
-    const user = useUserProfileService();
     
     useEffect(() => {
         const canEdit = selectMode && 
@@ -48,7 +43,7 @@ export default function UserChatPopUp(props: IUserChatPopUp) {
 
     const sendMessage = (event: React.SubmitEvent<HTMLFormElement>) => {
         event.preventDefault();
-        if (userChat.isProcessing) return;
+        if (props.userChat.isProcessing) return;
 
         if (selectMode && chosenMessage) {
             if (!text.trim() || chosenMessage.text.trim() === text.trim()) {
@@ -59,11 +54,11 @@ export default function UserChatPopUp(props: IUserChatPopUp) {
                 return;
             }
             
-            userChat.changeMessageMt.mutate(chosenMessage._id);
+            props.userChat.changeMessageMt.mutate(chosenMessage._id);
             return
         }
 
-        userChat.sendMessageMt.mutate();
+        props.userChat.sendMessageMt.mutate();
     }
 
     const closeUserChatPopUp = () => {
@@ -89,7 +84,7 @@ export default function UserChatPopUp(props: IUserChatPopUp) {
     }
 
     return (
-        <section className="h-full overflow-y-auto flex flex-col w-full md:w-3/4">
+        <section className="h-full flex flex-col w-full">
             <header className="bg-zinc-800 flex justify-between p-2.5">
                 {props.userProfile.error ? (
                     <div className="flex justify-center items-center h-full">
@@ -108,21 +103,21 @@ export default function UserChatPopUp(props: IUserChatPopUp) {
                         onClick={seeUserProfile}
                         type="button"
                     >
-                        {user.showOtherUser.data && user.showOtherUser.data.image_public_id ? (
+                        {props.userProfile.image_public_id && props.userProfile.image_public_id !== "" ? (
                             <div className="w-8 h-8 rounded-full">
                                 <img
                                     className="w-full h-full object-cover rounded-full"
-                                    alt={`${user.showOtherUser.data.name}-picture`}
-                                    src={user.showOtherUser.data.image}
+                                    alt={`${props.userProfile.name}-picture`}
+                                    src={props.userProfile.image}
                                 />
                             </div>
                         ) : (
                             <div className="bg-amber-400 flex justify-center items-center w-8 h-8 rounded-full">
-                                <p className="text-olive-800 font-medium">{user.showOtherUser.data?.name[0]}</p>
+                                <p className="text-olive-800 font-medium">{props.userProfile.name[0]}</p>
                             </div>
                         )}
                         <h3 className="text-white text-base text-left font-medium">
-                            {user.showOtherUser.data?.name}
+                            {props.userProfile?.name}
                         </h3>
                     </button>
                 )}
@@ -145,7 +140,7 @@ export default function UserChatPopUp(props: IUserChatPopUp) {
                     </button>
                 </section>
             </header>
-            <div className="flex flex-col gap-2.5 px-2.5 h-[80%] border-x border-gray-400">
+            <main className="h-full overflow-y-auto p-2.5 flex flex-col w-full">
                 {props.userChat.isLoading ? (
                     <div className="flex justify-center items-center bg-white h-full">
                         <Loading/>
@@ -165,38 +160,38 @@ export default function UserChatPopUp(props: IUserChatPopUp) {
                         isProcessing={props.isProcessing}
                     />
                 )}
-            </div>
-            <form 
-                className="bg-white relative h-[20%] inset-shadow-gray-200 p-1.5 flex flex-col gap-1.5 border border-gray-400"
-                onSubmit={sendMessage}
-            >
-                <textarea
-                    className="focus:outline-0 outline-0 w-full h-full resize-none pr-12"
-                    id="message"
-                    name="message"
-                    onChange={(event) => setText(event.target.value)}
-                    value={text}
-                />
-                <div className="absolute bottom-2 right-2 top-2 flex items-center bg-white">
-                    <div className="flex flex-col gap-2.5">
-                        <button
-                            className="text-blue-500 font-medium cursor-pointer disabled:cursor-not-allowed"
-                            disabled={props.isProcessing}
-                            type="submit"
-                        >
-                            <SendIcon size={22}/>
-                        </button>
-                        <button 
-                            className="text-blue-500 font-medium cursor-pointer disabled:cursor-not-allowed"
-                            disabled={props.isProcessing}
-                            onClick={seeFilePreview}
-                            type="button"
-                        >
-                            <File size={22}/>
-                        </button>
+                <form 
+                    className="bg-white relative p-2 w-full flex h-[20%] items-center gap-2 border border-gray-400"
+                    onSubmit={sendMessage}
+                >
+                    <textarea
+                        className="focus:outline-0 outline-0 w-full h-full resize-none pr-12"
+                        id="message"
+                        name="message"
+                        onChange={(event) => setText(event.target.value)}
+                        value={text}
+                    />
+                    <div className="absolute bottom-2 right-2 top-2 flex items-center bg-white">
+                        <div className="flex flex-col gap-2.5">
+                            <button
+                                className="text-blue-500 font-medium cursor-pointer disabled:cursor-not-allowed"
+                                disabled={props.isProcessing}
+                                type="submit"
+                            >
+                                <SendIcon size={22}/>
+                            </button>
+                            <button 
+                                className="text-blue-500 font-medium cursor-pointer disabled:cursor-not-allowed"
+                                disabled={props.isProcessing}
+                                onClick={seeFilePreview}
+                                type="button"
+                            >
+                                <File size={22}/>
+                            </button>
+                        </div>
                     </div>
-                </div>
-            </form>
+                </form>
+            </main>
         </section>
     );
 }

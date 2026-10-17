@@ -80,6 +80,7 @@ class UserChatRepository {
             hidden_for: { $nin: [new ObjectId(props.sender_id)] }
         })
         .limit(limit)
+        .sort({ created_at: -1 })
         .skip(skip)
         .toArray();
     }

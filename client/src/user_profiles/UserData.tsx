@@ -51,7 +51,7 @@ export default function UserData(props: UserData) {
     }
 
     return (
-        <div className="bg-gray-50  p-1.5">
+        <div className="p-1.5">
             {props.place.name === "group-member" ? (
                 <div 
                     className="justify-between items-center flex cursor-pointer"

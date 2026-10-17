@@ -40,7 +40,7 @@ export default function Home() {
     }, [message, setMessage]);
 
     return (
-        <section className="flex md:flex-row p-2.5 gap-2.5 flex-col h-dvh relative z-10">
+        <section className="flex md:flex-row flex-col relative z-10 h-dvh gap-2 p-2">
             {message ? <Alert message={message}/> : null}
             <Navbar isProcessing={userProfile.isProcessing || userChat.isProcessing}/>
             {!openPopUpOption ? null : (
@@ -53,67 +53,67 @@ export default function Home() {
                     deleteChosen={userChat.deleteChosenMessagesMt}
                 />
             )}
-            {userProfile.showUsers.error ? (
-                <div className="md:w-3/4 w-full h-full flex flex-col px-2.5 inset-shadow-sm inset-shadow-gray-400 border border-gray-400 overflow-y-auto">
+            <main className="md:w-3/4 w-full h-full flex flex-col inset-shadow-sm inset-shadow-gray-400 border border-gray-400 overflow-y-auto">
+                {userProfile.showUsers.error ? (
                     <div className="flex justify-center items-center h-full">
                         <div className="text-gray-700 font-medium text-center">
                             {userProfile.showUsers.error.message}
                         </div>
                     </div>
-                </div>
-            ) : userProfile.showUsers.isLoading ? (
-                <div className="md:w-3/4 w-full h-full flex flex-col px-2.5 inset-shadow-sm inset-shadow-gray-400 border border-gray-400 overflow-y-auto">
+                ) : userProfile.showUsers.isLoading ? (
                     <div className="flex justify-center items-center h-full">
                         <Loading/>
                     </div>
-                </div>
-            ) : receiverId && receiverId !== "" && showUserChatPopUp ? (
-                <UserChatPopUp isProcessing={userChat.isProcessing || userProfile.isProcessing} 
-                    userChat={{
-                        data: userChat.showAllUserChats.data ? 
-                        userChat.showAllUserChats.data.pages.flatMap(page => page).reverse() : [],
+                ) : receiverId && receiverId !== "" && showUserChatPopUp ? (
+                    <UserChatPopUp isProcessing={userChat.isProcessing || userProfile.isProcessing} 
+                        userChat={{
+                            changeMessageMt: userChat.changeMessageMt,
+                            data: userChat.showAllUserChats.data ? 
+                            userChat.showAllUserChats.data.pages.flatMap(page => page).reverse() : [],
 
-                        error: userChat.showAllUserChats.error,
-                        fetchNextPage: userChat.showAllUserChats.fetchNextPage,
-                        hasNextPage: userChat.showAllUserChats.hasNextPage,
-                        isFetchingNextPage: userChat.showAllUserChats.isFetchingNextPage,
-                        isLoading: userChat.showAllUserChats.isLoading
-                    }} 
-                    userProfile={{
-                        error: userProfile.showOtherUser.error,
-                        image: userProfile.showOtherUser.data ? userProfile.showOtherUser.data.image : "-",
-                        image_public_id: userProfile.showOtherUser.data ? userProfile.showOtherUser.data.image_public_id : "-",
-                        isLoading: userProfile.showOtherUser.isLoading,
-                        name: userProfile.showOtherUser.data ? userProfile.showOtherUser.data.name : "-"
-                    }}
-                />
-            ) : receiverId && receiverId !== "" && showUserProfilePopUp ? (
-                <UserProfilePopUp 
-                    _id={userProfile.showOtherUser.data ? userProfile.showOtherUser.data._id : "-"}
-                    address={userProfile.showOtherUser.data ? userProfile.showOtherUser.data.address : "-"}
-                    description={userProfile.showOtherUser.data ? userProfile.showOtherUser.data.description : "-"}
-                    error={userProfile.showOtherUser.error}
-                    gender={userProfile.showOtherUser.data ? userProfile.showOtherUser.data.gender : "-"}
-                    isLoading={userProfile.showOtherUser.isLoading}
-                    image={userProfile.showOtherUser.data ? userProfile.showOtherUser.data.image : "-"}
-                    image_public_id={userProfile.showOtherUser.data ? userProfile.showOtherUser.data.image_public_id : "-"}
-                    name={userProfile.showOtherUser.data ? userProfile.showOtherUser.data.name : "-"} 
-                />
-            ) : receiverId && receiverId !== "" && showUserMedia ? (
-                <UserChatFilesPreviewPopUp 
-                    handleMediaPreview={userChat.handleMediaPreview} 
-                    isProcessing={userChat.isProcessing || userProfile.isProcessing} 
-                    inputMediaRef={userChat.inputMediaRef} 
-                    sendMessageMt={userChat.sendMessageMt}
-                />
-            ) : receiverId && receiverId !== "" && showUserChatFilesPopUp ? (
-                <UserChatFilesPopUp 
-                    error={userChat.showChosenMessageFiles.error} 
-                    files={userChat.showChosenMessageFiles.data ? userChat.showChosenMessageFiles.data.files : []} 
-                    isProcessing={userChat.isProcessing || userProfile.isProcessing} 
-                    isLoading={userChat.showChosenMessageFiles.isLoading}/>
-            ) : (
-                <div className="md:w-3/4 w-full h-full flex flex-col px-2.5 inset-shadow-sm inset-shadow-gray-400 border border-gray-400 overflow-y-auto">
+                            error: userChat.showAllUserChats.error,
+                            fetchNextPage: userChat.showAllUserChats.fetchNextPage,
+                            hasNextPage: userChat.showAllUserChats.hasNextPage,
+                            isFetchingNextPage: userChat.showAllUserChats.isFetchingNextPage,
+                            isLoading: userChat.showAllUserChats.isLoading,
+                            isProcessing: userChat.isProcessing || userProfile.isProcessing,
+                            sendMessageMt: userChat.sendMessageMt
+                        }} 
+                        userProfile={{
+                            error: userProfile.showOtherUser.error,
+                            image: userProfile.showOtherUser.data ? userProfile.showOtherUser.data.image : "-",
+                            image_public_id: userProfile.showOtherUser.data ? userProfile.showOtherUser.data.image_public_id : "-",
+                            isLoading: userProfile.showOtherUser.isLoading,
+                            name: userProfile.showOtherUser.data ? userProfile.showOtherUser.data.name : "-"
+                        }}
+                    />
+                ) : receiverId && receiverId !== "" && showUserProfilePopUp ? (
+                    <UserProfilePopUp 
+                        _id={userProfile.showOtherUser.data ? userProfile.showOtherUser.data._id : "-"}
+                        address={userProfile.showOtherUser.data ? userProfile.showOtherUser.data.address : "-"}
+                        description={userProfile.showOtherUser.data ? userProfile.showOtherUser.data.description : "-"}
+                        error={userProfile.showOtherUser.error}
+                        gender={userProfile.showOtherUser.data ? userProfile.showOtherUser.data.gender : "-"}
+                        isLoading={userProfile.showOtherUser.isLoading}
+                        image={userProfile.showOtherUser.data ? userProfile.showOtherUser.data.image : "-"}
+                        image_public_id={userProfile.showOtherUser.data ? userProfile.showOtherUser.data.image_public_id : "-"}
+                        name={userProfile.showOtherUser.data ? userProfile.showOtherUser.data.name : "-"} 
+                    />
+                ) : receiverId && receiverId !== "" && showUserMedia ? (
+                    <UserChatFilesPreviewPopUp 
+                        handleMediaPreview={userChat.handleMediaPreview} 
+                        isProcessing={userChat.isProcessing || userProfile.isProcessing} 
+                        inputMediaRef={userChat.inputMediaRef} 
+                        sendMessageMt={userChat.sendMessageMt}
+                    />
+                ) : receiverId && receiverId !== "" && showUserChatFilesPopUp ? (
+                    <UserChatFilesPopUp 
+                        error={userChat.showChosenMessageFiles.error} 
+                        files={userChat.showChosenMessageFiles.data ? userChat.showChosenMessageFiles.data.files : []} 
+                        isProcessing={userChat.isProcessing || userProfile.isProcessing} 
+                        isLoading={userChat.showChosenMessageFiles.isLoading}
+                    />
+                ) : (
                     <UserList 
                         fetchNextUser={userProfile.showUsers.fetchNextPage}
                         hasNextPage={userProfile.showUsers.hasNextPage}
@@ -122,8 +122,8 @@ export default function Home() {
                         place={{ name: "user-list-home" }}
                         users={userProfile.showUsers.data ? userProfile.showUsers.data.pages.flat() : []}
                     />
-                </div>
-            )}
+                )}
+            </main>
         </section>
     );
 }

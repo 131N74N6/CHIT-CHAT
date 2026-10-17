@@ -18,7 +18,7 @@ export default function UserList(props: UserList) {
     }
 
     return (
-        <div className="flex flex-col gap-2 py-2.5 overflow-y-auto">
+        <div className="p-2.5 overflow-y-auto h-full flex flex-col gap-2.5">
             <div className="flex flex-col gap-2">
                 {props.users.map((user) => {
                     return (
