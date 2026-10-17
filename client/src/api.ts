@@ -25,7 +25,8 @@ async function handleResponse<T>(response: Response) {
 export async function apiRequest<T>(endpoint: string, options: RequestInit) {
     const response = await fetch(`${import.meta.env.VITE_BASE_API_URL}${endpoint}`, {
         credentials: "include",
-        headers: { "Content-Type": "application/json", ...options.headers }
+        headers: { "Content-Type": "application/json", ...options.headers },
+        ...options
     });
     
     return handleResponse<T>(response);

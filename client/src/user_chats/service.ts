@@ -174,7 +174,7 @@ export default function useUserChatService() {
 
     const clearAllMessagesMt = useMutation({
         mutationFn: async () => {
-            const endpoint = `/api/v1/user-chats/clear`;
+            const endpoint = `/api/v1/user-chats/clear?receiver_id=${receiverId}`;
             await apiRequest(endpoint, { method: "DELETE" });
         },
         onError: (error) => {
@@ -192,7 +192,8 @@ export default function useUserChatService() {
     const clearChosenMessagesMt = useMutation({
         mutationFn: async () => {
             const endpoint = `/api/v1/user-chats/clear/bulk`;
-            await apiRequest(endpoint, { method: "DELETE" });
+            const data = JSON.stringify({ sender_id: currentUserId });
+            await apiRequest(endpoint, { body: data, method: "DELETE" });
         },
         onError: (error) => {
             setMessage(error.message);
@@ -208,7 +209,7 @@ export default function useUserChatService() {
 
     const deleteAllMessagesMt = useMutation({
         mutationFn: async () => {
-            const endpoint = `/api/v1/user-chats`;
+            const endpoint = `/api/v1/user-chats?receiver_id=${receiverId}`;
             await apiRequest(endpoint, { method: "DELETE" });
         },
         onError: (error) => {
@@ -226,7 +227,8 @@ export default function useUserChatService() {
     const deleteChosenMessagesMt = useMutation({
         mutationFn: async () => {
             const endpoint = `/api/v1/user-chats/bulk`;
-            await apiRequest(endpoint, { method: "DELETE" });
+            const data = JSON.stringify({ sender_id: currentUserId });
+            await apiRequest(endpoint, { body: data, method: "DELETE" });
         },
         onError: (error) => {
             setMessage(error.message);

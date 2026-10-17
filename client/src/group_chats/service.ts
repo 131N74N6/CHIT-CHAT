@@ -186,14 +186,8 @@ export default function useGroupChatService() {
     const changeChosenMessageMt = useMutation({
         mutationFn: async (id: string) => {
             const endpoint = `/api/v1/groups/chats`;
-            await apiRequest(endpoint, {
-                body: JSON.stringify({ 
-                    _id: id.trim(), 
-                    text: groupMessage.trim(), 
-                    group_id: groupId 
-                }),
-                method: "PUT"
-            });
+            const data = JSON.stringify({ _id: id.trim(), text: groupMessage.trim(), group_id: groupId });
+            await apiRequest(endpoint, { body: data, method: "PUT" });
         },
         onError: (error) => {
             setMessage(error.message);
@@ -226,10 +220,8 @@ export default function useGroupChatService() {
     const clearChosenMessageFromGroupMt = useMutation({
         mutationFn: async () => {
             const endpoint = `/api/v1/groups/chats/clear/bulk`;
-            await apiRequest(endpoint, {
-                body: JSON.stringify({ group_id: groupId, message_ids: chosenMessageIdsFromGroup }),
-                method: "DELETE"
-            });
+            const data = JSON.stringify({ group_id: groupId, message_ids: chosenMessageIdsFromGroup });
+            await apiRequest(endpoint, {body: data, method: "DELETE" });
         },
         onError: (error) => {
             setMessage(error.message);
@@ -267,10 +259,8 @@ export default function useGroupChatService() {
     const deleteChosenMessagesFromGroupMt = useMutation({
         mutationFn: async () => {
             const endpoint = `/api/v1/groups/chats/bulk`;
-            await apiRequest(endpoint, {
-                body: JSON.stringify({ group_id: groupId, message_ids: chosenMessageIdsFromGroup }),
-                method: "DELETE"
-            });
+            const data = JSON.stringify({ group_id: groupId, message_ids: chosenMessageIdsFromGroup });
+            await apiRequest(endpoint, {body: data, method: "DELETE" });
         },
         onError: (error) => {
             setMessage(error.message);

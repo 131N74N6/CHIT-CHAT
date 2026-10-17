@@ -4,27 +4,27 @@ import groupChatService from "./service";
 class GroupChatController {
     async changeChosenMessage(props: TGroupChats["changeMessage"]) {
         await groupChatService.changeChosenMessage(props);
-        return { message: "message has changed" }
+        return { message: "message from this group has changed" }
     }
 
     async clearAllMessages(props: Omit<TGroupChats["deleteMessage"], "message_ids">) {
         await groupChatService.clearAllMessages(props);
-        return { message: "all messages from group chat has cleared" }
+        return { message: "all messages from this group has cleared" }
     }
 
     async clearChosenMessages(props: TGroupChats["deleteMessage"]) {
         await groupChatService.clearChosenMessages(props);
-        return { message: "chosen messages from group chat has cleared" }
+        return { message: "chosen messages from this group has cleared" }
     }
 
     async deleteAllMessages(props: Omit<TGroupChats["deleteMessage"], "message_ids">) {
         await groupChatService.deleteAllMessages(props);
-        return { message: "all messages from group chat has deleted" }
+        return { message: "all messages from this group has deleted" }
     }
 
     async deleteChosenMessages(props: TGroupChats["deleteMessage"]) {
         await groupChatService.deleteChosenMessages(props);
-        return { message: "chosen messages from group chat has deleted" }
+        return { message: "chosen messages from this group has deleted" }
     }
 
     async sendMessage(props: TGroupChats["sendMessageRaw"]) {
