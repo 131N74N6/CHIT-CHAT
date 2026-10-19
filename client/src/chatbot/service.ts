@@ -1,7 +1,7 @@
 import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useChatbotStore } from "./store";
 import { useUserStore } from "../stores/user.store";
-import { useMessageStore } from "../stores/message.store";
+import { useMessageStore } from "../alert/store";
 import { apiRequest } from "../api";
 import type { IMessageBot } from "./model";
 

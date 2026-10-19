@@ -3,7 +3,7 @@ import useAuthService from "./service";
 import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeClosed, MessageCircle } from "lucide-react";
 import { useEffect } from "react";
-import { useMessageStore } from "../stores/message.store";
+import { useMessageStore } from "../alert/store";
 import { useAuthStore } from "./store";
 
 export default function SignUp() {

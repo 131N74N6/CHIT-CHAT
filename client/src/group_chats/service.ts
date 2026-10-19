@@ -2,7 +2,7 @@ import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tansta
 import { useGroupChatStore } from "./store";
 import { useEffect, useRef } from "react";
 import type { IGroupMessage, IGroupMessageFiles, IGroupFilePreview } from "./model";
-import { useMessageStore } from "../stores/message.store";
+import { useMessageStore } from "../alert/store";
 import { apiRequest, apiUpload } from "../api";
 import { useUserStore } from "../user_profiles/store";
 import { groupChatWebSocket } from "./event";

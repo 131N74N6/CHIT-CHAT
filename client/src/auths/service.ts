@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useUserChatStore } from "../user_chats/store";
 import { useNavbarStore } from "../navbar/store";
 import { useChatbotStore } from "../chatbot/store";
-import { useMessageStore } from "../stores/message.store";
+import { useMessageStore } from "../alert/store";
 import { createAuthClient } from "better-auth/client";
 import type { AuthServiceApi } from "../../../api/src/auth/model";
 import { inferAdditionalFields } from "better-auth/client/plugins";

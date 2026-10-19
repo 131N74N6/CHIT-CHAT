@@ -2,7 +2,7 @@ import Alert from "../alert/Alert";
 import cn from "../utils/cn";
 import Navbar from "../navbar/Navbar";
 import { ArrowBigLeft, Camera, MessageCircle, X } from "lucide-react";
-import { useMessageStore } from "../stores/message.store";
+import { useMessageStore } from "../alert/store";
 import { useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Loading from "../loading/Loading";

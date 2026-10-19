@@ -161,35 +161,33 @@ export default function UserChatPopUp(props: IUserChatPopUp) {
                     />
                 )}
                 <form 
-                    className="bg-white relative p-2 w-full flex h-[20%] items-center gap-2 border border-gray-400"
+                    className="bg-white border overflow-y-auto border-gray-400 relative p-2 flex w-full h-[20%] items-center gap-2"
                     onSubmit={sendMessage}
                 >
                     <textarea
-                        className="focus:outline-0 outline-0 w-full h-full resize-none pr-12"
+                        className="outline-0 w-full h-full resize-none pr-12"
                         id="message"
                         name="message"
                         onChange={(event) => setText(event.target.value)}
                         value={text}
                     />
-                    <div className="absolute bottom-2 right-2 top-2 flex items-center bg-white">
-                        <div className="flex flex-col gap-2.5">
-                            <button
-                                className="text-blue-500 font-medium cursor-pointer disabled:cursor-not-allowed"
-                                disabled={props.isProcessing}
-                                type="submit"
-                            >
-                                <SendIcon size={22}/>
-                            </button>
-                            <button 
-                                className="text-blue-500 font-medium cursor-pointer disabled:cursor-not-allowed"
-                                disabled={props.isProcessing}
-                                onClick={seeFilePreview}
-                                type="button"
-                            >
-                                <File size={22}/>
-                            </button>
-                        </div>
-                    </div>
+                    <section className="flex flex-col gap-1.5">
+                        <button
+                            className="text-blue-500 font-medium cursor-pointer disabled:cursor-not-allowed"
+                            disabled={props.isProcessing}
+                            type="submit"
+                        >
+                            <SendIcon size={22}/>
+                        </button>
+                        <button 
+                            className="text-blue-500 font-medium cursor-pointer disabled:cursor-not-allowed"
+                            disabled={props.isProcessing}
+                            onClick={seeFilePreview}
+                            type="button"
+                        >
+                            <File size={22}/>
+                        </button>
+                    </section>
                 </form>
             </main>
         </section>

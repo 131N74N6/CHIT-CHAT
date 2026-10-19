@@ -77,7 +77,7 @@ export default function GroupChatPopUp(props: IGroupChatPopUp) {
     }
     
     return (
-        <section className="h-full overflow-y-auto p-2.5 md:flex hidden flex-col w-full md:w-3/4">
+        <section className="h-full flex flex-col w-full">
             <header className="bg-zinc-800 flex justify-between p-2.5">
                 <button 
                     className="flex-row flex items-center gap-2.5 cursor-pointer disabled:cursor-not-allowed"
@@ -121,7 +121,9 @@ export default function GroupChatPopUp(props: IGroupChatPopUp) {
                     </button>
                 </section>
             </header>
-            <div className="flex flex-col gap-2.5 px-2.5 h-full border-x border-gray-400">
+            <main className="h-full overflow-y-auto p-2.5 flex flex-col w-full">
+
+            </main>
                 {props.group_chat.isLoading ? (
                     <div className="flex justify-center items-center bg-white h-full">
                         <Loading/>
@@ -141,38 +143,37 @@ export default function GroupChatPopUp(props: IGroupChatPopUp) {
                         isProcessing={props.group_chat.isProcessing}
                     />
                 )}
-            </div>
-            <form 
-                className="bg-white inset-shadow-gray-200 p-1.5 flex flex-col gap-1.5 border border-gray-400"
-                onSubmit={sendMessageToGroup}
-            >
-                <div className="flex gap-1.5">
-                    <textarea
-                        className="focus:outline-0 w-[90%] resize-none"
-                        id="message"
-                        name="message"
-                        onChange={(event) => setGroupMessage(event.target.value)}
-                        value={groupMessage}
-                    />
-                    <div className="flex flex-col gap-2 justify-center">
-                        <button
-                            className="text-blue-500 font-medium cursor-pointer disabled:cursor-not-allowed"
-                            disabled={groupChat.isProcessing || groupProfile.isProcessing}
-                            type="submit"
-                        >
-                            <SendIcon size={22}/>
-                        </button>
-                        <button 
-                            className="text-blue-500 font-medium cursor-pointer disabled:cursor-not-allowed"
-                            disabled={groupChat.isProcessing || groupProfile.isProcessing}
-                            onClick={seeFilePreview}
-                            type="button"
-                        >
-                            <File size={22}/>
-                        </button>
+                <form 
+                    className="bg-white inset-shadow-gray-200 p-1.5 flex flex-col gap-1.5 border border-gray-400"
+                    onSubmit={sendMessageToGroup}
+                >
+                    <div className="flex gap-1.5">
+                        <textarea
+                            className="focus:outline-0 w-[90%] resize-none"
+                            id="message"
+                            name="message"
+                            onChange={(event) => setGroupMessage(event.target.value)}
+                            value={groupMessage}
+                        />
+                        <div className="flex flex-col gap-2 justify-center">
+                            <button
+                                className="text-blue-500 font-medium cursor-pointer disabled:cursor-not-allowed"
+                                disabled={groupChat.isProcessing || groupProfile.isProcessing}
+                                type="submit"
+                            >
+                                <SendIcon size={22}/>
+                            </button>
+                            <button 
+                                className="text-blue-500 font-medium cursor-pointer disabled:cursor-not-allowed"
+                                disabled={groupChat.isProcessing || groupProfile.isProcessing}
+                                onClick={seeFilePreview}
+                                type="button"
+                            >
+                                <File size={22}/>
+                            </button>
+                        </div>
                     </div>
-                </div>
-            </form>
+                </form>
         </section>
     );
 }

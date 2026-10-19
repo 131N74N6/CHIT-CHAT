@@ -4,7 +4,7 @@ import useUserChatService from "../user_chats/service";
 import UserList from "./UserList";
 import useUserProfileService from "./service";
 import { useEffect } from "react";
-import { useMessageStore } from "../stores/message.store";
+import { useMessageStore } from "../alert/store";
 import { useUserChatStore } from "../user_chats/store";
 import Alert from "../alert/Alert";
 import PopUpOption from "../user_chats/PopUpOption";

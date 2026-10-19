@@ -3,7 +3,7 @@ import useUserChatService from "./service";
 import cn from "../utils/cn";
 import Loading from "../loading/Loading";
 import { File, MessageCircle, SendIcon, Settings2 } from "lucide-react";
-import { useMessageStore } from "../stores/message.store";
+import { useMessageStore } from "../alert/store";
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect } from "react";
 import Navbar from "../navbar/Navbar";

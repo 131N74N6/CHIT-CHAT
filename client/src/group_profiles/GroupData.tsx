@@ -22,7 +22,7 @@ export default function GroupData(props: IGroupProfileData) {
     }
 
     return (
-        <div className="border-b bg-white border-gray-600">
+        <div className="border-b border-gray-600">
             <div 
                 className="p-1.5 items-center cursor-pointer flex gap-1.5"
                 onClick={seeGroupChat}

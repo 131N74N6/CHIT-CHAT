@@ -1,6 +1,6 @@
 import cn from "../utils/cn";
 import Navbar from "../navbar/Navbar";
-import { useMessageStore } from "../stores/message.store";
+import { useMessageStore } from "../alert/store";
 import { useEffect } from "react";
 import Alert from "../alert/Alert";
 import useGroupMemberService from "./service";

@@ -1,6 +1,4 @@
-interface AlertIntrf {
-    message: string;
-}
+import type { AlertIntrf } from "./model";
 
 export default function Alert(props: AlertIntrf) {
     return (

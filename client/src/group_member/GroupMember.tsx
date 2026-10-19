@@ -2,7 +2,7 @@ import Loading from "../loading/Loading";
 import Navbar from "../navbar/Navbar";
 import UserList from "../user_profiles/UserList";
 import cn from "../utils/cn";
-import { useMessageStore } from "../stores/message.store";
+import { useMessageStore } from "../alert/store";
 import { useEffect } from "react";
 import Alert from "../alert/Alert";
 import { MessageCircle } from "lucide-react";

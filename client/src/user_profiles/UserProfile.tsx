@@ -1,6 +1,6 @@
 import useUserProfileService from "./service";
 import { useNavigate, useParams } from "react-router-dom";
-import { useMessageStore } from "../stores/message.store";
+import { useMessageStore } from "../alert/store";
 import { useEffect } from "react";
 import Alert from "../alert/Alert";
 import Loading from "../loading/Loading";

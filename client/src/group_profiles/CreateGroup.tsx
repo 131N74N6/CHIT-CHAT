@@ -1,7 +1,7 @@
-import { Camera, MessageCircle, X } from "lucide-react";
+import { Camera, X } from "lucide-react";
 import Navbar from "../navbar/Navbar";
 import cn from "../utils/cn";
-import { useMessageStore } from "../stores/message.store";
+import { useMessageStore } from "../alert/store";
 import { useEffect } from "react";
 import Alert from "../alert/Alert";
 import useGroupProfileService from "./service";
@@ -33,12 +33,12 @@ export default function CreateGroup() {
     }, [message, setMessage]);
 
     return (
-        <section className="flex md:flex-row p-2.5 gap-2.5 flex-col h-dvh relative z-10">
+        <section className="flex md:flex-row p-2 gap-2 flex-col h-dvh relative z-10">
             <Navbar isProcessing={groupProfile.isProcessing}/>
             {message ? <Alert message={message}/> : null}
             <form 
                 className={cn(
-                    "w-full md:w-2/5 flex flex-col h-full p-2.5 gap-3 overflow-y-auto", 
+                    "w-full md:w-3/4 flex flex-col h-full p-2.5 gap-3 overflow-y-auto", 
                     "inset-shadow-sm inset-shadow-gray-400 border border-gray-400"
                 )} 
                 onSubmit={(event: React.SubmitEvent<HTMLFormElement>) => {
@@ -95,25 +95,21 @@ export default function CreateGroup() {
                 <div className="flex flex-col gap-1.5">
                     <label htmlFor="room_name" className="text-gray-900 font-medium text-[1.2rem]">Name</label>
                     <input
-                        className={cn("focus:outline-0 w-full bg-gray-200 text-gray-900 font-medium p-1.5 text-[1rem]")}
+                        className={cn("outline-0 w-full bg-gray-200 text-gray-900 font-medium p-1.5 text-[1rem]")}
                         id="room_name"
                         name="room_name"
-                        onChange={(event: React.ChangeEvent<HTMLInputElement, HTMLInputElement>) => setGroupName(event.target.value)}
+                        onChange={(event) => setGroupName(event.target.value)}
                         type="text"
                         value={groupName}
                     />
                 </div>
                 <div className="flex flex-col gap-1.5">
                     <label htmlFor="room_description" className="text-gray-900 font-medium text-[1.2rem]">Description</label>
-                    <input
-                        className={cn(
-                            "focus:outline-0 bg-gray-200 text-gray-900 font-medium text-[1rem]", 
-                            "p-1.5 w-full max-h-80 overflow-y-auto"
-                        )}
+                    <textarea
+                        className="outline-0 h-full w-full resize-none p-1.5 bg-gray-200 text-gray-900 font-medium text-base"
                         id="room_description"
                         name="room_description"
-                        onChange={(event: React.ChangeEvent<HTMLInputElement, HTMLInputElement>) => setGroupDescription(event.target.value)}
-                        type="text"
+                        onChange={(event) => setGroupDescription(event.target.value)}
                         value={groupDescription}
                     />
                 </div>
@@ -128,22 +124,6 @@ export default function CreateGroup() {
                     Create group
                 </button>
             </form>
-            <div 
-                className={cn(
-                    "md:flex md:justify-center md:items-center md:h-full md:w-2/5", 
-                    "md:bg-white hidden inset-shadow-sm inset-shadow-gray-400",
-                    "border border-gray-400"
-                )}
-            >
-                <div className="flex flex-col gap-2">
-                    <div className="text-gray-500 font-medium flex justify-center">
-                        <MessageCircle size={34}/>
-                    </div>
-                    <div className="text-gray-700 font-medium text-center">
-                        Welcome to Chit Chat
-                    </div>
-                </div>
-            </div>
         </section>
     );
 }

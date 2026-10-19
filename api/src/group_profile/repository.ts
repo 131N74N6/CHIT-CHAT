@@ -24,8 +24,11 @@ class GroupProfileRepository {
     }
 
     async createGroup(props: TGroupProfile["createGroupResult"]) {
+        const newGroupId = new ObjectId();
+
         return await Promise.all([
             this.group_profiles.insertOne({
+                _id: newGroupId,
                 created_at: new Date(),
                 group_description: props.group_description,
                 group_name: props.group_name,
@@ -34,7 +37,7 @@ class GroupProfileRepository {
                 updated_at: new Date(),
             }),
             this.users.updateOne({ _id: new ObjectId(props.owner_id) }, {
-                $addToSet: { group_ids: props.owner_id }
+                $addToSet: { group_ids: newGroupId.toHexString() }
             })
         ]);
     }
@@ -53,13 +56,15 @@ class GroupProfileRepository {
 
     async deleteGroupProfilePicture(_id: string) {
         await this.group_profiles.updateOne({ _id: new ObjectId(_id) }, {
-            group_profile: {
-                file_name: "", 
-                file_type: "", 
-                public_id: "", 
-                resource_type: "", 
-                size: 0, 
-                url: ""
+            $set: {
+                group_profile: {
+                    file_name: "", 
+                    file_type: "", 
+                    public_id: "", 
+                    resource_type: "", 
+                    size: 0, 
+                    url: ""
+                }
             }
         });
 
@@ -77,6 +82,10 @@ class GroupProfileRepository {
 
         const currentUser = await this.users.findOne({ _id: new ObjectId(props.user_id) });
         const groupIds = currentUser?.group_ids?.map(group_id => new ObjectId(group_id));
+        
+        const userGroupIds = currentUser?.group_ids || [];
+        
+        if (userGroupIds.length === 0) return [];
 
         return await this.group_profiles.find(
             { _id: { $in: groupIds }},

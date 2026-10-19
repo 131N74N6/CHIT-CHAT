@@ -4,7 +4,7 @@ import { useUserChatStore } from "../user_chats/store";
 import { useUserStore } from "./store";
 import { useNavbarStore } from "../navbar/store";
 import { useEffect, useRef } from "react";
-import { useMessageStore } from "../stores/message.store";
+import { useMessageStore } from "../alert/store";
 import { apiRequest, apiUpload } from "../api";
 import type { UserDetail, Users } from "./model";
 import { useGroupChatStore } from "../group_chats/store";

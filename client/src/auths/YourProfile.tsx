@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import useUserProfileService from "../user_profiles/service";
-import { useMessageStore } from "../stores/message.store";
+import { useMessageStore } from "../alert/store";
 import Loading from "../loading/Loading";
 import Navbar from "../navbar/Navbar";
 import { ArrowBigLeft, MessageCircle, Pen, X } from "lucide-react";

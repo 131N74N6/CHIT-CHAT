@@ -34,7 +34,7 @@ const groupProfileRouters = new Elysia({ prefix: "/api/v1/groups" })
         owner_id: context.user.id 
     });
 }, {
-    body: t.Omit(groupProfileSchema.createGroupRaw, ["user_id"])
+    body: t.Omit(groupProfileSchema.createGroupRaw, ["owner_id"])
 })
 .put("/", async (context) => {
     return await groupProfileController.changeGroup({
@@ -45,7 +45,7 @@ const groupProfileRouters = new Elysia({ prefix: "/api/v1/groups" })
         owner_id: context.user.id, 
     });
 }, {
-    body: t.Omit(groupProfileSchema.changeGroupRaw, ["user_id"])
+    body: t.Omit(groupProfileSchema.changeGroupRaw, ["owner_id"])
 })
 .put("/:_id", async (context) => {
     return await groupProfileController.deleteGroupProfilePicture({ 

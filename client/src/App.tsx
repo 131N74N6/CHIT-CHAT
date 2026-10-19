@@ -13,7 +13,6 @@ import SignIn from "./auths/SignIn";
 import SignUp from "./auths/SignUp";
 import UserChat from "./user_chats/UserChat";
 import UserChatFiles from "./user_chats/UserChatFiles";
-import UserChatFilesPreview from "./user_chats/UserChatFilesPreview";
 import UserProfile from "./user_profiles/UserProfile";
 import YourProfile from "./auths/YourProfile";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
@@ -32,7 +31,6 @@ export default function App() {
                     <Route element={<ProtectedRoute><Home/></ProtectedRoute>} path="/home"/>
                     <Route element={<ProtectedRoute><YourProfile/></ProtectedRoute>} path="/profile"/>
                     <Route element={<ProtectedRoute><UserChat/></ProtectedRoute>} path="/user/chat/:receiver_id"/>
-                    <Route element={<ProtectedRoute><UserChatFilesPreview/></ProtectedRoute>} path="/user/chat/preview/:receiver_id"/>
                     <Route element={<ProtectedRoute><UserChatFiles/></ProtectedRoute>} path="/user/media/detail/:chat_id"/>
                     <Route element={<ProtectedRoute><UserProfile/></ProtectedRoute>} path="/user/profile/:receiver_id"/>
                     <Route element={<ProtectedRoute><AvailableGroup/></ProtectedRoute>} path="/rooms"/>

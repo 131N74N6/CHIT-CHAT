@@ -26,7 +26,7 @@ export default function UserChatFilesPreviewPopUp(props: IUserChatFilesPreviewPo
 
     return (
         <form 
-            className="flex flex-col h-full gap-2.5 p-2.5 w-full md:w-3/4 inset-shadow-sm inset-shadow-gray-400 border border-gray-400 overflow-y-auto"
+            className="flex flex-col h-full gap-2.5 p-2.5 w-full inset-shadow-sm inset-shadow-gray-400 border border-gray-400 overflow-y-auto"
             onSubmit={(event: React.SubmitEvent<HTMLFormElement>) => {
                 event.preventDefault();
                 props.sendMessageMt.mutate();
@@ -84,7 +84,7 @@ export default function UserChatFilesPreviewPopUp(props: IUserChatFilesPreviewPo
                     </div>
                 )}
             </div>
-            <div className="flex relative flex-col gap-2 p-2 border border-dashed border-gray-400 h-[20%] rounded">
+            <div className="flex relative flex-col gap-2 p-2 border overflow-y-auto border-dashed border-gray-400 h-[20%] rounded">
                 <textarea
                     className="focus:outline-0 outline-0 w-full h-full resize-none pr-12"
                     id="message"

@@ -1,5 +1,5 @@
 import { Query, useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useMessageStore } from "../stores/message.store";
+import { useMessageStore } from "../alert/store";
 import { useUserStore } from "../user_profiles/store";
 import { apiRequest } from "../api";
 import type { Users } from "../user_profiles/model";

@@ -13,7 +13,7 @@ export default function GroupList(props: IGroupProfileList) {
     }
 
     return (
-        <section className="px-2.5 pb-2.5 overflow-y-auto h-full flex flex-col gap-2.5">
+        <section className="p-2.5 overflow-y-auto h-full flex flex-col gap-2.5">
             <div className="flex flex-col gap-2">
                 {props.groups.map((group) => {
                     return (

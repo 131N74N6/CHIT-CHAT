@@ -1,7 +1,7 @@
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef } from "react";
 import { useUserChatStore } from "./store";
-import { useMessageStore } from "../stores/message.store";
+import { useMessageStore } from "../alert/store";
 import { apiRequest, apiUpload } from "../api";
 import type { IFilePreview, IUserChat, IUserChatFiles } from "./model";
 import { useUserStore } from "../user_profiles/store";

@@ -1,5 +1,5 @@
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useMessageStore } from "../stores/message.store";
+import { useMessageStore } from "../alert/store";
 import { useNavigate } from "react-router-dom";
 import { useUserStore } from "../user_profiles/store";
 import { useGroupProfileStore } from "./store";
@@ -200,6 +200,7 @@ export default function useGroupProfileService() {
             await apiUpload(endpoint, formData, "POST");
         },
         onError: (error) => {
+            console.log(error.message);
             setMessage(error.message);
         },
         onSuccess: () => {
@@ -281,7 +282,7 @@ export default function useGroupProfileService() {
     const showJoinedGroup = useInfiniteQuery({
         enabled: !!currentUserId,
         getNextPageParam: (lastPage, allPages) => {
-            if (lastPage.length <= 14) return;
+            if (lastPage.length < 16) return;
             return allPages.length + 1;
         },
         queryFn: async ({ pageParam = 1 }: { pageParam?: number }) => {

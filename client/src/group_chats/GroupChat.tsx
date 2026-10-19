@@ -3,7 +3,7 @@ import cn from "../utils/cn";
 import Loading from "../loading/Loading";
 import { File, MessageCircle, SendIcon, Settings2 } from "lucide-react";
 import { useEffect } from "react";
-import { useMessageStore } from "../stores/message.store";
+import { useMessageStore } from "../alert/store";
 import { useNavigate, useParams } from "react-router-dom";
 import Navbar from "../navbar/Navbar";
 import useGroupChatService from "./service";
