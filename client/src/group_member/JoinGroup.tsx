@@ -17,15 +17,13 @@ export default function JoinGroup() {
     
     useEffect(() => {
         if (message) {
-            const timer = setTimeout(() => {
-                setMessage(null);
-            }, 1500);
+            const timer = setTimeout(() => setMessage(null), 1500);
             return () => clearTimeout(timer);
         }
     }, [message, setMessage]);
 
     return (
-        <section className="flex md:flex-row flex-col gap-2.5 p-2.5 h-dvh relative z-10">
+        <section className="flex md:flex-row flex-col gap-2 p-2 h-dvh relative z-10">
             <Navbar isProcessing={groupMember.isProcessing}/>
             {message ? <Alert message={message}/> : null}
             <main 

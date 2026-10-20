@@ -26,16 +26,15 @@ export default function Chatbot() {
     useEffect(() => {
         if (message) {
             const timer = setTimeout(() => setMessage(null), 1500);
-
             return () => clearTimeout(timer);
         }
     }, [message, setMessage]);
 
     return (
-        <section className="flex md:flex-row flex-col h-dvh relative z-10 p-2.5 gap-2.5">
+        <section className="flex md:flex-row flex-col h-dvh relative z-10 p-2 gap-2">
             {message ? <Alert message={message}/> : null}
             <Navbar isProcessing={userChatBot.isProcessing}/>
-            <div className="md:w-2/5 w-full flex flex-col h-full inset-shadow-sm inset-shadow-gray-400 border border-gray-400 overflow-y-auto">
+            <div className="md:w-3/4 w-full flex flex-col h-full inset-shadow-sm inset-shadow-gray-400 border border-gray-400 overflow-y-auto">
                 {selectMode ? (
                     <div className="bg-gray-200 gap-2 p-2.5 flex items-center">
                         <button

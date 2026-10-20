@@ -69,6 +69,8 @@ export default function useChatbotService() {
         onSuccess: (response) => {
             queryClient.invalidateQueries({ queryKey: [`all-results-${currentUserId}`] });
             if (response && response.data) setAnswer(response.data);
+            resetSelectedChatBotIds();
+            setSelectMode(false);
             setQuestion("");
             setSelectMode(false)
         }
@@ -87,7 +89,8 @@ export default function useChatbotService() {
             return request.data ?? [];
         },
         initialPageParam: 1,
-        refetchOnReconnect: true,
+        refetchOnMount: false,
+        refetchOnWindowFocus: false,
         staleTime: Infinity
     });
 
