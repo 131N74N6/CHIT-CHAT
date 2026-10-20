@@ -69,8 +69,15 @@ export default function useUserChatService() {
             
             if (payload.type === "user-message:sent") {
                 queryClient.setQueryData(queryKey, (old: any) => {
-                    if (!old) return old;
+                    if (!old) {
+                        return {
+                            pageParams: [1],
+                            pages: [[payload.data]]
+                        };
+                    }
+                    
                     const newPages = [...old.pages];
+                    if (!newPages[0]) newPages[0] = [];
                     
                     newPages[0] = [payload.data, ...newPages[0]];
                     return { ...old, pages: newPages };

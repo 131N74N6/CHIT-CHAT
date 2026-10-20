@@ -104,8 +104,16 @@ export default function useGroupChatService() {
                 });
             } else if (payload.type === "group-message:sent") {
                 queryClient.setQueryData(queryKey, (old: any) => {
-                    if (!old) return;
+                    if (!old) {
+                        return {
+                            pageParams: [1],
+                            pages: [[payload.data]]
+                        };
+                    }
+                    
                     const newMessagePage = [...old.pages];
+                    if (!newMessagePage[0]) newMessagePage[0] = [];
+
                     newMessagePage[0] = [payload.data, ...newMessagePage[0]];
                     return { ...old, pages: newMessagePage };
                 });
