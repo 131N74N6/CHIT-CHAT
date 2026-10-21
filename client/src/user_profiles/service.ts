@@ -28,18 +28,18 @@ export default function useUserProfileService() {
     const resetGroupProfileState = useGroupProfileStore((state) => state.resetGroupProfileState);
 
     const address = useUserStore((state) => state.address);
-    const setAddress = useUserStore((state) => state.setAddress);
+    // const setAddress = useUserStore((state) => state.setAddress);
 
     const currentUserId = useUserStore((state) => state.currentUserId);
     const groupIds = useUserStore((state) => state.groupIds);
     
     const description = useUserStore((state) => state.description);
-    const setDescription = useUserStore((state) => state.setDescription);
+    // const setDescription = useUserStore((state) => state.setDescription);
 
     const setEditMode = useUserStore((state) => state.setEditMode);
 
     const gender = useUserStore((state) => state.gender);
-    const setGender = useUserStore((state) => state.setGender);
+    // const setGender = useUserStore((state) => state.setGender);
 
     const profilePicture = useUserStore((state) => state.profilePicture);
     const setProfilePicture = useUserStore((state) => state.setProfilePicture);
@@ -47,7 +47,7 @@ export default function useUserProfileService() {
     const setProfilePictureUrl = useUserStore((state) => state.setProfilePictureUrl);
 
     const username = useUserStore((state) => state.username);
-    const setUserName = useUserStore((state) => state.setUserName);
+    // const setUserName = useUserStore((state) => state.setUserName);
 
     const resetUserState = useUserStore((state) => state.resetUserState);
 
@@ -71,7 +71,7 @@ export default function useUserProfileService() {
     });
 
     useEffect(() => {
-        if (!currentUserId && !receiverId) return;
+        if (!currentUserId) return;
         if (getSessionToken.isLoading || !getSessionToken.data) return;
         
         const token = getSessionToken.data;
@@ -113,7 +113,7 @@ export default function useUserProfileService() {
                 return;
             }
 
-            const queryKey1 = ['all-users'];
+            const queryKey1 = ["all-users"];
             const queryKey2 = [`other-user-${receiverId}`];
 
             if (payload.type === "available-user:changed") {
@@ -236,21 +236,19 @@ export default function useUserProfileService() {
                 newUserInfo.append("image", profilePicture);
             }
 
-            const request = await apiUpload(endpoint, newUserInfo, "PUT");
-            return request.data;
+            await apiUpload(endpoint, newUserInfo, "PUT");
+            
         },
         onError: (error) => {
             setMessage(error.message);
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['all-users'] });
-            queryClient.invalidateQueries({ queryKey: ['current-user'] });
+            if (fileInputRef.current) fileInputRef.current.value = "";
 
-            if (receiverId) {
-                queryClient.invalidateQueries({ queryKey: [`other-user-${receiverId}`] });
-            }
+            queryClient.invalidateQueries({ queryKey: ["all-users"] });
+            queryClient.invalidateQueries({ queryKey: ["current-user"] });
 
-            queryClient.invalidateQueries({ queryKey: [`other-user-${currentUserId}`] });
+            if (receiverId) queryClient.invalidateQueries({ queryKey: [`other-user-${receiverId}`] });
 
             if (groupIds.length > 0) {
                 groupIds.map((group_id) => {
@@ -259,31 +257,24 @@ export default function useUserProfileService() {
                 });
             }
 
-            setAddress("");
-            setDescription("");
             setEditMode(false);
-            setGender("");
             setProfilePicture(null);
             setProfilePictureUrl(null);
-            setUserName("");
         }
     });
 
     const deleteUserMt = useMutation({
         mutationFn: async () => {
             const endpoint = `/api/v1/users`;
-            const request = await apiRequest(endpoint, { method: "DELETE" });
-            return request.data;
+            await apiRequest(endpoint, { method: "DELETE" });
         },
         onError: (error) => {
             setMessage(error.message);
         },
         onSuccess: () => {
-            queryClient.setQueryData(['current-user'], null);
+            if (fileInputRef.current) fileInputRef.current.value = "";
+            queryClient.setQueryData(["current-user"], null);
             queryClient.clear();
-            useGroupChatStore.persist.clearStorage();
-            useUserStore.persist.clearStorage();
-            useUserChatStore.persist.clearStorage();
             resetChatState();
             resetGroupMemberState();
             resetGroupMessageState();
@@ -291,6 +282,9 @@ export default function useUserProfileService() {
             resetUserState();
             resetChatBotState();
             resetNavbarState();
+            useGroupChatStore.persist.clearStorage();
+            useUserStore.persist.clearStorage();
+            useUserChatStore.persist.clearStorage();
             navigate("/sign-in");
         }
     });
@@ -298,24 +292,24 @@ export default function useUserProfileService() {
     const deleteUserProfilePictureMt = useMutation({
         mutationFn: async () => {
             const endpoint = `/api/v1/users/${currentUserId}`;
-            const request = await apiRequest(endpoint, { method: "PUT" });
-            return request.data;
+            await apiRequest(endpoint, { method: "PUT" });
         },
         onError: (error) => {
             setMessage(error.message);
         },
         onSuccess: () => {
-            queryClient.setQueryData(['current-user'], null);
+            if (fileInputRef.current) fileInputRef.current.value = "";
+            queryClient.setQueryData(["current-user"], null);
             queryClient.clear();
-            useGroupChatStore.persist.clearStorage();
-            useUserStore.persist.clearStorage();
-            useUserChatStore.persist.clearStorage();
             resetChatState();
             resetGroupMemberState();
             resetGroupMessageState();
             resetGroupProfileState();
             resetUserState();
             resetNavbarState();
+            useGroupChatStore.persist.clearStorage();
+            useUserStore.persist.clearStorage();
+            useUserChatStore.persist.clearStorage();
             navigate("/sign-in");
         }
     });
@@ -339,7 +333,7 @@ export default function useUserProfileService() {
             return request.data ?? [];
         },
         initialPageParam: 1,
-        queryKey: ['all-users'],
+        queryKey: ["all-users"],
         refetchOnMount: false,
         refetchOnWindowFocus: false,
         staleTime: Infinity

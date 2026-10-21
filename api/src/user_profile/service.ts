@@ -28,10 +28,10 @@ class UserProfileService {
 
     async changeUser(props: TUserProfile["changeRaw"]) {
         const userId = this.checkIsIdIsValid("user", props.id);
-        let address = "";
-        let gender = "";
-        let username = "";
-        let description = "";
+        let address = "-";
+        let gender = "-";
+        let username = "-";
+        let description = "-";
         
         const user = await userProfileRepository.findUserById({ id: userId });
         if (!user) throw new ChitChatApiError("user not found", 404);
@@ -43,12 +43,12 @@ class UserProfileService {
         if (props.gender) gender = this.checkIsInputIsAString("gender", props.gender);
 
         let image: CloudinaryUploadResult = {
-            file_name: "", 
-            file_type: "", 
-            public_id: "", 
-            resource_type: "", 
+            file_name: "-", 
+            file_type: "-", 
+            public_id: "-", 
+            resource_type: "-", 
             size: 0, 
-            url: ""
+            url: "-"
         }
 
         if (username === user.name && 
@@ -64,7 +64,7 @@ class UserProfileService {
             const bufferFile = Buffer.from(getArrayBuffer!);
             
             if (user.image_public_id && user.image_resource_type) {
-                if (user.image_public_id !== "" && user.image_resource_type!== "" ) {
+                if (user.image_public_id !== "-" && user.image_resource_type!== "-" ) {
                     await v2.uploader.destroy(user.image_public_id, { 
                         resource_type: user.image_resource_type 
                     });
@@ -152,7 +152,7 @@ class UserProfileService {
         if (user._id.toString() !== userId) throw new ChitChatApiError("you are not allowed", 403);
 
         if (user.image_public_id && user.image_resource_type) {
-            if (user.image_public_id !== "" && user.image_resource_type!== "" ) {
+            if (user.image_public_id !== "-" && user.image_resource_type!== "-" ) {
                 await v2.uploader.destroy(user.image_public_id, { 
                     resource_type: user.image_resource_type 
                 });
@@ -183,7 +183,7 @@ class UserProfileService {
         if (user._id.toString() !== userId) throw new ChitChatApiError("you are not allowed", 403);
 
         if (user.image_public_id && user.image_resource_type) {
-            if (user.image_public_id !== "" && user.image_resource_type!== "" ) {
+            if (user.image_public_id !== "-" && user.image_resource_type!== "-" ) {
                 await v2.uploader.destroy(user.image_public_id, { 
                     resource_type: user.image_resource_type 
                 });

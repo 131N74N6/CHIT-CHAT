@@ -127,9 +127,6 @@ export default function useAuthService() {
         onSuccess: () => {
             queryClient.setQueryData(['current-user'], null);
             queryClient.clear();
-            useGroupChatStore.persist.clearStorage();
-            useUserStore.persist.clearStorage();
-            useUserChatStore.persist.clearStorage();
             resetChatState();
             resetGroupMemberState();
             resetGroupMessageState();
@@ -137,6 +134,9 @@ export default function useAuthService() {
             resetChatBotState();
             resetUserState();
             resetNavbarState();
+            useGroupChatStore.persist.clearStorage();
+            useUserStore.persist.clearStorage();
+            useUserChatStore.persist.clearStorage();
             navigate("/sign-in");
         }
     });

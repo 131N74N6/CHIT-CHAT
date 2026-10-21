@@ -3,7 +3,7 @@ import useUserProfileService from "../user_profiles/service";
 import { useMessageStore } from "../alert/store";
 import Loading from "../loading/Loading";
 import Navbar from "../navbar/Navbar";
-import { ArrowBigLeft, MessageCircle, Pen, X } from "lucide-react";
+import { ArrowBigLeft, Pen, X } from "lucide-react";
 import Alert from "../alert/Alert";
 import cn from "../utils/cn";
 import useAuthService from "./service";
@@ -18,6 +18,8 @@ export default function YourProfile() {
     
     const address = useUserStore((state) => state.address);
     const setAddress = useUserStore((state) => state.setAddress);
+
+    const currentUserId = useUserStore((state) => state.currentUserId);
 
     const description = useUserStore((state) => state.description);
     const setDescription = useUserStore((state) => state.setDescription);
@@ -40,18 +42,22 @@ export default function YourProfile() {
     const userProfile = useUserProfileService();
     
     useEffect(() => {
-        if (editMode && userProfile.showOtherUser.data) {
-            setAddress(userProfile.showOtherUser.data.address || "-")
-            setDescription(userProfile.showOtherUser.data.description || "-");
-            setGender(userProfile.showOtherUser.data.gender || "-");
-            setUserName(userProfile.showOtherUser.data.name || "-");
+        if (editMode && owner.getCurrentUser.data) {
+            setAddress(owner.getCurrentUser.data.address || "-")
+            setDescription(owner.getCurrentUser.data.description || "-");
+            setGender(owner.getCurrentUser.data.gender || "-");
+            setUserName(owner.getCurrentUser.data.user_name || "-");
+            if (owner.getCurrentUser.data.profile_picture && owner.getCurrentUser.data.profile_picture.url) {
+                setProfilePictureUrl(owner.getCurrentUser.data.profile_picture.url);
+            }
         } else {
             setAddress("");
             setDescription("");
             setGender("");
             setUserName("");
+            setProfilePictureUrl(null);
         }
-    }, [editMode]);
+    }, [editMode, owner.getCurrentUser.data, currentUserId]);
 
     useEffect(() => {
         if (message) {
@@ -78,7 +84,7 @@ export default function YourProfile() {
                 </div>
             ) : editMode ? (
                 <form 
-                    className="flex w-full md:w-2/5 flex-col h-full p-2.5 inset-shadow-sm inset-shadow-gray-400 border border-gray-400"
+                    className="flex w-full md:w-3/4 flex-col h-full p-2.5 inset-shadow-sm inset-shadow-gray-400 border border-gray-400"
                     onSubmit={(event: React.SubmitEvent<HTMLFormElement>) => {
                         event.preventDefault();
                         userProfile.changeUserMt.mutate();
@@ -180,7 +186,7 @@ export default function YourProfile() {
                                 />
                             </div>
                             <div className="flex flex-col gap-1.5">
-                                <label htmlFor="new-description" className="text-gray-900 font-medium text-[1rem]">Username</label>
+                                <label htmlFor="new-description" className="text-gray-900 font-medium text-[1rem]">Description</label>
                                 <textarea
                                     className={cn("outline-0 resize-none bg-blue-200 text-gray-900 font-medium p-1.5 text-[1rem] w-full")}
                                     id="new-description"
@@ -228,7 +234,7 @@ export default function YourProfile() {
                     </div>
                 </form>
             ) : (
-                <div className="flex md:w-2/5 w-full flex-col h-full border border-gray-400">
+                <main className="flex md:w-3/4 w-full flex-col h-full border border-gray-400">
                     <div className="bg-white flex flex-col gap-2.5 h-full p-2.5 inset-shadow-sm inset-shadow-gray-400">
                         <div className="flex gap-1.5">
                             <button
@@ -245,8 +251,10 @@ export default function YourProfile() {
                         <div className="flex justify-center">
                             <div className="w-20 h-20 rounded-full">
                                 {owner.getCurrentUser.data && 
-                                owner.getCurrentUser.data.profile_picture.public_id !== null && 
-                                owner.getCurrentUser.data.profile_picture.url !== null ? (
+                                owner.getCurrentUser.data.profile_picture.public_id && 
+                                owner.getCurrentUser.data.profile_picture.public_id !== "-" && 
+                                owner.getCurrentUser.data.profile_picture.url && 
+                                owner.getCurrentUser.data.profile_picture.url !== "-" ? (
                                     <div className="w-full h-full rounded-full">
                                         <img
                                             alt={owner.getCurrentUser.data.profile_picture.public_id}
@@ -297,24 +305,8 @@ export default function YourProfile() {
                             </div>
                         </div>
                     </div>
-                </div>
+                </main>
             )}
-            <div 
-                className={cn(
-                    "md:flex md:justify-center md:items-center md:h-full md:w-2/5", 
-                    "md:bg-white hidden inset-shadow-sm inset-shadow-gray-400",
-                    "border border-gray-400"
-                )}
-            >
-                <div className="flex flex-col gap-2">
-                    <div className="text-gray-500 font-medium flex justify-center">
-                        <MessageCircle size={34}/>
-                    </div>
-                    <div className="text-gray-700 font-medium text-center">
-                        Welcome to Chit Chat
-                    </div>
-                </div>
-            </div>
         </section>
     );
 }

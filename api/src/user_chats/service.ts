@@ -171,11 +171,13 @@ class UserChatService {
         });
 
         const toHideDeletedChat = chats.filter(chat => {
-            return !chat.hidden_for.includes(receiverId) && chat.text === "This message has been deleted";
+            return !chat.hidden_for.some((id: ObjectId) => id.toString() === receiverId) && 
+            chat.text === "This message has been deleted";
         });
         
         const toRemoveDeletedChat = chats.filter(chat => {
-            return chat.hidden_for.includes(receiverId) && chat.text === "This message has been deleted";
+            return chat.hidden_for.some((id: ObjectId) => id.toString() === receiverId) && 
+            chat.text === "This message has been deleted";
         });
 
         await this.executeDeletion({

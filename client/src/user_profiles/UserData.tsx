@@ -67,7 +67,9 @@ export default function UserData(props: UserData) {
                 >
                     <div className="flex gap-2 items-center">
                         <div className={cn("w-10 h-10 rounded-full")}>
-                            {props.user.image && props.user.image_public_id ? (
+                            {props.user.image && props.user.image_public_id && 
+                            props.user.image_public_id !== "-" && 
+                            props.user.image && props.user.image !== "-" ? (
                                 <div className="w-full h-full">
                                     <img 
                                         className="w-full h-full object-cover rounded-full" 
