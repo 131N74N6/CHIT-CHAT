@@ -147,110 +147,107 @@ class UserChatService {
         const receiverId = this.checkIsIdValid("receiver", props.receiver_id);
         const senderId = this.checkIsIdValid("sender", props.sender_id);
 
-        const chats = await userChatRepository.findAllMessages({ 
-            receiver_id: receiverId, sender_id: senderId 
-        });
+        const chats = await userChatRepository.findAllMessages({ receiver_id: receiverId, sender_id: senderId });
+        if (chats.length === 0) throw new ChitChatApiError("messages not found", 404);
 
-        if (chats.length === 0) throw new ChitChatApiError("chat not found", 404);
-
-        const deleteOwnMessagePermanently = chats.filter((chat) => {
+        const toDeleteOwnPermanent = chats.filter(chat => {
             return chat.hidden_for.some((id: ObjectId) => id.toString() === receiverId) &&
-            (chat.receiver_id === receiverId && chat.sender_id === senderId)
+            (chat.receiver_id.toString() === receiverId && chat.sender_id.toString() === senderId);
         });
 
-        const deleteOwnMessagesTemporary = chats.filter((chat) => {
+        const toDeleteOwnTemporary = chats.filter(chat => {
             return !chat.hidden_for.some((id: ObjectId) => id.toString() === receiverId) &&
-            (chat.receiver_id === receiverId && chat.sender_id === senderId)
+            (chat.receiver_id.toString() === receiverId && chat.sender_id.toString() === senderId);
         });
 
-        const deleteOtherMessagesPermanently = chats.filter((chat) => {
+        const toDeleteOtherPermanent = chats.filter(chat => {
             return chat.hidden_for.some((id: ObjectId) => id.toString() === receiverId) &&
-            (chat.receiver_id === senderId && chat.sender_id === receiverId)
+            (chat.receiver_id.toString() === senderId && chat.sender_id.toString() === receiverId);
         });
 
-        const deleteOtherMessagesTemporary = chats.filter((chat) => {
+        const toDeleteOtherTemporary = chats.filter(chat => {
             return !chat.hidden_for.some((id: ObjectId) => id.toString() === receiverId) &&
-            (chat.receiver_id === senderId && chat.sender_id === receiverId)
+            (chat.receiver_id.toString() === senderId && chat.sender_id.toString() === receiverId);
         });
 
-        const hideDeletedMessages = chats.filter((chat) => {
-            return chat.text === "This message has been deleted" &&
-            !chat.hidden_for.some((id: ObjectId) => id.toString() === receiverId)
+        const toHideDeletedChat = chats.filter(chat => {
+            return !chat.hidden_for.includes(receiverId) && chat.text === "This message has been deleted";
         });
-
-        const removeDeletedMessagesPermanently = chats.filter((chat) => {
-            return chat.text === "This message has been deleted" &&
-            chat.hidden_for.some((id: ObjectId) => id.toString() === receiverId)
+        
+        const toRemoveDeletedChat = chats.filter(chat => {
+            return chat.hidden_for.includes(receiverId) && chat.text === "This message has been deleted";
         });
 
         await this.executeDeletion({
             deleteMessagePermanently: [
-                ...deleteOwnMessagePermanently, 
-                ...deleteOtherMessagesPermanently, 
-                ...removeDeletedMessagesPermanently
+                ...toDeleteOwnPermanent, ...toDeleteOtherPermanent, ...toRemoveDeletedChat
             ],
-            deleteMessageTemporary: deleteOwnMessagesTemporary,
-            hideMessages: [...hideDeletedMessages, ...deleteOtherMessagesTemporary],
+            deleteMessageTemporary: toDeleteOwnTemporary,
+            hideMessages: [...toDeleteOtherTemporary, ...toHideDeletedChat],
             sender_id: senderId
         });
 
-        const affectedIds = deleteOwnMessagesTemporary.map((message) => message._id.toString());
-        const roomId = this.getRoomId(receiverId, senderId);
-        userChatEvent.emit(roomId, { data: affectedIds, type: "user-message:deleted" });
+        const affectedIds = toDeleteOwnTemporary.map(message => message._id.toString());
+
+        if (chats.length > 0) {
+            const roomId = this.getRoomId(senderId, receiverId);
+            userChatEvent.emit(roomId, { type: "user-message:deleted", data: affectedIds });
+        }
     }
 
     async deleteChosenMessages(props: TUserChat["deleteChat"]) {
-        const messageIds = props.message_ids.map((id) => this.checkIsIdValid("message chat", id));
         const receiverId = this.checkIsIdValid("receiver", props.receiver_id);
         const senderId = this.checkIsIdValid("sender", props.sender_id);
+        const messageIds = props.message_ids.map(id => this.checkIsIdValid("", id));
 
         const chats = await userChatRepository.findChosenMessagesById(messageIds);
-        if (chats.length === 0) throw new ChitChatApiError("chat not found", 404);
+        if (chats.length === 0) throw new ChitChatApiError("messages not found", 404);
 
-        const deleteOwnMessagePermanently = chats.filter((chat) => {
+        const toDeleteOwnPermanent = chats.filter(chat => {
             return chat.hidden_for.some((id: ObjectId) => id.toString() === receiverId) &&
-            (chat.receiver_id === receiverId && chat.sender_id === senderId)
+            (chat.receiver_id.toString() === receiverId && chat.sender_id.toString() === senderId);
         });
 
-        const deleteOwnMessagesTemporary = chats.filter((chat) => {
+        const toDeleteOwnTemporary = chats.filter(chat => {
             return !chat.hidden_for.some((id: ObjectId) => id.toString() === receiverId) &&
-            (chat.receiver_id === receiverId && chat.sender_id === senderId)
+            (chat.receiver_id.toString() === receiverId && chat.sender_id.toString() === senderId);
         });
 
-        const deleteOtherMessagesPermanently = chats.filter((chat) => {
+        const toDeleteOtherPermanent = chats.filter(chat => {
             return chat.hidden_for.some((id: ObjectId) => id.toString() === receiverId) &&
-            (chat.receiver_id === senderId && chat.sender_id === receiverId)
+            (chat.receiver_id.toString() === senderId && chat.sender_id.toString() === receiverId);
         });
 
-        const deleteOtherMessagesTemporary = chats.filter((chat) => {
+        const toDeleteOtherTemporary = chats.filter(chat => {
             return !chat.hidden_for.some((id: ObjectId) => id.toString() === receiverId) &&
-            (chat.receiver_id === senderId && chat.sender_id === receiverId)
+            (chat.receiver_id.toString() === senderId && chat.sender_id.toString() === receiverId);
         });
 
-        const hideDeletedMessages = chats.filter((chat) => {
-            return !chat.hidden_for.some((id: ObjectId) => id.toString() === receiverId) &&
-            chat.text === "This message has been deleted"
+        const toHideDeletedChat = chats.filter(chat => {
+            return !chat.hidden_for.some((id: ObjectId) => id.toString() === receiverId) && 
+            chat.text === "This message has been deleted";
         });
-
-        const removeDeletedMessagesPermanently = chats.filter((chat) => {
-            return chat.hidden_for.some((id: ObjectId) => id.toString() === receiverId) &&
-            chat.text === "This message has been deleted"
+        
+        const toRemoveDeletedChat = chats.filter(chat => {
+            return chat.hidden_for.some((id: ObjectId) => id.toString() === receiverId) && 
+            chat.text === "This message has been deleted";
         });
 
         await this.executeDeletion({
             deleteMessagePermanently: [
-                ...deleteOwnMessagePermanently,
-                ...deleteOtherMessagesPermanently,
-                ...removeDeletedMessagesPermanently
+                ...toDeleteOwnPermanent, ...toDeleteOtherPermanent, ...toRemoveDeletedChat
             ],
-            deleteMessageTemporary: deleteOwnMessagesTemporary,
-            hideMessages: [...hideDeletedMessages, ...deleteOtherMessagesTemporary],
+            deleteMessageTemporary: toDeleteOwnTemporary,
+            hideMessages: [...toDeleteOtherTemporary, ...toHideDeletedChat],
             sender_id: senderId
         });
 
-        const roomId = this.getRoomId(receiverId, senderId);
-        const affectedIds = deleteOwnMessagesTemporary.map((message) => message._id.toString());
-        userChatEvent.emit(roomId, { data: affectedIds, type: "user-message:deleted" });
+        const affectedIds = toDeleteOwnTemporary.map(message => message._id.toString());
+
+        if (chats.length > 0) {
+            const roomId = this.getRoomId(senderId, receiverId);
+            userChatEvent.emit(roomId, { type: "user-message:deleted", data: affectedIds });
+        }
     }
 
     private getRoomId(receiver_id: string, sender_id: string) {

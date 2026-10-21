@@ -14,14 +14,15 @@ export default function useUserChatService() {
     const chosenMessageId = useUserChatStore((state) => state.chosenMessageId);
     const setSelectMode = useUserChatStore((state) => state.setSelectMode);
 
+    const chosenMessageIds = useUserChatStore((state) => state.chosenMessageIds);
+    const resetChosenMessageIds = useUserChatStore((state) => state.resetChosenMessageIds);
+
     const receiverId = useUserChatStore((state) => state.receiverId);
     const chosenFiles = useUserChatStore((state) => state.chosenFiles);
     const setChosenFiles = useUserChatStore((state) => state.setChosenFiles);
 
     const text = useUserChatStore((state) => state.text);
     const setText = useUserChatStore((state) => state.setText);
-
-    const resetChosenMessageIds = useUserChatStore((state) => state.resetChosenMessageIds);
 
     const setChosenMessage = useUserChatStore((state) => state.setChosenMessage);
     const setOpenPopUpOption = useUserChatStore((state) => state.setOpenPopUpOption);
@@ -69,23 +70,25 @@ export default function useUserChatService() {
             
             if (payload.type === "user-message:sent") {
                 queryClient.setQueryData(queryKey, (old: any) => {
-                    if (!old) {
-                        return {
-                            pageParams: [1],
-                            pages: [[payload.data]]
-                        };
-                    }
+                    if (!old) return { pageParams: [1], pages: [[payload.data]] }
+
+                    const alreadyExists = old.pages.some((page: any[]) => {
+                        return page.some((msg: any) => msg._id === payload.data._id);
+                    });
+                    
+                    if (alreadyExists) return old;
                     
                     const newPages = [...old.pages];
                     if (!newPages[0]) newPages[0] = [];
                     
                     newPages[0] = [payload.data, ...newPages[0]];
-                    return { ...old, pages: newPages };
+                    return { ...old, pages: newPages }
                 });
             } else if (payload.type === "user-message:deleted") {
                 queryClient.setQueryData(queryKey, (old: any) => {
-                    if (!old) return;
-                    const newMessagePage = old.pages.map((page: any[]) => {
+                    if (!old) return old;
+
+                    const newPages = old.pages.map((page: any[]) => {
                         return page.map((message: any) => {
                             if (payload.data.includes(message._id)) {
                                 return { 
@@ -97,17 +100,20 @@ export default function useUserChatService() {
                             return message;
                         });
                     });
-                    return { ...old, pages: newMessagePage };
+
+                    return { ...old, pages: newPages };
                 });
             } else if (payload.type === "user-message:changed") {
                 queryClient.setQueryData(queryKey, (old: any) => {
                     if (!old) return old;
-                    const newMessagePage = old.pages.map((page: any[]) => {
+
+                    const newPages = old.pages.map((page: any[]) => {
                         return page.map((message) => {
                             return message._id === payload.data._id ? payload.data : message
                         });
                     });
-                    return { ...old, pages: newMessagePage };
+                    
+                    return { ...old, pages: newPages };
                 });
             }
         }
@@ -169,7 +175,6 @@ export default function useUserChatService() {
             setMessage(error.message || "Failed to edit message");
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: [`user-messages-${receiverId}`] });
             setText("");
             setSelectMode(false);
             setChosenMessage(null);
@@ -191,6 +196,7 @@ export default function useUserChatService() {
             queryClient.invalidateQueries({ queryKey: [`user-messages-${receiverId}`] });
             setText("");
             setChosenFiles([]);
+            setSelectMode(false);
             resetChosenMessageIds();
             setOpenPopUpOption(false);
         }
@@ -199,7 +205,7 @@ export default function useUserChatService() {
     const clearChosenMessagesMt = useMutation({
         mutationFn: async () => {
             const endpoint = `/api/v1/user-chats/clear/bulk`;
-            const data = JSON.stringify({ sender_id: currentUserId });
+            const data = JSON.stringify({ message_ids: chosenMessageIds, receiver_id: receiverId });
             await apiRequest(endpoint, { body: data, method: "DELETE" });
         },
         onError: (error) => {
@@ -209,6 +215,7 @@ export default function useUserChatService() {
             queryClient.invalidateQueries({ queryKey: [`user-messages-${receiverId}`] });
             setText("");
             setChosenFiles([]);
+            setSelectMode(false);
             resetChosenMessageIds();
             setOpenPopUpOption(false);
         }
@@ -227,6 +234,7 @@ export default function useUserChatService() {
             setText("");
             setChosenFiles([]);
             resetChosenMessageIds();
+            setSelectMode(false);
             setOpenPopUpOption(false);
         }
     });
@@ -234,7 +242,7 @@ export default function useUserChatService() {
     const deleteChosenMessagesMt = useMutation({
         mutationFn: async () => {
             const endpoint = `/api/v1/user-chats/bulk`;
-            const data = JSON.stringify({ sender_id: currentUserId });
+            const data = JSON.stringify({ message_ids: chosenMessageIds, receiver_id: receiverId });
             await apiRequest(endpoint, { body: data, method: "DELETE" });
         },
         onError: (error) => {
@@ -245,6 +253,7 @@ export default function useUserChatService() {
             setText("");
             setChosenFiles([]);
             resetChosenMessageIds();
+            setSelectMode(false);
             setOpenPopUpOption(false);
         }
     });
@@ -288,10 +297,10 @@ export default function useUserChatService() {
             setMessage(error.message);
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: [`user-messages-${receiverId}`] });
             setText("");
             setChosenFiles([]);
             resetChosenMessageIds();
+            setSelectMode(false);
             setOpenPopUpOption(false);
         }
     });

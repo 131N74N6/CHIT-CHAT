@@ -96,7 +96,6 @@ export interface IUserChatState {
 }
 
 export interface iPopUpOptionForUser {
-    chosenMessageIds: string[];
     clearAll: UseMutationResult<void, Error, void, unknown>;
     clearChosen: UseMutationResult<void, Error, void, unknown>;
     deleteAll: UseMutationResult<void, Error, void, unknown>;

@@ -3,7 +3,9 @@ import type { iPopUpOptionForUser } from "./model";
 import { useUserChatStore } from "./store";
 
 export default function PopUpOption(props: iPopUpOptionForUser) {
+    const chosenMessageIds = useUserChatStore((state) => state.chosenMessageIds);
     const resetChosenMessageIds = useUserChatStore((state) => state.resetChosenMessageIds);
+
     const setChosenMessage = useUserChatStore((state) => state.setChosenMessage);
     const setText = useUserChatStore((state) => state.setText);
     const setOpenPopUpOption = useUserChatStore((state) => state.setOpenPopUpOption);
@@ -54,32 +56,7 @@ export default function PopUpOption(props: iPopUpOptionForUser) {
                         Select message
                     </button>
                 )}
-                {props.chosenMessageIds.length === 0 ? (
-                    <>
-                        <button
-                            className={cn(
-                                "cursor-pointer disabled:cursor-not-allowed ring ring-zinc-800", 
-                                "bg-white text-zinc-800 font-medium text-sm p-2 w-full rounded-md" 
-                            )}
-                            disabled={props.isProcessing}
-                            onClick={() => props.deleteAll.mutate()}
-                            type="button"
-                        >
-                            Delete All Messages
-                        </button>
-                        <button
-                            className={cn(
-                                "cursor-pointer disabled:cursor-not-allowed ring ring-zinc-800", 
-                                "bg-white text-zinc-800 font-medium text-sm p-2 w-full rounded-md" 
-                            )}
-                            disabled={props.isProcessing}
-                            onClick={() => props.clearAll.mutate()}
-                            type="button"
-                        >
-                            Clear All Messages
-                        </button>
-                    </>
-                ) : (
+                {chosenMessageIds.length > 0 ? (
                     <>
                         <button
                             className={cn(
@@ -102,6 +79,31 @@ export default function PopUpOption(props: iPopUpOptionForUser) {
                             type="button"
                         >
                             Clear Chosen Messages
+                        </button>
+                    </>
+                ) : (
+                    <>
+                        <button
+                            className={cn(
+                                "cursor-pointer disabled:cursor-not-allowed ring ring-zinc-800", 
+                                "bg-white text-zinc-800 font-medium text-sm p-2 w-full rounded-md" 
+                            )}
+                            disabled={props.isProcessing}
+                            onClick={() => props.deleteAll.mutate()}
+                            type="button"
+                        >
+                            Delete All Messages
+                        </button>
+                        <button
+                            className={cn(
+                                "cursor-pointer disabled:cursor-not-allowed ring ring-zinc-800", 
+                                "bg-white text-zinc-800 font-medium text-sm p-2 w-full rounded-md" 
+                            )}
+                            disabled={props.isProcessing}
+                            onClick={() => props.clearAll.mutate()}
+                            type="button"
+                        >
+                            Clear All Messages
                         </button>
                     </>
                 )}

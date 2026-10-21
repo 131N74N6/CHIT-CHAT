@@ -19,7 +19,6 @@ export default function Home() {
     const setMessage = useMessageStore((state) => state.setMessage);
 
     const openPopUpOption = useUserChatStore((state) => state.openPopUpOption);
-    const chosenMessageIds = useUserChatStore((state) => state.chosenMessageIds);
 
     const showUserChatPopUp = useUserChatStore((state) => state.showUserChatPopUp);
     
@@ -47,7 +46,6 @@ export default function Home() {
                 <PopUpOption
                     isProcessing={userChat.isProcessing || userProfile.isProcessing}
                     clearAll={userChat.clearAllMessagesMt}
-                    chosenMessageIds={chosenMessageIds}
                     clearChosen={userChat.clearChosenMessagesMt}
                     deleteAll={userChat.deleteAllMessagesMt}
                     deleteChosen={userChat.deleteChosenMessagesMt}
