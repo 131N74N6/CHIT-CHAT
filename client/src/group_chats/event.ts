@@ -9,7 +9,7 @@ class GroupChatWebSocket extends EventEmitter {
     private reconnectDelay = 2000;
 
     private messageQueue: any[] = [];
-    private isConnecting = false;
+    protected isConnecting = false;
     private shouldReconnect = true;
 
     private token = "";
@@ -22,7 +22,7 @@ class GroupChatWebSocket extends EventEmitter {
         this.ws.onopen = () => {
             this.reconnectAttemps = 0;
             this.isConnecting = false;
-            this.emit("connect", { type: "connect", message: "Connected to group" });
+            this.emit("connect", { type: "connect", message: "You're connected" });
 
             this.messageQueue.forEach((message) => this.ws?.send(message));
             this.messageQueue = [];
@@ -39,7 +39,7 @@ class GroupChatWebSocket extends EventEmitter {
 
                 this.emit("message", payload);
             } catch (error) {
-                this.emit("error", { type: "error", message: "Failed to parse message" });
+                this.emit("error", { type: "error", message: "Failed to get message" });
             }
         }
 
@@ -73,15 +73,28 @@ class GroupChatWebSocket extends EventEmitter {
     }
 
     connect(backendUrl: string, groupId: string, token: string) {
-        if (this.isConnecting) return;
-        if (this.ws && (this.ws.readyState !== WebSocket.CONNECTING && this.ws.readyState !== WebSocket.OPEN)) return;
-
         const newWsUrl = this.buildWsUrl(backendUrl, groupId, token);
         
-        if (this.url && this.url !== newWsUrl) this.disconnect();
+        if (this.url === newWsUrl && this.ws?.readyState === WebSocket.OPEN) return;
+
+        if (this.url !== newWsUrl) {
+            this.shouldReconnect = false; 
+            
+            if (this.ws) {
+                this.ws.close();
+                this.ws = null;
+            }
+        }
 
         this.url = newWsUrl;
+        this.token = token;
+        this.groupId = groupId;
+        this.backendUrl = backendUrl;
         this.isConnecting = true;
+        this.shouldReconnect = true;
+        this.reconnectAttemps = 0;
+        this.messageQueue = [];
+        this.ws = new WebSocket(this.url);
         this.bindEvents();
     }
 

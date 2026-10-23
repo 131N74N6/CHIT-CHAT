@@ -31,16 +31,16 @@ class GroupProfileService {
         const room1 = `group-profile-${groupId}`;
         const room2 = `joined-group-${userId}`;
 
-        let newDescription = "";
-        let newName = "";
+        let newDescription = "-";
+        let newName = "-";
 
         let newProfilePicture: CloudinaryUploadResult = {
-            file_name: "", 
-            file_type: "", 
-            public_id: "", 
-            resource_type: "", 
+            file_name: "-", 
+            file_type: "-", 
+            public_id: "-", 
+            resource_type: "-", 
             size: 0, 
-            url: ""
+            url: "-"
         }
 
         const group = await groupProfileRepository.findOneGroup(groupId);
@@ -58,9 +58,7 @@ class GroupProfileService {
             newDescription = this.checkIsInputAString("group descripton", props.group_description);
         }
 
-        if (props.group_name) {
-            newName = this.checkIsInputAString("group name", props.group_name);
-        }
+        if (props.group_name) newName = this.checkIsInputAString("group name", props.group_name);
 
         if (stillSame) return;
 
@@ -124,12 +122,12 @@ class GroupProfileService {
         let newDescription = "";
 
         let newProfilePicture: CloudinaryUploadResult = {
-            file_name: "", 
-            file_type: "", 
-            public_id: "", 
-            resource_type: "", 
+            file_name: "-", 
+            file_type: "-", 
+            public_id: "-", 
+            resource_type: "-", 
             size: 0, 
-            url: ""
+            url: "-"
         }
 
         if (props.group_description) {

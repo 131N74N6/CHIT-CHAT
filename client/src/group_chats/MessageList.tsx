@@ -71,7 +71,7 @@ export default function MessageList(props: IGroupMessageList) {
     }
 
     return (
-        <div className="flex flex-col py-2.5 overflow-y-auto gap-2" ref={scrollContainerRef}>
+        <div className="flex flex-col pb-2.5 overflow-y-auto h-[80%] gap-2" ref={scrollContainerRef}>
             {props.hasNextPage ? (
                 <section className="flex justify-center">
                     <button

@@ -24,7 +24,7 @@ export default function GroupMemberPopUp(props: IGroupMemberPopUp) {
     }
 
     return (
-        <section className="flex flex-col h-full w-full md:w-3/4 p-2.5 border border-gray-400 overflow-y-auto">
+        <section className="flex flex-col h-full w-full p-2 border border-gray-400 overflow-y-auto">
             <header className="flex gap-2">
                 <button 
                     className="text-base font-medium cursor-pointer disabled:cursor-not-allowed text-gray-900"

@@ -84,14 +84,13 @@ export default function useGroupChatService() {
                 });
             } else if (payload.type === "group-message:deleted") {
                 queryClient.setQueryData(queryKey, (old: any) => {
-                    if (!old) return;
+                    if (!old) return old;
 
                     const newMessagePage = old.pages.map((page: any[]) => {
-                        return page.map((message) => {
+                        return page.map((message: any) => {
                             if (payload.data.includes(message._id)) {
                                 return {
                                     ...message, 
-                                    files: [], 
                                     files_total: 0, 
                                     text: "This message has been deleted"
                                 }
@@ -104,12 +103,13 @@ export default function useGroupChatService() {
                 });
             } else if (payload.type === "group-message:sent") {
                 queryClient.setQueryData(queryKey, (old: any) => {
-                    if (!old) {
-                        return {
-                            pageParams: [1],
-                            pages: [[payload.data]]
-                        };
-                    }
+                    if (!old) return { pageParams: [1], pages: [[payload.data]] }
+
+                    const alreadyExists = old.pages.some((page: any[]) => {
+                        return page.some((message: any) => message._id === payload.data._id);
+                    });
+
+                    if (alreadyExists) return old;
                     
                     const newMessagePage = [...old.pages];
                     if (!newMessagePage[0]) newMessagePage[0] = [];
@@ -195,6 +195,7 @@ export default function useGroupChatService() {
         mutationFn: async (id: string) => {
             const endpoint = `/api/v1/groups/chats`;
             const data = JSON.stringify({ _id: id.trim(), text: groupMessage.trim(), group_id: groupId });
+            console.log(data);
             await apiRequest(endpoint, { body: data, method: "PUT" });
         },
         onError: (error) => {
@@ -350,8 +351,7 @@ export default function useGroupChatService() {
             return allPages.length + 1;
         },
         queryFn: async ({pageParam = 1}: { pageParam?: number }) => {
-            const endpoint = `/api/v1/groups/chats?
-            group_id=${groupId}?page=${pageParam}&limit=${52}`;
+            const endpoint = `/api/v1/groups/chats?group_id=${groupId}&page=${pageParam}&limit=${52}`;
 
             const request = await apiRequest<IGroupMessage[]>(endpoint, { method: "GET" });
             return request.data ?? [];

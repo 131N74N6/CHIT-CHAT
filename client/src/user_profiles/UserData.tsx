@@ -25,7 +25,6 @@ export default function UserData(props: UserData) {
     const setShowMemberPopUp = useGroupMemberStore((state) => state.setShowMemberPopUp);
 
     const setShowProfile = useGroupProfileStore((state) => state.setShowProfile);
-
     
     const closeUserChatPopUp = () => {
         setShowUserMedia(false);
@@ -40,6 +39,7 @@ export default function UserData(props: UserData) {
         setShowUserChatPopUp(true);
         setShowUserChatFilesPopUp(false);
         setShowUserProfilePopUp(false);
+        navigate("/home");
     }
 
     const closeGroupMember = () => {
@@ -61,7 +61,7 @@ export default function UserData(props: UserData) {
                             closeUserChatPopUp();
                         } else {
                             closeGroupMember();
-                            navigate(`/home`);
+                            seeUserChatPopUp();
                         }
                     }}
                 >
@@ -110,7 +110,9 @@ export default function UserData(props: UserData) {
                     onClick={seeUserChatPopUp}
                 >
                     <div className={cn("w-10 h-10 rounded-full")}>
-                        {props.user.image && props.user.image_public_id ? (
+                        {props.user.image && props.user.image_public_id && 
+                        props.user.image_public_id !== "-" && 
+                        props.user.image && props.user.image !== "-" ?  (
                             <div className="w-full h-full">
                                 <img 
                                     className="w-full h-full object-cover rounded-full" 

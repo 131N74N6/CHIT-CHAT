@@ -91,7 +91,11 @@ class UserProfileRepository {
                 image: 1,
                 image_public_id: 1,
             }
-        }).limit(limit).skip(skip).toArray();
+        })
+        .sort({ name: 1 })
+        .limit(limit)
+        .skip(skip)
+        .toArray();
     }
 
     async showUser(props: TUserProfile["showUser"]) {

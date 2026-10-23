@@ -15,8 +15,8 @@ export const groupChatSchema = {
         text: t.Optional(t.String({ error: "invalid message" }))
     }),
     deleteMessage: t.Object({
-        group_id: t.String({ error: "invalid group", pattern: "^[0-9A-F-af]{24}$" }),
-        message_ids: t.Array(t.String({ error: "invalid chat message", pattern: "^[0-9A-F-af]{24}$" })),
+        group_id: t.String({ error: "invalid group", pattern: "^[0-9A-Fa-f]{24}$" }),
+        message_ids: t.Array(t.String({ error: "invalid chat message", pattern: "^[0-9A-Fa-f]{24}$" })),
         sender_id: t.String({ error: "invalid sender", pattern: "^[0-9A-Fa-f]{24}$" })
     }),
     executeDeletion: t.Object({

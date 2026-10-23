@@ -14,7 +14,7 @@ import { useGroupMemberStore } from "../group_member/store";
 import GroupMemberPopUp from "../group_member/GroupMemberPopUp";
 import { useUserStore } from "../user_profiles/store";
 import { useGroupProfileStore } from "./store";
-import GroupDetailPopUp from "./GroupDetailPopUp";
+import GroupProfilePopUp from "./GroupProfilePopUp";
 import GroupChatFilesPopUp from "../group_chats/GroupChatFilesPopUp";
 import GroupChatFilesPreviewPopUp from "../group_chats/GroupChatFilesPreviewPopUp";
 
@@ -124,15 +124,17 @@ export default function AvailableGroup() {
                 ) : groupId && groupId !== "" && showGroupChatPopUp ? (
                     <GroupChatPopUp 
                         group_chat={{
+                            changeChosenMessageMt: groupChat.changeChosenMessageMt,
                             chats: groupChat.showAllGroupMessages.data ? 
                             groupChat.showAllGroupMessages.data.pages.flatMap(page => page).reverse() : [],
-
+                            
                             fetchNextPage: groupChat.showAllGroupMessages.fetchNextPage,
                             hasNextPage: groupChat.showAllGroupMessages.hasNextPage,
                             isFetchingNextPage: groupChat.showAllGroupMessages.isFetchingNextPage,
                             isLoading: groupChat.showAllGroupMessages.isLoading,
                             error: groupChat.showAllGroupMessages.error,
-                            isProcessing: groupChat.isProcessing || groupMember.isProcessing || groupProfile.isProcessing
+                            isProcessing: groupChat.isProcessing || groupMember.isProcessing || groupProfile.isProcessing,
+                            sendChatToGroup: groupChat.sendChatToGroup
                         }} 
                         group_profile={{
                             _id: groupProfile.showGroupDetail.data ?
@@ -186,7 +188,7 @@ export default function AvailableGroup() {
                         isProcessing={false}
                     />
                 ) : groupId && groupId !== "" && showProfile ? (
-                    <GroupDetailPopUp 
+                    <GroupProfilePopUp 
                         groupMember={{
                             leftGroupMt: groupMember.leftGroupMt
                         }} 

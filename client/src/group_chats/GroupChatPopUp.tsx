@@ -1,8 +1,6 @@
 import Loading from "../loading/Loading";
 import { ArrowLeft, File, SendIcon, Settings2 } from "lucide-react";
-import useGroupChatService from "./service";
 import { useGroupChatStore } from "./store";
-import useGroupProfileService from "../group_profiles/service";
 import MessageList from "./MessageList";
 import { useGroupProfileStore } from "../group_profiles/store";
 import { useGroupMemberStore } from "../group_member/store";
@@ -29,27 +27,24 @@ export default function GroupChatPopUp(props: IGroupChatPopUp) {
 
     const setShowProfile = useGroupProfileStore((state) => state.setShowProfile);
 
-    const groupChat = useGroupChatService();
-    const groupProfile = useGroupProfileService();
-
     const sendMessageToGroup = (event: React.SubmitEvent<HTMLFormElement>) => {
         event.preventDefault();
-        if (groupChat.isProcessing || groupProfile.isProcessing) return;
+        if (props.group_chat.isProcessing) return;
 
         if (selectMode && chosenMessageFromGroup) {
             if (!groupMessage.trim() || groupMessage.trim() === chosenMessageFromGroup.text) {
                 setChosenMessageFromGroup(null);
-                setGroupMessage("");
+                setGroupMessage("-");
                 setSelectMode(false);
                 resetChosenMessageIdsFromGroup();
                 return;
             }
 
-            groupChat.changeChosenMessageMt.mutate(chosenMessageFromGroup._id);
+            props.group_chat.changeChosenMessageMt.mutate(chosenMessageFromGroup._id);
             return;
         }
 
-        groupChat.sendChatToGroup.mutate();
+        props.group_chat.sendChatToGroup.mutate();
     }
 
     const seeJoinedGroup = () => {
@@ -81,11 +76,11 @@ export default function GroupChatPopUp(props: IGroupChatPopUp) {
             <header className="bg-zinc-800 flex justify-between p-2.5">
                 <button 
                     className="flex-row flex items-center gap-2.5 cursor-pointer disabled:cursor-not-allowed"
-                    disabled={groupChat.isProcessing}
+                    disabled={props.group_chat.isProcessing}
                     onClick={seeProfileGroup}
                     type="button"
                 >
-                    {props.group_profile.picture.public_id !== "" ? (
+                    {props.group_profile.picture.public_id !== "-" ? (
                         <div className="w-8 h-8 rounded-full">
                             <img
                                 className="w-full h-full object-cover rounded-full"
@@ -105,7 +100,7 @@ export default function GroupChatPopUp(props: IGroupChatPopUp) {
                 <section className="flex gap-2">
                     <button 
                         className="text-base font-medium cursor-pointer disabled:cursor-not-allowed text-white"
-                        disabled={groupChat.isProcessing}
+                        disabled={props.group_chat.isProcessing}
                         onClick={() => setOpenPopUpOption(true)}
                         type="button"
                     >
@@ -113,7 +108,7 @@ export default function GroupChatPopUp(props: IGroupChatPopUp) {
                     </button>
                     <button 
                         className="text-base font-medium cursor-pointer disabled:cursor-not-allowed text-white"
-                        disabled={groupChat.isProcessing}
+                        disabled={props.group_chat.isProcessing}
                         onClick={seeJoinedGroup}
                         type="button"
                     >
@@ -122,8 +117,6 @@ export default function GroupChatPopUp(props: IGroupChatPopUp) {
                 </section>
             </header>
             <main className="h-full overflow-y-auto p-2.5 flex flex-col w-full">
-
-            </main>
                 {props.group_chat.isLoading ? (
                     <div className="flex justify-center items-center bg-white h-full">
                         <Loading/>
@@ -144,36 +137,35 @@ export default function GroupChatPopUp(props: IGroupChatPopUp) {
                     />
                 )}
                 <form 
-                    className="bg-white inset-shadow-gray-200 p-1.5 flex flex-col gap-1.5 border border-gray-400"
+                    className="bg-white border overflow-y-auto border-gray-400 relative p-2 flex w-full h-[20%] items-center gap-2"
                     onSubmit={sendMessageToGroup}
                 >
-                    <div className="flex gap-1.5">
-                        <textarea
-                            className="focus:outline-0 w-[90%] resize-none"
-                            id="message"
-                            name="message"
-                            onChange={(event) => setGroupMessage(event.target.value)}
-                            value={groupMessage}
-                        />
-                        <div className="flex flex-col gap-2 justify-center">
-                            <button
-                                className="text-blue-500 font-medium cursor-pointer disabled:cursor-not-allowed"
-                                disabled={groupChat.isProcessing || groupProfile.isProcessing}
-                                type="submit"
-                            >
-                                <SendIcon size={22}/>
-                            </button>
-                            <button 
-                                className="text-blue-500 font-medium cursor-pointer disabled:cursor-not-allowed"
-                                disabled={groupChat.isProcessing || groupProfile.isProcessing}
-                                onClick={seeFilePreview}
-                                type="button"
-                            >
-                                <File size={22}/>
-                            </button>
-                        </div>
-                    </div>
+                    <textarea
+                        className="outline-0 w-full h-full resize-none pr-12"
+                        id="message"
+                        name="message"
+                        onChange={(event) => setGroupMessage(event.target.value)}
+                        value={groupMessage}
+                    />
+                    <section className="flex flex-col gap-1.5">
+                        <button
+                            className="text-blue-500 font-medium cursor-pointer disabled:cursor-not-allowed"
+                            disabled={props.group_chat.isProcessing}
+                            type="submit"
+                        >
+                            <SendIcon size={22}/>
+                        </button>
+                        <button 
+                            className="text-blue-500 font-medium cursor-pointer disabled:cursor-not-allowed"
+                            disabled={props.group_chat.isProcessing}
+                            onClick={seeFilePreview}
+                            type="button"
+                        >
+                            <File size={22}/>
+                        </button>
+                    </section>
                 </form>
+            </main>
         </section>
     );
 }

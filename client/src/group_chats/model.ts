@@ -95,6 +95,7 @@ export interface iPopUpOptionForGroup {
 
 export interface IGroupChatPopUp {
     group_chat: {
+        changeChosenMessageMt: UseMutationResult<void, Error, string, unknown>;
         chats: IGroupMessage[];
         fetchNextPage: (options?: FetchNextPageOptions | undefined) => Promise<InfiniteQueryObserverResult<InfiniteData<any, unknown>, Error>>;
         hasNextPage: boolean;
@@ -102,6 +103,7 @@ export interface IGroupChatPopUp {
         isLoading: boolean;
         error: Error | null;
         isProcessing: boolean;
+        sendChatToGroup: UseMutationResult<void, Error, void, unknown>;
     }
     group_profile: {
         _id: string;

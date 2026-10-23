@@ -103,7 +103,10 @@ export default function UserChatPopUp(props: IUserChatPopUp) {
                         onClick={seeUserProfile}
                         type="button"
                     >
-                        {props.userProfile.image_public_id && props.userProfile.image_public_id !== "" ? (
+                        {props.userProfile.image_public_id && 
+                        props.userProfile.image_public_id !== "-" && 
+                        props.userProfile.image_public_id && 
+                        props.userProfile.image_public_id !== "-" ? (
                             <div className="w-8 h-8 rounded-full">
                                 <img
                                     className="w-full h-full object-cover rounded-full"

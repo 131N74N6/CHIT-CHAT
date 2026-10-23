@@ -167,11 +167,8 @@ export default function useGroupMemberService() {
     const joinGroupMt = useMutation({
         mutationFn: async () => {
             const endpoint = `/api/v1/groups/members`;
-            const request = await apiRequest(endpoint, {
-                body: JSON.stringify({ group_id: roomCode.trim() }),
-                method: "POST"
-            });
-            return request;
+            const data = JSON.stringify({ group_id: roomCode.trim() });
+            await apiRequest(endpoint, { body: data, method: "POST" });
         },
         onError: (error) => {
             setMessage(error.message);
@@ -187,11 +184,8 @@ export default function useGroupMemberService() {
     const kickMemberMt = useMutation({
         mutationFn: async (userId: string) => {
             const endpoint = `/api/v1/groups/members/kick`;
-            const request = await apiRequest(endpoint, {
-                body: JSON.stringify({ group_id: groupId, user_id: userId }), 
-                method: "DELETE"
-            });
-            return request;
+            const data = JSON.stringify({ group_id: groupId, user_id: userId });
+            await apiRequest(endpoint, { body: data, method: "DELETE" });
         },
         onError: (error) => {
             setMessage(error.message);
@@ -243,9 +237,7 @@ export default function useGroupMemberService() {
         },
         initialPageParam: 1,
         queryFn: async ({ pageParam = 1 }: { pageParam?: number }) => {
-            const endpoint = `/rooms/members?
-            group_id=${groupId}&page=${pageParam}&limit=${16}`;
-
+            const endpoint = `/api/v1/groups/members?group_id=${groupId}&page=${pageParam}&limit=${16}`;
             const request = await apiRequest<Users[]>(endpoint, { method: "GET" });
             return request.data ?? [];
         },

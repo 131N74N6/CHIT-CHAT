@@ -15,7 +15,7 @@ const groupChatRouters = new Elysia({ prefix: "/api/v1/groups/chats" })
     body: t.Omit(groupChatSchema.deleteMessage, ["sender_id"])
 })
 .delete("/clear", async ({ query, user }) => {
-    return await groupChatController.clearAllMessages({ ...query, sender_id: user.id })
+    return await groupChatController.clearAllMessages({ ...query, sender_id: user.id });
 }, {
     query: t.Omit(groupChatSchema.deleteMessage, ["message_ids", "sender_id"])
 })
@@ -67,8 +67,8 @@ const groupChatRouters = new Elysia({ prefix: "/api/v1/groups/chats" })
             const senderId = session.user.id;
 
             if (!groupId || !senderId || typeof senderId !== "string" || typeof groupId !== "string") {
-                ws.send(JSON.stringify({ message: "invalid group or user", type: "error" }));
-                ws.close(4002, "invalid group or user");
+                ws.send(JSON.stringify({ message: "Invalid group or user", type: "error" }));
+                ws.close(4002, "Invalid group or user");
                 return;
             }
 
@@ -77,8 +77,8 @@ const groupChatRouters = new Elysia({ prefix: "/api/v1/groups/chats" })
             groupChatEvent.on(groupId, handler );
             wsContext.set(ws, { roomId: groupId, handler });
         } catch (error) {
-            ws.send(JSON.stringify({ message: "connection failed", type: "error" }));
-            ws.close(4003, "internal error");
+            ws.send(JSON.stringify({ message: "Connection failed", type: "error" }));
+            ws.close(4003, "Internal error");
         }
     },
 

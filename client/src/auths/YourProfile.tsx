@@ -69,7 +69,7 @@ export default function YourProfile() {
     }, [message, setMessage]);
 
     return (
-        <section className="flex md:flex-row gap-2.5 p-2.5 flex-col relative h-dvh z-10">
+        <section className="flex md:flex-row gap-2 p-2 flex-col relative h-dvh z-10">
             {message ? <Alert message={message}/> : null}
             <Navbar isProcessing={owner.isProcessing || userProfile.isProcessing}/>
             {owner.getCurrentUser.isLoading ? (

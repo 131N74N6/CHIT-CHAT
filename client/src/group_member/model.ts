@@ -1,6 +1,5 @@
 import type { FetchNextPageOptions, InfiniteData, InfiniteQueryObserverResult, UseMutationResult, UseQueryResult } from "@tanstack/react-query";
 import type { Users, UsersMarks } from "../user_profiles/model";
-import type { ApiResponse } from "../api";
 
 export interface IGroupMemberState {
     showMemberPopUp: boolean;
@@ -24,7 +23,7 @@ export interface IGroupMemberPopUp {
         isFetchingNextPage: boolean;
         isGroupOwner: UseQueryResult<boolean, Error>;
         isLoading: boolean;
-        kickMemberMt: UseMutationResult<ApiResponse<unknown>, Error, string, unknown>
+        kickMemberMt: UseMutationResult<void, Error, string, unknown>;
         place: GroupMembersMarks | UsersMarks;
     }
     isProcessing: boolean;

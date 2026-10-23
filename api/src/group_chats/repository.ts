@@ -9,15 +9,13 @@ class GroupChatRepository {
     private users = db().collection<Omit<User, "id">>("user");
 
     async changeChosenMessage(props: TGroupChats["changeMessage"]) {
-        const edited = await this.group_chats.findOneAndUpdate({ 
+        return await this.group_chats.findOneAndUpdate({ 
             _id: new ObjectId(props._id), 
             group_id: new ObjectId(props.group_id), 
-            sender_id: new ObjectId(props.group_id),
+            sender_id: new ObjectId(props.sender_id),
         }, {
             $set: { text: props.text, updated_at: new Date() }
         }, { returnDocument: "after" });
-
-        return edited;
     }
 
     async deleteMessagesPermanently(ids: ObjectId[]) {
@@ -56,7 +54,7 @@ class GroupChatRepository {
 
     async hideMessages(props: TGroupChats["hideChosenMessages"]) {
         return await this.group_chats.updateMany({ _id: { $in: props.message_ids }}, {
-            $addToSet: { hidden_for: props.sender_id }
+            $addToSet: { hidden_for: new ObjectId(props.sender_id) }
         });
     }
 

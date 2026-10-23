@@ -6,12 +6,8 @@ import JoinGroup from "./group_member/JoinGroup";
 import GroupChatFiles from "./group_chats/GroupChatFiles";
 import GroupChatFilesPreview from "./group_chats/GroupChatFilesPreview";
 import ProtectedRoute from "./auths/ProtectedRoute";
-import GroupChat from "./group_chats/GroupChat";
-import GroupMember from "./group_member/GroupMember";
-import GroupDetail from "./group_profiles/GroupDetail";
 import SignIn from "./auths/SignIn";
 import SignUp from "./auths/SignUp";
-import UserChat from "./user_chats/UserChat";
 import UserChatFiles from "./user_chats/UserChatFiles";
 import UserProfile from "./user_profiles/UserProfile";
 import YourProfile from "./auths/YourProfile";
@@ -30,17 +26,13 @@ export default function App() {
                     <Route element={<SignUp/>} path="/sign-up"/>
                     <Route element={<ProtectedRoute><Home/></ProtectedRoute>} path="/home"/>
                     <Route element={<ProtectedRoute><YourProfile/></ProtectedRoute>} path="/profile"/>
-                    <Route element={<ProtectedRoute><UserChat/></ProtectedRoute>} path="/user/chat/:receiver_id"/>
                     <Route element={<ProtectedRoute><UserChatFiles/></ProtectedRoute>} path="/user/media/detail/:chat_id"/>
                     <Route element={<ProtectedRoute><UserProfile/></ProtectedRoute>} path="/user/profile/:receiver_id"/>
                     <Route element={<ProtectedRoute><AvailableGroup/></ProtectedRoute>} path="/rooms"/>
                     <Route element={<ProtectedRoute><CreateGroup/></ProtectedRoute>} path="/rooms/create"/>
                     <Route element={<ProtectedRoute><JoinGroup/></ProtectedRoute>} path="/rooms/join"/>
-                    <Route element={<ProtectedRoute><GroupChat/></ProtectedRoute>} path="/rooms/chat/:room_id"/>
                     <Route element={<ProtectedRoute><GroupChatFilesPreview/></ProtectedRoute>} path="/room/chat/preview/:room_id"/>
                     <Route element={<ProtectedRoute><GroupChatFiles/></ProtectedRoute>} path="/room/media/detail/:chat_id"/>
-                    <Route element={<ProtectedRoute><GroupDetail/></ProtectedRoute>} path="/rooms/profile/:room_id"/>
-                    <Route element={<ProtectedRoute><GroupMember/></ProtectedRoute>} path="/rooms/member/:room_id"/>
                     <Route element={<ProtectedRoute><Chatbot/></ProtectedRoute>} path="/chatbot"/>
                     <Route path="*" element={<Navigate to="/sign-in" replace/>}/>
                 </Routes>

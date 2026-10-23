@@ -28,7 +28,7 @@ export default function GroupData(props: IGroupProfileData) {
                 onClick={seeGroupChat}
             >
                 <div className="w-10 h-10 rounded-full">
-                    {props.group.group_profile.public_id !== "" ? (
+                    {props.group.group_profile.public_id && props.group.group_profile.public_id !== "-" ? (
                         <div className="w-full h-full">
                             <img 
                                 className="w-full h-full object-cover" 
