@@ -292,7 +292,7 @@ export default function YourProfile() {
                                 </div>
                             </div>
                             <div className="flex flex-col gap-1.5">
-                                <div className="text-[1rem] font-medium text-gray-800">Gender</div>
+                                <div className="text-[1rem] font-medium text-gray-800">Description</div>
                                 <div className="text-[1rem] font-medium text-gray-800">
                                     {owner.getCurrentUser.data ? owner.getCurrentUser.data.description : "-"}
                                 </div>

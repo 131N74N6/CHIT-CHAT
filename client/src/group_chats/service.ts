@@ -195,14 +195,13 @@ export default function useGroupChatService() {
         mutationFn: async (id: string) => {
             const endpoint = `/api/v1/groups/chats`;
             const data = JSON.stringify({ _id: id.trim(), text: groupMessage.trim(), group_id: groupId });
-            console.log(data);
             await apiRequest(endpoint, { body: data, method: "PUT" });
         },
         onError: (error) => {
             setMessage(error.message);
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: [`group-chat-${groupId}`] });
+            resetChosenMessageIdsFromGroup();
             setGroupMessage("");
             setChosenFiles([]);
             setSelectMode(false);
@@ -219,6 +218,7 @@ export default function useGroupChatService() {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: [`group-chat-${groupId}`] });
+            resetChosenMessageIdsFromGroup();
             setGroupMessage("");
             setChosenFiles([]);
             setSelectMode(false);
@@ -325,9 +325,12 @@ export default function useGroupChatService() {
             setMessage(error.message);
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: [`group-chat-${groupId}`] });
             setGroupMessage("");
             setChosenFiles([]);
+            resetChosenMessageIdsFromGroup();
+            setChosenMessageFromGroup(null);
+            setSelectMode(false);
+            setOpenPopUpOption(false);
         }
     });
 

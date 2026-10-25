@@ -22,6 +22,25 @@ export const authServiceApi = betterAuth({
     },
 
     databaseHooks: {
+        user: {
+            create: {
+                before: async (user) => {
+                    return {
+                        data: {
+                            ...user,
+                            address: "-",
+                            description: "-",
+                            gender: "-",
+                            group_ids: [],
+                            image_public_id: "-",
+                            image_filename: "-",
+                            image_filetype: "-",
+                            image_resource_type: "-"
+                        }
+                    };
+                }
+            }
+        },
         session: {
             delete: {
                 after: async (session) => {
