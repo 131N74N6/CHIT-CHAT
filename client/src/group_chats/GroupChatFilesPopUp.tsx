@@ -16,7 +16,7 @@ export default function GroupChatFilesPopUp(props: IGroupChatFilesPopUp) {
     const setShowProfile = useGroupProfileStore((state) => state.setShowProfile);
 
     const seeGroupChat = () => {
-        setShowGroupChatPopUp(false);
+        setShowGroupChatPopUp(true);
         setShowMemberPopUp(false);
         setShowProfile(false);
         setShowGroupChatFilesPopUp(false);
@@ -24,32 +24,30 @@ export default function GroupChatFilesPopUp(props: IGroupChatFilesPopUp) {
     }
 
     return (
-        <section className="">
-            <div className="border-gray-400 inset-shadow-sm inset-shadow-gray-400 h-full overflow-y-auto p-2.5 flex flex-col w-full md:w-3/4">
-                <div className="flex px-2.5 pt-2.5">
-                    <button
-                        className="cursor-pointer disabled:cursor-not-allowed font-medium text-gray-700 hover:text-gray-500 transition-colors"
-                        disabled={props.isProcessing}
-                        onClick={seeGroupChat}
-                        type="button"
-                    >
-                        <MessageCircle size={22}/>
-                    </button>
-                </div>
-                {props.error ? (
-                    <div className="flex justify-center items-center h-full">
-                        <div className="text-gray-700 font-medium text-center">
-                            {props.error.message}
-                        </div>
-                    </div>
-                ) : props.isLoading ? (
-                    <div className="flex justify-center items-center bg-white h-full">
-                        <Loading/>
-                    </div>
-                ) : (
-                    <UserChatFileList files={props.files} isLoading={props.isLoading}/>
-                )}
+        <section className="border-gray-400 inset-shadow-sm inset-shadow-gray-400 h-full overflow-y-auto p-2.5 flex flex-col w-full md:w-3/4">
+            <div className="flex px-2.5 pt-2.5">
+                <button
+                    className="cursor-pointer disabled:cursor-not-allowed font-medium text-gray-700 hover:text-gray-500 transition-colors"
+                    disabled={props.isProcessing}
+                    onClick={seeGroupChat}
+                    type="button"
+                >
+                    <MessageCircle size={22}/>
+                </button>
             </div>
+            {props.error ? (
+                <div className="flex justify-center items-center h-full">
+                    <div className="text-gray-700 font-medium text-center">
+                        {props.error.message}
+                    </div>
+                </div>
+            ) : props.isLoading ? (
+                <div className="flex justify-center items-center bg-white h-full">
+                    <Loading/>
+                </div>
+            ) : (
+                <UserChatFileList files={props.files} isLoading={props.isLoading}/>
+            )}
         </section>
     );
 }

@@ -114,7 +114,7 @@ export interface IUserChatPopUp {
         isFetchingNextPage: boolean;
         isLoading: boolean;
         isProcessing: boolean;
-        sendMessageMt: UseMutationResult<void, Error, void, unknown>;
+        sendMessageMt: UseMutationResult<ApiResponse<unknown>, Error, void, unknown>;
     }
     userProfile: {
         error: Error | null;
@@ -129,7 +129,7 @@ export interface IUserChatFilesPreviewPopUp {
     handleMediaPreview: (event: React.ChangeEvent<HTMLInputElement, Element>) => void;
     isProcessing: boolean;
     inputMediaRef: React.RefObject<HTMLInputElement | null>;
-    sendMessageMt: UseMutationResult<void, Error, void, unknown>
+    sendMessageMt: UseMutationResult<ApiResponse<unknown>, Error, void, unknown>;
 }
 
 export interface IUserChatFilesPopUp {

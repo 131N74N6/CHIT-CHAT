@@ -3,8 +3,6 @@ import Chatbot from "./chatbot/Chatbot";
 import CreateGroup from "./group_profiles/CreateGroup";
 import Home from "./user_profiles/Home";
 import JoinGroup from "./group_member/JoinGroup";
-import GroupChatFiles from "./group_chats/GroupChatFiles";
-import GroupChatFilesPreview from "./group_chats/GroupChatFilesPreview";
 import ProtectedRoute from "./auths/ProtectedRoute";
 import SignIn from "./auths/SignIn";
 import SignUp from "./auths/SignUp";
@@ -31,8 +29,6 @@ export default function App() {
                     <Route element={<ProtectedRoute><AvailableGroup/></ProtectedRoute>} path="/rooms"/>
                     <Route element={<ProtectedRoute><CreateGroup/></ProtectedRoute>} path="/rooms/create"/>
                     <Route element={<ProtectedRoute><JoinGroup/></ProtectedRoute>} path="/rooms/join"/>
-                    <Route element={<ProtectedRoute><GroupChatFilesPreview/></ProtectedRoute>} path="/room/chat/preview/:room_id"/>
-                    <Route element={<ProtectedRoute><GroupChatFiles/></ProtectedRoute>} path="/room/media/detail/:chat_id"/>
                     <Route element={<ProtectedRoute><Chatbot/></ProtectedRoute>} path="/chatbot"/>
                     <Route path="*" element={<Navigate to="/sign-in" replace/>}/>
                 </Routes>

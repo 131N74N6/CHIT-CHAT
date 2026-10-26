@@ -103,23 +103,30 @@ class GroupChatService {
         const senderId = this.checkIsIdValid("sender", props.sender_id);
 
         const members = await groupChatRepository.findAllMembers(groupId);
-        if (members.length === 0) throw new ChitChatApiError("member not found", 404);
+        const isMember = members.some(member => String(member._id) === String(senderId));
 
+        if (!isMember) throw new ChitChatApiError("you are not a member of this group", 403);
+
+        const totalMembers = members.length;
         const chats = await groupChatRepository.findAllMessages(groupId);
-        if (chats.length === 0) throw new ChitChatApiError("chat not found", 404);
 
-        const deleteOwnMessagesPermanently = chats.filter((chat) => {
-            return chat.hidden_for.length + 1 === members.length;
+        if (chats.length === 0) return;
+
+        const toDeletePermanently = chats.filter((chat) => {
+            // ✅ PERBAIKAN: Gunakan optional chaining (?.) untuk mencegah crash 500
+            const hiddenCount = chat.hidden_for ? chat.hidden_for.length : 0;
+            return hiddenCount + 1 >= totalMembers;
         });
 
-        const hideAllMessages = chats.filter((chat) => {
-            return chat.hidden_for.length + 1 < members.length;
+        const toHide = chats.filter((chat) => {
+            const hiddenCount = chat.hidden_for ? chat.hidden_for.length : 0;
+            return hiddenCount + 1 < totalMembers;
         });
 
         await this.executeDeletion({
-            deleteMessagesPermanently: deleteOwnMessagesPermanently,
+            deleteMessagesPermanently: toDeletePermanently,
             deleteMessagesTemporary: [],
-            hideMessages: hideAllMessages,
+            hideMessages: toHide,
             sender_id: senderId
         });
     }
@@ -130,23 +137,28 @@ class GroupChatService {
         const senderId = this.checkIsIdValid("sender", props.sender_id);
 
         const chats = await groupChatRepository.findChosenMessagesById(ids);
-        if (chats.length === 0) throw new ChitChatApiError("chat not found", 404);
+        if (chats.length === 0) return;
 
         const members = await groupChatRepository.findAllMembers(groupId);
-        if (members.length === 0) throw new ChitChatApiError("member not found", 404);
+        const isMember = members.some(member => String(member._id) === String(senderId));
+        if (!isMember) throw new ChitChatApiError("you are not a member of this group", 403);
+        
+        const totalMembers = members.length;
 
-        const deleteOwnMessagesPermanently = chats.filter((chat) => {
-            return chat.hidden_for.length + 1 === members.length;
+        const toDeletePermanently = chats.filter((chat) => {
+            const hiddenCount = chat.hidden_for ? chat.hidden_for.length : 0;
+            return hiddenCount + 1 >= totalMembers;
         });
 
-        const hideChosenMessages = chats.filter((chat) => {
-            return chat.hidden_for.length + 1 < members.length;
+        const toHide = chats.filter((chat) => {
+            const hiddenCount = chat.hidden_for ? chat.hidden_for.length : 0;
+            return hiddenCount + 1 < totalMembers;
         });
 
         await this.executeDeletion({
-            deleteMessagesPermanently: deleteOwnMessagesPermanently,
+            deleteMessagesPermanently: toDeletePermanently,
             deleteMessagesTemporary: [],
-            hideMessages: hideChosenMessages,
+            hideMessages: toHide,
             sender_id: senderId
         });
     }
@@ -156,35 +168,42 @@ class GroupChatService {
         const senderId = this.checkIsIdValid("sender", props.sender_id);
 
         const members = await groupChatRepository.findAllMembers(groupId);
-        if (members.length === 0) throw new ChitChatApiError("member not found", 404);
+        const isMember = members.some(member => String(member._id) === String(senderId));
+        if (!isMember) throw new ChitChatApiError("you are not a member of this group", 403);
 
+        const totalMembers = members.length;
         const chats = await groupChatRepository.findAllMessages(groupId);
-        if (chats.length === 0) throw new ChitChatApiError("chat not found", 404);
+        
+        if (chats.length === 0) return;
 
         const deleteOwnMessagesPermanently = chats.filter((chat) => {
-            return chat.hidden_for.length + 1 === members.length && chat.sender_id === senderId;
+            const hiddenCount = chat.hidden_for ? chat.hidden_for.length : 0;
+            return hiddenCount + 1 >= totalMembers && String(chat.sender_id) === String(senderId);
         });
 
         const deleteOwnMessagesTemporary = chats.filter((chat) => {
-            return chat.hidden_for.length + 1 < members.length && chat.sender_id === senderId;
+            const hiddenCount = chat.hidden_for ? chat.hidden_for.length : 0;
+            return hiddenCount + 1 < totalMembers && String(chat.sender_id) === String(senderId);
         });
 
         const deleteOtherMessagesPermanently = chats.filter((chat) => {
-            return chat.hidden_for.length + 1 === members.length && chat.sender_id !== senderId;
+            const hiddenCount = chat.hidden_for ? chat.hidden_for.length : 0;
+            return hiddenCount + 1 >= totalMembers && String(chat.sender_id) !== String(senderId);
         });
 
         const deleteOtherMessagesTemporary = chats.filter((chat) => {
-            return chat.hidden_for.length + 1 < members.length && chat.sender_id !== senderId
+            const hiddenCount = chat.hidden_for ? chat.hidden_for.length : 0;
+            return hiddenCount + 1 < totalMembers && String(chat.sender_id) !== String(senderId);
         });
 
         const hideDeletedMessages = chats.filter((chat) => {
-            return chat.text === "This message has been deleted" &&
-            chat.hidden_for.length + 1 < members.length;
+            const hiddenCount = chat.hidden_for ? chat.hidden_for.length : 0;
+            return chat.text === "This message has been deleted" && hiddenCount + 1 < totalMembers;
         });
 
         const removeDeletedMessgesPermanently = chats.filter((chat) => {
-            return chat.text === "This message has been deleted" && 
-            chat.hidden_for.length + 1 === members.length;
+            const hiddenCount = chat.hidden_for ? chat.hidden_for.length : 0;
+            return chat.text === "This message has been deleted" && hiddenCount + 1 >= totalMembers;
         });
 
         await this.executeDeletion({
@@ -198,8 +217,11 @@ class GroupChatService {
             sender_id: senderId
         });
 
-        const affectedIds = deleteOtherMessagesTemporary.map((message) => message._id.toString());
-        groupChatEvent.emit(groupId, { data: affectedIds, type: "group-message:deleted" });
+        const affectedIds = deleteOwnMessagesTemporary.map((message) => message._id.toString());
+
+        if (affectedIds.length > 0) {
+            groupChatEvent.emit(groupId, { data: affectedIds, type: "group-message:deleted" });
+        }
     }
 
     async deleteChosenMessages(props: TGroupChats["deleteMessage"]) {
@@ -208,35 +230,42 @@ class GroupChatService {
         const senderId = this.checkIsIdValid("sender", props.sender_id);
 
         const chats = await groupChatRepository.findChosenMessagesById(ids);
-        if (chats.length === 0) throw new ChitChatApiError("chat not found", 404);
+        if (chats.length === 0) return;
 
         const members = await groupChatRepository.findAllMembers(groupId);
-        if (members.length === 0) throw new ChitChatApiError("member not found", 404);
+        const isMember = members.some(member => String(member._id) === String(senderId));
+        if (!isMember) throw new ChitChatApiError("you are not a member of this group", 403);
+
+        const totalMembers = members.length;
 
         const deleteOwnMessagesPermanently = chats.filter((chat) => {
-            return chat.hidden_for.length + 1 === members.length && chat.sender_id === senderId;
+            const hiddenCount = chat.hidden_for ? chat.hidden_for.length : 0;
+            return hiddenCount + 1 >= totalMembers && String(chat.sender_id) === String(senderId);
         });
 
         const deleteOwnMessagesTemporary = chats.filter((chat) => {
-            return chat.hidden_for.length + 1 < members.length && chat.sender_id === senderId;
+            const hiddenCount = chat.hidden_for ? chat.hidden_for.length : 0;
+            return hiddenCount + 1 < totalMembers && String(chat.sender_id) === String(senderId);
         });
 
         const deleteOtherMessagesPermanently = chats.filter((chat) => {
-            return chat.hidden_for.length + 1 === members.length && chat.sender_id !== senderId;
+            const hiddenCount = chat.hidden_for ? chat.hidden_for.length : 0;
+            return hiddenCount + 1 >= totalMembers && String(chat.sender_id) !== String(senderId);
         });
 
         const deleteOtherMessagesTemporary = chats.filter((chat) => {
-            return chat.hidden_for.length + 1 < members.length && chat.sender_id !== senderId;
+            const hiddenCount = chat.hidden_for ? chat.hidden_for.length : 0;
+            return hiddenCount + 1 < totalMembers && String(chat.sender_id) !== String(senderId);
         });
 
         const hideDeletedMessages = chats.filter((chat) => {
-            return chat.text === "This message has been deleted" &&
-            chat.hidden_for.length + 1 < members.length;
+            const hiddenCount = chat.hidden_for ? chat.hidden_for.length : 0;
+            return chat.text === "This message has been deleted" && hiddenCount + 1 < totalMembers;
         });
 
         const removeDeletedMessgesPermanently = chats.filter((chat) => {
-            return chat.text === "This message has been deleted" &&
-            chat.hidden_for.length + 1 === members.length;
+            const hiddenCount = chat.hidden_for ? chat.hidden_for.length : 0;
+            return chat.text === "This message has been deleted" && hiddenCount + 1 >= totalMembers;
         });
 
         await this.executeDeletion({
@@ -251,7 +280,10 @@ class GroupChatService {
         });
 
         const affectedIds = deleteOwnMessagesTemporary.map((message) => message._id.toString());
-        groupChatEvent.emit(groupId, { data: affectedIds, type: "group-message:deleted" });
+
+        if (affectedIds.length > 0) {
+            groupChatEvent.emit(groupId, { data: affectedIds, type: "group-message:deleted" });
+        }
     }
 
     async sendMessage(props: TGroupChats["sendMessageRaw"]) {

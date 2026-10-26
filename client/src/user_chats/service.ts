@@ -291,12 +291,14 @@ export default function useUserChatService() {
             }
     
             const endpoint = `/api/v1/user-chats`;
-            await apiUpload(endpoint, formData, "POST");
+            console.log(chosenFiles);
+            return await apiUpload(endpoint, formData, "POST");
         },
         onError: (error) => {
             setMessage(error.message);
         },
         onSuccess: () => {
+            if (inputMediaRef.current) inputMediaRef.current.value = "";
             setText("");
             setChosenFiles([]);
             resetChosenMessageIds();
