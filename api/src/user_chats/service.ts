@@ -8,18 +8,6 @@ import { uploadToCloudinary } from "../cloudinary/service";
 import { CloudinaryUploadResult } from "../cloudinary/model";
 
 class UserChatService {
-    private checkIsFileSupported(file: File) {
-        const isFileNotSupported = 
-        !file.type.includes("image") && 
-        !file.type.includes("video") && 
-        !file.type.includes("application");
-
-        if (isFileNotSupported) {
-            throw new ChitChatApiError("unsupported file", 400);
-        }
-        return file;
-    }
-
     private checkIsIdValid(field: string, value: unknown) {
         if (!value || typeof value !== "string" || !ObjectId.isValid(value)) {
             throw new ChitChatApiError(`invalid ${field}`, 400);
@@ -257,54 +245,52 @@ class UserChatService {
     }
 
     async sendMessages(props: TUserChat["sendMessageRaw"]) {
-        let filesTotal: number = 0;
-        let selectedFiles: CloudinaryUploadResult[] = [];
-        let text: string = "";
-
-        const receiverId = this.checkIsIdValid("receiver", props.receiver_id);
-        const senderId = this.checkIsIdValid("sender", props.sender_id);
+        let selectedMedia: CloudinaryUploadResult[] = [];
+        let newMessage = "";
         const chosenFiles = Array.isArray(props.files) ? props.files : (props.files ? [props.files] : []);
 
-        if (props.text) text = this.checkIsInputAString("message", props.text);
+        if (props.text) newMessage = this.checkIsInputAString("message", props.text); 
+        if (!newMessage && chosenFiles.length === 0) throw new ChitChatApiError("message or media is required", 400);
+        
+        const receiverId = this.checkIsIdValid("receiver", props.receiver_id);
+        const senderId = this.checkIsIdValid("sender", props.sender_id);
 
-        if (!text && chosenFiles.length === 0) {
-            throw new ChitChatApiError("message or file is required", 400);
+        if (chosenFiles.length > 10) {
+            throw new ChitChatApiError("only accept 10 files or less", 400);
         }
-
-        if (chosenFiles.length > 8) {
-            throw new ChitChatApiError("only accept 8 files or less", 400);
-        }
-
+    
         if (chosenFiles.length > 0) {
-            filesTotal = chosenFiles.length;
-            
-            const result = chosenFiles.map(async (chosenFile) => {
-                const file = this.checkIsFileSupported(chosenFile);
-                const fileArrayBuffer = await file.arrayBuffer();
-                const fileBuffer = Buffer.from(fileArrayBuffer);
+            const uploadPromises = chosenFiles.map(async (chosenFile) => {
+                if (!chosenFile.type.includes("image") && 
+                !chosenFile.type.includes("video") && 
+                !chosenFile.type.includes("application")) {
+                    throw new ChitChatApiError(`unsupported file type: ${chosenFile.name}`, 400);
+                }
 
+                const fileArrayBuffer = await chosenFile.arrayBuffer();
+                const fileBuffer = Buffer.from(fileArrayBuffer);
+                
                 return await uploadToCloudinary({
                     file_buffer: fileBuffer,
                     foldername: "chat_media",
-                    mimetype: file.type,
-                    original_name: file.name,
-                    size: file.size
+                    mimetype: chosenFile.type,
+                    original_name: chosenFile.name
                 });
             });
 
-            selectedFiles = await Promise.all(result);
+            selectedMedia = await Promise.all(uploadPromises);
         }
 
-        const message = await userChatRepository.sendMessage({
-            files: selectedFiles,
-            files_total: filesTotal,
+        const message = await userChatRepository.sendMessages({
+            files: selectedMedia,
+            files_total: selectedMedia.length,
+            text: newMessage,
             receiver_id: receiverId,
             sender_id: senderId,
-            text: text
         });
 
-        const roomId = this.getRoomId(receiverId, senderId);
-        userChatEvent.emit(roomId, { data: message, type: "user-message:sent" });
+        const roomId = this.getRoomId(senderId, receiverId);
+        userChatEvent.emit(roomId, { data: message, type: "user-message:sent"});
     }
 
     async showAllMessages(props: TUserChat["filter"]) {

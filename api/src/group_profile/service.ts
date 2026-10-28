@@ -39,7 +39,6 @@ class GroupProfileService {
             file_type: "-", 
             public_id: "-", 
             resource_type: "-", 
-            size: 0, 
             url: "-"
         }
 
@@ -85,8 +84,7 @@ class GroupProfileService {
                 file_buffer: fileBuffer,
                 mimetype: props.group_profile.type,
                 foldername: "room_profile",
-                original_name: props.group_profile.name,
-                size: props.group_profile.size
+                original_name: props.group_profile.name
             });
         }
 
@@ -126,7 +124,6 @@ class GroupProfileService {
             file_type: "-", 
             public_id: "-", 
             resource_type: "-", 
-            size: 0, 
             url: "-"
         }
 
@@ -151,8 +148,7 @@ class GroupProfileService {
                 file_buffer: fileBuffer,
                 foldername: "room_profile",
                 mimetype: props.group_profile.type,
-                original_name: props.group_profile.name,
-                size: props.group_profile.size
+                original_name: props.group_profile.name
             });
         }
 

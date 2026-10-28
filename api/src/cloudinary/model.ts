@@ -3,7 +3,6 @@ export interface CloudinaryUploadResult {
     file_type: string;
     public_id: string;
     resource_type: string;
-    size: number;
     url: string;
 }
 
@@ -12,5 +11,4 @@ export interface CloudinaryUploadOption {
     foldername: string;
     mimetype: string;
     original_name: string;
-    size: number;
 }

@@ -19,6 +19,10 @@ async function handleResponse<T>(response: Response) {
         throw new ApiError(response.ok ? "Failed to give response" : "internal server error");
     }
 
+    if (!response.ok) {
+        throw new ApiError(result.message || "Internal server error");
+    }
+
     return result;
 }
 

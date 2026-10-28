@@ -18,7 +18,7 @@ export default function useGroupChatService() {
     
     const setMessage = useMessageStore((state) => state.setMessage);
 
-    const media = useGroupChatStore((state) => state.chosenFiles);
+    const chosenFiles = useGroupChatStore((state) => state.chosenFiles);
     const setChosenFiles = useGroupChatStore((state) => state.setChosenFiles);
 
     const groupMessage = useGroupChatStore((state) => state.groupMessage);
@@ -202,6 +202,7 @@ export default function useGroupChatService() {
         },
         onSuccess: () => {
             resetChosenMessageIdsFromGroup();
+            setChosenMessageFromGroup(null);
             setGroupMessage("");
             setChosenFiles([]);
             setSelectMode(false);
@@ -222,6 +223,7 @@ export default function useGroupChatService() {
             setGroupMessage("");
             setChosenFiles([]);
             setSelectMode(false);
+            setChosenMessageFromGroup(null);
             setOpenPopUpOption(false);
         }
     });
@@ -313,9 +315,9 @@ export default function useGroupChatService() {
 
             if (groupMessage.trim()) newMessage.append("text", groupMessage.trim());
 
-            if (media && media.length > 0) {
-                for (let t = 0; t < media.length; t++) {
-                    newMessage.append("files", media[t].file);
+            if (chosenFiles && chosenFiles.length > 0) {
+                for (let t = 0; t < chosenFiles.length; t++) {
+                    newMessage.append("files", chosenFiles[t].file);
                 }
             }
 

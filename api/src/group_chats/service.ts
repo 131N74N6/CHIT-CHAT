@@ -8,16 +8,6 @@ import { uploadToCloudinary } from "../cloudinary/service";
 import { CloudinaryUploadResult } from "../cloudinary/model";
 
 class GroupChatService {
-    private checkIsFileSupported(file: File) {
-        const isFileNotSupported = !file.type.includes("image") && 
-        !file.type.includes("video") && 
-        !file.type.includes("application");
-
-        if (isFileNotSupported) throw new ChitChatApiError("unsupported file", 400);
-
-        return file;
-    }
-
     private checkIsIdValid(field: string, value: unknown) {
         if (!value || typeof value !== "string" || !ObjectId.isValid(value)) {
             throw new ChitChatApiError(`invalid ${field}`, 400);
@@ -310,16 +300,19 @@ class GroupChatService {
             filesTotal = chosenFiles.length;
 
             const result = chosenFiles.map(async (chosenFile) => {
-                const file = this.checkIsFileSupported(chosenFile);
-                const arrayBuffer = await file.arrayBuffer();
+                if (!chosenFile.type.includes("image") && 
+                !chosenFile.type.includes("video") && 
+                !chosenFile.type.includes("application")) {
+                    throw new ChitChatApiError(`unsupported file type: ${chosenFile.name}`, 400);
+                }
+                const arrayBuffer = await chosenFile.arrayBuffer();
                 const fileBuffer = Buffer.from(arrayBuffer);
 
                 return await uploadToCloudinary({
                     file_buffer: fileBuffer,
                     foldername: "chat_media",
-                    mimetype: file.type,
-                    original_name: file.name,
-                    size: file.size
+                    mimetype: chosenFile.type,
+                    original_name: chosenFile.name,
                 });
             });
 

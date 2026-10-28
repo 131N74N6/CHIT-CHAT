@@ -6,7 +6,6 @@ import JoinGroup from "./group_member/JoinGroup";
 import ProtectedRoute from "./auths/ProtectedRoute";
 import SignIn from "./auths/SignIn";
 import SignUp from "./auths/SignUp";
-import UserChatFiles from "./user_chats/UserChatFiles";
 import UserProfile from "./user_profiles/UserProfile";
 import YourProfile from "./auths/YourProfile";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
@@ -24,7 +23,6 @@ export default function App() {
                     <Route element={<SignUp/>} path="/sign-up"/>
                     <Route element={<ProtectedRoute><Home/></ProtectedRoute>} path="/home"/>
                     <Route element={<ProtectedRoute><YourProfile/></ProtectedRoute>} path="/profile"/>
-                    <Route element={<ProtectedRoute><UserChatFiles/></ProtectedRoute>} path="/user/media/detail/:chat_id"/>
                     <Route element={<ProtectedRoute><UserProfile/></ProtectedRoute>} path="/user/profile/:receiver_id"/>
                     <Route element={<ProtectedRoute><AvailableGroup/></ProtectedRoute>} path="/rooms"/>
                     <Route element={<ProtectedRoute><CreateGroup/></ProtectedRoute>} path="/rooms/create"/>

@@ -26,6 +26,7 @@ export default function useUserChatService() {
 
     const setChosenMessage = useUserChatStore((state) => state.setChosenMessage);
     const setOpenPopUpOption = useUserChatStore((state) => state.setOpenPopUpOption);
+    const setShowUserMedia = useUserChatStore((state) => state.setShowUserMedia);
 
     const currentUserId = useUserStore((state) => state.currentUserId);
     const setMessage = useMessageStore((state) => state.setMessage);
@@ -169,7 +170,7 @@ export default function useUserChatService() {
         mutationFn: async (id: string) => {
             const endpoint = `/api/v1/user-chats`;
             const newMessage = JSON.stringify({ _id: id, text: text.trim(), receiver_id: receiverId });
-            return await apiRequest<IUserChat>(endpoint, { body: newMessage, method: "PUT" });
+            await apiRequest<IUserChat>(endpoint, { body: newMessage, method: "PUT" });
         },
         onError: (error) => {
             setMessage(error.message || "Failed to edit message");
@@ -268,7 +269,7 @@ export default function useUserChatService() {
             tempt.push({
                 file: files[p],
                 file_name: files[p].name,
-                file_type: files[0].type,
+                file_type: files[p].type,
                 url: URL.createObjectURL(files[p])
             });
         }
@@ -280,7 +281,7 @@ export default function useUserChatService() {
     const sendMessageMt = useMutation({
         mutationFn: async () => {
             const formData = new FormData();
-            formData.append("receiver_id", receiverId!);
+            formData.append("receiver_id", receiverId.trim());
             
             if (text.trim()) formData.append("text", text.trim());
             
@@ -291,8 +292,7 @@ export default function useUserChatService() {
             }
     
             const endpoint = `/api/v1/user-chats`;
-            console.log(chosenFiles);
-            return await apiUpload(endpoint, formData, "POST");
+            await apiUpload(endpoint, formData, "POST");
         },
         onError: (error) => {
             setMessage(error.message);
@@ -301,6 +301,7 @@ export default function useUserChatService() {
             if (inputMediaRef.current) inputMediaRef.current.value = "";
             setText("");
             setChosenFiles([]);
+            setShowUserMedia(false);
             resetChosenMessageIds();
             setSelectMode(false);
             setOpenPopUpOption(false);

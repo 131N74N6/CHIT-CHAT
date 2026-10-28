@@ -59,7 +59,6 @@ export const userChatSchema = {
             file_type: t.String({ error: "invalid file type", minLength: 1 }),
             public_id: t.String({ error: "invalid file", minLength: 1 }),
             resource_type: t.String({ error: "unable to get file", minLength: 1 }),
-            size: t.Number({ error: "invalid file size" }),
             url: t.String({ error: "failed to access file", minLength: 1 })
         })),
         files_total: t.Number({ minimum: 0, error: "minimum files total is 0 and maximum is 20", maximum: 20 }),

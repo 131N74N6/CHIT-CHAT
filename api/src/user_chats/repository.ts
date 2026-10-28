@@ -51,7 +51,7 @@ class UserChatRepository {
         });
     }
 
-    async sendMessage(props: TUserChat["sendMessageResult"]) {
+    async sendMessages(props: TUserChat["sendMessageResult"]) {
         const newMessage = {
             created_at: new Date(),
             files: props.files,

@@ -9,7 +9,6 @@ export async function uploadToCloudinary(props: CloudinaryUploadOption): Promise
             folder: props.foldername,
             public_id: publicId,
             resource_type: "auto",
-            size: props.size
         }, (error, result) => {
             if (error) {
                 reject("Failed to upload to cloudinary");
@@ -26,7 +25,6 @@ export async function uploadToCloudinary(props: CloudinaryUploadOption): Promise
                 file_type: props.mimetype,
                 public_id: result.public_id,
                 resource_type: result.resource_type,
-                size: props.size,
                 url: result.url
             });
         });

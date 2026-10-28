@@ -28,89 +28,82 @@ class UserProfileService {
 
     async changeUser(props: TUserProfile["changeRaw"]) {
         const userId = this.checkIsIdIsValid("user", props.id);
-        let address = "-";
-        let gender = "-";
-        let username = "-";
-        let description = "-";
-        
         const user = await userProfileRepository.findUserById({ id: userId });
+        
         if (!user) throw new ChitChatApiError("user not found", 404);
         if (user._id.toString() !== userId) throw new ChitChatApiError("you are not allowed", 403);
 
-        if (props.name) username = this.checkIsInputIsAString("username", props.name);
-        if (props.address) address = this.checkIsInputIsAString("address", props.address);
-        if (props.description) description = this.checkIsInputIsAString("description", props.description);
-        if (props.gender) gender = this.checkIsInputIsAString("gender", props.gender);
+        // ✅ FIX: Gunakan nilai existing sebagai fallback, bukan hardcoded "-"
+        const username = props.name ? this.checkIsInputIsAString("username", props.name) : (user.name || "-");
+        const address = props.address ? this.checkIsInputIsAString("address", props.address) : (user.address || "-");
+        const description = props.description ? this.checkIsInputIsAString("description", props.description) : (user.description || "-");
+        const gender = props.gender ? this.checkIsInputIsAString("gender", props.gender) : (user.gender || "-");
 
-        let image: CloudinaryUploadResult = {
-            file_name: "-", 
-            file_type: "-", 
-            public_id: "-", 
-            resource_type: "-", 
-            size: 0, 
-            url: "-"
+        // ✅ FIX: Early return yang akurat (hanya return jika SEMUA field yang dikirim sama dengan yang lama)
+        const isNameUnchanged = !props.name || username === user.name;
+        const isAddressUnchanged = !props.address || address === user.address;
+        const isDescUnchanged = !props.description || description === user.description;
+        const isGenderUnchanged = !props.gender || gender === user.gender;
+        const isImageUnchanged = !props.image; 
+
+        if (isNameUnchanged && isAddressUnchanged && isDescUnchanged && isGenderUnchanged && isImageUnchanged) {
+            return { message: "No changes detected" }; // Kembalikan response agar tidak hang
         }
 
-        if (username === user.name && 
-            description === user.description && 
-            user.image_filename === image.file_name &&
-            user.gender === gender && user.address === address
-        ) {
-            return;
-        }
+        let imageResult = {
+            file_name: user.image_filename || "-", 
+            file_type: user.image_filetype || "-", 
+            public_id: user.image_public_id || "-", 
+            resource_type: user.image_resource_type || "-", 
+            url: user.image || "-"
+        };
 
         if (props.image) {
             const getArrayBuffer = await props.image.arrayBuffer();
             const bufferFile = Buffer.from(getArrayBuffer!);
             
-            if (user.image_public_id && user.image_resource_type) {
-                if (user.image_public_id !== "-" && user.image_resource_type!== "-" ) {
-                    await v2.uploader.destroy(user.image_public_id, { 
-                        resource_type: user.image_resource_type 
-                    });
-                }
+            if (user.image_public_id && user.image_resource_type && user.image_public_id !== "-" && user.image_resource_type !== "-") {
+                await v2.uploader.destroy(user.image_public_id, { 
+                    resource_type: user.image_resource_type 
+                });
             }
 
-            image = await uploadToCloudinary({
+            imageResult = await uploadToCloudinary({
                 file_buffer: bufferFile,
                 foldername: "user_profile",
-                mimetype: props.image?.type!,
-                original_name: props.image?.name!,
-                size: props.image?.size!
+                mimetype: props.image.type!,
+                original_name: props.image.name!
             });
         }
 
         const result = await userProfileRepository.changeUser({
-            address: address,
-            gender: gender,
-            id: userId,
-            description: description,
-            image: image.url,
-            image_filename: image.file_name,
-            image_filetype: image.file_type,
-            image_public_id: image.public_id,
-            image_resource_type: image.resource_type,
+            address, gender, id: userId, description,
+            image: imageResult.url,
+            image_filename: imageResult.file_name,
+            image_filetype: imageResult.file_type,
+            image_public_id: imageResult.public_id,
+            image_resource_type: imageResult.resource_type,
             name: username
         });
 
-        const availableUserRoom = `available-user-${userId}`;
-        const currentUserProfileRoom = `current-user-profile-${userId}`;
-
+        // ✅ FIX: Pastikan payload yang di-emmit lengkap dan konsisten
         const forAvailableUserRoom = {
             _id: result.id, 
             name: result.name, 
             image: result.image, 
             image_public_id: result.image_public_id
-        }
+        };
 
         const forCurrentUserProfileRoom = {
             _id: result.id, 
+            name: result.name,
+            address: result.address,
+            gender: result.gender,
             description: result.description,
-            name: result.name, 
             image: result.image, 
             image_public_id: result.image_public_id,
             updated_at: new Date()
-        }
+        };
 
         const forGroupChatRoom = { 
             _id: result.id, 
@@ -133,12 +126,12 @@ class UserProfileService {
             });
         }
 
-        userProfileEvent.emit(availableUserRoom, { 
+        userProfileEvent.emit(`available-user-${userId}`, { 
             data: forAvailableUserRoom, 
             type: "available-user:changed" 
         });
 
-        userProfileEvent.emit(currentUserProfileRoom, { 
+        userProfileEvent.emit(`current-user-profile-${userId}`, { 
             data: forCurrentUserProfileRoom, 
             type: "user-profile:changed" 
         });

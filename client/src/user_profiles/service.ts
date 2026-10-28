@@ -28,26 +28,27 @@ export default function useUserProfileService() {
     const resetGroupProfileState = useGroupProfileStore((state) => state.resetGroupProfileState);
 
     const address = useUserStore((state) => state.address);
-    // const setAddress = useUserStore((state) => state.setAddress);
+    const setAddress = useUserStore((state) => state.setAddress);
 
     const currentUserId = useUserStore((state) => state.currentUserId);
     const groupIds = useUserStore((state) => state.groupIds);
     
     const description = useUserStore((state) => state.description);
-    // const setDescription = useUserStore((state) => state.setDescription);
+    const setDescription = useUserStore((state) => state.setDescription);
 
     const setEditMode = useUserStore((state) => state.setEditMode);
 
     const gender = useUserStore((state) => state.gender);
-    // const setGender = useUserStore((state) => state.setGender);
+    const setGender = useUserStore((state) => state.setGender);
 
     const profilePicture = useUserStore((state) => state.profilePicture);
     const setProfilePicture = useUserStore((state) => state.setProfilePicture);
 
+    const profilePictureUrl = useUserStore((state) => state.profilePictureUrl);
     const setProfilePictureUrl = useUserStore((state) => state.setProfilePictureUrl);
 
     const username = useUserStore((state) => state.username);
-    // const setUserName = useUserStore((state) => state.setUserName);
+    const setUserName = useUserStore((state) => state.setUserName);
 
     const resetUserState = useUserStore((state) => state.resetUserState);
 
@@ -113,45 +114,40 @@ export default function useUserProfileService() {
                 return;
             }
 
-            const queryKey1 = ["all-users"];
-            const queryKey2 = [`other-user-${receiverId}`];
+            const allUsersQueryKey = ["all-users"];
+            const otherUserQueryKey = [`other-user-${receiverId}`];
 
-            if (payload.type === "available-user:changed") {
-                queryClient.setQueryData(queryKey1, (old: any) => {
+            if (payload.type === "available-user:changed" || payload.type === "user-profile:changed") {
+                queryClient.setQueryData(allUsersQueryKey, (old: any) => {
                     if (!old) return old;
 
-                    const newMessagePage = old.pages.map((page: any[]) => {
-                        return page.map((user) => {
-                            return user._id === payload.data._id ? payload.data : user
-                        });
-                    });
-
-                    return { ...old, pages: newMessagePage }
+                    return {
+                        ...old,
+                        pages: old.pages.map((page: any[]) => {
+                            return page.map((user) => {
+                                return (user._id === payload.data._id ? { ...user, ...payload.data } : user)
+                            });
+                        })
+                    }
                 });
-            } else if (payload.type === "user-profile:changed") {
-                queryClient.setQueryData(queryKey2, (old: any) => {
-                    if (!old) return old;
 
-                    const newMessagePage = old.pages.map((page: any[]) => {
-                        return page.map((user) => {
-                            return user._id === payload.data._id ? payload.data : user
-                        });
+                if (receiverId === payload.data._id) {
+                    queryClient.setQueryData(allUsersQueryKey, (old: any) => {
+                        return old ? { ...old, ...payload.data } : payload.data;
                     });
+                }
 
-                    return { ...old, pages: newMessagePage }
-                });
-            } else if (payload.type === "available-user:deleted") {
-                queryClient.setQueryData(queryKey1, (old: any) => {
-                    if (!old) return old;
-
-                    const newMessagePage = old.pages.map((page: any[]) => {
-                        return page.filter((user) => user._id !== payload.data);
-                    });
-
-                    return { ...old, pages: newMessagePage }
-                });
-            } else if (payload.type === "user-profile:deleted") {
-                queryClient.setQueryData(queryKey2, (old: any) => {
+                if (currentUserId === payload.data._id) {
+                    if (payload.data.name) setUserName(payload.data.name);
+                    if (payload.data.address) setAddress(payload.data.address);
+                    if (payload.data.description) setDescription(payload.data.description);
+                    if (payload.data.gender) setGender(payload.data.gender);
+                    if (payload.data.image && payload.data.image !== "-") {
+                        setProfilePictureUrl(payload.data.image);
+                    }
+                }
+            } else if (payload.type === "available-user:deleted" || payload.type === "user-profile:deleted") {
+                queryClient.setQueryData(allUsersQueryKey, (old: any) => {
                     if (!old) return old;
 
                     const newMessagePage = old.pages.map((page: any[]) => {
@@ -160,32 +156,29 @@ export default function useUserProfileService() {
 
                     return { ...old, pages: newMessagePage }
                 });
-            } else if (payload.type === "available-user-profile-picture:deleted") {
-                queryClient.setQueryData(queryKey1, (old: any) => {
-                    if (!old) return;
-                    const newUserData = old.pages.map((page: any[]) => {
-                        return page.map((user: any) => {
-                            if (payload.data.includes(user._id)) {
-                                return { ...user, image: "-", image_public_id: "-" }
-                            }
-                            return user;
-                        });
-                    });
-                    return { ...old, pages: newUserData };
+            } else if (payload.type === "available-user-profile-picture:deleted" || payload.type === "user-profile-picture:deleted") {
+                queryClient.setQueryData(otherUserQueryKey, (old: any) => {
+                    if (!old) return old;
+
+                    return {
+                        ...old,
+                        pages: old.pages.map((page: any[]) => {
+                            return page.map((user) => {
+                                return user._id === payload.data._id ? 
+                                { 
+                                    ...user, 
+                                    image: payload.data.image, 
+                                    image_public_id: payload.data.image_public_id 
+                                } : user
+                            });
+                        })
+                    }
+
                 });
-            } else if (payload.type === "user-profile-picture:deleted") {
-                queryClient.setQueryData(queryKey2, (old: any) => {
-                    if (!old) return;
-                    const newUserData = old.pages.map((page: any[]) => {
-                        return page.map((user: any) => {
-                            if (payload.data.includes(user._id)) {
-                                return { ...user, image: "-", image_public_id: "-" }
-                            }
-                            return user;
-                        });
-                    });
-                    return { ...old, pages: newUserData };
-                });
+
+                if (currentUserId === payload.data._id) {
+                    setProfilePictureUrl(payload.data.image === "-" ? null : payload.data.image);
+                }
             }
         }
 
@@ -244,11 +237,15 @@ export default function useUserProfileService() {
         },
         onSuccess: () => {
             if (fileInputRef.current) fileInputRef.current.value = "";
+            if (profilePictureUrl) setProfilePictureUrl(profilePictureUrl);
+
+            setUserName(username.trim());
+            setAddress(address.trim());
+            setDescription(description.trim());
+            setGender(gender.trim());
 
             queryClient.invalidateQueries({ queryKey: ["all-users"] });
             queryClient.invalidateQueries({ queryKey: ["current-user"] });
-
-            if (receiverId) queryClient.invalidateQueries({ queryKey: [`other-user-${receiverId}`] });
 
             if (groupIds.length > 0) {
                 groupIds.map((group_id) => {
@@ -259,7 +256,6 @@ export default function useUserProfileService() {
 
             setEditMode(false);
             setProfilePicture(null);
-            setProfilePictureUrl(null);
         }
     });
 

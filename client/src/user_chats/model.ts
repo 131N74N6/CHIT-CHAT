@@ -1,5 +1,4 @@
 import type { FetchNextPageOptions, InfiniteData, InfiniteQueryObserverResult, UseMutationResult } from "@tanstack/react-query";
-import type { ApiResponse } from "../api";
 
 export interface IUserChat {
     _id: string;
@@ -106,7 +105,7 @@ export interface iPopUpOptionForUser {
 export interface IUserChatPopUp {
     isProcessing: boolean;
     userChat: {
-        changeMessageMt: UseMutationResult<ApiResponse<IUserChat>, Error, string, unknown>;
+        changeMessageMt: UseMutationResult<void, Error, string, unknown>;
         data: IUserChat[];
         error: Error | null;
         fetchNextPage: (options?: FetchNextPageOptions | undefined) => Promise<InfiniteQueryObserverResult<InfiniteData<any, unknown>, Error>>;
@@ -114,7 +113,7 @@ export interface IUserChatPopUp {
         isFetchingNextPage: boolean;
         isLoading: boolean;
         isProcessing: boolean;
-        sendMessageMt: UseMutationResult<ApiResponse<unknown>, Error, void, unknown>;
+        sendMessageMt: UseMutationResult<void, Error, void, unknown>;
     }
     userProfile: {
         error: Error | null;
@@ -129,7 +128,7 @@ export interface IUserChatFilesPreviewPopUp {
     handleMediaPreview: (event: React.ChangeEvent<HTMLInputElement, Element>) => void;
     isProcessing: boolean;
     inputMediaRef: React.RefObject<HTMLInputElement | null>;
-    sendMessageMt: UseMutationResult<ApiResponse<unknown>, Error, void, unknown>;
+    sendMessageMt: UseMutationResult<void, Error, void, unknown>;
 }
 
 export interface IUserChatFilesPopUp {

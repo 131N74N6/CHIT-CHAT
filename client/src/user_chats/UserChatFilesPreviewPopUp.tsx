@@ -46,7 +46,7 @@ export default function UserChatFilesPreviewPopUp(props: IUserChatFilesPreviewPo
                 onClick={() => props.inputMediaRef.current?.click()}
             >
                 {chosenFiles.length > 0 ? (
-                    <div className="rounded p-2 grid gap-2 md:grid-cols-3 sm:grid-cols-2 grid-cols-1">
+                    <div className="rounded p-2 grid gap-2 lg:grid-cols-4 md:grid-cols-3 grid-cols-2">
                         {chosenFiles.map((chosenFile, index) => {
                             return (
                                 <div className=" relative group">
@@ -54,7 +54,7 @@ export default function UserChatFilesPreviewPopUp(props: IUserChatFilesPreviewPo
                                         file={chosenFile.file}
                                         file_type={chosenFile.file_type}
                                         file_name={chosenFile.file_type}
-                                        key={`file-in-room-${index}`}
+                                        key={`file-for-user-${index}`}
                                         url={chosenFile.url}
                                     />
                                     <button

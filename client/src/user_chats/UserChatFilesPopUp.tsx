@@ -1,5 +1,4 @@
 import { MessageCircle } from "lucide-react";
-import Navbar from "../navbar/Navbar";
 import Loading from "../loading/Loading";
 import { useUserChatStore } from "./store";
 import { useUserStore } from "../user_profiles/store";
@@ -20,31 +19,28 @@ export default function UserChatFilesPopUp(props: IUserChatFilesPopUp) {
     }
     
     return (
-        <section className="flex flex-col h-full gap-2.5 p-2.5 w-full md:w-3/4 inset-shadow-sm inset-shadow-gray-400 border border-gray-400 overflow-y-auto">
-            <Navbar isProcessing={props.isProcessing}/>
-            <main className="h-full flex flex-col w-full md:w-2/5 border border-gray-400 inset-shadow-sm inset-shadow-gray-400 overflow-y-auto">
-                <div className="flex px-2.5 pt-2.5">
-                    <button
-                        className="cursor-pointer disabled:cursor-not-allowed font-medium text-gray-700 hover:text-gray-500 transition-colors"
-                        disabled={props.isProcessing}
-                        onClick={seeUserChat}
-                        type="button"
-                    >
-                        <MessageCircle size={22}/>
-                    </button>
+        <section className="flex flex-col h-full gap-2.5 w-full inset-shadow-sm inset-shadow-gray-400 border border-gray-400">
+            <div className="flex px-2.5 pt-2.5">
+                <button
+                    className="cursor-pointer disabled:cursor-not-allowed font-medium text-gray-700 hover:text-gray-500 transition-colors"
+                    disabled={props.isProcessing}
+                    onClick={seeUserChat}
+                    type="button"
+                >
+                    <MessageCircle size={22}/>
+                </button>
+            </div>
+            {props.isLoading ? (
+                <div className="flex justify-center items-center h-full">
+                    <Loading/>
                 </div>
-                {props.isLoading ? (
-                    <div className="flex justify-center items-center h-full">
-                        <Loading/>
-                    </div>
-                ) : props.error ? (
-                    <div className="flex justify-center items-center h-full">
-                        <div className="text-gray-700 text-2xl font-medium text-center">{props.error.message}</div>
-                    </div>
-                ) : (
-                    <UserChatFileList files={props.files} isLoading={props.isLoading}/>
-                )}
-            </main>
+            ) : props.error ? (
+                <div className="flex justify-center items-center h-full">
+                    <div className="text-gray-700 text-2xl font-medium text-center">{props.error.message}</div>
+                </div>
+            ) : (
+                <UserChatFileList files={props.files} isLoading={props.isLoading}/>
+            )}
         </section>
     );
 }

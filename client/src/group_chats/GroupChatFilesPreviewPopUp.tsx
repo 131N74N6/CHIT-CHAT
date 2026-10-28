@@ -51,7 +51,7 @@ export default function GroupChatFilesPreviewPopUp(props: IGroupChatFilesPreview
                 onClick={() => props.inputMediaRef.current?.click()}
             >
                 {chosenFiles.length > 0 ? (
-                    <div className="rounded p-2 grid gap-2 md:grid-cols-3 sm:grid-cols-2 grid-cols-1">
+                    <div className="rounded p-2 grid gap-2 lg:grid-cols-4 md:grid-cols-3 grid-cols-2">
                         {chosenFiles.map((chosenFile, index) => {
                             return (
                                 <div className=" relative group">

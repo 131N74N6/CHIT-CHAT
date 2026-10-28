@@ -50,15 +50,15 @@ export default function MessageBubble(props: IUserMessageData) {
         <div 
             className={cn(
                 "flex flex-col gap-1 p-2.5 transition-all duration-200 w-[60%]",
-                props.own ? "ml-[40%] bg-blue-700 text-white rounded-t-2xl rounded-bl-2xl" : 
-                "mr-[50%] bg-gray-200 text-gray-900 rounded-t-2xl rounded-br-2xl",
+                props.own ? "ml-[40%] bg-blue-800 text-white rounded-t-2xl rounded-bl-2xl" : 
+                "mr-[50%] bg-gray-300 text-gray-900 rounded-t-2xl rounded-br-2xl",
                 selectMode ? "cursor-pointer hover:opacity-80" : "",
                 isSelected ? "border border-orange-500 bg-orange-50 text-gray-900" : ""
             )}
             onClick={selectMessage}
         >
             {props.chat.files_total > 0 ? (
-                <div className="cursor-pointer bg-gray-100 p-2 rounded-md">
+                <div className={`cursor-pointer ${props.own ? "bg-blue-600" : "bg-gray-200"} p-2 rounded-md`}>
                     <div 
                         className="items-center gap-2.5 md:flex hidden" 
                         onClick={seeUserChatFiles}
