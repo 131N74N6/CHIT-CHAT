@@ -26,7 +26,6 @@ export default function useUserChatService() {
 
     const setChosenMessage = useUserChatStore((state) => state.setChosenMessage);
     const setOpenPopUpOption = useUserChatStore((state) => state.setOpenPopUpOption);
-    const setShowUserMedia = useUserChatStore((state) => state.setShowUserMedia);
 
     const currentUserId = useUserStore((state) => state.currentUserId);
     const setMessage = useMessageStore((state) => state.setMessage);
@@ -301,7 +300,6 @@ export default function useUserChatService() {
             if (inputMediaRef.current) inputMediaRef.current.value = "";
             setText("");
             setChosenFiles([]);
-            setShowUserMedia(false);
             resetChosenMessageIds();
             setSelectMode(false);
             setOpenPopUpOption(false);

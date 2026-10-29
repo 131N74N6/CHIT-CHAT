@@ -16,33 +16,13 @@ class UserProfileWebSocket extends EventEmitter {
     private backendUrl = "";
     private userId = "";
 
-    connect(token: string, backendUrl: string) {
-        if (!this.isConnecting) return;
-
-        if (this.ws && (this.ws.readyState === WebSocket.CONNECTING || this.ws.readyState === WebSocket.OPEN)) {
-            return;
-        }
-
-        const newWsUrl = this.buildWsUrl(token, backendUrl);
-        
-        if (this.url && this.url !== newWsUrl) {
-            this.disconnected();
-        }
-
-        this.url = newWsUrl;
-        this.isConnecting = true;
-        this.ws = new WebSocket(this.url);
-        
-        this.bindEvents();
-    }
-
     private bindEvents() {
         if (!this.ws) return;
 
         this.ws.onopen = () => {
             this.reconnectAttemps = 0;
             this.isConnecting = false;
-            this.emit("connected", { message: "you're connected", type: "connected" });
+            this.emit("connected", { message: "You're connected", type: "connected" });
 
             this.messageQueue.forEach((message) => this.ws?.send(message));
             this.messageQueue = [];
@@ -89,8 +69,29 @@ class UserProfileWebSocket extends EventEmitter {
         const wsProtocol = backendUrl.includes("https") ? "wss:" : "ws:";
         const backendHost = backendUrl.replace(/^https?:\/\//, "");
         const encodedToken = encodeURIComponent(token);
-        const wsUrl = `${wsProtocol}//${backendHost}/api/v1/users/ws?token${encodedToken}`;
+        const wsUrl = `${wsProtocol}//${backendHost}/api/v1/users/ws?token=${encodedToken}`;
         return wsUrl;
+    }
+
+    connect(token: string, backendUrl: string, userId: string) {
+        if (this.isConnecting) return;
+
+        if (this.ws && (this.ws.readyState === WebSocket.CONNECTING || this.ws.readyState === WebSocket.OPEN)) {
+            return;
+        }
+
+        const newWsUrl = this.buildWsUrl(token, backendUrl);
+        
+        if (this.url && this.url !== newWsUrl) {
+            this.disconnected();
+        }
+
+        this.url = newWsUrl;
+        this.isConnecting = true;
+        this.userId = userId;
+        this.ws = new WebSocket(this.url);
+        
+        this.bindEvents();
     }
 
     private connectFromUrl() {

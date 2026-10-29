@@ -34,6 +34,7 @@ export default function YourProfile() {
     const setProfilePictureUrl = useUserStore((state) => state.setProfilePictureUrl);
 
     const oldProfilePicture = useUserStore((state) => state.oldProfilePicture);
+    const setOldProfilePicture = useUserStore((state) => state.setOldProfilePicture);
 
     const username = useUserStore((state) => state.username);
     const setUserName = useUserStore((state) => state.setUserName);
@@ -48,16 +49,16 @@ export default function YourProfile() {
             setGender(owner.getCurrentUser.data.gender || "-");
             setUserName(owner.getCurrentUser.data.user_name || "-");
             if (owner.getCurrentUser.data.profile_picture && owner.getCurrentUser.data.profile_picture.url) {
-                setProfilePictureUrl(owner.getCurrentUser.data.profile_picture.url);
+                setOldProfilePicture(owner.getCurrentUser.data.profile_picture.url);
             }
         } else {
             setAddress("");
             setDescription("");
             setGender("");
             setUserName("");
-            setProfilePictureUrl(null);
+            setOldProfilePicture(null);
         }
-    }, [editMode, owner.getCurrentUser.data, currentUserId]);
+    }, [editMode, owner.getCurrentUser, currentUserId]);
 
     useEffect(() => {
         if (message) {
@@ -134,15 +135,15 @@ export default function YourProfile() {
                                             }}
                                             type="button"
                                         >
-                                            <X size={1}/>
+                                            <X size={22}/>
                                         </button>
                                     </div>
-                                ) : oldProfilePicture && oldProfilePicture.public_id !== "-" ? (
+                                ) : oldProfilePicture && oldProfilePicture !== "-" ? (
                                     <div className="w-full h-full relative group">
                                         <img
-                                            alt={oldProfilePicture.public_id}
+                                            alt={oldProfilePicture}
                                             className="w-full h-full object-cover rounded-full"
-                                            src={oldProfilePicture.url}
+                                            src={oldProfilePicture}
                                         />
                                         <button
                                             className={cn(
@@ -157,7 +158,7 @@ export default function YourProfile() {
                                             }}
                                             type="button"
                                         >
-                                            <X size={1}/>
+                                            <X size={22}/>
                                         </button>
                                     </div>
                                 ) : (

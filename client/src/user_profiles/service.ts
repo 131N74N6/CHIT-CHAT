@@ -84,7 +84,7 @@ export default function useUserProfileService() {
 
         const apiUrl = import.meta.env.VITE_BASE_API_URL;
         userProfileWebSocket.enableReconnect();
-        userProfileWebSocket.connect(token, apiUrl);
+        userProfileWebSocket.connect(token, apiUrl, currentUserId);
 
         const handleConnected = (payload: any) => {
             setMessage(payload.message);
@@ -119,7 +119,7 @@ export default function useUserProfileService() {
 
             if (payload.type === "available-user:changed" || payload.type === "user-profile:changed") {
                 queryClient.setQueryData(allUsersQueryKey, (old: any) => {
-                    if (!old) return old;
+                    if (!old?.pages) return old;
 
                     return {
                         ...old,
@@ -132,7 +132,7 @@ export default function useUserProfileService() {
                 });
 
                 if (receiverId === payload.data._id) {
-                    queryClient.setQueryData(allUsersQueryKey, (old: any) => {
+                    queryClient.setQueryData(otherUserQueryKey, (old: any) => {
                         return old ? { ...old, ...payload.data } : payload.data;
                     });
                 }
@@ -288,7 +288,7 @@ export default function useUserProfileService() {
     const deleteUserProfilePictureMt = useMutation({
         mutationFn: async () => {
             const endpoint = `/api/v1/users/${currentUserId}`;
-            await apiRequest(endpoint, { method: "PUT" });
+            await apiRequest(endpoint, { method: "DELETE" });
         },
         onError: (error) => {
             setMessage(error.message);

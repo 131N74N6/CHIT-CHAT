@@ -6,7 +6,6 @@ import { groupChatEvent } from "../group_chats/event";
 import { groupMemberEvent } from "../group_members/event";
 import { userProfileEvent } from "./event";
 import { TUserProfile } from "./model";
-import { CloudinaryUploadResult } from "../cloudinary/model";
 import { uploadToCloudinary } from "../cloudinary/service";
 
 class UserProfileService {
@@ -31,15 +30,23 @@ class UserProfileService {
         const user = await userProfileRepository.findUserById({ id: userId });
         
         if (!user) throw new ChitChatApiError("user not found", 404);
-        if (user._id.toString() !== userId) throw new ChitChatApiError("you are not allowed", 403);
 
-        // ✅ FIX: Gunakan nilai existing sebagai fallback, bukan hardcoded "-"
-        const username = props.name ? this.checkIsInputIsAString("username", props.name) : (user.name || "-");
-        const address = props.address ? this.checkIsInputIsAString("address", props.address) : (user.address || "-");
-        const description = props.description ? this.checkIsInputIsAString("description", props.description) : (user.description || "-");
-        const gender = props.gender ? this.checkIsInputIsAString("gender", props.gender) : (user.gender || "-");
+        if (user._id.toString() !== userId) {
+            throw new ChitChatApiError("you are not allowed to change", 403);
+        }
 
-        // ✅ FIX: Early return yang akurat (hanya return jika SEMUA field yang dikirim sama dengan yang lama)
+        const username = props.name ? 
+        this.checkIsInputIsAString("username", props.name) : (user.name || "-");
+
+        const address = props.address ? 
+        this.checkIsInputIsAString("address", props.address) : (user.address || "-");
+
+        const description = props.description ? 
+        this.checkIsInputIsAString("description", props.description) : (user.description || "-");
+
+        const gender = props.gender ? 
+        this.checkIsInputIsAString("gender", props.gender) : (user.gender || "-");
+
         const isNameUnchanged = !props.name || username === user.name;
         const isAddressUnchanged = !props.address || address === user.address;
         const isDescUnchanged = !props.description || description === user.description;
@@ -71,13 +78,16 @@ class UserProfileService {
             imageResult = await uploadToCloudinary({
                 file_buffer: bufferFile,
                 foldername: "user_profile",
-                mimetype: props.image.type!,
-                original_name: props.image.name!
+                mimetype: props.image.type,
+                original_name: props.image.name
             });
         }
 
         const result = await userProfileRepository.changeUser({
-            address, gender, id: userId, description,
+            address, 
+            gender, 
+            id: userId, 
+            description,
             image: imageResult.url,
             image_filename: imageResult.file_name,
             image_filetype: imageResult.file_type,
