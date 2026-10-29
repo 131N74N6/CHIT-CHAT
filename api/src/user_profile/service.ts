@@ -7,6 +7,7 @@ import { groupMemberEvent } from "../group_members/event";
 import { userProfileEvent } from "./event";
 import { TUserProfile } from "./model";
 import { uploadToCloudinary } from "../cloudinary/service";
+import { CloudinaryUploadResult } from "../cloudinary/model";
 
 class UserProfileService {
     private checkIsIdIsValid(field: string, value: unknown) {
@@ -51,13 +52,13 @@ class UserProfileService {
         const isAddressUnchanged = !props.address || address === user.address;
         const isDescUnchanged = !props.description || description === user.description;
         const isGenderUnchanged = !props.gender || gender === user.gender;
-        const isImageUnchanged = !props.image; 
+        const isImageUnchanged = !props.image;
 
         if (isNameUnchanged && isAddressUnchanged && isDescUnchanged && isGenderUnchanged && isImageUnchanged) {
-            return { message: "No changes detected" }; // Kembalikan response agar tidak hang
+            return;
         }
 
-        let imageResult = {
+        let imageResult: CloudinaryUploadResult = {
             file_name: user.image_filename || "-", 
             file_type: user.image_filetype || "-", 
             public_id: user.image_public_id || "-", 

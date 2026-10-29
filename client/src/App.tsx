@@ -10,6 +10,7 @@ import UserProfile from "./user_profiles/UserProfile";
 import YourProfile from "./auths/YourProfile";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import Settings from "./settings/Settings";
 
 const queryClient = new QueryClient();
 
@@ -22,6 +23,7 @@ export default function App() {
                     <Route element={<SignIn/>} path="/sign-in"/>
                     <Route element={<SignUp/>} path="/sign-up"/>
                     <Route element={<ProtectedRoute><Home/></ProtectedRoute>} path="/home"/>
+                    <Route element={<ProtectedRoute><Settings/></ProtectedRoute>} path="/settings"/>
                     <Route element={<ProtectedRoute><YourProfile/></ProtectedRoute>} path="/profile"/>
                     <Route element={<ProtectedRoute><UserProfile/></ProtectedRoute>} path="/user/profile/:receiver_id"/>
                     <Route element={<ProtectedRoute><AvailableGroup/></ProtectedRoute>} path="/rooms"/>

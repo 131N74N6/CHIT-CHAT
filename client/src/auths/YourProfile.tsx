@@ -3,13 +3,16 @@ import useUserProfileService from "../user_profiles/service";
 import { useMessageStore } from "../alert/store";
 import Loading from "../loading/Loading";
 import Navbar from "../navbar/Navbar";
-import { ArrowBigLeft, Pen, X } from "lucide-react";
+import { ArrowBigLeft, X } from "lucide-react";
 import Alert from "../alert/Alert";
 import cn from "../utils/cn";
 import useAuthService from "./service";
 import { useUserStore } from "../user_profiles/store";
+import { useNavigate } from "react-router-dom";
 
 export default function YourProfile() {
+    const navigate = useNavigate();
+
     const message = useMessageStore((state) => state.message);
     const setMessage = useMessageStore((state) => state.setMessage);
 
@@ -58,7 +61,7 @@ export default function YourProfile() {
             setUserName("");
             setOldProfilePicture(null);
         }
-    }, [editMode, owner.getCurrentUser, currentUserId]);
+    }, [editMode, owner.getCurrentUser.data, currentUserId]);
 
     useEffect(() => {
         if (message) {
@@ -68,6 +71,8 @@ export default function YourProfile() {
             return () => clearTimeout(timer);
         }
     }, [message, setMessage]);
+
+    console.log(username);
 
     return (
         <section className="flex md:flex-row gap-2 p-2 flex-col relative h-dvh z-10">
@@ -105,7 +110,10 @@ export default function YourProfile() {
                                     "hover:text-gray-500 transition-colors text-gray-800 font-medium"
                                 )}
                                 disabled={owner.isProcessing || userProfile.isProcessing}
-                                onClick={() => setEditMode(false)}
+                                onClick={() => {
+                                    setEditMode(false);
+                                    navigate("/settings");
+                                }}
                                 type="button"
                             >
                                 <ArrowBigLeft size={24}/>
@@ -145,21 +153,6 @@ export default function YourProfile() {
                                             className="w-full h-full object-cover rounded-full"
                                             src={oldProfilePicture}
                                         />
-                                        <button
-                                            className={cn(
-                                                "font-medium w-8 h-8 rounded-full bg-red-600 text-white opacity-0 cursor-pointer",
-                                                "disabled:cursor-not-allowed group-hover:opacity-100 duration-300 transition-opacity",
-                                                "flex justify-center items-center p-1.5 absolute top-1 left-[46%]"
-                                            )}
-                                            disabled={owner.isProcessing || userProfile.isProcessing}
-                                            onClick={(event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-                                                event.stopPropagation();
-                                                userProfile.deleteUserProfilePictureMt.mutate();
-                                            }}
-                                            type="button"
-                                        >
-                                            <X size={22}/>
-                                        </button>
                                     </div>
                                 ) : (
                                     <div 
@@ -237,18 +230,6 @@ export default function YourProfile() {
             ) : (
                 <main className="flex md:w-3/4 w-full flex-col h-full border border-gray-400">
                     <div className="bg-white flex flex-col gap-2.5 h-full p-2.5 inset-shadow-sm inset-shadow-gray-400">
-                        <div className="flex gap-1.5">
-                            <button
-                                className={cn(
-                                    "disabled:cursor-not-allowed cursor-pointer", 
-                                    "hover:text-gray-500 transition-colors text-gray-800 font-medium"
-                                )}
-                                onClick={() => setEditMode(true)}
-                                type="button"
-                            >
-                                <Pen size={24}/>
-                            </button>
-                        </div>
                         <div className="flex justify-center">
                             <div className="w-20 h-20 rounded-full">
                                 {owner.getCurrentUser.data && 
