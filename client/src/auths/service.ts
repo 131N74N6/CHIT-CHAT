@@ -82,8 +82,9 @@ export default function useAuthService() {
     });
 
     useEffect(() => {
-        if (!getCurrentUser.data) return;
-        setCurrentUserId(getCurrentUser.data.user_id);
+        if (getCurrentUser.data && getCurrentUser.data.user_id) {
+            setCurrentUserId(getCurrentUser.data.user_id);
+        }
     }, [getCurrentUser.data?.user_id, setCurrentUserId]);
 
     useEffect(() => {

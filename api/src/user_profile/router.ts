@@ -9,13 +9,11 @@ const wsContext = new WeakMap<any, { room: string; handler: (data: any) => void 
 
 const userProfileRouters = new Elysia({ prefix: "/api/v1/users" })
 .use(apiAuthMiddleware)
+.delete("/profile-picture", async (context) => {
+    return await userProfileController.deleteUserProfilePicture(context.user.id);
+})
 .delete("/", async (context) => {
     return await userProfileController.deleteUser(context.user.id);
-})
-.delete("/:id", async (context) => {
-    return await userProfileController.deleteUserProfilePicture(context.params.id);
-}, {
-    params: t.Pick(userProfileSchema.changeRaw, ["id"])
 })
 .get("/all", async (context) => {
     return await userProfileController.showAllUsers({ id: context.user.id, ...context.query });
@@ -74,6 +72,7 @@ const userProfileRouters = new Elysia({ prefix: "/api/v1/users" })
             ws.close(4003, "Internal error");
         }
     },
+    
     close: (ws) => {
         const subscriptions = wsContext.get(ws);
         if (subscriptions) {

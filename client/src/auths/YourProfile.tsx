@@ -72,8 +72,6 @@ export default function YourProfile() {
         }
     }, [message, setMessage]);
 
-    console.log(username);
-
     return (
         <section className="flex md:flex-row gap-2 p-2 flex-col relative h-dvh z-10">
             {message ? <Alert message={message}/> : null}
@@ -120,7 +118,10 @@ export default function YourProfile() {
                             </button>
                         </div>
                         <div className="flex justify-center">
-                            <div className="w-20 h-20 rounded-full">
+                            <div 
+                                className="w-20 h-20 cursor-pointer rounded-full" 
+                                onClick={() => userProfile.fileInputRef.current?.click()}
+                            >
                                 {profilePicture && profilePictureUrl ? (
                                     <div className="w-full h-full relative group">
                                         <img
@@ -160,7 +161,6 @@ export default function YourProfile() {
                                             "border-dashed border-gray-500 flex justify-center items-center bg-purple-400",
                                             "w-full text-white h-full rounded-full cursor-pointer font-medium text-[1.2rem]"
                                         )}
-                                        onClick={() => userProfile.fileInputRef.current?.click()}
                                     >
                                         {owner.getCurrentUser.data?.user_name[0]}
                                     </div>

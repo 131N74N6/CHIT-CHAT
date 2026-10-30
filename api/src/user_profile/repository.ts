@@ -64,8 +64,8 @@ class UserProfileRepository {
         return result;
     }
 
-    async findUserById(props: TUserProfile["showUser"]) {
-        return await this.users.findOne({ _id: new ObjectId(props.id) }, {
+    async findUserById(id: string) {
+        return await this.users.findOne({ _id: new ObjectId(id) }, {
             projection: {
                 _id: 1,
                 address: 1,

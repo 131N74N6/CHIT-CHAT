@@ -136,16 +136,6 @@ export default function useUserProfileService() {
                         return old ? { ...old, ...payload.data } : payload.data;
                     });
                 }
-
-                if (currentUserId === payload.data._id) {
-                    if (payload.data.name) setUserName(payload.data.name);
-                    if (payload.data.address) setAddress(payload.data.address);
-                    if (payload.data.description) setDescription(payload.data.description);
-                    if (payload.data.gender) setGender(payload.data.gender);
-                    if (payload.data.image && payload.data.image !== "-") {
-                        setProfilePictureUrl(payload.data.image);
-                    }
-                }
             } else if (payload.type === "available-user:deleted" || payload.type === "user-profile:deleted") {
                 queryClient.setQueryData(allUsersQueryKey, (old: any) => {
                     if (!old) return old;
@@ -287,7 +277,7 @@ export default function useUserProfileService() {
 
     const deleteUserProfilePictureMt = useMutation({
         mutationFn: async () => {
-            const endpoint = `/api/v1/users/${currentUserId}`;
+            const endpoint = `/api/v1/users/profile-picture`;
             await apiRequest(endpoint, { method: "DELETE" });
         },
         onError: (error) => {

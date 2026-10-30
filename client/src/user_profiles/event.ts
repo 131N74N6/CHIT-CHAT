@@ -88,6 +88,7 @@ class UserProfileWebSocket extends EventEmitter {
 
         this.url = newWsUrl;
         this.isConnecting = true;
+        this.shouldReconnect = true;
         this.userId = userId;
         this.ws = new WebSocket(this.url);
         

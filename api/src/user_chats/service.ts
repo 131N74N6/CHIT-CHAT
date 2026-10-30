@@ -249,7 +249,7 @@ class UserChatService {
         let newMessage = "";
         const chosenFiles = Array.isArray(props.files) ? props.files : (props.files ? [props.files] : []);
 
-        if (props.text) newMessage = this.checkIsInputAString("message", props.text); 
+        if (props.text) newMessage = this.checkIsInputAString("message", props.text);
         if (!newMessage && chosenFiles.length === 0) throw new ChitChatApiError("message or media is required", 400);
         
         const receiverId = this.checkIsIdValid("receiver", props.receiver_id);
