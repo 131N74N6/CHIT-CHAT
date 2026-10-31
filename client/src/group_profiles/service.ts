@@ -291,9 +291,7 @@ export default function useGroupProfileService() {
             return request.data ?? [];
         },
         initialPageParam: 1,
-        queryKey: [`available-group-${currentUserId}`],
-        refetchOnReconnect: true,
-        staleTime: Infinity
+        queryKey: [`available-group-${currentUserId}`]
     });
 
     const showGroupDetail = useQuery({
@@ -303,8 +301,7 @@ export default function useGroupProfileService() {
             const request = await apiRequest<IGroupProfileDetail>(endpoint, { method: "GET" });
             return request.data;
         },
-        queryKey: [`group-profile-${groupId}`],
-        staleTime: Infinity
+        queryKey: [`group-profile-${groupId}`]
     });
 
     const isProcessing = [

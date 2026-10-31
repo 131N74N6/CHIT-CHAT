@@ -27,6 +27,10 @@ class UserProfileService {
     }
 
     async changeUser(props: TUserProfile["changeRaw"]) {
+        let newProfileImage: CloudinaryUploadResult = {
+            file_name: "-", file_type: "-", url: "-", resource_type: "-", public_id: "-"
+        }
+        
         const currentUserId = this.checkIsIdIsValid("user", props.id);
         const user = await userProfileRepository.findUserById(currentUserId);
 
@@ -36,26 +40,18 @@ class UserProfileService {
             throw new ChitChatApiError("you are not allowed to change", 403);
         }
         
-        let newUsername = user.name;
-        let newAddress = user.address;
-        let newDescription = user.description;
-        let newGender = user.gender;
-        
-        if (props.name !== undefined && props.name !== "") {
-            newUsername = this.checkIsInputIsAString("username", props.name);
-        }
-        
-        if (props.gender !== undefined && props.gender !== "") {
-            newGender = this.checkIsInputIsAString("gender", props.gender);
-        }
-        
-        if (props.address !== undefined && props.address !== "") {
-            newAddress = this.checkIsInputIsAString("address", props.address);
-        }
-        
-        if (props.description !== undefined && props.description !== "") {
-            newDescription = this.checkIsInputIsAString("description", props.description);
-        }
+        let newUsername = props.name !== undefined && props.name !== "" ? 
+        this.checkIsInputIsAString("username", props.name) : user.name;
+
+        let newAddress = props.address !== undefined && props.address !== "" ? 
+        this.checkIsInputIsAString("address", props.address) : user.address || "-";
+
+        let newDescription = props.description !== undefined && props.description !== "" ? 
+        this.checkIsInputIsAString("description", props.description) : user.description || "-";
+
+        let newGender = props.gender !== undefined && props.gender !== "" ? 
+        this.checkIsInputIsAString("gender", props.gender) : user.gender || "-";
+
         
         if (props.image) {
             const fileArrayBuffer = await props.image.arrayBuffer();
@@ -69,143 +65,82 @@ class UserProfileService {
                 throw new ChitChatApiError("file size is too large", 400);
             }
 
-            if (user.image_public_id && user.image_resource_type && user.image_public_id !== "-" && user.image_resource_type !== "-") {
+            if (user.image_public_id && user.image_resource_type) {
                 await v2.uploader.destroy(user.image_public_id, { 
                     resource_type: user.image_resource_type 
                 });
             }
 
-            const newProfileImage = await uploadToCloudinary({
+            newProfileImage = await uploadToCloudinary({
                 file_buffer: fileBuffer,
                 foldername: "user_profile",
                 mimetype: props.image.type,
                 original_name: props.image.name
-            });
-    
-            await userProfileRepository.changeUser({
-                id: props.id,
-                address: user.address || "-" || props.address,
-                gender: user.gender || "-" || props.gender,
-                description: user.description || props.description || "-",
-                image: newProfileImage.url,
-                image_filename: newProfileImage.file_name,
-                image_filetype: newProfileImage.file_type,
-                image_public_id: newProfileImage.public_id,
-                image_resource_type: newProfileImage.resource_type,
-                name: newUsername
-            });
+            });    
+        }
 
-            const forAvailableUserRoom = {
-                _id: currentUserId, 
-                name: newUsername, 
-                image: newProfileImage.url, 
-                image_public_id: newProfileImage.public_id
-            };
+        
+        await userProfileRepository.changeUser({
+            id: props.id,
+            address: user.address || props.address,
+            gender: user.gender || props.gender,
+            description: user.description || props.description,
+            image: newProfileImage?.url,
+            image_filename: newProfileImage.file_name || "-",
+            image_filetype: newProfileImage.file_type || "-",
+            image_public_id: newProfileImage.public_id || "-",
+            image_resource_type: newProfileImage.resource_type || "-",
+            name: newUsername
+        });
 
-            const forCurrentUserProfileRoom = {
-                _id: currentUserId, 
-                name: newUsername,
-                address: newAddress,
-                gender: newGender,
-                description: newDescription,
-                image: newProfileImage.url, 
-                image_public_id: newProfileImage.public_id,
-                updated_at: new Date()
-            };
+        const forAvailableUserRoom = {
+            _id: currentUserId, 
+            name: newUsername, 
+            image: newProfileImage?.url, 
+            image_public_id: newProfileImage?.public_id
+        };
 
-            const forGroupChatRoom = { 
-                _id: currentUserId, 
-                sender_id: currentUserId, 
-                sender_name: newUsername
-            }
+        const forCurrentUserProfileRoom = {
+            _id: currentUserId, 
+            name: newUsername,
+            address: newAddress,
+            gender: newGender,
+            description: newDescription,
+            image: newProfileImage?.url, 
+            image_public_id: newProfileImage?.public_id,
+            updated_at: new Date()
+        };
 
-            const forGroupMemberRoom = { 
-                _id: currentUserId, 
-                name: newUsername
-            }
+        const forGroupChatRoom = { 
+            _id: currentUserId, 
+            sender_id: currentUserId, 
+            sender_name: newUsername
+        }
 
-            if (user.group_ids && user.group_ids.length > 0) {
-                user.group_ids.map((group_id) => {
-                    const room = `member-from-group-${group_id.toString()}`;
-                    groupChatEvent.emit(group_id.toString(), { 
-                        data: forGroupChatRoom, type: "group-message-owner:changed" 
-                    });
-                    groupMemberEvent.emit(room, { data: forGroupMemberRoom, type: "member-profile:changed" });
+        const forGroupMemberRoom = { 
+            _id: currentUserId, 
+            name: newUsername
+        }
+
+        if (user.group_ids && user.group_ids.length > 0) {
+            user.group_ids.map((group_id) => {
+                const room = `member-from-group-${group_id.toString()}`;
+                groupChatEvent.emit(group_id.toString(), { 
+                    data: forGroupChatRoom, type: "group-message-owner:changed" 
                 });
-            }
-
-            userProfileEvent.emit(`available-user-${currentUserId}`, { 
-                data: forAvailableUserRoom, 
-                type: "available-user:changed" 
-            });
-
-            userProfileEvent.emit(`current-user-profile-${currentUserId}`, { 
-                data: forCurrentUserProfileRoom, 
-                type: "user-profile:changed" 
-            });
-        } else {
-            await userProfileRepository.changeUser({
-                id: props.id,
-                address: user.address || "-" || props.address,
-                gender: user.gender || "-" || props.gender,
-                description: user.description || props.description || "-",
-                image: user.image || "-",
-                image_filename: user.image_filename || "-",
-                image_filetype: user.image_filetype || "-",
-                image_public_id: user.image_public_id || "-",
-                image_resource_type: user.image_resource_type || "-",
-                name: props.name
-            });
-
-            const forAvailableUserRoom = {
-                _id: currentUserId, 
-                name: newUsername, 
-                image: user.image || "-", 
-                image_public_id: user.image_public_id || "-"
-            };
-
-            const forCurrentUserProfileRoom = {
-                _id: currentUserId, 
-                name: newUsername,
-                address: newAddress,
-                gender: newGender,
-                description: newDescription,
-                image: user.image || "-", 
-                image_public_id: user.image_public_id || "-",
-                updated_at: new Date()
-            };
-
-            const forGroupChatRoom = { 
-                _id: currentUserId, 
-                sender_id: currentUserId, 
-                sender_name: newUsername
-            }
-
-            const forGroupMemberRoom = { 
-                _id: currentUserId, 
-                name: newUsername
-            }
-
-            if (user.group_ids && user.group_ids.length > 0) {
-                user.group_ids.map((group_id) => {
-                    const room = `member-from-group-${group_id.toString()}`;
-                    groupChatEvent.emit(group_id.toString(), { 
-                        data: forGroupChatRoom, type: "group-message-owner:changed" 
-                    });
-                    groupMemberEvent.emit(room, { data: forGroupMemberRoom, type: "member-profile:changed" });
-                });
-            }
-
-            userProfileEvent.emit(`available-user-${currentUserId}`, { 
-                data: forAvailableUserRoom, 
-                type: "available-user:changed" 
-            });
-
-            userProfileEvent.emit(`current-user-profile-${currentUserId}`, { 
-                data: forCurrentUserProfileRoom, 
-                type: "user-profile:changed" 
+                groupMemberEvent.emit(room, { data: forGroupMemberRoom, type: "member-profile:changed" });
             });
         }
+
+        userProfileEvent.emit(`available-user-${currentUserId}`, { 
+            data: forAvailableUserRoom, 
+            type: "available-user:changed" 
+        });
+
+        userProfileEvent.emit(`current-user-profile-${currentUserId}`, { 
+            data: forCurrentUserProfileRoom, 
+            type: "user-profile:changed" 
+        });
     }
 
     async deleteUser(id: string) {
@@ -215,7 +150,7 @@ class UserProfileService {
         if (!user) throw new ChitChatApiError("user not found", 404);
         if (user._id.toString() !== userId) throw new ChitChatApiError("you are not allowed", 403);
 
-        if (user.image_public_id && user.image_resource_type && user.image_public_id !== "-" && user.image_resource_type !== "-") {
+        if (user.image_public_id && user.image_resource_type) {
             await v2.uploader.destroy(user.image_public_id, { 
                 resource_type: user.image_resource_type 
             });

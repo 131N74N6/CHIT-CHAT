@@ -77,7 +77,6 @@ export default function useAuthService() {
                 user_session: request.data.session
             }
         },
-        
         retry: false
     });
 
@@ -158,7 +157,7 @@ export default function useAuthService() {
             setMessage(errorMessage);
         },
         onSuccess: () => {
-            navigate("/sign-in");
+            navigate("/home");
             resetSignUpState();
         }
     });

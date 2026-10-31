@@ -1,6 +1,6 @@
 import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useChatbotStore } from "./store";
-import { useUserStore } from "../stores/user.store";
+import { useUserStore } from "../user_profiles/store";
 import { useMessageStore } from "../alert/store";
 import { apiRequest } from "../api";
 import type { IMessageBot } from "./model";
@@ -88,10 +88,7 @@ export default function useChatbotService() {
             const request = await apiRequest<IMessageBot[]>(endpoint, { method: "GET" });
             return request.data ?? [];
         },
-        initialPageParam: 1,
-        refetchOnMount: false,
-        refetchOnWindowFocus: false,
-        staleTime: Infinity
+        initialPageParam: 1
     });
 
     const isProcessing = [sendQuestionMt, deleteAllMessagesMt, deleteChosenMessagesMt].some((f) => f.isPending);

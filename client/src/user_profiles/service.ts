@@ -19,7 +19,6 @@ export default function useUserProfileService() {
     const queryClient = useQueryClient();
     
     const setMessage = useMessageStore((state) => state.setMessage);
-    const allowedFiles = ["image/png", "image/jpeg", "image/avif", "image/webp"];
     
     const resetGroupMessageState = useGroupChatStore((state) => state.resetGroupMessageState);
     
@@ -116,6 +115,7 @@ export default function useUserProfileService() {
 
             const allUsersQueryKey = ["all-users"];
             const otherUserQueryKey = [`other-user-${receiverId}`];
+            const currentUserQueryKey = ["current-user"];
 
             if (payload.type === "available-user:changed" || payload.type === "user-profile:changed") {
                 queryClient.setQueryData(allUsersQueryKey, (old: any) => {
@@ -136,6 +136,23 @@ export default function useUserProfileService() {
                         return old ? { ...old, ...payload.data } : payload.data;
                     });
                 }
+
+                queryClient.setQueryData(currentUserQueryKey, (old: any) => {
+                    if (!old) return old;
+                    
+                    return {
+                        ...old,
+                        address: payload.data.address || old.address,
+                        description: payload.data.description || old.description,
+                        gender: payload.data.gender || old.gender,
+                        user_name: payload.data.name || old.user_name,
+                        profile_picture: {
+                            public_id: payload.data.image_public_id || old.profile_picture?.public_id,
+                            url: payload.data.image || old.profile_picture?.url,
+                        },
+                        updated_at: new Date().toISOString()
+                    };
+                });
             } else if (payload.type === "available-user:deleted" || payload.type === "user-profile:deleted") {
                 queryClient.setQueryData(allUsersQueryKey, (old: any) => {
                     if (!old) return old;
@@ -210,14 +227,7 @@ export default function useUserProfileService() {
             newUserInfo.append("gender", gender.trim());
             newUserInfo.append("name", username.trim());
 
-            if (profilePicture) {
-                if (allowedFiles.includes(profilePicture.type) === false) {
-                    setProfilePicture(null);
-                    setProfilePictureUrl(null);
-                    throw new Error("You cant upload this file");
-                }
-                newUserInfo.append("image", profilePicture);
-            }
+            if (profilePicture) newUserInfo.append("image", profilePicture);
 
             await apiUpload(endpoint, newUserInfo, "PUT");
             
@@ -319,10 +329,7 @@ export default function useUserProfileService() {
             return request.data ?? [];
         },
         initialPageParam: 1,
-        queryKey: ["all-users"],
-        refetchOnMount: false,
-        refetchOnWindowFocus: false,
-        staleTime: Infinity
+        queryKey: ["all-users"]
     });
 
     const showOtherUser = useQuery({
@@ -332,10 +339,7 @@ export default function useUserProfileService() {
             const request = await apiRequest<UserDetail>(endpoint, { method: "GET" });
             return request.data;
         },
-        queryKey: [`other-user-${receiverId}`],
-        refetchOnMount: false,
-        refetchOnWindowFocus: false,
-        staleTime: Infinity
+        queryKey: [`other-user-${receiverId}`]
     });
 
     const isProcessing = [

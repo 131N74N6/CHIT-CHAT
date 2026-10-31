@@ -26,7 +26,8 @@ class UserProfileRepository {
                     image_filetype: props.image_filetype,
                     image_public_id: props.image_public_id,
                     image_resource_type: props.image_resource_type,
-                    name: props.name
+                    name: props.name,
+                    updatedAt: new Date()
                 }
             })
         ]);

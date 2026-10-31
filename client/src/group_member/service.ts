@@ -159,9 +159,7 @@ export default function useGroupMemberService() {
             const request = await apiRequest<boolean>(endpoint, { method: "GET" });
             return request.data ?? false;
         },
-        queryKey: [`group-owner-${currentUserId}-${groupId}`],
-        refetchOnMount: false,
-        refetchOnWindowFocus: false,
+        queryKey: [`group-owner-${currentUserId}-${groupId}`]
     });
 
     const joinGroupMt = useMutation({
@@ -241,10 +239,7 @@ export default function useGroupMemberService() {
             const request = await apiRequest<Users[]>(endpoint, { method: "GET" });
             return request.data ?? [];
         },
-        queryKey: [`group-member-${groupId}`],
-        refetchOnMount: false,
-        refetchOnWindowFocus: false,
-        staleTime: Infinity
+        queryKey: [`group-member-${groupId}`]
     });
 
     const isProcessing = [joinGroupMt, kickMemberMt, leftGroupMt].some(feature => feature.isPending);

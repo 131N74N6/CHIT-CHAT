@@ -318,10 +318,7 @@ export default function useUserChatService() {
             const request = await apiRequest<IUserChat[]>(endpoint, { method: "GET" });
             return request.data ?? [];
         },
-        queryKey: [`user-messages-${receiverId}`],
-        refetchOnMount: false,
-        refetchOnWindowFocus: false,
-        staleTime: Infinity
+        queryKey: [`user-messages-${receiverId}`]
     });
 
     const showChosenMessageFiles = useQuery({
@@ -335,10 +332,7 @@ export default function useUserChatService() {
             });
             return request.data;
         },
-        queryKey: [`user-messages-media-${chosenMessageId}`],
-        refetchOnMount: false,
-        refetchOnWindowFocus: false,
-        staleTime: Infinity
+        queryKey: [`user-messages-media-${chosenMessageId}`]
     });
 
     const isProcessing = [

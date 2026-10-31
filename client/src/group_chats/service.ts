@@ -343,10 +343,7 @@ export default function useGroupChatService() {
             const request = await apiRequest<IGroupMessageFiles>(endpoint, { method: "GET" });
             return request.data;
         },
-        queryKey: [`group-chat-files-${groupMessageId}`],
-        refetchOnMount: false,
-        refetchOnWindowFocus: false,
-        staleTime: Infinity
+        queryKey: [`group-chat-files-${groupMessageId}`]
     });
 
     const showAllGroupMessages = useInfiniteQuery({
@@ -362,10 +359,7 @@ export default function useGroupChatService() {
             return request.data ?? [];
         },
         initialPageParam: 1,
-        queryKey: [`group-chat-${groupId}`],
-        refetchOnMount: false,
-        refetchOnWindowFocus: false,
-        staleTime: Infinity
+        queryKey: [`group-chat-${groupId}`]
     });
 
     const isProcessing = [changeChosenMessageMt, clearAllMessageFromGroupMt, clearChosenMessageFromGroupMt,
