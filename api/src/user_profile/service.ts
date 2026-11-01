@@ -51,7 +51,6 @@ class UserProfileService {
 
         let newGender = props.gender !== undefined && props.gender !== "" ? 
         this.checkIsInputIsAString("gender", props.gender) : user.gender || "-";
-
         
         if (props.image) {
             const fileArrayBuffer = await props.image.arrayBuffer();
@@ -82,14 +81,14 @@ class UserProfileService {
         
         await userProfileRepository.changeUser({
             id: props.id,
-            address: user.address || props.address,
-            gender: user.gender || props.gender,
-            description: user.description || props.description,
+            address: newAddress,
+            gender: newGender,
+            description: newDescription,
             image: newProfileImage?.url,
-            image_filename: newProfileImage.file_name || "-",
-            image_filetype: newProfileImage.file_type || "-",
-            image_public_id: newProfileImage.public_id || "-",
-            image_resource_type: newProfileImage.resource_type || "-",
+            image_filename: newProfileImage.file_name,
+            image_filetype: newProfileImage.file_type,
+            image_public_id: newProfileImage.public_id,
+            image_resource_type: newProfileImage.resource_type,
             name: newUsername
         });
 
@@ -144,32 +143,67 @@ class UserProfileService {
     }
 
     async deleteUser(id: string) {
+        const operations = [];
         const userId = this.checkIsIdIsValid("user", id);
         const user = await userProfileRepository.findUserById(userId);
+        const userMessagesFiles = await userProfileRepository.findUserMessagesFiles(userId);
+        const groupChatMessagesFiles = await userProfileRepository.findGroupChatMessagesFiles(userId);
+        const yourGroupProfiles = await userProfileRepository.findYourGroupProfiles(userId);
+
+        const selectedGroupChatMessagesFiles = groupChatMessagesFiles.flatMap(message => message.files || []);
+        const selectedUserMessagesFiles = userMessagesFiles.flatMap(message => message.files || []);
 
         if (!user) throw new ChitChatApiError("user not found", 404);
         if (user._id.toString() !== userId) throw new ChitChatApiError("you are not allowed", 403);
 
-        if (user.image_public_id && user.image_resource_type) {
-            await v2.uploader.destroy(user.image_public_id, { 
+        if (user.image_public_id && user.image_resource_type && user.image_public_id !== "-" && user.image_resource_type !== "-") {
+            operations.push(v2.uploader.destroy(user.image_public_id, { 
                 resource_type: user.image_resource_type 
-            });
+            }));
         }
+
+        if (selectedGroupChatMessagesFiles.length > 0) {
+            const removeFromCloudinary = selectedGroupChatMessagesFiles.map(messagesFile => {
+                return v2.uploader.destroy(messagesFile.public_id, { 
+                    resource_type: messagesFile.resource_type 
+                });
+            });
+
+            operations.push(...removeFromCloudinary);
+        }
+
+        if (selectedUserMessagesFiles.length > 0) {
+            const removeFromCloudinary = selectedUserMessagesFiles.map(messagesFile => {
+                return v2.uploader.destroy(messagesFile.public_id, { 
+                    resource_type: messagesFile.resource_type 
+                });
+            });
+
+            operations.push(...removeFromCloudinary);
+        }
+
+        if (operations.length > 0) await Promise.all(operations);
 
         const result = await userProfileRepository.deleteUser(userId);
-        const availableUserRoom = `available-user-${userId}`;
-        const currentUserProfileRoom = `current-user-profile-${userId}`;
 
-        if (user.group_ids && user.group_ids.length > 0) {
-            user.group_ids.map((group_id) => {
-                const room = `member-from-group-${group_id}`;
-                groupChatEvent.emit(group_id, { data: result, type: "group-message-owner:deleted" });
-                groupMemberEvent.emit(room, { data: result, type: "member:left" });
-            });
+        if (yourGroupProfiles && yourGroupProfiles.length > 0) {
+            for (const yourGroupProfile of yourGroupProfiles) {
+                const groupId = this.checkIsIdIsValid("group", yourGroupProfile._id);
+            
+                if (yourGroupProfile.owner_id.toString() === userId) {
+                    await userProfileRepository.deleteYourGroups(userId);
+                    groupChatEvent.emit(groupId, { data: result, type: "group-message-owner:deleted" });
+                } else {
+                    await userProfileRepository.leftGroup(groupId);
+            
+                    groupMemberEvent.emit(`member-from-group-${groupId}`, { 
+                        data: result, type: "member:left" 
+                    });
+                }
+            }
         }
 
-        userProfileEvent.emit(availableUserRoom, { data: result, type: "available-user:deleted" });
-        userProfileEvent.emit(currentUserProfileRoom, { data: result, type: "user-profile:deleted" });
+        userProfileEvent.emit(`available-user-${userId}`, { data: result, type: "available-user:deleted" });
     }
 
     async deleteUserProfilePicture(id: string) {
@@ -186,8 +220,6 @@ class UserProfileService {
         }
 
         const result = await userProfileRepository.deleteUserProfilePicture(userId);
-        const availableUserRoom = `available-user-${userId}`;
-        const currentUserProfileRoom = `current-user-profile-${userId}`;
 
         const broadcastedData = {
             _id: result?._id,
@@ -198,17 +230,26 @@ class UserProfileService {
         if (user.group_ids && user.group_ids.length > 0) {
             user.group_ids.map((group_id) => {
                 const room = `member-from-group-${group_id}`;
-                groupMemberEvent.emit(room, { data: broadcastedData, type: "member-profile-picture:deleted" });
+                groupMemberEvent.emit(room, { 
+                    data: broadcastedData, type: "member-profile-picture:deleted" 
+                });
             });
         }
 
-        userProfileEvent.emit(availableUserRoom, { data: broadcastedData, type: "available-user-profile-picture:deleted" });
-        userProfileEvent.emit(currentUserProfileRoom, { data: broadcastedData, type: "user-profile-picture:deleted" });
+        userProfileEvent.emit(`available-user-${userId}`, { 
+            data: broadcastedData, type: "available-user-profile-picture:deleted" 
+        });
+
+        userProfileEvent.emit(`current-user-profile-${userId}`, { 
+            data: broadcastedData, type: "user-profile-picture:deleted" 
+        });
     }
 
     async showAllUsers(props: TUserProfile["showAllUser"]) {
         const userId = this.checkIsIdIsValid("user", props.id);
-        return await userProfileRepository.showAllUsers({ id: userId, limit: props.limit, page: props.page });
+        return await userProfileRepository.showAllUsers({ 
+            id: userId, limit: props.limit, page: props.page 
+        });
     }
 
     async showUser(props: TUserProfile["showUser"]) {

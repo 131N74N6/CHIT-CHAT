@@ -46,19 +46,21 @@ export default function YourProfile() {
     const userProfile = useUserProfileService();
     
     useEffect(() => {
-        if (editMode && owner.getCurrentUser.data) {
-            setAddress(owner.getCurrentUser.data.address || "-")
-            setDescription(owner.getCurrentUser.data.description || "-");
-            setGender(owner.getCurrentUser.data.gender || "-");
-            setUserName(owner.getCurrentUser.data.user_name || "-");
-            if (owner.getCurrentUser.data.profile_picture && owner.getCurrentUser.data.profile_picture.url) {
-                setOldProfilePicture(owner.getCurrentUser.data.profile_picture.url);
+        if (editMode) {
+            if (owner.getCurrentUser.data) {
+                setAddress(owner.getCurrentUser.data.address || "-")
+                setDescription(owner.getCurrentUser.data.description || "-");
+                setGender(owner.getCurrentUser.data.gender || "-");
+                setUserName(owner.getCurrentUser.data.user_name || "-");
+                if (owner.getCurrentUser.data.profile_picture && owner.getCurrentUser.data.profile_picture.url) {
+                    setOldProfilePicture(owner.getCurrentUser.data.profile_picture.url);
+                }
             }
         } else {
-            setAddress("");
-            setDescription("");
-            setGender("");
-            setUserName("");
+            setAddress("-");
+            setDescription("-");
+            setGender("-");
+            setUserName("-");
             setOldProfilePicture(null);
         }
     }, [editMode, owner.getCurrentUser.data, currentUserId]);

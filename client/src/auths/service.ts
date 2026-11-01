@@ -156,7 +156,8 @@ export default function useAuthService() {
             const errorMessage = parseAuthError(error);
             setMessage(errorMessage);
         },
-        onSuccess: () => {
+        onSuccess: async () => {
+            await queryClient.invalidateQueries({ queryKey: ["current-user"] });
             navigate("/home");
             resetSignUpState();
         }

@@ -43,7 +43,6 @@ export default function useUserProfileService() {
     const profilePicture = useUserStore((state) => state.profilePicture);
     const setProfilePicture = useUserStore((state) => state.setProfilePicture);
 
-    const profilePictureUrl = useUserStore((state) => state.profilePictureUrl);
     const setProfilePictureUrl = useUserStore((state) => state.setProfilePictureUrl);
 
     const username = useUserStore((state) => state.username);
@@ -115,7 +114,6 @@ export default function useUserProfileService() {
 
             const allUsersQueryKey = ["all-users"];
             const otherUserQueryKey = [`other-user-${receiverId}`];
-            const currentUserQueryKey = ["current-user"];
 
             if (payload.type === "available-user:changed" || payload.type === "user-profile:changed") {
                 queryClient.setQueryData(allUsersQueryKey, (old: any) => {
@@ -136,23 +134,6 @@ export default function useUserProfileService() {
                         return old ? { ...old, ...payload.data } : payload.data;
                     });
                 }
-
-                queryClient.setQueryData(currentUserQueryKey, (old: any) => {
-                    if (!old) return old;
-                    
-                    return {
-                        ...old,
-                        address: payload.data.address || old.address,
-                        description: payload.data.description || old.description,
-                        gender: payload.data.gender || old.gender,
-                        user_name: payload.data.name || old.user_name,
-                        profile_picture: {
-                            public_id: payload.data.image_public_id || old.profile_picture?.public_id,
-                            url: payload.data.image || old.profile_picture?.url,
-                        },
-                        updated_at: new Date().toISOString()
-                    };
-                });
             } else if (payload.type === "available-user:deleted" || payload.type === "user-profile:deleted") {
                 queryClient.setQueryData(allUsersQueryKey, (old: any) => {
                     if (!old) return old;
@@ -213,8 +194,7 @@ export default function useUserProfileService() {
         getSessionToken.data, 
         getSessionToken.isLoading, 
         getSessionToken.error, 
-        queryClient, 
-        receiverId,
+        queryClient,
         setMessage
     ]);
 
@@ -230,22 +210,15 @@ export default function useUserProfileService() {
             if (profilePicture) newUserInfo.append("image", profilePicture);
 
             await apiUpload(endpoint, newUserInfo, "PUT");
-            
         },
         onError: (error) => {
             setMessage(error.message);
         },
         onSuccess: () => {
             if (fileInputRef.current) fileInputRef.current.value = "";
-            if (profilePictureUrl) setProfilePictureUrl(profilePictureUrl);
-
-            setUserName(username.trim());
-            setAddress(address.trim());
-            setDescription(description.trim());
-            setGender(gender.trim());
-
-            queryClient.invalidateQueries({ queryKey: ["all-users"] });
-            queryClient.invalidateQueries({ queryKey: ["current-user"] });
+            
+            queryClient.invalidateQueries({ queryKey: ["all-users"], type: "active" });
+            queryClient.invalidateQueries({ queryKey: ["current-user"], type: "active" });
 
             if (groupIds.length > 0) {
                 groupIds.map((group_id) => {
@@ -253,7 +226,11 @@ export default function useUserProfileService() {
                     queryClient.invalidateQueries({ queryKey: [`group-member-${group_id}`] });
                 });
             }
-
+            
+            setUserName("-");
+            setAddress("-");
+            setDescription("-");
+            setGender("-");
             setEditMode(false);
             setProfilePicture(null);
         }
@@ -295,18 +272,16 @@ export default function useUserProfileService() {
         },
         onSuccess: () => {
             if (fileInputRef.current) fileInputRef.current.value = "";
-            queryClient.setQueryData(["current-user"], null);
-            queryClient.clear();
-            resetChatState();
-            resetGroupMemberState();
-            resetGroupMessageState();
-            resetGroupProfileState();
-            resetUserState();
-            resetNavbarState();
-            useGroupChatStore.persist.clearStorage();
-            useUserStore.persist.clearStorage();
-            useUserChatStore.persist.clearStorage();
-            navigate("/sign-in");
+            
+            queryClient.invalidateQueries({ queryKey: ["all-users"], type: "active" });
+            queryClient.invalidateQueries({ queryKey: ["current-user"], type: "active" });
+
+            if (groupIds.length > 0) {
+                groupIds.map((group_id) => {
+                    queryClient.invalidateQueries({ queryKey: [`group-chat-${group_id}`] });
+                    queryClient.invalidateQueries({ queryKey: [`group-member-${group_id}`] });
+                });
+            }
         }
     });
 

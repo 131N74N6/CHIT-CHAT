@@ -5,6 +5,7 @@ import { TUserProfile } from "./model";
 
 class UserProfileRepository {
     private accounts = db().collection("account");
+    private chatbots = db().collection("chatbots");
     private group_chats = db().collection("group_chats");
     private group_profiles = db().collection("group_profiles");
     private sessions = db().collection("session");
@@ -38,8 +39,8 @@ class UserProfileRepository {
     async deleteUser(id: string) {
         await Promise.all([
             this.accounts.deleteOne({ userId: new ObjectId(id) }),
+            this.chatbots.deleteMany({ user_id: new ObjectId(id) }),
             this.group_chats.deleteMany({ sender_id: new ObjectId(id) }),
-            this.group_profiles.deleteMany({ owner_id: new ObjectId(id) }),
             this.user_chats.deleteMany(
                 { $or: [{ sender_id: new ObjectId(id) }, { receiver_id: new ObjectId(id) }] }
             ),
@@ -65,18 +66,49 @@ class UserProfileRepository {
         return result;
     }
 
+    async deleteYourGroups(id: string) {
+        return await this.group_profiles.deleteMany({ owner_id: new ObjectId(id) });
+    }
+
     async findUserById(id: string) {
         return await this.users.findOne({ _id: new ObjectId(id) }, {
             projection: {
                 _id: 1,
                 address: 1,
                 createdAt: 1,
+                group_ids: 1,
                 gender: 1,
                 image: 1,
                 description: 1,
                 name: 1,
                 image_public_id: 1,
             }
+        });
+    }
+
+    async findYourGroupProfiles(id: string) {
+        return await this.group_profiles.find({ owner_id: new ObjectId(id) }).toArray();
+    }
+
+    async findGroupChatMessagesFiles(id: string) {
+        return await this.group_chats.find(
+            { sender_id: new ObjectId(id) }, 
+            { projection: { files: 1 } }
+        ).toArray();
+    }
+
+    async findUserMessagesFiles(id: string) {
+        return await this.user_chats.find({ 
+                $or: [{ sender_id: new ObjectId(id) }, { receiver_id: new ObjectId(id) }] 
+            }, 
+            { projection: { files: 1 } }
+        )
+        .toArray();
+    }
+
+    async leftGroup(group_id: string) {
+        return await this.users.updateOne({ group_ids: { $in: [group_id]} }, {
+            $pull: { group_ids: [group_id] }
         });
     }
 
