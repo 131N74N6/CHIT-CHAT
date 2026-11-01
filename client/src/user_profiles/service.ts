@@ -233,6 +233,7 @@ export default function useUserProfileService() {
             setGender("-");
             setEditMode(false);
             setProfilePicture(null);
+            setProfilePictureUrl(null); 
         }
     });
 

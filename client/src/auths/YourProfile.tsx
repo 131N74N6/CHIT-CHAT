@@ -52,7 +52,7 @@ export default function YourProfile() {
                 setDescription(owner.getCurrentUser.data.description || "-");
                 setGender(owner.getCurrentUser.data.gender || "-");
                 setUserName(owner.getCurrentUser.data.user_name || "-");
-                if (owner.getCurrentUser.data.profile_picture && owner.getCurrentUser.data.profile_picture.url) {
+                if (owner.getCurrentUser.data.profile_picture && owner.getCurrentUser.data.profile_picture.url && owner.getCurrentUser.data.profile_picture.url !== "-") {
                     setOldProfilePicture(owner.getCurrentUser.data.profile_picture.url);
                 }
             }
