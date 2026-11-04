@@ -1,15 +1,15 @@
-import EventEmitter from "eventemitter3";
+import { EventEmitter } from "eventemitter3";
 
 class GroupMemberWebSocket extends EventEmitter {
     private ws: WebSocket | null = null;
     private url: string | null = null;
 
-    private reconnectAttemps = 0;
-    private maxReconnectAttemps = 5;
+    private reconnectAttempts = 0;
+    private maxReconnectAttempts = 5;
     private reconnectDelay = 1000;
 
     private messageQueue: any[] = [];
-    private isConnecting = false;
+    protected isConnecting = false;
     private shouldReconnect = true;
 
     private token = "";
@@ -20,7 +20,7 @@ class GroupMemberWebSocket extends EventEmitter {
         if (!this.ws) return;
 
         this.ws.onopen = () => {
-            this.reconnectAttemps = 0;
+            this.reconnectAttempts = 0;
             this.isConnecting = false;
             this.emit("connect", { type: "connect", message: "You're connected" });
 
@@ -51,11 +51,11 @@ class GroupMemberWebSocket extends EventEmitter {
             this.isConnecting = false;
             this.emit("disconnected");
 
-            if (this.shouldReconnect && (this.reconnectAttemps < this.maxReconnectAttemps)) {
-                this.reconnectAttemps++;
-                const delay = this.reconnectDelay * Math.pow(2, (this.reconnectAttemps - 1));
+            if (this.shouldReconnect && (this.reconnectAttempts < this.maxReconnectAttempts)) {
+                this.reconnectAttempts++;
+                const delay = this.reconnectDelay * Math.pow(2, (this.reconnectAttempts - 1));
 
-                this.emit("reconnecting", { message: "Reconnecting...", attempt: this.reconnectAttemps });
+                this.emit("reconnecting", { message: "Reconnecting...", attempt: this.reconnectAttempts });
                 setTimeout(() => {
                     if (this.url) this.connectWithUrl();
                 }, delay);
@@ -74,14 +74,29 @@ class GroupMemberWebSocket extends EventEmitter {
     }
 
     connect(backendUrl: string, groupId: string, token: string) {
-        if (this.isConnecting) return;
-        if (this.ws && (this.ws.readyState !== WebSocket.OPEN && this.ws.readyState !== WebSocket.CONNECTING)) return;
-
         const newWsUrl = this.buildWsUrl(backendUrl, groupId, token);
-        if (this.url && this.url !== newWsUrl) this.disconnect();
+
+        if (this.url === newWsUrl && this.ws?.readyState === WebSocket.OPEN) return;
+
+        if (this.url !== newWsUrl) {
+            this.shouldReconnect = false; 
+            
+            if (this.ws) {
+                this.ws.close();
+                this.ws = null;
+            }
+        }
 
         this.url = newWsUrl;
+        this.token = token;
+        this.groupId = groupId;
+        this.backendUrl = backendUrl;
         this.isConnecting = true;
+        this.shouldReconnect = true;
+        this.reconnectAttempts = 0;
+        this.messageQueue = [];
+        this.ws = new WebSocket(this.url);
+        
         this.bindEvents();
     }
 

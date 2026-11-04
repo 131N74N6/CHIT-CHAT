@@ -29,7 +29,7 @@ export default function UserProfilePopUp(props: IUserProfilePopUp) {
     }
 
     return (
-        <section className="flex flex-col w-full md:w-3/4 h-full overflow-y-auto border border-gray-400">
+        <section className="h-full flex flex-col w-full">
             {props.isLoading ? (
                 <div className="flex justify-center items-center h-full">
                     <Loading/>
@@ -66,7 +66,7 @@ export default function UserProfilePopUp(props: IUserProfilePopUp) {
                     </div>
                     <div className="flex justify-center">
                         <div className="w-20 h-20 rounded-full">
-                            {props.image_public_id ? (
+                            {props.image_public_id && props.image_public_id !== "-" ? (
                                 <div className="w-full h-full rounded-full">
                                     <img
                                         alt={props.image_public_id}

@@ -43,6 +43,7 @@ export default function useUserProfileService() {
     const profilePicture = useUserStore((state) => state.profilePicture);
     const setProfilePicture = useUserStore((state) => state.setProfilePicture);
 
+    const profilePictureUrl = useUserStore((state) => state.profilePicture);
     const setProfilePictureUrl = useUserStore((state) => state.setProfilePictureUrl);
 
     const username = useUserStore((state) => state.username);
@@ -113,6 +114,7 @@ export default function useUserProfileService() {
             }
 
             const allUsersQueryKey = ["all-users"];
+            const currentUserQueryKey = ["current-user"];
             const otherUserQueryKey = [`other-user-${receiverId}`];
 
             if (payload.type === "available-user:changed" || payload.type === "user-profile:changed") {
@@ -132,6 +134,23 @@ export default function useUserProfileService() {
                 if (receiverId === payload.data._id) {
                     queryClient.setQueryData(otherUserQueryKey, (old: any) => {
                         return old ? { ...old, ...payload.data } : payload.data;
+                    });
+                }
+
+                if (currentUserId === payload.data._id) {
+                    queryClient.setQueryData(currentUserQueryKey, (old: any) => {
+                        if (!old) return old;
+                        return {
+                            ...old,
+                            user_name: payload.data.name,
+                            address: payload.data.address,
+                            gender: payload.data.gender,
+                            description: payload.data.description,
+                            profile_picture: {
+                                public_id: payload.data.image_public_id,
+                                url: payload.data.image,
+                            },
+                        };
                     });
                 }
             } else if (payload.type === "available-user:deleted" || payload.type === "user-profile:deleted") {
@@ -165,6 +184,21 @@ export default function useUserProfileService() {
                 });
 
                 if (currentUserId === payload.data._id) {
+                    setProfilePictureUrl(payload.data.image === "-" ? null : payload.data.image);
+                }
+
+                if (currentUserId === payload.data._id) {
+                    queryClient.setQueryData(currentUserQueryKey, (old: any) => {
+                        if (!old) return old;
+                        return {
+                            ...old,
+                            profile_picture: {
+                                public_id: payload.data.image_public_id,
+                                url: payload.data.image === "-" ? null : payload.data.image,
+                            }
+                        };
+                    });
+
                     setProfilePictureUrl(payload.data.image === "-" ? null : payload.data.image);
                 }
             }
@@ -217,8 +251,22 @@ export default function useUserProfileService() {
         onSuccess: () => {
             if (fileInputRef.current) fileInputRef.current.value = "";
             
-            queryClient.invalidateQueries({ queryKey: ["all-users"], type: "active" });
-            queryClient.invalidateQueries({ queryKey: ["current-user"], type: "active" });
+            queryClient.invalidateQueries({ queryKey: ["all-users"] });
+            queryClient.invalidateQueries({ queryKey: ["current-user"] });
+            
+            queryClient.setQueryData(["current-user"], (old: any) => {
+                if (!old) return old;
+                return {
+                    ...old,
+                    user_name: username,
+                    address: address,
+                    gender: gender,
+                    description: description,
+                    profile_picture: profilePictureUrl 
+                        ? { url: profilePictureUrl, public_id: old.profile_picture?.public_id || "pending" }
+                        : old.profile_picture,
+                };
+            });
 
             if (groupIds.length > 0) {
                 groupIds.map((group_id) => {

@@ -77,14 +77,11 @@ const groupProfileRouters = new Elysia({ prefix: "/api/v1/groups" })
                 return;
             }
 
-            const room1 = `group-profile-${groupId}`;
-            const room2 = `joined-group-${userId}`;
-
             const handler = (data: any) => ws.send(JSON.stringify(data));
 
             const subscriptions: TGroupProfile["wsSubscription"][] = [
-                { room_name: room1, room_handler: handler }, 
-                { room_name: room2, room_handler: handler }
+                { room_name: `group-profile-${groupId}`, room_handler: handler }, 
+                { room_name: `joined-group-${userId}`, room_handler: handler }
             ]
 
             subscriptions.forEach((subscription) => {

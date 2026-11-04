@@ -84,7 +84,7 @@ class UserProfileService {
             address: newAddress,
             gender: newGender,
             description: newDescription,
-            image: newProfileImage?.url,
+            image: newProfileImage.url,
             image_filename: newProfileImage.file_name,
             image_filetype: newProfileImage.file_type,
             image_public_id: newProfileImage.public_id,
@@ -92,52 +92,48 @@ class UserProfileService {
             name: newUsername
         });
 
-        const forAvailableUserRoom = {
-            _id: currentUserId, 
-            name: newUsername, 
-            image: newProfileImage?.url, 
-            image_public_id: newProfileImage?.public_id
-        };
-
-        const forCurrentUserProfileRoom = {
-            _id: currentUserId, 
-            name: newUsername,
-            address: newAddress,
-            gender: newGender,
-            description: newDescription,
-            image: newProfileImage?.url, 
-            image_public_id: newProfileImage?.public_id,
-            updated_at: new Date()
-        };
-
-        const forGroupChatRoom = { 
-            _id: currentUserId, 
-            sender_id: currentUserId, 
-            sender_name: newUsername
-        }
-
-        const forGroupMemberRoom = { 
-            _id: currentUserId, 
-            name: newUsername
-        }
-
         if (user.group_ids && user.group_ids.length > 0) {
             user.group_ids.map((group_id) => {
-                const room = `member-from-group-${group_id.toString()}`;
                 groupChatEvent.emit(group_id.toString(), { 
-                    data: forGroupChatRoom, type: "group-message-owner:changed" 
+                    data: { 
+                        _id: currentUserId, 
+                        sender_id: currentUserId, 
+                        sender_name: newUsername
+                    }, 
+                    type: "group-message-owner:changed" 
                 });
-                groupMemberEvent.emit(room, { data: forGroupMemberRoom, type: "member-profile:changed" });
+
+                groupMemberEvent.emit(`member-from-group-${group_id.toString()}`, { 
+                    data: { 
+                        _id: currentUserId, 
+                        name: newUsername
+                    }, 
+                    type: "member-profile:changed" 
+                });
             });
         }
 
         userProfileEvent.emit(`available-user-${currentUserId}`, { 
-            data: forAvailableUserRoom, 
+            data: {
+                _id: currentUserId, 
+                name: newUsername, 
+                image: newProfileImage.url, 
+                image_public_id: newProfileImage.public_id
+            }, 
             type: "available-user:changed" 
         });
 
         userProfileEvent.emit(`current-user-profile-${currentUserId}`, { 
-            data: forCurrentUserProfileRoom, 
+            data: {
+                _id: currentUserId, 
+                name: newUsername,
+                address: newAddress,
+                gender: newGender,
+                description: newDescription,
+                image: newProfileImage.url, 
+                image_public_id: newProfileImage.public_id,
+                updated_at: new Date()
+            }, 
             type: "user-profile:changed" 
         });
     }

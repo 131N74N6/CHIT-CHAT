@@ -84,14 +84,11 @@ export default function useAuthService() {
         if (getCurrentUser.data && getCurrentUser.data.user_id) {
             setCurrentUserId(getCurrentUser.data.user_id);
         }
-    }, [getCurrentUser.data?.user_id, setCurrentUserId]);
-
-    useEffect(() => {
-        if (!getCurrentUser.data) return;
-        if (getCurrentUser.data.group_ids && getCurrentUser.data.group_ids.length > 0) {
+        
+        if (getCurrentUser.data && getCurrentUser.data.group_ids) {
             setGroupIds(getCurrentUser.data.group_ids);
         }
-    }, [getCurrentUser.data?.group_ids, getCurrentUser.data?.group_ids?.length, setGroupIds]);
+    }, [getCurrentUser.data?.user_id, setCurrentUserId]);
 
     const signInMt = useMutation({
         mutationFn: async () => {

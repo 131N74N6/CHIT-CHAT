@@ -12,7 +12,7 @@ class GroupProfileWebSocket extends EventEmitter {
     private backendUrl = "";
     private token = "";
 
-    private isConnecting = false;
+    protected isConnecting = false;
     private messageQueue: any[] = [];
     private shouldReconnect = true;
 
@@ -66,21 +66,37 @@ class GroupProfileWebSocket extends EventEmitter {
     }
 
     private buildWsUrl(backendUrl: string, groupId: string, token: string) {
-        const wsProtocol = backendUrl.includes("https") ? "wss:" : "ws:";
+        const wsProtocol = backendUrl.startsWith("https") ? "wss:" : "ws:";
         const backendHost = backendUrl.replace(/^https?:\/\//, "");
         const encodedToken = encodeURIComponent(token);
-        return `${wsProtocol}//${backendHost}/api/v1/groups/ws?group_id=${groupId}&token=${encodedToken}`;
+        const wsUrl = `${wsProtocol}//${backendHost}/api/v1/groups/ws?group_id=${groupId}&token=${encodedToken}`;
+        return wsUrl;
     }
     
     connect(backendUrl: string, groupId: string, token: string) {
-        if (this.isConnecting) return;
-        if (this.ws && (this.ws.readyState !== WebSocket.OPEN && this.ws.readyState !== WebSocket.CONNECTING)) return;
-
         const newWsUrl = this.buildWsUrl(backendUrl, groupId, token);
-        if (this.url && this.url !== newWsUrl) this.disconnect();
+
+        if (this.url === newWsUrl && this.ws?.readyState === WebSocket.OPEN) return;
+
+        if (this.url !== newWsUrl) {
+            this.shouldReconnect = false; 
+            
+            if (this.ws) {
+                this.ws.close();
+                this.ws = null;
+            }
+        }
 
         this.url = newWsUrl;
-        this.isConnecting = true
+        this.token = token;
+        this.groupId = groupId;
+        this.backendUrl = backendUrl;
+        this.isConnecting = true;
+        this.shouldReconnect = true;
+        this.reconnectAttemps = 0;
+        this.messageQueue = [];
+        this.ws = new WebSocket(this.url);
+        
         this.bindEvents();
     }
     

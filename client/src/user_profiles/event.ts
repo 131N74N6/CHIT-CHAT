@@ -1,26 +1,26 @@
-import EventEmitter from "eventemitter3";
+import { EventEmitter } from "eventemitter3";
 
 class UserProfileWebSocket extends EventEmitter {
     private ws: WebSocket | null = null;
-    private url: string | null = "";
+    private url: string | null = null;
 
-    private reconnectAttemps = 0;
-    private maxReconnectAttemps = 5;
+    private reconnectAttempts = 0;
+    private maxReconnectAttempts = 5;
     private reconnectDelay = 1000;
 
     private messageQueue: any[] = [];
-    private isConnecting = false;
+    protected isConnecting = false;
     private shouldReconnect = true;
 
-    private token = "";
-    private backendUrl = "";
-    private userId = "";
+    private token: string = "";
+    private backendUrl: string = "";
+    private userId: string = "";
 
     private bindEvents() {
         if (!this.ws) return;
 
         this.ws.onopen = () => {
-            this.reconnectAttemps = 0;
+            this.reconnectAttempts = 0;
             this.isConnecting = false;
             this.emit("connected", { message: "You're connected", type: "connected" });
 
@@ -51,9 +51,9 @@ class UserProfileWebSocket extends EventEmitter {
             this.isConnecting = false;
             this.emit("disconnected");
 
-            if (this.shouldReconnect && (this.reconnectAttemps < this.maxReconnectAttemps)) {
-                this.reconnectAttemps++;
-                const delay = this.reconnectDelay * Math.pow(2, this.reconnectAttemps - 1);
+            if (this.shouldReconnect && (this.reconnectAttempts < this.maxReconnectAttempts)) {
+                this.reconnectAttempts++;
+                const delay = this.reconnectDelay * Math.pow(2, this.reconnectAttempts - 1);
 
                 this.emit("reconnecting", { message: "Reconnecting..." });
                 setTimeout(() => {
@@ -66,7 +66,7 @@ class UserProfileWebSocket extends EventEmitter {
     }
 
     private buildWsUrl(token: string, backendUrl: string) {
-        const wsProtocol = backendUrl.includes("https") ? "wss:" : "ws:";
+        const wsProtocol = backendUrl.startsWith("https") ? "wss:" : "ws:";
         const backendHost = backendUrl.replace(/^https?:\/\//, "");
         const encodedToken = encodeURIComponent(token);
         const wsUrl = `${wsProtocol}//${backendHost}/api/v1/users/ws?token=${encodedToken}`;
@@ -74,22 +74,27 @@ class UserProfileWebSocket extends EventEmitter {
     }
 
     connect(token: string, backendUrl: string, userId: string) {
-        if (this.isConnecting) return;
-
-        if (this.ws && (this.ws.readyState === WebSocket.CONNECTING || this.ws.readyState === WebSocket.OPEN)) {
-            return;
-        }
-
         const newWsUrl = this.buildWsUrl(token, backendUrl);
-        
-        if (this.url && this.url !== newWsUrl) {
-            this.disconnected();
+
+        if (this.url === newWsUrl && this.ws?.readyState === WebSocket.OPEN) return;
+
+        if (this.url !== newWsUrl) {
+            this.shouldReconnect = false; 
+            
+            if (this.ws) {
+                this.ws.close();
+                this.ws = null;
+            }
         }
 
         this.url = newWsUrl;
+        this.token = token;
+        this.userId = userId;
+        this.backendUrl = backendUrl;
         this.isConnecting = true;
         this.shouldReconnect = true;
-        this.userId = userId;
+        this.reconnectAttempts = 0;
+        this.messageQueue = [];
         this.ws = new WebSocket(this.url);
         
         this.bindEvents();

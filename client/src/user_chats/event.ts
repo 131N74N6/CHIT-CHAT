@@ -22,9 +22,9 @@ class UserChatWebSocket extends EventEmitter {
         this.ws.onopen = () => {
             this.reconnectAttempts = 0;
             this.isConnecting = false;
-            this.emit("connected", { type: "connected", message: "You're connected" });
+            this.emit("connected", { message: "You're connected", type: "connected" });
 
-            this.messageQueue.forEach(msg => this.ws?.send(msg));
+            this.messageQueue.forEach((message) => this.ws?.send(message));
             this.messageQueue = [];
         }
 
@@ -67,7 +67,7 @@ class UserChatWebSocket extends EventEmitter {
 
     private buildWsUrl(token: string, otherUserId: string, backendUrl: string) {
         const wsProtocol = backendUrl.startsWith("https") ? "wss:" : "ws:";
-        const backendHost = backendUrl.replace(/^https?:\/\//, '');
+        const backendHost = backendUrl.replace(/^https?:\/\//, "");
         const encodedToken = encodeURIComponent(token);
         const wsUrl = `${wsProtocol}//${backendHost}/api/v1/user-chats/ws/${otherUserId}?token=${encodedToken}`;
         return wsUrl;
