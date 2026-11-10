@@ -2,7 +2,7 @@ import { ObjectId } from "mongodb";
 import { TGroupMember } from "./model";
 import { ChitChatApiError } from "../error/service";
 import groupMemberRepository from "./repository";
-import { groupMemberEvent } from "./event";
+import { groupMemberEvent } from "./websocket";
 
 class GroupMemberService {
     private checkIsIdValid(field: string, value: unknown) {

@@ -3,7 +3,7 @@ import { ChitChatApiError } from "../error/service";
 import userProfileRepository from "./repository";
 import { v2 } from "cloudinary";
 import { groupChatWS } from "../group_chats/websocket";
-import { groupMemberEvent } from "../group_members/event";
+import { groupMemberEvent } from "../group_members/websocket";
 import { userProfileEvent } from "./sse";
 import { TUserProfile } from "./model";
 import { uploadToCloudinary } from "../cloudinary/service";
@@ -113,7 +113,7 @@ class UserProfileService {
             });
         }
 
-        userProfileEvent.emit(`available-user-${currentUserId}`, { 
+        userProfileEvent.emit("available-user", { 
             data: {
                 _id: currentUserId, 
                 name: newUsername, 
@@ -123,7 +123,7 @@ class UserProfileService {
             type: "available-user:changed" 
         });
 
-        userProfileEvent.emit(`current-user-profile-${currentUserId}`, { 
+        userProfileEvent.emit(`user-profile-${currentUserId}`, { 
             data: {
                 _id: currentUserId, 
                 name: newUsername,
@@ -199,7 +199,7 @@ class UserProfileService {
             }
         }
 
-        userProfileEvent.emit(`available-user-${userId}`, { data: result, type: "available-user:deleted" });
+        userProfileEvent.emit("available-user", { data: result, type: "available-user:deleted" });
     }
 
     async deleteUserProfilePicture(id: string) {
@@ -232,11 +232,11 @@ class UserProfileService {
             });
         }
 
-        userProfileEvent.emit(`available-user-${userId}`, { 
+        userProfileEvent.emit("available-user", { 
             data: broadcastedData, type: "available-user-profile-picture:deleted" 
         });
 
-        userProfileEvent.emit(`current-user-profile-${userId}`, { 
+        userProfileEvent.emit(`user-profile-${userId}`, { 
             data: broadcastedData, type: "user-profile-picture:deleted" 
         });
     }

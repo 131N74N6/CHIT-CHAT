@@ -3,7 +3,7 @@ import { apiAuthMiddleware } from "../auth/middleware";
 import groupMemberController from "./controller";
 import { groupMemberSchema } from "./model";
 import { validateSession } from "../auth/service";
-import { groupMemberEvent } from "./event";
+import { groupMemberEvent } from "./websocket";
 
 const wsContext = new WeakMap<any, { roomId: string; handler: (data: any) => void }>();
 

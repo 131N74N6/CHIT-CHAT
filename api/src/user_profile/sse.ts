@@ -101,7 +101,7 @@ export const createUserSSEStream = (userId: string) => {
         }
 
         send("current-user-profile:changed", data);
-    };
+    }
 
     const stream = new ReadableStream<Uint8Array>({
         start(c) {
@@ -114,8 +114,8 @@ export const createUserSSEStream = (userId: string) => {
                 user_id: userId,
             });
 
-            subscribe(`available-user-${userId}`, availableHandler);
-            subscribe(`current-user-profile-${userId}`, currentHandler);
+            subscribe("available-user", availableHandler);
+            subscribe(`user-profile-${userId}`, currentHandler);
 
             heartbeat = setInterval(() => {
                 if (!controller) return;

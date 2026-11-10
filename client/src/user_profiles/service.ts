@@ -213,6 +213,7 @@ export default function useUserProfileService() {
         setProfilePictureUrl(previewUrl);
         if (fileInputRef.current) fileInputRef.current.value = "";
     }
+    
     const showUsers = useInfiniteQuery({
         enabled: !!currentUserId,
         getNextPageParam: (lastPage, allPages) => {

@@ -69,7 +69,6 @@ export default function useAuthService() {
             }
 
             const user = meResponse.data;
-            console.log(meResponse.data);
 
             return { 
                 address: user.address, 

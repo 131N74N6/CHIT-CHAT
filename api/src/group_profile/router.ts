@@ -2,10 +2,8 @@ import Elysia, { t } from "elysia";
 import { apiAuthMiddleware } from "../auth/middleware";
 import groupProfileController from "./controller";
 import { groupProfileSchema, TGroupProfile } from "./model";
-import { validateSession } from "../auth/service";
-import { groupProfileEvent } from "./sse";
-
-const wsContext = new WeakMap<any, TGroupProfile["wsSubscription"][]>();
+import { createGroupProfileErrorStream, createGroupProfileSSEStream, groupProfileSSEHeaders } from "./sse";
+import { authServiceApi } from "../auth/service";
 
 const groupProfileRouters = new Elysia({ prefix: "/api/v1/groups" })
 .use(apiAuthMiddleware)
@@ -15,6 +13,15 @@ const groupProfileRouters = new Elysia({ prefix: "/api/v1/groups" })
     });
 }, {
     query: t.Pick(groupProfileSchema.deleteGroup, ["group_id"])
+})
+.get("/sse/:group_id", async (context) => {
+    const session = await authServiceApi.api.getSession({ headers: context.request.headers });
+    if (!session) return new Response(createGroupProfileErrorStream(), { headers: groupProfileSSEHeaders });
+
+    const stream = createGroupProfileSSEStream(context.params.group_id, session.user.id);
+    return new Response(stream, { headers: groupProfileSSEHeaders });
+}, {
+    params: t.Pick(groupProfileSchema.deleteGroup, ["group_id"])
 })
 .get("/", async (context) => {
     return await groupProfileController.showAllGroups({ ...context.query, user_id: context.user.id });
@@ -53,58 +60,6 @@ const groupProfileRouters = new Elysia({ prefix: "/api/v1/groups" })
     });
 }, {
     params: t.Pick(groupProfileSchema.changeGroupRaw, ["_id"])
-})
-.ws("/ws", {
-    query: groupProfileSchema.wsConfig,
-    
-    async open(ws) {
-        try {
-            const groupId = ws.data.query.group_id;
-            const token = ws.data.query.token;
-            const session = await validateSession(token);
-
-            if (!session || !session.user) {
-                ws.send(JSON.stringify({ message: "you are not allowed to access", type: "error" }));
-                ws.close(4001, "you are not allowed to access");
-                return;
-            }
-
-            const userId = session.user.id;
-
-            if (!userId || !groupId || typeof userId !== "string" || typeof groupId !== "string") {
-                ws.send(JSON.stringify({ message: "invalid group or user", type: "error" }));
-                ws.close(4002, "invalid group or user");
-                return;
-            }
-
-            const handler = (data: any) => ws.send(JSON.stringify(data));
-
-            const subscriptions: TGroupProfile["wsSubscription"][] = [
-                { room_name: `group-profile-${groupId}`, room_handler: handler }, 
-                { room_name: `joined-group-${userId}`, room_handler: handler }
-            ]
-
-            subscriptions.forEach((subscription) => {
-                groupProfileEvent.on(subscription.room_name, subscription.room_handler);
-            });
-
-            wsContext.set(ws, subscriptions);
-        } catch (error) {
-            ws.send(JSON.stringify({ message: "internal error", type: "error" }));
-            ws.close(4003, "internal error");
-        }
-    },
-
-    close(ws) {
-        const subscriptions = wsContext.get(ws);
-            
-        if (subscriptions) {
-            subscriptions.forEach((subscription) => {
-                groupProfileEvent.off(subscription.room_name, subscription.room_handler);
-            });
-            wsContext.delete(ws);
-        }
-    }
 });
 
 export default groupProfileRouters;
