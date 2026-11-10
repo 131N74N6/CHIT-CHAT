@@ -13,6 +13,7 @@ import { useUserStore } from "../user_profiles/store";
 import { useGroupChatStore } from "../group_chats/store";
 import { useGroupMemberStore } from "../group_member/store";
 import { useGroupProfileStore } from "../group_profiles/store";
+import { apiRequest } from "../api";
 
 export default function useAuthService() {
     const navigate = useNavigate();
@@ -58,23 +59,31 @@ export default function useAuthService() {
     const getCurrentUser = useQuery({
         queryKey: ["current-user"],
         queryFn: async () => {
-            const request = await authServiceClient.getSession();
-            if (request.error || !request.data) return null;
+            const [sessionResponse, meResponse] = await Promise.all([
+                authServiceClient.getSession(),
+                apiRequest<any>("/api/v1/users/me", { method: "GET" }),
+            ]);
+
+            if (sessionResponse.error || !meResponse.data) {
+                return null;
+            }
+
+            const user = meResponse.data;
 
             return { 
-                address: request.data.user.address, 
-                created_at: request.data.user.createdAt,
-                description: request.data.user.description,
-                email: request.data.user.email,
-                gender: request.data.user.gender, 
-                group_ids: request.data.user.group_ids,
+                address: user.data.user.address, 
+                created_at: user.data.user.createdAt,
+                description: user.data.user.description,
+                email: user.data.user.email,
+                gender: user.data.user.gender, 
+                group_ids: user.data.user.group_ids,
                 profile_picture: {
-                    public_id: request.data.user.image_public_id,
-                    url: request.data.user.image,
+                    public_id: user.data.user.image_public_id,
+                    url: user.data.user.image,
                 },
-                user_id: request.data.user.id,
-                user_name: request.data.user.name,
-                user_session: request.data.session
+                user_id: user.data.user.id,
+                user_name: user.data.user.name,
+                user_session: sessionResponse.data?.session ?? null
             }
         },
         retry: false
@@ -85,7 +94,7 @@ export default function useAuthService() {
             setCurrentUserId(getCurrentUser.data.user_id);
         }
         
-        if (getCurrentUser.data && getCurrentUser.data.group_ids) {
+        if (getCurrentUser.data && getCurrentUser.data.group_ids && getCurrentUser.data.group_ids.length > 0) {
             setGroupIds(getCurrentUser.data.group_ids);
         }
     }, [getCurrentUser.data?.user_id, setCurrentUserId]);

@@ -2,7 +2,7 @@ import Elysia, { t } from "elysia";
 import { apiAuthMiddleware } from "../auth/middleware";
 import userChatController from "./controller";
 import { userChatSchema } from "./model";
-import { userChatEvent } from "./event";
+import { userChatWS } from "./websocket";
 import { validateSession } from "../auth/service";
 
 const wsContext = new WeakMap<any, { roomId: string; handler: (data: any) => void }>();
@@ -76,7 +76,7 @@ const userChatRouters = new Elysia({ prefix: "/api/v1/user-chats" })
             const roomId = [senderId, receiverId].sort().join("_");
             const handler = (data: any) => ws.send(JSON.stringify(data));
 
-            userChatEvent.on(roomId, handler);
+            userChatWS.on(roomId, handler);
             wsContext.set(ws, { roomId, handler });
             
             ws.send(JSON.stringify({ type: "connected", message: "You're connected" }));
@@ -89,7 +89,7 @@ const userChatRouters = new Elysia({ prefix: "/api/v1/user-chats" })
     close(ws) {
         const ctx = wsContext.get(ws);
         if (ctx) {
-            userChatEvent.off(ctx.roomId, ctx.handler);
+            userChatWS.off(ctx.roomId, ctx.handler);
             wsContext.delete(ws);
         }
     }

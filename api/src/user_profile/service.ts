@@ -2,7 +2,7 @@ import { ObjectId } from "mongodb";
 import { ChitChatApiError } from "../error/service";
 import userProfileRepository from "./repository";
 import { v2 } from "cloudinary";
-import { groupChatEvent } from "../group_chats/event";
+import { groupChatWS } from "../group_chats/websocket";
 import { groupMemberEvent } from "../group_members/event";
 import { userProfileEvent } from "./event";
 import { TUserProfile } from "./model";
@@ -94,7 +94,7 @@ class UserProfileService {
 
         if (user.group_ids && user.group_ids.length > 0) {
             user.group_ids.map((group_id) => {
-                groupChatEvent.emit(group_id.toString(), { 
+                groupChatWS.emit(group_id.toString(), { 
                     data: { 
                         _id: currentUserId, 
                         sender_id: currentUserId, 
@@ -188,7 +188,7 @@ class UserProfileService {
             
                 if (yourGroupProfile.owner_id.toString() === userId) {
                     await userProfileRepository.deleteYourGroups(userId);
-                    groupChatEvent.emit(groupId, { data: result, type: "group-message-owner:deleted" });
+                    groupChatWS.emit(groupId, { data: result, type: "group-message-owner:deleted" });
                 } else {
                     await userProfileRepository.leftGroup(groupId);
             

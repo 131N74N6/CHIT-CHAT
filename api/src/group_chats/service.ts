@@ -1,6 +1,6 @@
 import { TGroupChats } from "./model";
 import groupChatRepository from "./repository";
-import { groupChatEvent } from "./event";
+import { groupChatWS } from "./websocket";
 import { ObjectId } from "mongodb";
 import { ChitChatApiError } from "../error/service";
 import { v2 } from "cloudinary";
@@ -85,7 +85,7 @@ class GroupChatService {
             _id: id, group_id: groupId, sender_id: senderId, text: text 
         });
 
-        groupChatEvent.emit(groupId, { data: edited, type: "group-message:changed" });
+        groupChatWS.emit(groupId, { data: edited, type: "group-message:changed" });
     }
     
     async clearAllMessages(props: Omit<TGroupChats["deleteMessage"], "message_ids">) {
@@ -210,7 +210,7 @@ class GroupChatService {
         const affectedIds = deleteOwnMessagesTemporary.map((message) => message._id.toString());
 
         if (affectedIds.length > 0) {
-            groupChatEvent.emit(groupId, { data: affectedIds, type: "group-message:deleted" });
+            groupChatWS.emit(groupId, { data: affectedIds, type: "group-message:deleted" });
         }
     }
 
@@ -272,7 +272,7 @@ class GroupChatService {
         const affectedIds = deleteOwnMessagesTemporary.map((message) => message._id.toString());
 
         if (affectedIds.length > 0) {
-            groupChatEvent.emit(groupId, { data: affectedIds, type: "group-message:deleted" });
+            groupChatWS.emit(groupId, { data: affectedIds, type: "group-message:deleted" });
         }
     }
 
@@ -328,7 +328,7 @@ class GroupChatService {
             text: text
         });
 
-        groupChatEvent.emit(groupId, { data: message, type: "group-message:sent" });
+        groupChatWS.emit(groupId, { data: message, type: "group-message:sent" });
     }
 
     async showAllMessages(props: Omit<TGroupChats["additionalFilter"], "skip">) {

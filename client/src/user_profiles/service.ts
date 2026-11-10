@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useUserChatStore } from "../user_chats/store";
 import { useUserStore } from "./store";
 import { useNavbarStore } from "../navbar/store";
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { useMessageStore } from "../alert/store";
 import { apiRequest, apiUpload } from "../api";
 import type { UserDetail, Users } from "./model";
@@ -11,7 +11,6 @@ import { useGroupChatStore } from "../group_chats/store";
 import { useGroupMemberStore } from "../group_member/store";
 import { useGroupProfileStore } from "../group_profiles/store";
 import { useChatbotStore } from "../chatbot/store";
-import { userProfileWebSocket } from "./event";
 
 export default function useUserProfileService() {
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -58,178 +57,234 @@ export default function useUserProfileService() {
     const receiverId = useUserChatStore((state) => state.receiverId);
 
     const resetNavbarState = useNavbarStore((state) => state.resetNavbarState);
+    const receiverIdRef = useRef(receiverId);
 
-    const getSessionToken = useQuery({
-        enabled: !!currentUserId,
-        queryFn: async () => {
-            const response = await apiRequest<string>("/api/v1/users/session", { method: "GET" });
-            return response.data;
-        },
-        queryKey: [`user-session-token-${currentUserId}`],
-        retry: 3,
-        retryDelay: 1000,
-    });
+    useEffect(() => {
+        receiverIdRef.current = receiverId;
+    }, [receiverId]);
+
+    const mergeCurrentUser = useCallback((old: any, incoming: any) => {
+        if (!old && !incoming) return old;
+        if (!old) return incoming;
+
+        return {
+            ...old,
+            ...incoming,
+            profile_picture: {
+                ...(old.profile_picture ?? {}),
+                ...(incoming.profile_picture ?? {}),
+            },
+        };
+    }, []);
+
+    const patchAllUsers = useCallback((userId: string, patch: Record<string, any>) => {
+        queryClient.setQueryData(["all-users"], (old: any) => {
+            if (!old?.pages) return old;
+
+            return {
+                ...old,
+                pages: old.pages.map((page: any[]) =>
+                    page.map((user) =>
+                        user._id === userId
+                            ? { ...user, ...patch }
+                            : user
+                    )
+                ),
+            };
+        });
+    }, [queryClient]);
+
+    const removeAllUsers = useCallback((userId: string) => {
+        queryClient.setQueryData(["all-users"], (old: any) => {
+            if (!old?.pages) return old;
+
+            return {
+                ...old,
+                pages: old.pages.map((page: any[]) =>
+                    page.filter((user) => user._id !== userId)
+                ),
+            };
+        });
+    }, [queryClient]);
 
     useEffect(() => {
         if (!currentUserId) return;
-        if (getSessionToken.isLoading || !getSessionToken.data) return;
-        
-        const token = getSessionToken.data;
 
-        if (!token || typeof token !== "string") {
-            setMessage("authentication failed");
-            return;
-        }
+        const baseUrl = (import.meta.env.VITE_BASE_API_URL ?? "").replace(/\/$/, "");
+        const es = new EventSource(`${baseUrl}/api/v1/users/sse`, { withCredentials: true });
 
-        const apiUrl = import.meta.env.VITE_BASE_API_URL;
-        userProfileWebSocket.enableReconnect();
-        userProfileWebSocket.connect(token, apiUrl, currentUserId);
-
-        const handleConnected = (payload: any) => {
-            setMessage(payload.message);
-        }
-
-        const handleDisconnected = () => {
-            //
-        }
-
-        const handleError = (payload: any) => {
-            const message = payload.message;
-            setMessage(message);
-
-            if (message.includes("not allowed") || message.includes("Invalid user")) {
-                userProfileWebSocket.disconnected();
+        const parseEvent = (event: MessageEvent) => {
+            try {
+                return JSON.parse(event.data);
+            } catch {
+                return null;
             }
-        }
+        };
 
-        const handleMaxRetries = (payload: any) => {
-            setMessage(payload.message);
-            userProfileWebSocket.disconnected();
-        }
-
-        const handleMessage = (payload: any) => {
-            if (payload.type === "error") {
-                setMessage(payload.message);
-                return;
+        const onConnected = (event: MessageEvent) => {
+            const data = parseEvent(event);
+            if (data?.message) {
+                setMessage(data.message);
             }
+        };
 
-            const allUsersQueryKey = ["all-users"];
-            const currentUserQueryKey = ["current-user"];
-            const otherUserQueryKey = [`other-user-${receiverId}`];
+        const onAuthError = (event: MessageEvent) => {
+            const data = parseEvent(event);
+            setMessage(data?.message ?? "authentication failed");
+            es.close();
+            navigate("/sign-in");
+        };
 
-            if (payload.type === "available-user:changed" || payload.type === "user-profile:changed") {
-                queryClient.setQueryData(allUsersQueryKey, (old: any) => {
-                    if (!old?.pages) return old;
+        const onCurrentProfileChanged = (event: MessageEvent) => {
+            const data = parseEvent(event);
+            if (!data) return;
 
-                    return {
+            queryClient.setQueryData(["current-user"], (old: any) =>
+                mergeCurrentUser(old, data)
+            );
+        };
+
+        const onAvailableUserChanged = (event: MessageEvent) => {
+            const data = parseEvent(event);
+            if (!data?._id) return;
+
+            patchAllUsers(data._id, {
+                name: data.name,
+                image: data.image,
+                image_public_id: data.image_public_id,
+            });
+
+            if (receiverIdRef.current === data._id) {
+                queryClient.setQueryData([`other-user-${receiverIdRef.current}`],
+                    (old: any) => old ? {
                         ...old,
-                        pages: old.pages.map((page: any[]) => {
-                            return page.map((user) => {
-                                return (user._id === payload.data._id ? { ...user, ...payload.data } : user)
-                            });
-                        })
-                    }
-                });
-
-                if (receiverId === payload.data._id) {
-                    queryClient.setQueryData(otherUserQueryKey, (old: any) => {
-                        return old ? { ...old, ...payload.data } : payload.data;
-                    });
-                }
-
-                if (currentUserId === payload.data._id) {
-                    queryClient.setQueryData(currentUserQueryKey, (old: any) => {
-                        if (!old) return old;
-                        return {
-                            ...old,
-                            user_name: payload.data.name,
-                            address: payload.data.address,
-                            gender: payload.data.gender,
-                            description: payload.data.description,
-                            profile_picture: {
-                                public_id: payload.data.image_public_id,
-                                url: payload.data.image,
-                            },
-                        };
-                    });
-                }
-            } else if (payload.type === "available-user:deleted" || payload.type === "user-profile:deleted") {
-                queryClient.setQueryData(allUsersQueryKey, (old: any) => {
-                    if (!old) return old;
-
-                    const newMessagePage = old.pages.map((page: any[]) => {
-                        return page.filter((user) => user._id !== payload.data);
-                    });
-
-                    return { ...old, pages: newMessagePage }
-                });
-            } else if (payload.type === "available-user-profile-picture:deleted" || payload.type === "user-profile-picture:deleted") {
-                queryClient.setQueryData(otherUserQueryKey, (old: any) => {
-                    if (!old) return old;
-
-                    return {
-                        ...old,
-                        pages: old.pages.map((page: any[]) => {
-                            return page.map((user) => {
-                                return user._id === payload.data._id ? 
-                                { 
-                                    ...user, 
-                                    image: payload.data.image, 
-                                    image_public_id: payload.data.image_public_id 
-                                } : user
-                            });
-                        })
-                    }
-
-                });
-
-                if (currentUserId === payload.data._id) {
-                    setProfilePictureUrl(payload.data.image === "-" ? null : payload.data.image);
-                }
-
-                if (currentUserId === payload.data._id) {
-                    queryClient.setQueryData(currentUserQueryKey, (old: any) => {
-                        if (!old) return old;
-                        return {
-                            ...old,
-                            profile_picture: {
-                                public_id: payload.data.image_public_id,
-                                url: payload.data.image === "-" ? null : payload.data.image,
-                            }
-                        };
-                    });
-
-                    setProfilePictureUrl(payload.data.image === "-" ? null : payload.data.image);
-                }
+                        name: data.name,
+                        image: data.image,
+                        image_public_id: data.image_public_id,
+                    } : data
+                );
             }
-        }
+        };
 
-        const handleReconnecting = (payload: any) => {
-            setMessage(payload.message);
-        }
+        const onAvailableUserDeleted = (event: MessageEvent) => {
+            const data = parseEvent(event);
+            const userId =
+                typeof data === "string" ? data : data?.user_id;
 
-        userProfileWebSocket.on("connected", handleConnected);
-        userProfileWebSocket.on("disconnected", handleDisconnected);
-        userProfileWebSocket.on("error", handleError);
-        userProfileWebSocket.on("max_retries", handleMaxRetries);
-        userProfileWebSocket.on("message", handleMessage);
-        userProfileWebSocket.on("reconnecting", handleReconnecting);
+            if (typeof userId === "string") {
+                removeAllUsers(userId);
+            }
+        };
+
+        const onCurrentProfileDeleted = () => {
+            queryClient.setQueryData(["current-user"], null);
+        };
+
+        const onCurrentProfilePictureDeleted = (event: MessageEvent) => {
+            const data = parseEvent(event);
+            if (!data) return;
+
+            queryClient.setQueryData(["current-user"], (old: any) =>
+                mergeCurrentUser(old, data)
+            );
+
+            setProfilePictureUrl(
+                data.profile_picture?.url ?? null
+            );
+        };
+
+        const onAvailableProfilePictureDeleted = (event: MessageEvent) => {
+            const data = parseEvent(event);
+            if (!data?._id) return;
+
+            patchAllUsers(data._id, {
+                image: data.image,
+                image_public_id: data.image_public_id,
+            });
+
+            if (receiverIdRef.current === data._id) {
+                queryClient.setQueryData([`other-user-${receiverIdRef.current}`],
+                    (old: any) => old ? {
+                        ...old,
+                        image: data.image,
+                        image_public_id: data.image_public_id,
+                    } : old
+                );
+            }
+        };
+
+        es.addEventListener("connected", onConnected);
+        es.addEventListener("auth-error", onAuthError);
+        es.addEventListener(
+            "current-user-profile:changed",
+            onCurrentProfileChanged
+        );
+        es.addEventListener(
+            "available-user:changed",
+            onAvailableUserChanged
+        );
+        es.addEventListener(
+            "available-user:deleted",
+            onAvailableUserDeleted
+        );
+        es.addEventListener(
+            "current-user-profile:deleted",
+            onCurrentProfileDeleted
+        );
+        es.addEventListener(
+            "current-user-profile-picture:deleted",
+            onCurrentProfilePictureDeleted
+        );
+        es.addEventListener(
+            "available-user-profile-picture:deleted",
+            onAvailableProfilePictureDeleted
+        );
+
+        es.onerror = () => {
+            if (es.readyState === EventSource.CLOSED) {
+                setMessage("profile realtime connection closed");
+            }
+        };
 
         return () => {
-            userProfileWebSocket.off("connected", handleConnected);
-            userProfileWebSocket.off("disconnected", handleDisconnected);
-            userProfileWebSocket.off("error", handleError);
-            userProfileWebSocket.off("max_retries", handleMaxRetries);
-            userProfileWebSocket.off("message", handleMessage);
-            userProfileWebSocket.off("reconnecting", handleReconnecting);
+            es.removeEventListener("connected", onConnected);
+            es.removeEventListener("auth-error", onAuthError);
+            es.removeEventListener(
+                "current-user-profile:changed",
+                onCurrentProfileChanged
+            );
+            es.removeEventListener(
+                "available-user:changed",
+                onAvailableUserChanged
+            );
+            es.removeEventListener(
+                "available-user:deleted",
+                onAvailableUserDeleted
+            );
+            es.removeEventListener(
+                "current-user-profile:deleted",
+                onCurrentProfileDeleted
+            );
+            es.removeEventListener(
+                "current-user-profile-picture:deleted",
+                onCurrentProfilePictureDeleted
+            );
+            es.removeEventListener(
+                "available-user-profile-picture:deleted",
+                onAvailableProfilePictureDeleted
+            );
+
+            es.close();
         }
     }, [
-        currentUserId, 
-        getSessionToken.data, 
-        getSessionToken.isLoading, 
-        getSessionToken.error, 
+        currentUserId,
         queryClient,
-        setMessage
+        setMessage,
+        navigate,
+        mergeCurrentUser,
+        patchAllUsers,
+        removeAllUsers,
+        setProfilePictureUrl,
     ]);
 
     const changeUserMt = useMutation({

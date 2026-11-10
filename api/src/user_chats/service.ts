@@ -1,6 +1,6 @@
 import { TUserChat } from "./model";
 import userChatRepository from "./repository";
-import { userChatEvent } from "./event";
+import { userChatWS } from "./websocket";
 import { ChitChatApiError } from "../error/service";
 import { ObjectId } from "mongodb";
 import { v2 } from "cloudinary";
@@ -83,7 +83,7 @@ class UserChatService {
         });
 
         const roomId = this.getRoomId(receiverId, senderId);
-        userChatEvent.emit(roomId, { data: editedMessage, type: "user-message:changed" });
+        userChatWS.emit(roomId, { data: editedMessage, type: "user-message:changed" });
     }
 
     async clearAllMessages(props: Omit<TUserChat["deleteChat"], "message_ids">) {
@@ -183,7 +183,7 @@ class UserChatService {
 
         if (chats.length > 0) {
             const roomId = this.getRoomId(senderId, receiverId);
-            userChatEvent.emit(roomId, { type: "user-message:deleted", data: affectedIds });
+            userChatWS.emit(roomId, { type: "user-message:deleted", data: affectedIds });
         }
     }
 
@@ -238,7 +238,7 @@ class UserChatService {
 
         if (chats.length > 0) {
             const roomId = this.getRoomId(senderId, receiverId);
-            userChatEvent.emit(roomId, { type: "user-message:deleted", data: affectedIds });
+            userChatWS.emit(roomId, { type: "user-message:deleted", data: affectedIds });
         }
     }
 
@@ -292,7 +292,7 @@ class UserChatService {
         });
 
         const roomId = this.getRoomId(senderId, receiverId);
-        userChatEvent.emit(roomId, { data: message, type: "user-message:sent"});
+        userChatWS.emit(roomId, { data: message, type: "user-message:sent"});
     }
 
     async showAllMessages(props: TUserChat["filter"]) {

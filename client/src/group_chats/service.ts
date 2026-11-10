@@ -5,7 +5,7 @@ import type { IGroupMessage, IGroupMessageFiles, IGroupFilePreview } from "./mod
 import { useMessageStore } from "../alert/store";
 import { apiRequest, apiUpload } from "../api";
 import { useUserStore } from "../user_profiles/store";
-import { groupChatWebSocket } from "./event";
+import { groupChatWebSocket } from "./websocket";
 
 export default function useGroupChatService() {
     const queryClient = useQueryClient();

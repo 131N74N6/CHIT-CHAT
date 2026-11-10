@@ -33,7 +33,7 @@ class UserProfileRepository {
             })
         ]);
 
-        return props;
+        return await this.findUserById(props.id);
     }
 
     async deleteUser(id: string) {
@@ -60,6 +60,7 @@ class UserProfileRepository {
                 image_filetype: "-",
                 image_public_id: "-",
                 image_resource_type: "-",
+                updatedAt: new Date()
             }
         }, { returnDocument: "after" });
 

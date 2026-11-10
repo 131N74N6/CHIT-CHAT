@@ -5,7 +5,7 @@ import { useMessageStore } from "../alert/store";
 import { apiRequest, apiUpload } from "../api";
 import type { IFilePreview, IUserChat, IUserChatFiles } from "./model";
 import { useUserStore } from "../user_profiles/store";
-import { userChatWebSocket } from "./event";
+import { userChatWebSocket } from "./websocket";
 
 export default function useUserChatService() {
     const queryClient = useQueryClient();

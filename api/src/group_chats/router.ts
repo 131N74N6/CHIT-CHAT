@@ -3,7 +3,7 @@ import { apiAuthMiddleware } from "../auth/middleware";
 import groupChatController from "./controller";
 import { groupChatSchema } from "./model";
 import { validateSession } from "../auth/service";
-import { groupChatEvent } from "./event";
+import { groupChatWS } from "./websocket";
 
 const wsContext = new WeakMap<any, { roomId: string; handler: (data: any) => void }>();
 
@@ -74,7 +74,7 @@ const groupChatRouters = new Elysia({ prefix: "/api/v1/groups/chats" })
 
             const handler = (data: any) => ws.send(JSON.stringify(data));
 
-            groupChatEvent.on(groupId, handler );
+            groupChatWS.on(groupId, handler );
             wsContext.set(ws, { roomId: groupId, handler });
         } catch (error) {
             ws.send(JSON.stringify({ message: "Connection failed", type: "error" }));
@@ -85,7 +85,7 @@ const groupChatRouters = new Elysia({ prefix: "/api/v1/groups/chats" })
     close(ws) {
         const ctx = wsContext.get(ws);
         if (ctx) {
-            groupChatEvent.off(ctx.roomId, ctx.handler);
+            groupChatWS.off(ctx.roomId, ctx.handler);
             wsContext.delete(ws);
         }
     }
