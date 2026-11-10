@@ -3,7 +3,7 @@ import { TGroupProfile } from "./model";
 import { ChitChatApiError } from "../error/service";
 import groupProfileRepository from "./repository";
 import { uploadToCloudinary } from "../cloudinary/service";
-import { groupProfileEvent } from "./event";
+import { groupProfileEvent } from "./sse";
 import { v2 } from "cloudinary";
 import { CloudinaryUploadResult } from "../cloudinary/model";
 
@@ -190,9 +190,6 @@ class GroupProfileService {
     async deleteGroupProfilePicture(props: TGroupProfile["deleteGroup"]) {
         const groupId = this.checkIsIdValid("group", props.group_id);
         const userId = this.checkIsIdValid("group owner", props.owner_id);
-
-        const room1 = `group-profile-${groupId}`;
-        const room2 = `joined-group-${userId}`;
         
         const group = await groupProfileRepository.findOneGroup(groupId);
         if (!group) throw new ChitChatApiError("group not found", 404);
@@ -209,8 +206,13 @@ class GroupProfileService {
 
         const result = await groupProfileRepository.deleteGroupProfilePicture(groupId);
 
-        groupProfileEvent.emit(room1, { data: result, type: "group-profile-picture:deleted" });
-        groupProfileEvent.emit(room2, { data: result, type: "joined-group-profile-picture:deleted" });
+        groupProfileEvent.emit(`group-profile-${groupId}`, { 
+            data: result, type: "group-profile-picture:deleted" 
+        });
+
+        groupProfileEvent.emit(`joined-group-${userId}`, { 
+            data: result, type: "joined-group-profile-picture:deleted" 
+        });
     }
 
     async showAllGroups(props: TGroupProfile["filter"]) {

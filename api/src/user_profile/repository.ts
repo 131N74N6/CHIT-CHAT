@@ -138,6 +138,7 @@ class UserProfileRepository {
                 _id: 1,
                 address: 1,
                 createdAt: 1,
+                group_ids: 1, 
                 gender: 1,
                 image: 1,
                 description: 1,

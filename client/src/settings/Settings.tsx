@@ -5,13 +5,21 @@ import useUserProfileService from "../user_profiles/service";
 import cn from "../utils/cn";
 import { useUserStore } from "../user_profiles/store";
 import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 
 export default function Settings() {
     const navigate = useNavigate();
     const setEditMode = useUserStore((state) => state.setEditMode);
+    const currentUserId = useUserStore((state) => state.currentUserId);
     
     const owner = useAuthService();
     const userProfile = useUserProfileService();
+    
+    useEffect(() => {
+        if (!owner.getCurrentUser.data && !owner.getCurrentUser.isLoading) {
+            navigate("/sign-in", { replace: true });
+        }
+    }, [currentUserId, owner.getCurrentUser.isPending, owner.getCurrentUser.data, navigate]);
     
     return (
         <section className="flex md:flex-row flex-col relative z-10 h-dvh gap-2 p-2">

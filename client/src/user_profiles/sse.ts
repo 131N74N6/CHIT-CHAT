@@ -1,139 +1,151 @@
-import { EventEmitter } from "eventemitter3";
+import { useQueryClient } from "@tanstack/react-query";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useMessageStore } from "../alert/store";
+import { useUserStore } from "./store";
 
-class UserProfileWebSocket extends EventEmitter {
-    private ws: WebSocket | null = null;
-    private url: string | null = null;
+export default function useUserSSEClient(
+    mergeCurrentUser: (old: any, incoming: any) => any,
+    patchAllUsers: (userId: string, patch: Record<string, any>) => void,
+    receiverIdRef: React.RefObject<string>,
+    removeAllUsers: (userId: string) => void
+) {
+    const navigate = useNavigate();
+    const queryClient = useQueryClient();
+    
+    const setMessage = useMessageStore((state) => state.setMessage);
+    const currentUserId = useUserStore((state) => state.currentUserId);
+    const setProfilePictureUrl = useUserStore((state) => state.setProfilePictureUrl);
+    
+    useEffect(() => {
+        if (!currentUserId) return;
 
-    private reconnectAttempts = 0;
-    private maxReconnectAttempts = 5;
-    private reconnectDelay = 1000;
+        const baseUrl = (import.meta.env.VITE_BASE_API_URL ?? "").replace(/\/$/, "");
+        const es = new EventSource(`${baseUrl}/api/v1/users/sse`, { withCredentials: true });
 
-    private messageQueue: any[] = [];
-    protected isConnecting = false;
-    private shouldReconnect = true;
-
-    private token: string = "";
-    private backendUrl: string = "";
-    private userId: string = "";
-
-    private bindEvents() {
-        if (!this.ws) return;
-
-        this.ws.onopen = () => {
-            this.reconnectAttempts = 0;
-            this.isConnecting = false;
-            this.emit("connected", { message: "You're connected", type: "connected" });
-
-            this.messageQueue.forEach((message) => this.ws?.send(message));
-            this.messageQueue = [];
-        }
-
-        this.ws.onmessage = (event) => {
+        const parseEvent = (event: MessageEvent) => {
             try {
-                const payload = JSON.parse(event.data);
+                return JSON.parse(event.data);
+            } catch {
+                return null;
+            }
+        };
 
-                if (payload.type === "error") {
-                    this.emit("error", { type: "error", message: payload.message });
-                    return;
-                }
+        const onConnected = (event: MessageEvent) => {
+            const data = parseEvent(event);
+            if (data?.message) setMessage(data.message);
+        }
 
-                this.emit("message", payload);
-            } catch (error) {
-                this.emit("error", { type: "error", message: "Failed to get data" });
+        const onAuthError = (event: MessageEvent) => {
+            const data = parseEvent(event);
+            setMessage(data?.message ?? "authentication failed");
+            es.close();
+            navigate("/sign-in");
+        }
+
+        const onCurrentProfileChanged = (event: MessageEvent) => {
+            const data = parseEvent(event);
+            if (!data) return;
+
+            queryClient.setQueryData(["current-user"], (old: any) => mergeCurrentUser(old, data));
+        }
+
+        const onAvailableUserChanged = (event: MessageEvent) => {
+            const data = parseEvent(event);
+            if (!data?._id) return;
+
+            patchAllUsers(data._id, {
+                name: data.name,
+                image: data.image,
+                image_public_id: data.image_public_id,
+            });
+
+            if (receiverIdRef.current === data._id) {
+                queryClient.setQueryData([`other-user-${receiverIdRef.current}`],
+                    (old: any) => old ? {
+                        ...old,
+                        name: data.name,
+                        image: data.image,
+                        image_public_id: data.image_public_id,
+                    } : data
+                );
             }
         }
 
-        this.ws.onerror = () => {
-            this.emit("error", { type: "error", message: "Connection failed" });
+        const onAvailableUserDeleted = (event: MessageEvent) => {
+            const data = parseEvent(event);
+            const userId = typeof data === "string" ? data : data?.user_id;
+
+            if (typeof userId === "string") removeAllUsers(userId);
         }
 
-        this.ws.onclose = () => {
-            this.isConnecting = false;
-            this.emit("disconnected");
-
-            if (this.shouldReconnect && (this.reconnectAttempts < this.maxReconnectAttempts)) {
-                this.reconnectAttempts++;
-                const delay = this.reconnectDelay * Math.pow(2, this.reconnectAttempts - 1);
-
-                this.emit("reconnecting", { message: "Reconnecting..." });
-                setTimeout(() => {
-                    if (this.url) this.connectFromUrl();
-                }, delay);
-            } else if (this.shouldReconnect) {
-                this.emit("max_retries", { message: "Connection lost. Please refresh the page." });
-            }
+        const onCurrentProfileDeleted = () => {
+            queryClient.setQueryData(["current-user"], null);
         }
-    }
 
-    private buildWsUrl(token: string, backendUrl: string) {
-        const wsProtocol = backendUrl.startsWith("https") ? "wss:" : "ws:";
-        const backendHost = backendUrl.replace(/^https?:\/\//, "");
-        const encodedToken = encodeURIComponent(token);
-        const wsUrl = `${wsProtocol}//${backendHost}/api/v1/users/ws?token=${encodedToken}`;
-        return wsUrl;
-    }
+        const onCurrentProfilePictureDeleted = (event: MessageEvent) => {
+            const data = parseEvent(event);
+            if (!data) return;
 
-    connect(token: string, backendUrl: string, userId: string) {
-        const newWsUrl = this.buildWsUrl(token, backendUrl);
+            queryClient.setQueryData(["current-user"], (old: any) => mergeCurrentUser(old, data));
 
-        if (this.url === newWsUrl && this.ws?.readyState === WebSocket.OPEN) return;
+            setProfilePictureUrl(data.profile_picture?.url ?? null);
+        }
 
-        if (this.url !== newWsUrl) {
-            this.shouldReconnect = false; 
-            
-            if (this.ws) {
-                this.ws.close();
-                this.ws = null;
+        const onAvailableProfilePictureDeleted = (event: MessageEvent) => {
+            const data = parseEvent(event);
+            if (!data?._id) return;
+
+            patchAllUsers(data._id, {
+                image: data.image,
+                image_public_id: data.image_public_id,
+            });
+
+            if (receiverIdRef.current === data._id) {
+                queryClient.setQueryData([`other-user-${receiverIdRef.current}`],
+                    (old: any) => old ? {
+                        ...old,
+                        image: data.image,
+                        image_public_id: data.image_public_id,
+                    } : old
+                );
             }
         }
 
-        this.url = newWsUrl;
-        this.token = token;
-        this.userId = userId;
-        this.backendUrl = backendUrl;
-        this.isConnecting = true;
-        this.shouldReconnect = true;
-        this.reconnectAttempts = 0;
-        this.messageQueue = [];
-        this.ws = new WebSocket(this.url);
-        
-        this.bindEvents();
-    }
+        es.addEventListener("connected", onConnected);
+        es.addEventListener("auth-error", onAuthError);
+        es.addEventListener("current-user-profile:changed", onCurrentProfileChanged);
+        es.addEventListener("available-user:changed", onAvailableUserChanged);
+        es.addEventListener("available-user:deleted", onAvailableUserDeleted);
+        es.addEventListener("current-user-profile:deleted", onCurrentProfileDeleted);
+        es.addEventListener("current-user-profile-picture:deleted", onCurrentProfilePictureDeleted);
+        es.addEventListener("available-user-profile-picture:deleted", onAvailableProfilePictureDeleted);
 
-    private connectFromUrl() {
-        if (this.backendUrl && this.url && this.token && this.userId) {
-            this.isConnecting = true;
-            this.ws = new WebSocket(this.url);
-            this.bindEvents();
+        es.onerror = () => {
+            if (es.readyState === EventSource.CLOSED) {
+                setMessage("profile realtime connection closed");
+            }
+        };
+
+        return () => {
+            es.removeEventListener("connected", onConnected);
+            es.removeEventListener("auth-error", onAuthError);
+            es.removeEventListener("current-user-profile:changed", onCurrentProfileChanged);
+            es.removeEventListener("available-user:changed", onAvailableUserChanged);
+            es.removeEventListener("available-user:deleted", onAvailableUserDeleted);
+            es.removeEventListener("current-user-profile:deleted", onCurrentProfileDeleted);
+            es.removeEventListener("current-user-profile-picture:deleted", onCurrentProfilePictureDeleted);
+            es.removeEventListener("available-user-profile-picture:deleted", onAvailableProfilePictureDeleted);
+            es.close();
         }
-    }
-
-    disconnected() {
-        this.shouldReconnect = false;
-
-        if (this.ws) {
-            this.ws.close();
-            this.ws = null;
-        }
-
-        this.url = null;
-    }
-
-    enableReconnect() {
-        this.shouldReconnect = true;
-    }
-
-    isConnected() {
-        return this.ws?.readyState === WebSocket.OPEN;
-    }
-
-    send(message: any) {
-        if (this.ws && this.ws.readyState === WebSocket.OPEN) {
-            this.ws.send(JSON.stringify(message));
-        } else {
-            this.messageQueue.push(message);
-        }
-    }
+    }, [
+        currentUserId,
+        queryClient,
+        setMessage,
+        navigate,
+        mergeCurrentUser,
+        patchAllUsers,
+        removeAllUsers,
+        setProfilePictureUrl,
+    ]);
 }
-
-export const userProfileWebSocket = new UserProfileWebSocket();

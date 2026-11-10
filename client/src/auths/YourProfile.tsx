@@ -66,6 +66,12 @@ export default function YourProfile() {
     }, [editMode, owner.getCurrentUser.data, currentUserId]);
 
     useEffect(() => {
+        if (!owner.getCurrentUser.data && !owner.getCurrentUser.isLoading) {
+            navigate("/sign-in", { replace: true });
+        }
+    }, [currentUserId, owner.getCurrentUser.isPending, owner.getCurrentUser.data, navigate]);
+
+    useEffect(() => {
         if (message) {
             const timer = setTimeout(() => {
                 setMessage(null);

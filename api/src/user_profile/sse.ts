@@ -25,14 +25,7 @@ export const formatSSE = (event: string, data: unknown, id?: string) => {
 export const createAuthErrorStream = () => {
     return new ReadableStream<Uint8Array>({
         start(controller) {
-            controller.enqueue(
-                encoder.encode(
-                    formatSSE("auth-error", {
-                        message: "unauthorized",
-                    })
-                )
-            );
-
+            controller.enqueue(encoder.encode(formatSSE("auth-error", { message: "unauthorized" })));
             controller.close();
         },
     });

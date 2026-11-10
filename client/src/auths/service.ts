@@ -69,20 +69,21 @@ export default function useAuthService() {
             }
 
             const user = meResponse.data;
+            console.log(meResponse.data);
 
             return { 
-                address: user.data.user.address, 
-                created_at: user.data.user.createdAt,
-                description: user.data.user.description,
-                email: user.data.user.email,
-                gender: user.data.user.gender, 
-                group_ids: user.data.user.group_ids,
+                address: user.address, 
+                created_at: user.createdAt,
+                description: user.description,
+                email: user.email,
+                gender: user.gender, 
+                group_ids: user.group_ids,
                 profile_picture: {
-                    public_id: user.data.user.image_public_id,
-                    url: user.data.user.image,
+                    public_id: user.image_public_id,
+                    url: user.image,
                 },
-                user_id: user.data.user.id,
-                user_name: user.data.user.name,
+                user_id: user._id,
+                user_name: user.name,
                 user_session: sessionResponse.data?.session ?? null
             }
         },

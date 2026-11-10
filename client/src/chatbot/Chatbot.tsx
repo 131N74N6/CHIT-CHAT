@@ -7,8 +7,13 @@ import Alert from "../alert/Alert";
 import MessageList from "./MessageList";
 import Loading from "../loading/Loading";
 import { useChatbotStore } from "./store";
+import useAuthService from "../auths/service";
+import { useNavigate } from "react-router-dom";
+import { useUserStore } from "../user_profiles/store";
 
 export default function Chatbot() {
+    const navigate = useNavigate();
+
     const message = useMessageStore((state) => state.message);
     const setMessage = useMessageStore((state) => state.setMessage);
 
@@ -21,7 +26,16 @@ export default function Chatbot() {
     const selectedChatBotIds = useChatbotStore((state) => state.selectedChatBotIds);
     const resetSelectedChatBotIds = useChatbotStore((state) => state.resetSelectedChatBotIds);
 
+    const currentUserId = useUserStore((state) => state.currentUserId);
+
     const userChatBot = useChatbotService();
+    const auths = useAuthService();
+
+    useEffect(() => {
+        if (!auths.getCurrentUser.data && !auths.getCurrentUser.isLoading) {
+            navigate("/sign-in", { replace: true });
+        }
+    }, [currentUserId, auths.getCurrentUser.isPending, auths.getCurrentUser.data, navigate]);
     
     useEffect(() => {
         if (message) {

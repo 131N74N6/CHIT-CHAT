@@ -6,8 +6,13 @@ import { useEffect } from "react";
 import Alert from "../alert/Alert";
 import useGroupProfileService from "./service";
 import { useGroupProfileStore } from "./store";
+import { useNavigate } from "react-router-dom";
+import useAuthService from "../auths/service";
+import { useUserStore } from "../user_profiles/store";
 
 export default function CreateGroup() {
+    const navigate = useNavigate();
+    
     const message = useMessageStore((state) => state.message);
     const setMessage = useMessageStore((state) => state.setMessage);
 
@@ -23,7 +28,16 @@ export default function CreateGroup() {
     const selectedProfileGroupUrl = useGroupProfileStore((state) => state.selectedProfileGroupUrl);
     const setSelectedProfileGroupUrl = useGroupProfileStore((state) => state.setSelectedProfileGroupUrl);
 
+    const currentUserId = useUserStore((state) => state.currentUserId);
+
+    const auths = useAuthService();
     const groupProfile = useGroupProfileService();
+
+    useEffect(() => {
+        if (!auths.getCurrentUser.data && !auths.getCurrentUser.isLoading) {
+            navigate("/sign-in", { replace: true });
+        }
+    }, [currentUserId, auths.getCurrentUser.isPending, auths.getCurrentUser.data, navigate]);
 
     useEffect(() => {
         if (message) {

@@ -2,10 +2,8 @@ import Elysia, { t } from "elysia";
 import { apiAuthMiddleware } from "../auth/middleware";
 import userProfileController from "./controller";
 import { userProfileSchema } from "./model";
-import { createUserSSEStream, SSE_HEADERS } from "./event";
+import { createAuthErrorStream, createUserSSEStream, SSE_HEADERS } from "./sse";
 import { authServiceApi } from "../auth/service";
-
-const wsContext = new WeakMap<any, { room: string; handler: (data: any) => void }[]>();
 
 const userProfileRouters = new Elysia({ prefix: "/api/v1/users" })
 .use(apiAuthMiddleware)
@@ -26,8 +24,6 @@ const userProfileRouters = new Elysia({ prefix: "/api/v1/users" })
 })
 .get("/me", async (context) => {
     return await userProfileController.showUser({ id: context.user.id });
-}, {
-    query: userProfileSchema.showUser
 })
 .get("/sse", async ({ request }) => {
     const session = await authServiceApi.api.getSession({ headers: request.headers });
@@ -48,7 +44,3 @@ const userProfileRouters = new Elysia({ prefix: "/api/v1/users" })
 });
 
 export default userProfileRouters;
-
-function createAuthErrorStream(): BodyInit | null | undefined {
-    throw new Error("Function not implemented.");
-}

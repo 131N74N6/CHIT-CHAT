@@ -13,8 +13,12 @@ import UserChatPopUp from "../user_chats/UserChatPopUp";
 import UserProfilePopUp from "./UserProfilePopUp";
 import UserChatFilesPreviewPopUp from "../user_chats/UserChatFilesPreviewPopUp";
 import UserChatFilesPopUp from "../user_chats/UserChatFilesPopUp";
+import useAuthService from "../auths/service";
+import { useNavigate } from "react-router-dom";
 
 export default function Home() {
+    const navigate = useNavigate();
+    
     const message = useMessageStore((state) => state.message);
     const setMessage = useMessageStore((state) => state.setMessage);
 
@@ -27,9 +31,17 @@ export default function Home() {
     
     const receiverId = useUserChatStore((state) => state.receiverId);
     const showUserProfilePopUp = useUserStore((state) => state.showUserProfilePopUp);
+    const currentUserId = useUserStore((state) => state.currentUserId);
 
+    const auths = useAuthService();
     const userChat = useUserChatService();
     const userProfile = useUserProfileService();
+
+    useEffect(() => {
+        if (!auths.getCurrentUser.data && !auths.getCurrentUser.isLoading) {
+            navigate("/sign-in", { replace: true });
+        }
+    }, [currentUserId, auths.getCurrentUser.isPending, auths.getCurrentUser.data, navigate]);
 
     useEffect(() => {
         if (message) {

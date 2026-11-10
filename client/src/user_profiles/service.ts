@@ -11,6 +11,7 @@ import { useGroupChatStore } from "../group_chats/store";
 import { useGroupMemberStore } from "../group_member/store";
 import { useGroupProfileStore } from "../group_profiles/store";
 import { useChatbotStore } from "../chatbot/store";
+import useUserSSEClient from "./sse";
 
 export default function useUserProfileService() {
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -42,7 +43,7 @@ export default function useUserProfileService() {
     const profilePicture = useUserStore((state) => state.profilePicture);
     const setProfilePicture = useUserStore((state) => state.setProfilePicture);
 
-    const profilePictureUrl = useUserStore((state) => state.profilePicture);
+    const profilePictureUrl = useUserStore((state) => state.profilePictureUrl);
     const setProfilePictureUrl = useUserStore((state) => state.setProfilePictureUrl);
 
     const username = useUserStore((state) => state.username);
@@ -74,23 +75,18 @@ export default function useUserProfileService() {
                 ...(old.profile_picture ?? {}),
                 ...(incoming.profile_picture ?? {}),
             },
-        };
+        }
     }, []);
 
     const patchAllUsers = useCallback((userId: string, patch: Record<string, any>) => {
         queryClient.setQueryData(["all-users"], (old: any) => {
             if (!old?.pages) return old;
 
-            return {
-                ...old,
-                pages: old.pages.map((page: any[]) =>
-                    page.map((user) =>
-                        user._id === userId
-                            ? { ...user, ...patch }
-                            : user
-                    )
-                ),
-            };
+            return { ...old, pages: old.pages.map((page: any[]) => {
+                return page.map((user) => {
+                    return user._id === userId ? { ...user, ...patch } : user });
+                }),
+            }
         });
     }, [queryClient]);
 
@@ -99,193 +95,14 @@ export default function useUserProfileService() {
             if (!old?.pages) return old;
 
             return {
-                ...old,
-                pages: old.pages.map((page: any[]) =>
-                    page.filter((user) => user._id !== userId)
-                ),
-            };
+                ...old, pages: old.pages.map((page: any[]) => {
+                    return page.filter((user) => user._id !== userId)
+                }),
+            }
         });
     }, [queryClient]);
 
-    useEffect(() => {
-        if (!currentUserId) return;
-
-        const baseUrl = (import.meta.env.VITE_BASE_API_URL ?? "").replace(/\/$/, "");
-        const es = new EventSource(`${baseUrl}/api/v1/users/sse`, { withCredentials: true });
-
-        const parseEvent = (event: MessageEvent) => {
-            try {
-                return JSON.parse(event.data);
-            } catch {
-                return null;
-            }
-        };
-
-        const onConnected = (event: MessageEvent) => {
-            const data = parseEvent(event);
-            if (data?.message) {
-                setMessage(data.message);
-            }
-        };
-
-        const onAuthError = (event: MessageEvent) => {
-            const data = parseEvent(event);
-            setMessage(data?.message ?? "authentication failed");
-            es.close();
-            navigate("/sign-in");
-        };
-
-        const onCurrentProfileChanged = (event: MessageEvent) => {
-            const data = parseEvent(event);
-            if (!data) return;
-
-            queryClient.setQueryData(["current-user"], (old: any) =>
-                mergeCurrentUser(old, data)
-            );
-        };
-
-        const onAvailableUserChanged = (event: MessageEvent) => {
-            const data = parseEvent(event);
-            if (!data?._id) return;
-
-            patchAllUsers(data._id, {
-                name: data.name,
-                image: data.image,
-                image_public_id: data.image_public_id,
-            });
-
-            if (receiverIdRef.current === data._id) {
-                queryClient.setQueryData([`other-user-${receiverIdRef.current}`],
-                    (old: any) => old ? {
-                        ...old,
-                        name: data.name,
-                        image: data.image,
-                        image_public_id: data.image_public_id,
-                    } : data
-                );
-            }
-        };
-
-        const onAvailableUserDeleted = (event: MessageEvent) => {
-            const data = parseEvent(event);
-            const userId =
-                typeof data === "string" ? data : data?.user_id;
-
-            if (typeof userId === "string") {
-                removeAllUsers(userId);
-            }
-        };
-
-        const onCurrentProfileDeleted = () => {
-            queryClient.setQueryData(["current-user"], null);
-        };
-
-        const onCurrentProfilePictureDeleted = (event: MessageEvent) => {
-            const data = parseEvent(event);
-            if (!data) return;
-
-            queryClient.setQueryData(["current-user"], (old: any) =>
-                mergeCurrentUser(old, data)
-            );
-
-            setProfilePictureUrl(
-                data.profile_picture?.url ?? null
-            );
-        };
-
-        const onAvailableProfilePictureDeleted = (event: MessageEvent) => {
-            const data = parseEvent(event);
-            if (!data?._id) return;
-
-            patchAllUsers(data._id, {
-                image: data.image,
-                image_public_id: data.image_public_id,
-            });
-
-            if (receiverIdRef.current === data._id) {
-                queryClient.setQueryData([`other-user-${receiverIdRef.current}`],
-                    (old: any) => old ? {
-                        ...old,
-                        image: data.image,
-                        image_public_id: data.image_public_id,
-                    } : old
-                );
-            }
-        };
-
-        es.addEventListener("connected", onConnected);
-        es.addEventListener("auth-error", onAuthError);
-        es.addEventListener(
-            "current-user-profile:changed",
-            onCurrentProfileChanged
-        );
-        es.addEventListener(
-            "available-user:changed",
-            onAvailableUserChanged
-        );
-        es.addEventListener(
-            "available-user:deleted",
-            onAvailableUserDeleted
-        );
-        es.addEventListener(
-            "current-user-profile:deleted",
-            onCurrentProfileDeleted
-        );
-        es.addEventListener(
-            "current-user-profile-picture:deleted",
-            onCurrentProfilePictureDeleted
-        );
-        es.addEventListener(
-            "available-user-profile-picture:deleted",
-            onAvailableProfilePictureDeleted
-        );
-
-        es.onerror = () => {
-            if (es.readyState === EventSource.CLOSED) {
-                setMessage("profile realtime connection closed");
-            }
-        };
-
-        return () => {
-            es.removeEventListener("connected", onConnected);
-            es.removeEventListener("auth-error", onAuthError);
-            es.removeEventListener(
-                "current-user-profile:changed",
-                onCurrentProfileChanged
-            );
-            es.removeEventListener(
-                "available-user:changed",
-                onAvailableUserChanged
-            );
-            es.removeEventListener(
-                "available-user:deleted",
-                onAvailableUserDeleted
-            );
-            es.removeEventListener(
-                "current-user-profile:deleted",
-                onCurrentProfileDeleted
-            );
-            es.removeEventListener(
-                "current-user-profile-picture:deleted",
-                onCurrentProfilePictureDeleted
-            );
-            es.removeEventListener(
-                "available-user-profile-picture:deleted",
-                onAvailableProfilePictureDeleted
-            );
-
-            es.close();
-        }
-    }, [
-        currentUserId,
-        queryClient,
-        setMessage,
-        navigate,
-        mergeCurrentUser,
-        patchAllUsers,
-        removeAllUsers,
-        setProfilePictureUrl,
-    ]);
+    useUserSSEClient(mergeCurrentUser, patchAllUsers, receiverIdRef, removeAllUsers);
 
     const changeUserMt = useMutation({
         mutationFn: async () => {

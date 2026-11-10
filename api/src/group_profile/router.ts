@@ -3,7 +3,7 @@ import { apiAuthMiddleware } from "../auth/middleware";
 import groupProfileController from "./controller";
 import { groupProfileSchema, TGroupProfile } from "./model";
 import { validateSession } from "../auth/service";
-import { groupProfileEvent } from "./event";
+import { groupProfileEvent } from "./sse";
 
 const wsContext = new WeakMap<any, TGroupProfile["wsSubscription"][]>();
 

@@ -5,15 +5,28 @@ import { useEffect } from "react";
 import Alert from "../alert/Alert";
 import useGroupMemberService from "./service";
 import { useUserStore } from "../user_profiles/store";
+import useAuthService from "../auths/service";
+import { useNavigate } from "react-router-dom";
 
 export default function JoinGroup() {
+    const navigate = useNavigate();
+    
     const message = useMessageStore((state) => state.message);
     const setMessage = useMessageStore((state) => state.setMessage);
     
     const roomCode = useUserStore((state) => state.roomCode);
     const setRoomCode = useUserStore((state) => state.setRoomCode);
 
+    const currentUserId = useUserStore((state) => state.currentUserId);
+
+    const auths = useAuthService();
     const groupMember = useGroupMemberService();
+
+    useEffect(() => {
+        if (!auths.getCurrentUser.data && !auths.getCurrentUser.isLoading) {
+            navigate("/sign-in", { replace: true });
+        }
+    }, [currentUserId, auths.getCurrentUser.isPending, auths.getCurrentUser.data, navigate]);
     
     useEffect(() => {
         if (message) {

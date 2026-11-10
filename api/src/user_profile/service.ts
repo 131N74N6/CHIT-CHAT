@@ -4,7 +4,7 @@ import userProfileRepository from "./repository";
 import { v2 } from "cloudinary";
 import { groupChatWS } from "../group_chats/websocket";
 import { groupMemberEvent } from "../group_members/event";
-import { userProfileEvent } from "./event";
+import { userProfileEvent } from "./sse";
 import { TUserProfile } from "./model";
 import { uploadToCloudinary } from "../cloudinary/service";
 import { CloudinaryUploadResult } from "../cloudinary/model";
