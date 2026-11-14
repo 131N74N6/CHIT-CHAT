@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useUserChatStore } from "../user_chats/store";
 import { useUserStore } from "./store";
 import { useNavbarStore } from "../navbar/store";
-import { useCallback, useEffect, useRef } from "react";
+import { useRef } from "react";
 import { useMessageStore } from "../alert/store";
 import { apiRequest, apiUpload } from "../api";
 import type { UserDetail, Users } from "./model";
@@ -11,7 +11,6 @@ import { useGroupChatStore } from "../group_chats/store";
 import { useGroupMemberStore } from "../group_member/store";
 import { useGroupProfileStore } from "../group_profiles/store";
 import { useChatbotStore } from "../chatbot/store";
-import useUserSSEClient from "./sse";
 
 export default function useUserProfileService() {
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -58,51 +57,6 @@ export default function useUserProfileService() {
     const receiverId = useUserChatStore((state) => state.receiverId);
 
     const resetNavbarState = useNavbarStore((state) => state.resetNavbarState);
-    const receiverIdRef = useRef(receiverId);
-
-    useEffect(() => {
-        receiverIdRef.current = receiverId;
-    }, [receiverId]);
-
-    const mergeCurrentUser = useCallback((old: any, incoming: any) => {
-        if (!old && !incoming) return old;
-        if (!old) return incoming;
-
-        return {
-            ...old,
-            ...incoming,
-            profile_picture: {
-                ...(old.profile_picture ?? {}),
-                ...(incoming.profile_picture ?? {}),
-            },
-        }
-    }, []);
-
-    const patchAllUsers = useCallback((userId: string, patch: Record<string, any>) => {
-        queryClient.setQueryData(["all-users"], (old: any) => {
-            if (!old?.pages) return old;
-
-            return { ...old, pages: old.pages.map((page: any[]) => {
-                return page.map((user) => {
-                    return user._id === userId ? { ...user, ...patch } : user });
-                }),
-            }
-        });
-    }, [queryClient]);
-
-    const removeAllUsers = useCallback((userId: string) => {
-        queryClient.setQueryData(["all-users"], (old: any) => {
-            if (!old?.pages) return old;
-
-            return {
-                ...old, pages: old.pages.map((page: any[]) => {
-                    return page.filter((user) => user._id !== userId)
-                }),
-            }
-        });
-    }, [queryClient]);
-
-    useUserSSEClient(mergeCurrentUser, patchAllUsers, receiverIdRef, removeAllUsers);
 
     const changeUserMt = useMutation({
         mutationFn: async () => {

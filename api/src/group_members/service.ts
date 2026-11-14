@@ -22,29 +22,26 @@ class GroupMemberService {
 
     async joinGroup(data: TGroupMember["joinGroup"]) {
         const groupId = this.checkIsIdValid("group", data.group_id);
-        const roomId = `member-from-group-${groupId}`;
         const userId = this.checkIsIdValid("group", data.user_id);
 
         const result = await groupMemberRepository.joinGroup({ group_id: groupId, user_id: userId });
-        groupMemberEvent.emit(roomId, { data: result, type: "member:joined" });
+        groupMemberEvent.emit(`member-from-group-${groupId}`, { data: result, type: "member:joined" });
     }
 
     async kickMember(data: TGroupMember["leftGroup"]) {
         const groupId = this.checkIsIdValid("group", data.group_id);
-        const roomId = `member-from-group-${groupId}`;
         const userId = this.checkIsIdValid("group", data.user_id);
 
         const result = await groupMemberRepository.kickMember({ group_id: groupId, user_id: userId });
-        groupMemberEvent.emit(roomId, { data: result, type: "member:kicked" });
+        groupMemberEvent.emit(`member-from-group-${groupId}`, { data: result, type: "member:kicked" });
     }
 
     async leftGroup(data: TGroupMember["leftGroup"]) {
         const groupId = this.checkIsIdValid("group", data.group_id);
-        const roomId = `member-from-group-${groupId}`;
         const userId = this.checkIsIdValid("group", data.user_id);
 
         const result = await groupMemberRepository.leftGroup({ group_id: groupId, user_id: userId });
-        groupMemberEvent.emit(roomId, { data: result, type: "member:left" });
+        groupMemberEvent.emit(`member-from-group-${groupId}`, { data: result, type: "member:left" });
     }
 
     async showAllMembers(data: TGroupMember["filter"]) {

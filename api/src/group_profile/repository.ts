@@ -43,15 +43,13 @@ class GroupProfileRepository {
     }
 
     async deleteGroup(props: TGroupProfile["deleteGroup"]) {
-        await Promise.all([
+        return await Promise.all([
             this.group_chats.deleteMany({ group_id: new ObjectId(props.group_id) }),
             this.users.updateMany({ group_ids: { $in: [props.group_id] } }, {
                 $pull: { group_ids: props.group_id }
             }),
             this.group_profiles.deleteOne({ _id: new ObjectId(props.group_id) })
         ]);
-
-        return props;
     }
 
     async deleteGroupProfilePicture(_id: string) {

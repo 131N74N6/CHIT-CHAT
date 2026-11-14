@@ -2,8 +2,8 @@ import Elysia, { t } from "elysia";
 import { apiAuthMiddleware } from "../auth/middleware";
 import groupProfileController from "./controller";
 import { groupProfileSchema, TGroupProfile } from "./model";
-import { createGroupProfileErrorStream, createGroupProfileSSEStream, groupProfileSSEHeaders } from "./sse";
-import { authServiceApi } from "../auth/service";
+import { validateSession } from "../auth/service";
+import { addTunnel, removeTunnel } from "./websocket";
 
 const groupProfileRouters = new Elysia({ prefix: "/api/v1/groups" })
 .use(apiAuthMiddleware)
@@ -13,15 +13,6 @@ const groupProfileRouters = new Elysia({ prefix: "/api/v1/groups" })
     });
 }, {
     query: t.Pick(groupProfileSchema.deleteGroup, ["group_id"])
-})
-.get("/sse/:group_id", async (context) => {
-    const session = await authServiceApi.api.getSession({ headers: context.request.headers });
-    if (!session) return new Response(createGroupProfileErrorStream(), { headers: groupProfileSSEHeaders });
-
-    const stream = createGroupProfileSSEStream(context.params.group_id, session.user.id);
-    return new Response(stream, { headers: groupProfileSSEHeaders });
-}, {
-    params: t.Pick(groupProfileSchema.deleteGroup, ["group_id"])
 })
 .get("/", async (context) => {
     return await groupProfileController.showAllGroups({ ...context.query, user_id: context.user.id });
@@ -60,6 +51,46 @@ const groupProfileRouters = new Elysia({ prefix: "/api/v1/groups" })
     });
 }, {
     params: t.Pick(groupProfileSchema.changeGroupRaw, ["_id"])
+})
+.ws("/ws", {
+    params: t.Pick(groupProfileSchema.wsConfig, ["group_id"]),
+    query: t.Pick(groupProfileSchema.wsConfig, ["token"]),
+
+    async open(ws) {
+        try {
+            const token = ws.data.query.token;
+            const session = await validateSession(token);
+
+            if (!session || !session.user) {
+                ws.send(JSON.stringify({ type: "error", message: "You are not allowed to access" }));
+                ws.close(4001, "You are not allowed to access");
+                return;
+            }
+
+            const groupId = ws.data.params.group_id;
+
+            if (!groupId || typeof groupId !== "string") {
+                ws.send(JSON.stringify({ type: "error", message: "Invalid group" }));
+                ws.close(4002, "Invalid group");
+                return;
+            }
+
+            if (groupId) addTunnel(groupId, ws);
+        } catch (error) {
+            ws.send(JSON.stringify({ type: "error", message: "Connection failed" }));
+            ws.close(4003, "Internal error");
+        }
+    },
+
+    message(ws, message) {
+        const data = JSON.parse(message as string);
+        if (data.type === "ping") ws.send(JSON.stringify({ type: "pong" }));
+    },
+
+    close(ws) {
+        const groupId = ws.data.params.group_id;
+        if (groupId) removeTunnel(groupId, ws);
+    }
 });
 
 export default groupProfileRouters;

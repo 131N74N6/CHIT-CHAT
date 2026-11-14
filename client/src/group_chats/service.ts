@@ -117,30 +117,6 @@ export default function useGroupChatService() {
                     newMessagePage[0] = [payload.data, ...newMessagePage[0]];
                     return { ...old, pages: newMessagePage };
                 });
-            } else if (payload.type === "group-message-owner:changed") {
-                queryClient.setQueryData(queryKey, (old: any) => {
-                    if (!old) return old;
-
-                    const newMessagePage = old.pages.map((page: any[]) => {
-                        return page.map((message) => {
-                            return message._id === payload.data._id ? payload.data : message
-                        });
-                    });
-
-                    return { ...old, pages: newMessagePage };
-                });
-            } else if (payload.message === "group-message-owner:deleted") {
-                queryClient.setQueryData(queryKey, (old: any) => {
-                    if (!old) return;
-
-                    const newMessagePage = old.pages.map((page: any[]) => {
-                        return page.filter((message) => {
-                            return message.sender_id !== payload.data
-                        });
-                    });
-
-                    return { ...old, pages: newMessagePage };
-                });
             }
         }
 

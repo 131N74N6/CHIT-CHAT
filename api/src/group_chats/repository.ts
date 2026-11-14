@@ -28,6 +28,13 @@ class GroupChatRepository {
         });
     }
 
+    private async findUser(id: string) {
+        let username = "";
+        const user = await this.users.findOne({ _id: new ObjectId(id) }, { projection: { name: 1 }});
+        if (user) username = user.name;
+        return username;
+    }
+
     async findAllMessages(group_id: string) {
         return await this.group_chats.find({ group_id: new ObjectId(group_id) }).toArray();
     }
@@ -67,7 +74,7 @@ class GroupChatRepository {
             hidden_for: [],
             group_name: await this.findOneGroupById(props.group_id),
             sender_id: new ObjectId(props.sender_id),
-            sender_name: props.sender_name,
+            sender_name: await this.findUser(props.sender_id),
             text: props.text,
             updated_at: new Date()
         }

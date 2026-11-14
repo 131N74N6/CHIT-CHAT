@@ -3,11 +3,11 @@ import { useMessageStore } from "../alert/store";
 import { useNavigate } from "react-router-dom";
 import { useUserStore } from "../user_profiles/store";
 import { useGroupProfileStore } from "./store";
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 import { useGroupChatStore } from "../group_chats/store";
 import { apiRequest, apiUpload } from "../api";
 import type { IGroupProfileDetail, IGroups } from "./model";
-import { groupProfileWebSocket } from "./event";
+import useGroupProfileWebSocket from "./websocket";
 
 export default function useGroupProfileService() {
     const navigate = useNavigate();
@@ -31,129 +31,7 @@ export default function useGroupProfileService() {
 
     const setSelectedProfileGroupUrl = useGroupProfileStore((state) => state.setSelectedProfileGroupUrl);
 
-    const getSessionToken = useQuery({
-        enabled: !!currentUserId,
-        queryFn: async () => {
-            const response = await apiRequest<string>("/api/v1/users/session", { method: "GET" });
-            return response.data;
-        },
-        queryKey: [`user-session-token-${currentUserId}`],
-        retry: 3,
-        retryDelay: 1000,
-    });
-
-    useEffect(() => {
-        if (!currentUserId && !groupId) return;
-        if (getSessionToken.isLoading && !getSessionToken.data) return;
-
-        const token = getSessionToken.data;
-
-        if (!token || typeof token !== "string") {
-            setMessage("authentication failed");
-            return;
-        }
-
-        const baseApiUrl = import.meta.env.VITE_BASE_API_URL;
-        groupProfileWebSocket.enableReconnect();
-        groupProfileWebSocket.connect(baseApiUrl, groupId, token);
-
-        const queryKey1 = [`available-group-${currentUserId}`];
-        const queryKey2 = [`group-profile-${groupId}`];
-
-        const handleConnected = (payload: any) => {
-            setMessage(payload.message);
-        };
-
-        const handleMessage = (payload: any) => {
-            if (payload.type === "joined-group:changed") {
-                queryClient.setQueryData(queryKey1, (old: any) => {
-                    if (!old) return;
-
-                    const newMessagePage = old.pages.map((page: any[]) => {
-                        return page.map((message) => {
-                            return message._id === payload.data._id ? payload.data : message;
-                        });
-                    });
-
-                    return { ...old, pages: newMessagePage };
-                });
-            } else if (payload.type === "group-profile:changed") {
-                queryClient.setQueryData(queryKey2, (old: any) => {
-                    if (!old) return;
-
-                    const newMessagePage = old.pages.map((page: any[]) => {
-                        return page.map((message) => {
-                            return message._id === payload.data._id ? payload.data : message;
-                        });
-                    });
-
-                    return { ...old, pages: newMessagePage };
-                });
-            } else if (payload.type === "group-profile:deleted") {
-                queryClient.setQueryData(queryKey1, (old: any) => {
-                    if (!old) return;
-
-                    const newMessagePage = old.pages.map((page: any[]) => {
-                        return page.filter((message) => {
-                            return message._id !== payload.data
-                        });
-                    });
-
-                    return { ...old, pages: newMessagePage };
-                });
-            } else if (payload.type === "joined-group:deleted") {
-                queryClient.setQueryData(queryKey2, (old: any) => {
-                    if (!old) return;
-
-                    const newMessagePage = old.pages.map((page: any[]) => {
-                        return page.filter((message) => {
-                            return message._id !== payload.data
-                        });
-                    });
-
-                    return { ...old, pages: newMessagePage };
-                });
-            }
-        }
-
-        const handleDisconnect = () => {
-            //
-        }
-
-        const handleReconnecting = (payload: any) => {
-            setMessage(payload.message);
-        }
-
-        const handleMaxRetries = (payload: any) => {
-            setMessage(payload.message);
-            groupProfileWebSocket.disconnect();
-        }
-        
-        const handleError = (payload: any) => {
-            const msg = payload.message;
-            setMessage(msg);
-
-            if (msg.includes("not allowed") || msg.includes("Invalid user")) {
-                groupProfileWebSocket.disconnect();
-            }
-        }
-
-        groupProfileWebSocket.on("connect", handleConnected);
-        groupProfileWebSocket.on("message", handleMessage);
-        groupProfileWebSocket.on("disconnected", handleDisconnect);
-        groupProfileWebSocket.on("error", handleError);
-        groupProfileWebSocket.on("reconnecting", handleReconnecting);
-        groupProfileWebSocket.on("max_retried", handleMaxRetries);
-
-        return () => {
-            groupProfileWebSocket.off("connect", handleConnected);
-            groupProfileWebSocket.off("disconnected", handleDisconnect);
-            groupProfileWebSocket.off("message", handleMessage);
-            groupProfileWebSocket.off("error", handleError);
-            groupProfileWebSocket.off("reconnecting", handleReconnecting);
-            groupProfileWebSocket.off("max_retried", handleMaxRetries);
-        }
-    }, [currentUserId, setMessage]);
+    useGroupProfileWebSocket();
 
     const changeGroupMt = useMutation({
         mutationFn: async () => {

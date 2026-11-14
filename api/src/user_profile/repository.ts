@@ -72,19 +72,7 @@ class UserProfileRepository {
     }
 
     async findUserById(id: string) {
-        return await this.users.findOne({ _id: new ObjectId(id) }, {
-            projection: {
-                _id: 1,
-                address: 1,
-                createdAt: 1,
-                group_ids: 1,
-                gender: 1,
-                image: 1,
-                description: 1,
-                name: 1,
-                image_public_id: 1,
-            }
-        });
+        return await this.users.findOne({ _id: new ObjectId(id) });
     }
 
     async findYourGroupProfiles(id: string) {

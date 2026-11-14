@@ -63,10 +63,6 @@ export const groupProfileSchema = {
     wsConfig: t.Object({
         group_id: t.String({ pattern: "^[0-9a-fA-F]{24}$", error: "invalid group" }),
         token: t.String({ minLength: 1, error: "invalid token" })
-    }),
-    wsSubscription: t.Object({
-        room_handler: t.Function([t.Any()], t.Void()),
-        room_name: t.String({ error: "invalid user", minLength: 1 })
     })
 }
 

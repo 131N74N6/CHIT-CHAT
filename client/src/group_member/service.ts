@@ -76,40 +76,6 @@ export default function useGroupMemberService() {
 
                     return { ...old, pages: newMemberData };
                 });
-            } else if (payload.type === "member-profile:changed") {
-                queryClient.setQueryData(queryKey, (old: any) => {
-                    if (!old) return old;
-
-                    const newMemberData = old.pages.map((page: any[]) => {
-                        return page.map((message: any) => {
-                            if (payload.data.includes(message._id)) {
-                                return { ...message, name: payload.data.name }
-                            }
-                            return message;
-                        });
-                    });
-                    
-                    return { ...old, pages: newMemberData };
-                });
-            } else if (payload.type === "member-profile-picture:deleted") {
-                queryClient.setQueryData(queryKey, (old: any) => {
-                    if (!old) return old;
-
-                    const newMemberData = old.pages.map((page: any[]) => {
-                        return page.map((message: any) => {
-                            if (payload.data.includes(message._id)) {
-                                return { 
-                                    ...message, 
-                                    image: payload.data.image,
-                                    image_public_id: payload.data.image_public_id 
-                                }
-                            }
-                            return message;
-                        });
-                    });
-                    
-                    return { ...old, pages: newMemberData };
-                });
             }
 
             const handleDisconnect = () => {

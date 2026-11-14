@@ -14,6 +14,7 @@ import { useGroupChatStore } from "../group_chats/store";
 import { useGroupMemberStore } from "../group_member/store";
 import { useGroupProfileStore } from "../group_profiles/store";
 import { apiRequest } from "../api";
+import useUserProfileWebSocket from "../user_profiles/websocket";
 
 export default function useAuthService() {
     const navigate = useNavigate();
@@ -47,6 +48,8 @@ export default function useAuthService() {
     const resetUserState = useUserStore((state) => state.resetUserState);
 
     const setGroupIds = useUserStore((state) => state.setGroupIds);
+
+    useUserProfileWebSocket();
 
     const authServiceClient = createAuthClient({
         baseURL: import.meta.env.VITE_BASE_API_URL,

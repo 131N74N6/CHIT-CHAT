@@ -3,7 +3,7 @@ import { TGroupProfile } from "./model";
 import { ChitChatApiError } from "../error/service";
 import groupProfileRepository from "./repository";
 import { uploadToCloudinary } from "../cloudinary/service";
-import { userProfileEvent } from "./sse";
+import { broadcast } from "./websocket";
 import { v2 } from "cloudinary";
 import { CloudinaryUploadResult } from "../cloudinary/model";
 
@@ -85,7 +85,7 @@ class GroupProfileService {
             });
         }
 
-        const result = await groupProfileRepository.changeGroup({
+        await groupProfileRepository.changeGroup({
             _id: groupId,
             owner_id: userId,
             group_description: newDescription || "-",
@@ -93,26 +93,7 @@ class GroupProfileService {
             group_profile: newProfilePicture
         });
 
-        const broadcastToGroupProfile = {
-            _id: groupId,
-            group_description: result?.group_description,
-            group_name: result?.group_name,
-            group_profile: result?.group_profile
-        };
-
-        const broadcastToJoinedGroup = {
-            _id: groupId,
-            group_name: result?.group_name,
-            group_profile: result?.group_profile
-        };
-
-        userProfileEvent.emit(`group-profile-${groupId}`, { 
-            data: broadcastToGroupProfile, type: "group-profile:changed" 
-        });
-
-        userProfileEvent.emit(`joined-group-${userId}`, { 
-            data: broadcastToJoinedGroup, type: "joined-group:changed" 
-        });
+        broadcast("group-profile:changed");
     }
 
     async createGroup(props: TGroupProfile["createGroupRaw"]) {
@@ -181,15 +162,7 @@ class GroupProfileService {
 
         await groupProfileRepository.deleteGroup({ group_id: groupId, owner_id: userId });
 
-        const result = await groupProfileRepository.deleteGroup({ group_id: groupId, owner_id: userId});
-
-        userProfileEvent.emit(`group-profile-${groupId}`, { 
-            data: result.group_id, type: "group-profile:deleted" 
-        });
-
-        userProfileEvent.emit(`joined-group-${userId}`, { 
-            data: result.group_id, type: "joined-group:deleted" 
-        });
+        broadcast("group-profile:deleted");
     }
 
     async deleteGroupProfilePicture(props: TGroupProfile["deleteGroup"]) {
@@ -209,15 +182,9 @@ class GroupProfileService {
             });
         }
 
-        const result = await groupProfileRepository.deleteGroupProfilePicture(groupId);
+        await groupProfileRepository.deleteGroupProfilePicture(groupId);
 
-        userProfileEvent.emit(`group-profile-${groupId}`, { 
-            data: result, type: "group-profile-picture:deleted" 
-        });
-
-        userProfileEvent.emit(`joined-group-${userId}`, { 
-            data: result, type: "joined-group-profile-picture:deleted" 
-        });
+        broadcast("group-profile:profile-picture-deleted");
     }
 
     async showAllGroups(props: TGroupProfile["filter"]) {

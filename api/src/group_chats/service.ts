@@ -59,6 +59,7 @@ class GroupChatService {
                     resource_type: chosenFile.resource_type 
                 });
             });
+            
             props.operations.push(...removeFromCloudinary);
         }
 
@@ -284,7 +285,6 @@ class GroupChatService {
         const chosenFiles = Array.isArray(props.files) ? props.files : (props.files ? [props.files] : []);
         const groupId = this.checkIsIdValid("group", props.group_id);
         const senderId = this.checkIsIdValid("sender", props.sender_id);
-        const senderName = this.checkIsInputAString("sender name", props.sender_name);
 
         if (!props.text && chosenFiles.length === 0) {
             throw new ChitChatApiError("file or message is required", 400);
@@ -324,7 +324,6 @@ class GroupChatService {
             files_total: filesTotal,
             group_id: groupId,
             sender_id: senderId,
-            sender_name: senderName,
             text: text
         });
 
