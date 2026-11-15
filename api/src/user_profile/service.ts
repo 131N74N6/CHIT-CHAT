@@ -160,7 +160,7 @@ class UserProfileService {
                 } else {
                     await userProfileRepository.leftGroup(groupId);
             
-                    groupMemberEvent.emit(`member-from-group-${groupId}`, { 
+                    groupMemberEvent.emit(`member-from-group-${groupId}`, {
                         data: result, type: "member:left" 
                     });
                 }

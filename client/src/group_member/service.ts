@@ -58,20 +58,26 @@ export default function useGroupMemberService() {
 
             if (payload.type === "member:joined") {
                 queryClient.setQueryData(queryKey, (old: any) => {
-                    if (!old) return;
+                    if (!old) return { pageParams: [1], pages: [[payload.data]] }
 
-                    const newMemberData = old.pages.map((page: any[]) => {
-                        return page.map((message) => message.group_ids.push(payload.data));
+                    const alreadyExists = old.pages.some((page: any[]) => {
+                        return page.some((member: any) => member._id === payload.data);
                     });
 
-                    return { ...old, pages: newMemberData };
+                    if (alreadyExists) return old;
+
+                    const newPages = [...old.pages];
+                    if (!newPages[0]) newPages[0] = [];
+                    
+                    newPages[0] = [payload.data, ...newPages[0]];
+                    return { ...old, pages: newPages }
                 });
             } else if (payload.type === "member:kicked" || payload.type === "member:left") {
                 queryClient.setQueryData(queryKey, (old: any) => {
                     if (!old) return;
 
                     const newMemberData = old.pages.map((page: any[]) => {
-                        return page.filter((message) => message._id !== payload.data);
+                        return page.filter((member) => member._id !== payload.data);
                     });
 
                     return { ...old, pages: newMemberData };

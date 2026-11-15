@@ -19,7 +19,7 @@ class GroupMemberRepository {
             $addToSet: { group_ids: props.group_id }
         });
 
-        return props.group_id;
+        return props.user_id;
     }
 
     async kickMember(props: TGroupMember["leftGroup"]) {
