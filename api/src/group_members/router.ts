@@ -3,7 +3,7 @@ import { apiAuthMiddleware } from "../auth/middleware";
 import groupMemberController from "./controller";
 import { groupMemberSchema } from "./model";
 import { validateSession } from "../auth/service";
-import { groupMemberEvent } from "./websocket";
+import { addTunnel, removeTunnel, } from "./websocket";
 
 const wsContext = new WeakMap<any, { roomId: string; handler: (data: any) => void }>();
 
@@ -35,12 +35,13 @@ const groupMemberRouters = new Elysia({ prefix: "/api/v1/groups/members" })
     body: t.Pick(groupMemberSchema.joinGroup, ["group_id"])
 })
 .ws("/ws", {
-    query: groupMemberSchema.wsConfig,
+    params: t.Pick(groupMemberSchema.wsConfig, ["group_id"]),
+    query: t.Pick(groupMemberSchema.wsConfig, ["token"]),
 
     async open(ws) {
         try {
             const token = ws.data.query.token;
-            const groupId = ws.data.query.group_id;
+            const groupId = ws.data.params.group_id;
             const session = await validateSession(token);
 
             if (!session || !session.user) {
@@ -57,23 +58,21 @@ const groupMemberRouters = new Elysia({ prefix: "/api/v1/groups/members" })
                 return;
             }
             
-            const roomId = `member-from-group-${groupId}`;
-            const handler = (data: any) => ws.send(JSON.stringify(data));
-
-            groupMemberEvent.on(roomId, handler);
-            wsContext.set(ws, { roomId, handler });
+            addTunnel(groupId, ws);
         } catch (error) {
             ws.send(JSON.stringify({ message: "Connection failed", type: "error" }));
             ws.close(4003, "internal error");
         }
     },
 
+    message(ws, message) {
+        const payload = JSON.parse(message as string);
+        if (payload.type === "ping") ws.send(JSON.stringify({ type: "pong" }));
+    },
+
     close(ws) {
-        const ctx = wsContext.get(ws);
-        if (ctx) {
-            groupMemberEvent.off(ctx.roomId, ctx.handler);
-            wsContext.delete(ws);
-        }
+        const groupId = ws.data.params.group_id;
+        if (groupId) removeTunnel(groupId, ws);
     }
 });
 

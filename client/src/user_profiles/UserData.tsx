@@ -50,22 +50,21 @@ export default function UserData(props: UserData) {
         setShowGroupChatFilePreviewPopUp(true);
     }
 
+    const seeUserProfile = () => {
+        if (props.isOwnData) {
+            navigate("/profile");
+            closeUserChatPopUp();
+        } else {
+            closeGroupMember();
+            seeUserChatPopUp();
+        }
+    }
+
     return (
         <div className="p-1.5">
             {props.place.name === "group-member" ? (
-                <div 
-                    className="justify-between items-center flex cursor-pointer"
-                    onClick={() => {
-                        if (props.isOwnData) {
-                            navigate("/profile");
-                            closeUserChatPopUp();
-                        } else {
-                            closeGroupMember();
-                            seeUserChatPopUp();
-                        }
-                    }}
-                >
-                    <div className="flex gap-2 items-center">
+                <div className="justify-between items-center flex">
+                    <div className="flex gap-2 items-center cursor-pointer" onClick={seeUserProfile}>
                         <div className={cn("w-10 h-10 rounded-full")}>
                             {props.user.image && props.user.image_public_id && 
                             props.user.image_public_id !== "-" && 
@@ -88,7 +87,7 @@ export default function UserData(props: UserData) {
                         </div>
                         <div className="text-gray-950 font-medium">{props.user.name}</div>
                     </div>
-                    {props.place.isGroupOwner.data ? (
+                    {props.place.isGroupOwner.data ? null : (
                         <button
                             className={cn(
                                 "font-medium text-gray-700 hover:text-gray-400 transition-colors", 
@@ -102,7 +101,7 @@ export default function UserData(props: UserData) {
                         >
                             <UserMinus2 size={22}/>
                         </button>
-                    ) : null}
+                    )}
                 </div>
             ) : (
                 <div 

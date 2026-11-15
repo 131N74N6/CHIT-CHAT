@@ -6,6 +6,7 @@ class GroupMemberController {
         const isOwner = await groupMemberService.isGroupOwner(group_id, user_id);
         return { data: isOwner }
     }
+    
     async joinGroup(data: TGroupMember["joinGroup"]) {
         await groupMemberService.joinGroup(data);
         return { message: "successfully joined a group" }

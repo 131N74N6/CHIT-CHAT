@@ -47,8 +47,6 @@ class UserProfileRepository {
             this.sessions.deleteMany({ userId: new ObjectId(id) }),
             this.users.deleteOne({ _id: new ObjectId(id) })
         ]);
-
-        return id;
     }
 
     async deleteUserProfilePicture(id: string) {

@@ -1,5 +1,5 @@
 import type { FetchNextPageOptions, InfiniteData, InfiniteQueryObserverResult, UseMutationResult, UseQueryResult } from "@tanstack/react-query";
-import type { Users, UsersMarks } from "../user_profiles/model";
+import type { Users } from "../user_profiles/model";
 
 export interface IGroupMemberState {
     showMemberPopUp: boolean;
@@ -24,7 +24,6 @@ export interface IGroupMemberPopUp {
         isGroupOwner: UseQueryResult<boolean, Error>;
         isLoading: boolean;
         kickMemberMt: UseMutationResult<void, Error, string, unknown>;
-        place: GroupMembersMarks | UsersMarks;
     }
     isProcessing: boolean;
 }

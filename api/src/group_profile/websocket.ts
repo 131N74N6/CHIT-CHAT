@@ -5,7 +5,12 @@ export type GroupProfileWSData = {
 
 export const groupProfileContext = new Map<string, Set<GroupProfileWSData>>();
 
-export function broadcast(event_name: string) {
+export function addTunnel(group_id: string, ws: GroupProfileWSData) {
+    if (!groupProfileContext.has(group_id)) groupProfileContext.set(group_id, new Set());
+    groupProfileContext.get(group_id)?.add(ws);
+}
+
+export function groupProfileBroadcast(event_name: string) {
     const payload = JSON.stringify({ type: event_name });
 
     for (const groupProfile of groupProfileContext.values()) {
@@ -13,11 +18,6 @@ export function broadcast(event_name: string) {
             if (ws.readyState === 1) ws.send(payload);
         }
     }
-}
-
-export function addTunnel(group_id: string, ws: GroupProfileWSData) {
-    if (!groupProfileContext.has(group_id)) groupProfileContext.set(group_id, new Set());
-    groupProfileContext.get(group_id)?.add(ws);
 }
 
 export function removeTunnel(group_id: string, ws: GroupProfileWSData) {

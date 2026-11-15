@@ -3,7 +3,7 @@ import { TGroupProfile } from "./model";
 import { ChitChatApiError } from "../error/service";
 import groupProfileRepository from "./repository";
 import { uploadToCloudinary } from "../cloudinary/service";
-import { broadcast } from "./websocket";
+import { groupProfileBroadcast } from "./websocket";
 import { v2 } from "cloudinary";
 
 class GroupProfileService {
@@ -77,7 +77,7 @@ class GroupProfileService {
                 group_profile: newProfilePicture
             });
 
-            broadcast("group-profile:changed");
+            groupProfileBroadcast("group-profile:changed");
         } else {
             await groupProfileRepository.changeGroup({
                 _id: groupId,
@@ -87,7 +87,7 @@ class GroupProfileService {
                 group_profile: group.group_profile || "-"
             });
 
-            broadcast("group-profile:changed");
+            groupProfileBroadcast("group-profile:changed");
         }
     }
 
@@ -180,7 +180,7 @@ class GroupProfileService {
 
         await groupProfileRepository.deleteGroup({ group_id: groupId, owner_id: userId });
 
-        broadcast("group-profile:deleted");
+        groupProfileBroadcast("group-profile:deleted");
     }
 
     async deleteGroupProfilePicture(props: TGroupProfile["deleteGroup"]) {
@@ -202,7 +202,7 @@ class GroupProfileService {
 
         await groupProfileRepository.deleteGroupProfilePicture(groupId);
 
-        broadcast("group-profile:profile-picture-deleted");
+        groupProfileBroadcast("group-profile:profile-picture-deleted");
     }
 
     async showAllGroups(props: TGroupProfile["filter"]) {

@@ -4,6 +4,14 @@ import { useMessageStore } from "../alert/store";
 import { useUserStore } from "./store";
 import { apiRequest } from "../api";
 
+function buildWsUrl(backendUrl: string, token: string) {
+    const wsProtocol = backendUrl.startsWith("https") ? "wss:" : "ws:";
+    const backendHost = backendUrl.replace(/^https?:\/\//, "");
+    const encodedToken = encodeURIComponent(token);
+    const wsUrl = `${wsProtocol}//${backendHost}/api/v1/users/ws?token=${encodedToken}`;
+    return wsUrl;
+}
+
 export default function useUserProfileWebSocket() {
     const wsRef = useRef<WebSocket | null>(null);
     const reconnectTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -21,14 +29,6 @@ export default function useUserProfileWebSocket() {
         retry: 3,
         retryDelay: 1000,
     });
-
-    function buildWsUrl(backendUrl: string, token: string) {
-        const wsProtocol = backendUrl.startsWith("https") ? "wss:" : "ws:";
-        const backendHost = backendUrl.replace(/^https?:\/\//, "");
-        const encodedToken = encodeURIComponent(token);
-        const wsUrl = `${wsProtocol}//${backendHost}/api/v1/users/ws?token=${encodedToken}`;
-        return wsUrl;
-    }
 
     const connect = useCallback(() => {
         if (!currentUserId) return;

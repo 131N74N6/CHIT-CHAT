@@ -5,6 +5,14 @@ import { useGroupChatStore } from "../group_chats/store";
 import { apiRequest } from "../api";
 import { useUserStore } from "../user_profiles/store";
 
+function buildWsUrl(backend_url: string, group_id: string, token: string) {
+    const wsProtocol = backend_url.startsWith("https") ? "wss:" : "ws:";
+    const host = backend_url.replace(/^https?:\/\//, "");
+    const encodedToken = encodeURIComponent(token);
+    const wsUrl = `${wsProtocol}//${host}/api/v1/groups/ws/${group_id}?token=${encodedToken}`;
+    return wsUrl;
+}
+
 export default function useGroupProfileWebSocket() {
     const wsRef = useRef<WebSocket | null>(null);
     const reconnectTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -23,15 +31,7 @@ export default function useGroupProfileWebSocket() {
         retry: 3,
         retryDelay: 1000,
     });
-
-    function buildWsUrl(backend_url: string, group_id: string, token: string) {
-        const wsProtocol = backend_url.startsWith("https") ? "wss:" : "ws:";
-        const host = backend_url.replace(/^https?:\/\//, "");
-        const encodedToken = encodeURIComponent(token);
-        const wsUrl = `${wsProtocol}//${host}/api/v1/groups/ws/${group_id}?token=${encodedToken}`;
-        return wsUrl;
-    }
-
+    
     const connect = useCallback(() => {
         if (!getSessionToken.data || getSessionToken.isLoading) return;
         if (!groupId) return;
@@ -70,7 +70,6 @@ export default function useGroupProfileWebSocket() {
                         return (
                             key.startsWith("group-profile-") ||
                             key.startsWith("group-owner-") ||
-                            key.startsWith("group-member-") ||
                             key.startsWith("available-group-")
                         );
                     }

@@ -187,13 +187,9 @@ export default function AvailableGroup() {
                             isFetchingNextPage: groupMember.showGroupMembers.isFetchingNextPage,
                             isGroupOwner: groupMember.isGroupOwner,
                             isLoading: groupMember.showGroupMembers.isLoading,
-                            kickMemberMt: groupMember.kickMemberMt,
-                            place: { 
-                                name: "group-member", 
-                                isGroupOwner: groupMember.isGroupOwner, 
-                                kickMemberMt: groupMember.kickMemberMt 
-                            }
+                            kickMemberMt: groupMember.kickMemberMt
                         }}
+                        
                         isProcessing={false}
                     />
                 ) : groupId && groupId !== "" && showProfile ? (

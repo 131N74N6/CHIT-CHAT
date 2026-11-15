@@ -1,11 +1,11 @@
 import { t, UnwrapSchema } from "elysia";
-import { ObjectId } from "mongodb";
 
 export const groupMemberSchema = {
     filter: t.Object({
         group_id: t.String({ pattern: "^[0-9a-fA-F]{24}$", error: "invalid group" }),
         limit: t.Number({ maximum: 32, minimum: 16, error: "maximum member each page is 32 and the minimum is 16" }),
         page: t.Number({ minimum: 1, error: "member page must start from 1" }),
+        name: t.Optional(t.String({ minLength: 1, error: "invalid token" }))
     }),
     joinGroup: t.Object({
         group_id: t.String({ pattern: '^[0-9a-fA-F]{24}$', error: "invalid group" }),

@@ -2,10 +2,11 @@ import { ObjectId } from "mongodb";
 import { ChitChatApiError } from "../error/service";
 import userProfileRepository from "./repository";
 import { v2 } from "cloudinary";
-import { groupMemberEvent } from "../group_members/websocket";
+import { groupMemberBroadcast } from "../group_members/websocket";
 import { userProfileBroadcast } from "./websocket";
 import { TUserProfile } from "./model";
 import { uploadToCloudinary } from "../cloudinary/service";
+import { groupProfileBroadcast } from "../group_profile/websocket";
 
 class UserProfileService {
     private checkIsIdIsValid(field: string, value: unknown) {
@@ -149,23 +150,22 @@ class UserProfileService {
 
         if (operations.length > 0) await Promise.all(operations);
 
-        const result = await userProfileRepository.deleteUser(userId);
-
+        
         if (yourGroupProfiles && yourGroupProfiles.length > 0) {
             for (const yourGroupProfile of yourGroupProfiles) {
                 const groupId = this.checkIsIdIsValid("group", yourGroupProfile._id);
             
                 if (yourGroupProfile.owner_id.toString() === userId) {
                     await userProfileRepository.deleteYourGroups(userId);
+                    groupProfileBroadcast("group-profile:deleted");
                 } else {
                     await userProfileRepository.leftGroup(groupId);
-            
-                    groupMemberEvent.emit(`member-from-group-${groupId}`, {
-                        data: result, type: "member:left" 
-                    });
+                    groupMemberBroadcast("member:left");
                 }
             }
         }
+        
+        await userProfileRepository.deleteUser(userId);
         
         userProfileBroadcast("user-profile:deleted");
     }

@@ -4,8 +4,7 @@ import { useUserStore } from "../user_profiles/store";
 import { apiRequest } from "../api";
 import type { Users } from "../user_profiles/model";
 import { useGroupChatStore } from "../group_chats/store";
-import { useEffect } from "react";
-import { groupMemberWebSocket } from "./event";
+import useGroupMemberWebSocket from "./websocket";
 
 export default function useGroupMemberService() {
     const queryClient = useQueryClient();
@@ -18,111 +17,7 @@ export default function useGroupMemberService() {
     const roomCode = useUserStore((state) => state.roomCode);
     const setRoomCode = useUserStore((state) => state.setRoomCode);
 
-    const getSessionToken = useQuery({
-        enabled: !!currentUserId,
-        queryFn: async () => {
-            const response = await apiRequest<string>("/api/v1/users/session", { method: "GET" });
-            return response.data;
-        },
-        queryKey: [`user-session-token-${currentUserId}`],
-        retry: 3,
-        retryDelay: 1000,
-    });
-
-    useEffect(() => {
-        if (!currentUserId || !groupId) return;
-        if (getSessionToken.isLoading && !getSessionToken.data) return;
-
-        const token = getSessionToken.data;
-
-        if (!token || typeof token !== "string") {
-            setMessage("authentication failed");
-            return;
-        }
-
-        const baseApiUrl = import.meta.env.VITE_BASE_API_URL;
-        groupMemberWebSocket.enableReconnect();
-        groupMemberWebSocket.connect(baseApiUrl, groupId, token);
-
-        const handleConnection = (payload: any) => {
-            setMessage(payload.message);
-        }
-
-        const handleMessage = (payload: any) => {
-            if (payload.type === "error") {
-                setMessage(payload.message);
-                return;
-            }
-
-            const queryKey = [`group-member-${groupId}`];
-
-            if (payload.type === "member:joined") {
-                queryClient.setQueryData(queryKey, (old: any) => {
-                    if (!old) return { pageParams: [1], pages: [[payload.data]] }
-
-                    const alreadyExists = old.pages.some((page: any[]) => {
-                        return page.some((member: any) => member._id === payload.data);
-                    });
-
-                    if (alreadyExists) return old;
-
-                    const newPages = [...old.pages];
-                    if (!newPages[0]) newPages[0] = [];
-                    
-                    newPages[0] = [payload.data, ...newPages[0]];
-                    return { ...old, pages: newPages }
-                });
-            } else if (payload.type === "member:kicked" || payload.type === "member:left") {
-                queryClient.setQueryData(queryKey, (old: any) => {
-                    if (!old) return;
-
-                    const newMemberData = old.pages.map((page: any[]) => {
-                        return page.filter((member) => member._id !== payload.data);
-                    });
-
-                    return { ...old, pages: newMemberData };
-                });
-            }
-
-            const handleDisconnect = () => {
-                //
-            }
-            
-            const handleError = (payload: any) => {
-                const message = payload.message;
-                setMessage(message);
-    
-                if (message.includes("not allowed") || message.includes("Invalid user")) {
-                    groupMemberWebSocket.disconnect();
-                }
-            }
-
-            const handleReconnecting = (payload: any) => {
-                setMessage(payload.message);
-            }
-            
-            const handleMaxRetries = (payload: any) => {
-                setMessage(payload.message);
-                groupMemberWebSocket.disconnect();
-            }
-
-            groupMemberWebSocket.on("connect", handleConnection);
-            groupMemberWebSocket.on("message", handleMessage);
-            groupMemberWebSocket.on("reconnecting", handleReconnecting);
-            groupMemberWebSocket.on("max_retried", handleMaxRetries);
-            groupMemberWebSocket.on("error", handleError);
-            groupMemberWebSocket.on("disconnected", handleDisconnect);
-
-            return () => {
-                groupMemberWebSocket.off("disconnected", handleDisconnect);
-                groupMemberWebSocket.off("connect", handleConnection);
-                groupMemberWebSocket.off("message", handleMessage);
-                groupMemberWebSocket.off("reconnecting", handleReconnecting);
-                groupMemberWebSocket.off("max_retried", handleMaxRetries);
-                groupMemberWebSocket.off("error", handleError);
-            }
-        }
-    }, [currentUserId, groupId,  getSessionToken.data, getSessionToken.isLoading, getSessionToken.error, setMessage]);
+    useGroupMemberWebSocket();
 
     const isGroupOwner = useQuery({
         enabled: !!currentUserId && !!groupId,

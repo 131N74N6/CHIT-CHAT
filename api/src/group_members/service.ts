@@ -2,7 +2,7 @@ import { ObjectId } from "mongodb";
 import { TGroupMember } from "./model";
 import { ChitChatApiError } from "../error/service";
 import groupMemberRepository from "./repository";
-import { groupMemberEvent } from "./websocket";
+import { groupMemberBroadcast } from "./websocket";
 
 class GroupMemberService {
     private checkIsIdValid(field: string, value: unknown) {
@@ -24,32 +24,38 @@ class GroupMemberService {
         const groupId = this.checkIsIdValid("group", data.group_id);
         const userId = this.checkIsIdValid("group", data.user_id);
 
-        const result = await groupMemberRepository.joinGroup({ group_id: groupId, user_id: userId });
-        groupMemberEvent.emit(`member-from-group-${groupId}`, { data: result, type: "member:joined" });
+        await groupMemberRepository.joinGroup({ group_id: groupId, user_id: userId });
+        groupMemberBroadcast("member:joined");
     }
 
     async kickMember(data: TGroupMember["leftGroup"]) {
         const groupId = this.checkIsIdValid("group", data.group_id);
         const userId = this.checkIsIdValid("group", data.user_id);
 
-        const result = await groupMemberRepository.kickMember({ group_id: groupId, user_id: userId });
-        groupMemberEvent.emit(`member-from-group-${groupId}`, { data: result, type: "member:kicked" });
+        await groupMemberRepository.kickMember({ group_id: groupId, user_id: userId });
+        groupMemberBroadcast("member:kicked");
     }
 
     async leftGroup(data: TGroupMember["leftGroup"]) {
         const groupId = this.checkIsIdValid("group", data.group_id);
         const userId = this.checkIsIdValid("group", data.user_id);
 
-        const result = await groupMemberRepository.leftGroup({ group_id: groupId, user_id: userId });
-        groupMemberEvent.emit(`member-from-group-${groupId}`, { data: result, type: "member:left" });
+        await groupMemberRepository.leftGroup({ group_id: groupId, user_id: userId });
+        groupMemberBroadcast("member:left");
     }
 
     async showAllMembers(data: TGroupMember["filter"]) {
         const groupId = this.checkIsIdValid("group", data.group_id);
 
-        return await groupMemberRepository.showAllMembers({ 
-            group_id: groupId, page: data.page, limit: data.limit 
-        });
+        if (data.name === "" || data.name === undefined) {
+            return await groupMemberRepository.showAllMembers({ 
+                group_id: groupId, page: data.page, limit: data.limit, name: data.name 
+            });
+        } else {
+            return await groupMemberRepository.showAllMembers({ 
+                group_id: groupId, page: data.page, limit: data.limit
+            });
+        }
     }
 }
 
