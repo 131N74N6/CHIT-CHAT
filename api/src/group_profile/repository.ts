@@ -56,17 +56,20 @@ class GroupProfileRepository {
         await this.group_profiles.updateOne({ _id: new ObjectId(_id) }, {
             $set: {
                 group_profile: {
-                    file_name: "", 
-                    file_type: "", 
-                    public_id: "", 
-                    resource_type: "", 
-                    size: 0, 
-                    url: ""
+                    file_name: "-", 
+                    file_type: "-", 
+                    public_id: "-", 
+                    resource_type: "-",
+                    url: "-"
                 }
             }
         });
 
         return _id;
+    }
+
+    async findAllMessages(id: string) {
+        return await this.group_chats.find({ group_id: new ObjectId(id) }).toArray();
     }
 
     async findOneGroup(id: string) {

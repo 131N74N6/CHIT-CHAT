@@ -15,7 +15,6 @@ export interface IGroupProfileState {
         file_type: string;
         public_id: string;
         resource_type: string;
-        size: number;
         url: string;
     };
     setOldGroupProfilePicture: (oldGroupProfilePicture: {
@@ -23,7 +22,6 @@ export interface IGroupProfileState {
         file_type: string;
         public_id: string;
         resource_type: string;
-        size: number;
         url: string;
     }) => void
     
@@ -47,7 +45,6 @@ export interface IGroups {
         file_type: string;
         public_id: string;
         resource_type: string;
-        size: number;
         url: string;
     };
 }
@@ -66,7 +63,6 @@ export interface IGroupProfileDetail {
         file_type: string;
         public_id: string;
         resource_type: string;
-        size: number;
         url: string;
     };
     group_name: string;
@@ -100,7 +96,6 @@ export interface IGroupProfileDetailPopUp {
             file_type: string;
             public_id: string;
             resource_type: string;
-            size: number;
             url: string;
         };
         group_name: string;

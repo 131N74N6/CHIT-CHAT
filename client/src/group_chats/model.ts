@@ -79,7 +79,6 @@ export interface IGroupMessageFiles {
         file_type: string;
         public_id: string;
         resource_type: string;
-        size: number;
         url: string;
     }[];
 }
@@ -113,7 +112,6 @@ export interface IGroupChatPopUp {
             file_type: string;
             public_id: string;
             resource_type: string;
-            size: number;
             url: string;
         };
         group_name: string;
@@ -127,7 +125,6 @@ export interface IGroupChatFilesPopUp {
         file_type: string;
         public_id: string;
         resource_type: string;
-        size: number;
         url: string;
     }[];
     isLoading: boolean;

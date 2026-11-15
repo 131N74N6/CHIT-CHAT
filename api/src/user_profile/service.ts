@@ -122,7 +122,7 @@ class UserProfileService {
             (user.image_public_id && user.image_resource_type) && 
             (user.image_public_id !== "-" && user.image_resource_type !== "-")
         ) {
-            operations.push(v2.uploader.destroy(user.image_public_id, { 
+            operations.push(await v2.uploader.destroy(user.image_public_id, { 
                 resource_type: user.image_resource_type 
             }));
         }
@@ -181,7 +181,7 @@ class UserProfileService {
             (user.image_public_id && user.image_resource_type) && 
             (user.image_public_id !== "-" && user.image_resource_type !== "-")
         ) {
-            v2.uploader.destroy(user.image_public_id, { resource_type: user.image_resource_type });
+            await v2.uploader.destroy(user.image_public_id, { resource_type: user.image_resource_type });
         }
 
         await userProfileRepository.deleteUserProfilePicture(userId);

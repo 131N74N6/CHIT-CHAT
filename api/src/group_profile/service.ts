@@ -5,7 +5,6 @@ import groupProfileRepository from "./repository";
 import { uploadToCloudinary } from "../cloudinary/service";
 import { broadcast } from "./websocket";
 import { v2 } from "cloudinary";
-import { CloudinaryUploadResult } from "../cloudinary/model";
 
 class GroupProfileService {
     private checkIsIdValid(field: string, value: unknown) {
@@ -27,43 +26,29 @@ class GroupProfileService {
     async changeGroup(props: TGroupProfile["changeGroupRaw"]) {
         const groupId = this.checkIsIdValid("group", props._id);
         const userId = this.checkIsIdValid("group owner", props.owner_id);
-
-        let newDescription = "-";
-        let newName = "-";
         
         const group = await groupProfileRepository.findOneGroup(groupId);
         if (!group) throw new ChitChatApiError("group not found", 404);
-
-        let newProfilePicture: CloudinaryUploadResult = {
-            file_name: "-", 
-            file_type: "-", 
-            public_id: "-", 
-            resource_type: "-", 
-            url: "-"
-        }
-
+        
         if (group.owner_id.toString() !== userId) {
             throw new ChitChatApiError("you are not allowed to change this group", 403);
         }
+
+        const newGroupName = (props.group_name !== undefined && props.group_name !== "") ? 
+        this.checkIsInputAString("group name", props.group_name) : group.group_name;
         
-        const stillSame = group.group_name === newName && 
-        group.group_description === newDescription && 
-        (group.group_profile === null || group.group_profile?.group_name === props.group_profile?.name);
-
-        if (props.group_description) {
-            newDescription = this.checkIsInputAString("group descripton", props.group_description);
-        }
-
-        if (props.group_name) newName = this.checkIsInputAString("group name", props.group_name);
-
-        if (stillSame) return;
+        const newGroupDescription = (props.group_description !== undefined && props.group_description !== "") ?
+        this.checkIsInputAString("group description", props.group_description) : group.group_description;
 
         if (props.group_profile) {
             const arrayBuffer = await props.group_profile.arrayBuffer();
             const fileBuffer = Buffer.from(arrayBuffer);
 
-            if (!props.group_profile.type.includes("application") && 
-            !props.group_profile.type.includes("image") && !props.group_profile.type.includes("video")) {
+            if (
+                !props.group_profile.type.includes("application") && 
+                !props.group_profile.type.includes("image") && 
+                !props.group_profile.type.includes("video")
+            ) {
                 throw new ChitChatApiError("this file is not allowed", 400);
             }
 
@@ -71,52 +56,56 @@ class GroupProfileService {
                 throw new ChitChatApiError("this file size is too large", 400);
             }
 
-            if (group && group.group_profile && group.group_profile.public_id) {
+            if (group && group.group_profile && group.group_profile.public_id !== "-") {
                 await v2.uploader.destroy(group.group_profile.public_id, { 
                     resource_type: group.group_profile.resource_type 
                 });
             }
 
-            newProfilePicture = await uploadToCloudinary({
+            const newProfilePicture = await uploadToCloudinary({
                 file_buffer: fileBuffer,
                 mimetype: props.group_profile.type,
                 foldername: "room_profile",
                 original_name: props.group_profile.name
             });
+
+            await groupProfileRepository.changeGroup({
+                _id: groupId,
+                owner_id: userId,
+                group_description: newGroupDescription || "-",
+                group_name: newGroupName || "-",
+                group_profile: newProfilePicture
+            });
+
+            broadcast("group-profile:changed");
+        } else {
+            await groupProfileRepository.changeGroup({
+                _id: groupId,
+                owner_id: userId,
+                group_description: newGroupDescription  || "-",
+                group_name: newGroupName  || "-",
+                group_profile: group.group_profile || "-"
+            });
+
+            broadcast("group-profile:changed");
         }
-
-        await groupProfileRepository.changeGroup({
-            _id: groupId,
-            owner_id: userId,
-            group_description: newDescription || "-",
-            group_name: newName || "-",
-            group_profile: newProfilePicture
-        });
-
-        broadcast("group-profile:changed");
     }
 
     async createGroup(props: TGroupProfile["createGroupRaw"]) {
-        const groupName = this.checkIsInputAString("group name", props.group_name);
         const userId = this.checkIsIdValid("group owner", props.owner_id);
+
+        const newGroupName = (props.group_name !== undefined && props.group_name !== "") ? 
+        this.checkIsInputAString("group name", props.group_name) : `group-${Date.now()}`;
         
-        let newDescription = "";
-
-        let newProfilePicture: CloudinaryUploadResult = {
-            file_name: "-", 
-            file_type: "-", 
-            public_id: "-", 
-            resource_type: "-", 
-            url: "-"
-        }
-
-        if (props.group_description) {
-            newDescription = this.checkIsInputAString("group name", props.group_description);
-        }
+        const newGroupDescription = (props.group_description !== undefined && props.group_description !== "") ?
+        this.checkIsInputAString("group description", props.group_description) : "-";
 
         if (props.group_profile) {
-            if (!props.group_profile.type.includes("application") && 
-            !props.group_profile.type.includes("image") && !props.group_profile.type.includes("video")) {
+            if (
+                !props.group_profile.type.includes("application") && 
+                !props.group_profile.type.includes("image") && 
+                !props.group_profile.type.includes("video")
+            ) {
                 throw new ChitChatApiError("this file is not allowed", 400);
             }
 
@@ -127,38 +116,67 @@ class GroupProfileService {
             const arrayBuffer = await props.group_profile.arrayBuffer();
             const fileBuffer = Buffer.from(arrayBuffer)
 
-            newProfilePicture = await uploadToCloudinary({
+            const newProfilePicture = await uploadToCloudinary({
                 file_buffer: fileBuffer,
                 foldername: "room_profile",
                 mimetype: props.group_profile.type,
                 original_name: props.group_profile.name
             });
-        }
 
-        await groupProfileRepository.createGroup({
-            group_name: groupName,
-            owner_id: userId,
-            group_description: newDescription,
-            group_profile: newProfilePicture
-        });
+            await groupProfileRepository.createGroup({
+                group_name: newGroupName,
+                owner_id: userId,
+                group_description: newGroupDescription,
+                group_profile: newProfilePicture
+            });
+        } else {
+            await groupProfileRepository.createGroup({
+                group_name: newGroupName,
+                owner_id: userId,
+                group_description: newGroupDescription,
+                group_profile: {
+                    file_name: "-", 
+                    file_type: "-", 
+                    public_id: "-", 
+                    resource_type: "-", 
+                    url: "-"
+                }
+            });
+        }
     }
 
     async deleteGroup(props: TGroupProfile["deleteGroup"]) {
+        const operations = [];
         const groupId = this.checkIsIdValid("group", props.group_id);
         const userId = this.checkIsIdValid("group owner", props.owner_id);
 
         const group = await groupProfileRepository.findOneGroup(groupId);
+        const groupMessages = await groupProfileRepository.findAllMessages(groupId);
+        const groupMessagesFiles = groupMessages.flatMap(message => message.files || []);
+
         if (!group) throw new ChitChatApiError("group not found", 404);
 
         if (group.owner_id.toString() !== userId) {
             throw new ChitChatApiError("you are not allowed to delete this group", 403);
         }
 
-        if (group.group_profile && group.group_profile.public_id) {
-            await v2.uploader.destroy(group.group_profile.public_id, {
+        if (group.group_profile && group.group_profile.public_id !== "-") {
+            operations.push(await v2.uploader.destroy(group.group_profile.public_id, {
                 resource_type: group.group_profile.resource_type
-            });
+            }));
         }
+
+        if (groupMessagesFiles.length > 0) {
+            const removeFromCloudinary = groupMessagesFiles.map(messagesFile => {
+                return v2.uploader.destroy(messagesFile.public_id, { 
+                    resource_type: messagesFile.resource_type 
+                });
+            });
+
+            operations.push(...removeFromCloudinary);
+        }
+
+        if (operations.length > 0) await Promise.all(operations);
 
         await groupProfileRepository.deleteGroup({ group_id: groupId, owner_id: userId });
 
@@ -176,7 +194,7 @@ class GroupProfileService {
             throw new ChitChatApiError("you are not allowed to delete this group", 403);
         }
 
-        if (group.group_profile && group.group_profile.public_id) {
+        if (group.group_profile && group.group_profile.public_id !== "-") {
             await v2.uploader.destroy(group.group_profile.public_id, {
                 resource_type: group.group_profile.resource_type
             });

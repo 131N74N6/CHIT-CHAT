@@ -84,7 +84,6 @@ export default function AvailableGroup() {
                 file_type: "",
                 public_id: "",
                 resource_type: "",
-                size: 0,
                 url: "",
             });
         } else {
@@ -96,7 +95,6 @@ export default function AvailableGroup() {
                 file_type: "",
                 public_id: "",
                 resource_type: "",
-                size: 0,
                 url: "",
             });
             setSelectedProfileGroupUrl("");
@@ -153,22 +151,24 @@ export default function AvailableGroup() {
                             groupProfile.showGroupDetail.data.group_description : "-",
 
                             picture: {
-                                file_name: groupProfile.showGroupDetail.data ?
+                                file_name: groupProfile.showGroupDetail.data &&
+                                groupProfile.showGroupDetail.data.group_profile.file_name !== "-" ?
                                 groupProfile.showGroupDetail.data.group_profile.file_name : "-",
 
-                                file_type: groupProfile.showGroupDetail.data ?
+                                file_type: groupProfile.showGroupDetail.data && 
+                                groupProfile.showGroupDetail.data.group_profile.file_type !== "-" ?
                                 groupProfile.showGroupDetail.data.group_profile.file_type : "-",
 
-                                public_id: groupProfile.showGroupDetail.data ?
-                                groupProfile.showGroupDetail.data.group_profile.file_name : "-",
+                                public_id: groupProfile.showGroupDetail.data && 
+                                groupProfile.showGroupDetail.data.group_profile.public_id !== "-" ?
+                                groupProfile.showGroupDetail.data.group_profile.public_id : "-",
 
-                                resource_type: groupProfile.showGroupDetail.data ?
+                                resource_type: groupProfile.showGroupDetail.data && 
+                                groupProfile.showGroupDetail.data.group_profile.resource_type !== "-" ?
                                 groupProfile.showGroupDetail.data.group_profile.resource_type : "-",
 
-                                size: groupProfile.showGroupDetail.data ?
-                                groupProfile.showGroupDetail.data.group_profile.size : 0,
-
-                                url: groupProfile.showGroupDetail.data ?
+                                url: groupProfile.showGroupDetail.data && 
+                                groupProfile.showGroupDetail.data.group_profile.url !== "-" ?
                                 groupProfile.showGroupDetail.data.group_profile.url : "-"
                             },
                             group_name: groupProfile.showGroupDetail.data ?
@@ -221,28 +221,30 @@ export default function AvailableGroup() {
                             handleImagePreview: groupProfile.handleImagePreview,
 
                             picture: {
-                                file_name: groupProfile.showGroupDetail.data ? 
+                                file_name: groupProfile.showGroupDetail.data &&
+                                groupProfile.showGroupDetail.data.group_profile.file_name !== "-" ?
                                 groupProfile.showGroupDetail.data.group_profile.file_name : "-",
 
-                                file_type: groupProfile.showGroupDetail.data ? 
+                                file_type: groupProfile.showGroupDetail.data && 
+                                groupProfile.showGroupDetail.data.group_profile.file_type !== "-" ?
                                 groupProfile.showGroupDetail.data.group_profile.file_type : "-",
 
-                                public_id: groupProfile.showGroupDetail.data ? 
+                                public_id: groupProfile.showGroupDetail.data && 
+                                groupProfile.showGroupDetail.data.group_profile.public_id !== "-" ?
                                 groupProfile.showGroupDetail.data.group_profile.public_id : "-",
 
-                                resource_type: groupProfile.showGroupDetail.data ? 
+                                resource_type: groupProfile.showGroupDetail.data && 
+                                groupProfile.showGroupDetail.data.group_profile.resource_type !== "-" ?
                                 groupProfile.showGroupDetail.data.group_profile.resource_type : "-",
 
-                                size: groupProfile.showGroupDetail.data ? 
-                                groupProfile.showGroupDetail.data.group_profile.size : 0,
-                                
-                                url: groupProfile.showGroupDetail.data ? 
+                                url: groupProfile.showGroupDetail.data && 
+                                groupProfile.showGroupDetail.data.group_profile.url !== "-" ?
                                 groupProfile.showGroupDetail.data.group_profile.url : "-"
                             },
                             group_name: groupProfile.showGroupDetail.data ? 
                             groupProfile.showGroupDetail.data.group_name : "-",
 
-                            isLoading: false,
+                            isLoading: groupProfile.showGroupDetail.isLoading,
                             isGroupOwner: isGroupOwner
                         }} 
                         isProcessing={groupChat.isProcessing || groupMember.isProcessing || groupProfile.isProcessing}
