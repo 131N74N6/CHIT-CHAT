@@ -16,7 +16,7 @@ export default function Settings() {
     const userProfile = useUserProfileService();
     
     useEffect(() => {
-        if (!owner.getCurrentUser.data && !owner.getCurrentUser.isLoading) {
+        if (!owner.getCurrentUser.data && !owner.getCurrentUser.isPending) {
             navigate("/sign-in", { replace: true });
         }
     }, [currentUserId, owner.getCurrentUser.isPending, owner.getCurrentUser.data, navigate]);

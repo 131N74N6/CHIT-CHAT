@@ -19,8 +19,8 @@ const userProfileRouters = new Elysia({ prefix: "/api/v1/users" })
     query: t.Pick(userProfileSchema.showAllUser, ["limit", "page"])
 })
 .get("/session", async (context) => {
-    const token = context.cookie['better-auth.session_token'].value;
-    return { data: token };
+    const sessionToken = context.cookie['better-auth.session_token']?.value;
+    return { data: sessionToken || null, success: true, message: "Session retrieved successfully" };
 })
 .get("/me", async (context) => {
     return await userProfileController.showUser({ id: context.user.id });

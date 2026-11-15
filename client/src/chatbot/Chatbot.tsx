@@ -32,7 +32,7 @@ export default function Chatbot() {
     const auths = useAuthService();
 
     useEffect(() => {
-        if (!auths.getCurrentUser.data && !auths.getCurrentUser.isLoading) {
+        if (!auths.getCurrentUser.data && !auths.getCurrentUser.isPending) {
             navigate("/sign-in", { replace: true });
         }
     }, [currentUserId, auths.getCurrentUser.isPending, auths.getCurrentUser.data, navigate]);
