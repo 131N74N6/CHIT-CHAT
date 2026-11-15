@@ -161,7 +161,7 @@ class GroupProfileService {
         }
 
         if (group.group_profile && group.group_profile.public_id !== "-") {
-            operations.push(await v2.uploader.destroy(group.group_profile.public_id, {
+            operations.push(v2.uploader.destroy(group.group_profile.public_id, {
                 resource_type: group.group_profile.resource_type
             }));
         }
