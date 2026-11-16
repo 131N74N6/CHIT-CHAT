@@ -43,6 +43,7 @@ export default function useAuthService() {
     
     const resetNavbarState = useNavbarStore((state) => state.resetNavbarState);
     
+    const currentUserId = useUserStore((state) => state.currentUserId);
     const setCurrentUserId = useUserStore((state) => state.setCurrentUserId);
 
     const resetUserState = useUserStore((state) => state.resetUserState);
@@ -135,7 +136,7 @@ export default function useAuthService() {
         },
         onSuccess: () => {
             queryClient.setQueryData(['current-user'], null);
-            queryClient.removeQueries({ queryKey: [`user-session-token`] }); 
+            queryClient.removeQueries({ queryKey: [`user-session-token-${currentUserId}`] }); 
             queryClient.clear();
             resetChatState();
             resetGroupMemberState();

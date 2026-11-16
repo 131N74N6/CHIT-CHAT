@@ -13,7 +13,7 @@ export default function useGroupMemberService() {
     const setMessage = useMessageStore((state) => state.setMessage);
     
     const currentUserId = useUserStore((state) => state.currentUserId);
-
+    
     const roomCode = useUserStore((state) => state.roomCode);
     const setRoomCode = useUserStore((state) => state.setRoomCode);
 

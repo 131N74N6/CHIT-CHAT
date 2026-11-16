@@ -66,12 +66,6 @@ export default function YourProfile() {
     }, [editMode, owner.getCurrentUser.data, currentUserId]);
 
     useEffect(() => {
-        if (!owner.getCurrentUser.data && !owner.getCurrentUser.isPending) {
-            navigate("/sign-in", { replace: true });
-        }
-    }, [currentUserId, owner.getCurrentUser.isPending, owner.getCurrentUser.data, navigate]);
-
-    useEffect(() => {
         if (message) {
             const timer = setTimeout(() => setMessage(null), 1500);
             return () => clearTimeout(timer);

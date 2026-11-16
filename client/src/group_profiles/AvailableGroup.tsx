@@ -17,11 +17,8 @@ import { useGroupProfileStore } from "./store";
 import GroupProfilePopUp from "./GroupProfilePopUp";
 import GroupChatFilesPopUp from "../group_chats/GroupChatFilesPopUp";
 import GroupChatFilesPreviewPopUp from "../group_chats/GroupChatFilesPreviewPopUp";
-import { useNavigate } from "react-router-dom";
-import useAuthService from "../auths/service";
 
 export default function AvailableGroup() {
-    const navigate = useNavigate();
     const groupId = useGroupChatStore((state) => state.groupId);
 
     const message = useMessageStore((state) => state.message);
@@ -49,16 +46,9 @@ export default function AvailableGroup() {
     const showProfile = useGroupProfileStore((state) => state.showProfile);
     const currentUserId = useUserStore((state) => state.currentUserId);
 
-    const auths = useAuthService();
     const groupChat = useGroupChatService();
     const groupProfile = useGroupProfileService();
     const groupMember = useGroupMemberService();
-
-    useEffect(() => {
-        if (!auths.getCurrentUser.data && !auths.getCurrentUser.isPending) {
-            navigate("/sign-in", { replace: true });
-        }
-    }, [currentUserId, auths.getCurrentUser.isPending, auths.getCurrentUser.data, navigate]);
     
     useEffect(() => {
         if (message) {

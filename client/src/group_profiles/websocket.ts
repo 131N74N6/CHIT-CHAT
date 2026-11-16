@@ -1,5 +1,5 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useCallback, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { useMessageStore } from "../alert/store";
 import { useGroupChatStore } from "../group_chats/store";
 import { apiRequest } from "../api";
@@ -32,75 +32,109 @@ export default function useGroupProfileWebSocket() {
         retryDelay: 1000,
     });
     
-    const connect = useCallback(() => {
-        if (!getSessionToken.data || getSessionToken.isLoading) return;
-        if (!groupId) return;
+    
+    useEffect(() => {
+        let isMounted = true;
 
-        const token = getSessionToken.data;
-
-        if (!token || typeof token !== "string") {
-            setMessage("Authentication failed");
-            return;
-        }
-
-        const wsUrl = buildWsUrl(`${import.meta.env.VITE_BASE_API_URL}`, groupId, token);
-        const ws = new WebSocket(wsUrl);
-        wsRef.current = ws;
-
-        ws.onmessage = (event) => {
-            const data = JSON.parse(event.data);
-
-            if (data.type === "pong") return;
-
-            if (data.type === "error") {
-                setMessage(data.message);
+        function connect() {
+            if (!getSessionToken.data || getSessionToken.isLoading || !isMounted || !groupId) return;
+    
+            const token = getSessionToken.data;
+    
+            if (!token || typeof token !== "string") {
+                setMessage("Authentication failed");
                 return;
             }
+    
+            const wsUrl = buildWsUrl(`${import.meta.env.VITE_BASE_API_URL}`, groupId, token);
 
-            if (
-                data.type === "group-profile:changed" || 
-                data.type === "group-profile:deleted" || 
-                data.type === "group-profile:profile-picture-deleted"
-            ) {
-                queryClient.invalidateQueries({
-                    predicate: (query) => {
-                        const key = query.queryKey[0];
-                        if (typeof key !== "string") return false;
+            if (wsRef.current?.readyState === WebSocket.OPEN && wsRef.current.url === wsUrl) return;
+            if (wsRef.current) wsRef.current.close(1000, "Reconnecting...");
 
-                        return (
-                            key.startsWith("group-profile-") ||
-                            key.startsWith("group-owner-") ||
-                            key.startsWith("available-group-")
-                        );
-                    }
-                });
+            const ws = new WebSocket(wsUrl);
+            wsRef.current = ws;
+
+            ws.onopen = () => {
+                const heartbeat = setInterval(() => {
+                    if (ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ type : "ping" }));
+                }, 30000);
+
+                (ws as any).heartbeatInterval = heartbeat;
+            }
+    
+            ws.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+    
+                if (data.type === "pong") return;
+    
+                if (data.type === "error") {
+                    setMessage(data.message);
+                    return;
+                }
+    
+                if (
+                    data.type === "group-profile:changed" || 
+                    data.type === "group-profile:deleted" || 
+                    data.type === "group-profile:profile-picture-deleted"
+                ) {
+                    queryClient.invalidateQueries({
+                        predicate: (query) => {
+                            const key = query.queryKey[0];
+                            if (typeof key !== "string") return false;
+    
+                            return (
+                                key.startsWith("group-profile-") ||
+                                key.startsWith("group-owner-") ||
+                                key.startsWith("available-group-")
+                            );
+                        }
+                    });
+                }
+            }
+    
+            ws.onclose = (event) => {
+                if (!isMounted) return;
+                if (!groupId) return;
+                if ((ws as any).heartbeatInterval) clearInterval((ws as any).heartbeatInterval);
+                if (event.code === 4001 || event.code === 4002) return;
+
+                reconnectTimeoutRef.current = setTimeout(() => {
+                    if (isMounted) connect();
+                }, 3000);
+            }
+    
+            ws.onerror = () => {
+                if (!isMounted) return;
+                ws.close();
             }
         }
 
-        ws.onclose = () => {
-            reconnectTimeoutRef.current = setTimeout(() => connect, 3000);
-        }
-
-        ws.onerror = () => {
-            ws.close();
-        }
-    }, [groupId, queryClient]);
-
-    useEffect(() => {
         connect();
 
         return () => {
-            if (wsRef.current) {
-                clearInterval((wsRef.current as any).heartbeatInterval);
+            isMounted = false;
 
-                if (wsRef.current.readyState === WebSocket.OPEN) {
+            if (reconnectTimeoutRef.current) {
+                clearTimeout(reconnectTimeoutRef.current);
+                reconnectTimeoutRef.current = null;
+            }
+
+            if (wsRef.current) {
+                if ((wsRef.current as any).heartbeatInterval) {
+                    clearInterval((wsRef.current as any).heartbeatInterval);;
+                }
+
+                if (
+                    wsRef.current.readyState === WebSocket.OPEN ||
+                    wsRef.current.readyState === WebSocket.CONNECTING
+                ) {
                     wsRef.current.close(1000, "Unmounted");
                 }
             }
 
-            if (reconnectTimeoutRef.current) clearTimeout(reconnectTimeoutRef.current);
+            wsRef.current = null;
         }
-    }, [connect]);
+    }, [getSessionToken.data, getSessionToken.isLoading, groupId, queryClient, setMessage]);
 
     return wsRef.current;
 }

@@ -34,7 +34,7 @@ const groupMemberRouters = new Elysia({ prefix: "/api/v1/groups/members" })
 }, {
     body: t.Pick(groupMemberSchema.joinGroup, ["group_id"])
 })
-.ws("/ws", {
+.ws("/ws/:group_id", {
     params: t.Pick(groupMemberSchema.wsConfig, ["group_id"]),
     query: t.Pick(groupMemberSchema.wsConfig, ["token"]),
 

@@ -52,7 +52,7 @@ const groupProfileRouters = new Elysia({ prefix: "/api/v1/groups" })
 }, {
     params: t.Pick(groupProfileSchema.changeGroupRaw, ["_id"])
 })
-.ws("/ws", {
+.ws("/ws/:group_id", {
     params: t.Pick(groupProfileSchema.wsConfig, ["group_id"]),
     query: t.Pick(groupProfileSchema.wsConfig, ["token"]),
 

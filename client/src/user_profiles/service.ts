@@ -122,7 +122,7 @@ export default function useUserProfileService() {
         onSuccess: () => {
             if (fileInputRef.current) fileInputRef.current.value = "";
             queryClient.setQueryData(["current-user"], null);
-            queryClient.removeQueries({ queryKey: [`user-session-token`] }); 
+            queryClient.removeQueries({ queryKey: [`user-session-token-${currentUserId}`] }); 
             queryClient.clear();
             resetChatState();
             resetGroupMemberState();
