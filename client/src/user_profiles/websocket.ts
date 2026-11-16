@@ -42,6 +42,10 @@ export default function useUserProfileWebSocket() {
         }
 
         const wsUrl = buildWsUrl(`${import.meta.env.VITE_BASE_API_URL}`, token);
+
+        if (wsRef.current?.readyState === WebSocket.OPEN && wsRef.current.url === wsUrl) return;
+        if (wsRef.current) wsRef.current.close(1000, "Reconnecting...");
+
         const ws = new WebSocket(wsUrl);
         wsRef.current = ws;
 
@@ -85,8 +89,9 @@ export default function useUserProfileWebSocket() {
             }
         }
         
-        ws.onclose = () => {
-            reconnectTimeoutRef.current = setTimeout(connect, 3000);
+        ws.onclose = (event) => {
+            if (event.code === 4001 || event.code === 4002) return;
+            if (currentUserId) reconnectTimeoutRef.current = setTimeout(connect, 3000);
         }
 
         ws.onerror = () => {
@@ -95,20 +100,30 @@ export default function useUserProfileWebSocket() {
     }, [currentUserId, queryClient]);
     
     useEffect(() => {
+        if (!currentUserId) {
+            if (reconnectTimeoutRef.current) {
+                clearTimeout(reconnectTimeoutRef.current);
+                reconnectTimeoutRef.current = null;
+            }
+            
+            if (wsRef.current) {
+                wsRef.current.close(1000, "User signed out");
+                wsRef.current = null;
+            }
+
+            return;
+        }
+
         connect();
 
         return () => {
-            if (wsRef.current) {
-                clearInterval((wsRef.current as any).heartbeatInterval);
-
-                if (wsRef.current.readyState === WebSocket.OPEN) {
-                    wsRef.current.close(1000, "Unmounted");
-                }
-            }
-
             if (reconnectTimeoutRef.current) clearTimeout(reconnectTimeoutRef.current);
+
+            if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+                wsRef.current.close(1000, "Unmounted");
+            }
         }
-    }, [connect]);
+    }, [currentUserId, connect]);
 
     return wsRef.current;
 }

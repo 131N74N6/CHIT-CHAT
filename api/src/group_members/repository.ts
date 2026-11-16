@@ -14,7 +14,7 @@ class GroupMemberRepository {
     async isGroupOwner(group_id: string, user_id: string) {
         let isOwner = false;
         const group = await this.group_profiles.findOne({ _id: new ObjectId(group_id) });
-        if (group) isOwner = new ObjectId(user_id) === new ObjectId(group.owner_id)
+        if (group) isOwner = user_id === group.owner_id.toString();
         return isOwner;
     }
 

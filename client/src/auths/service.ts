@@ -135,6 +135,7 @@ export default function useAuthService() {
         },
         onSuccess: () => {
             queryClient.setQueryData(['current-user'], null);
+            queryClient.removeQueries({ queryKey: [`user-session-token`] }); 
             queryClient.clear();
             resetChatState();
             resetGroupMemberState();
