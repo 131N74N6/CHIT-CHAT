@@ -1,7 +1,7 @@
 import type { IGroupProfileData } from "./model";
-import { useGroupChatStore } from "../group_chats/store";
-import { useGroupMemberStore } from "../group_member/store";
-import { useGroupProfileStore } from "./store";
+import { useGroupChatStore } from "../group_chats/useGroupChatStore";
+import { useGroupMemberStore } from "../group_member/useGroupMemberStore";
+import { useGroupProfileStore } from "./useGroupProfileStore";
 
 export default function GroupData(props: IGroupProfileData) {
     const setShowGroupChatFilesPopUp = useGroupChatStore((state) => state.setShowGroupChatFilesPopUp);

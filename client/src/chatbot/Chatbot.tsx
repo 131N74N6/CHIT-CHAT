@@ -1,12 +1,12 @@
 import { BrushCleaning, CheckCircle, Eraser, SendIcon, X } from "lucide-react";
-import useChatbotService from "./service";
+import useChatbotService from "./useChatbotService";
 import Navbar from "../navbar/Navbar";
 import { useEffect } from "react";
-import { useMessageStore } from "../alert/store";
+import { useMessageStore } from "../alert/useMessageStore";
 import Alert from "../alert/Alert";
 import MessageList from "./MessageList";
 import Loading from "../loading/Loading";
-import { useChatbotStore } from "./store";
+import { useChatbotStore } from "./useChatbotStore";
 
 export default function Chatbot() {
     const message = useMessageStore((state) => state.message);

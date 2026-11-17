@@ -1,7 +1,7 @@
 import MessageBubble from "./MessageBubble";
 import { useCallback, useEffect, useRef } from "react";
 import type { IUserMessageList } from "./model";
-import { useUserStore } from "../user_profiles/store";
+import { useUserStore } from "../user_profiles/useUserStore";
 
 export default function MessageList(props: IUserMessageList) {
     const scrollContainerRef = useRef<HTMLDivElement>(null);

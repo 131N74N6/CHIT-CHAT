@@ -2,8 +2,8 @@ import { useNavigate } from "react-router-dom";
 import cn from "../utils/cn";
 import { FileIcon } from "lucide-react";
 import type { IUserMessageData } from "./model";
-import { useUserChatStore } from "./store";
-import { useUserStore } from "../user_profiles/store";
+import { useUserChatStore } from "./useUserChatStore";
+import { useUserStore } from "../user_profiles/useUserStore";
 
 export default function MessageBubble(props: IUserMessageData) {
     const navigate = useNavigate();

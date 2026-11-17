@@ -1,11 +1,11 @@
 import { FileIcon } from "lucide-react";
 import type { IGroupMessageData } from "./model";
 import cn from "../utils/cn";
-import { useGroupChatStore } from "./store";
-import { useUserChatStore } from "../user_chats/store";
-import { useGroupMemberStore } from "../group_member/store";
-import { useGroupProfileStore } from "../group_profiles/store";
-import { useUserStore } from "../user_profiles/store";
+import { useGroupChatStore } from "./useGroupChatStore";
+import { useUserChatStore } from "../user_chats/useUserChatStore";
+import { useGroupMemberStore } from "../group_member/useGroupMemberStore";
+import { useGroupProfileStore } from "../group_profiles/useGroupProfileStore";
+import { useUserStore } from "../user_profiles/useUserStore";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 

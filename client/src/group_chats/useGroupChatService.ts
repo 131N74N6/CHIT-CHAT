@@ -1,10 +1,10 @@
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useGroupChatStore } from "./store";
+import { useGroupChatStore } from "./useGroupChatStore";
 import { useEffect, useRef } from "react";
 import type { IGroupMessage, IGroupMessageFiles, IGroupFilePreview } from "./model";
-import { useMessageStore } from "../alert/store";
+import { useMessageStore } from "../alert/useMessageStore";
 import { apiRequest, apiUpload } from "../api";
-import { useUserStore } from "../user_profiles/store";
+import { useUserStore } from "../user_profiles/useUserStore";
 import { groupChatWebSocket } from "./websocket";
 
 export default function useGroupChatService() {

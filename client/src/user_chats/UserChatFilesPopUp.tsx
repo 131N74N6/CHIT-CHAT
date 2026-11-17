@@ -1,7 +1,7 @@
 import { MessageCircle } from "lucide-react";
 import Loading from "../loading/Loading";
-import { useUserChatStore } from "./store";
-import { useUserStore } from "../user_profiles/store";
+import { useUserChatStore } from "./useUserChatStore";
+import { useUserStore } from "../user_profiles/useUserStore";
 import type { IUserChatFilesPopUp } from "./model";
 import UserChatFileList from "./UserChatFileList";
 

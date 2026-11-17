@@ -5,7 +5,7 @@ import ReactMarkdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
 import remarkGfm from "remark-gfm";
 import type { IEachMessageBot } from "./model";
-import { useChatbotStore } from "./store";
+import { useChatbotStore } from "./useChatbotStore";
 
 export default function MessageBubble(props: IEachMessageBot) {
     const selectMode = useChatbotStore((state) => state.selectMode);

@@ -1,9 +1,9 @@
 import { ArrowLeft } from "lucide-react";
 import Loading from "../loading/Loading";
-import { useGroupChatStore } from "../group_chats/store";
+import { useGroupChatStore } from "../group_chats/useGroupChatStore";
 import UserList from "../user_profiles/UserList";
-import { useGroupMemberStore } from "./store";
-import { useGroupProfileStore } from "../group_profiles/store";
+import { useGroupMemberStore } from "./useGroupMemberStore";
+import { useGroupProfileStore } from "../group_profiles/useGroupProfileStore";
 import type { IGroupMemberPopUp } from "./model";
 
 export default function GroupMemberPopUp(props: IGroupMemberPopUp) {

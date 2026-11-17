@@ -1,11 +1,11 @@
 import { Camera, X } from "lucide-react";
 import Navbar from "../navbar/Navbar";
 import cn from "../utils/cn";
-import { useMessageStore } from "../alert/store";
+import { useMessageStore } from "../alert/useMessageStore";
 import { useEffect } from "react";
 import Alert from "../alert/Alert";
-import useGroupProfileService from "./service";
-import { useGroupProfileStore } from "./store";
+import useGroupProfileService from "./useGroupProfileService";
+import { useGroupProfileStore } from "./useGroupProfileStore";
 
 export default function CreateGroup() {
     const message = useMessageStore((state) => state.message);

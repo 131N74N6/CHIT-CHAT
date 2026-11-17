@@ -1,9 +1,9 @@
 import { FilesIcon, MessageCircle, SendIcon, X } from "lucide-react";
 import cn from "../utils/cn";
 import FileViewer from "../user_chats/FileViewer";
-import { useGroupChatStore } from "./store";
-import { useGroupMemberStore } from "../group_member/store";
-import { useGroupProfileStore } from "../group_profiles/store";
+import { useGroupChatStore } from "./useGroupChatStore";
+import { useGroupMemberStore } from "../group_member/useGroupMemberStore";
+import { useGroupProfileStore } from "../group_profiles/useGroupProfileStore";
 import type { IGroupChatFilesPreviewPopUp } from "./model";
 
 export default function GroupChatFilesPreviewPopUp(props: IGroupChatFilesPreviewPopUp) {

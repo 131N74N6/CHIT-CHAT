@@ -1,9 +1,9 @@
-import useUserProfileService from "./service";
+import useUserProfileService from "./useUserProfileService";
 import Loading from "../loading/Loading";
 import cn from "../utils/cn";
 import { MessageCircle, X } from "lucide-react";
-import { useUserChatStore } from "../user_chats/store";
-import { useUserStore } from "./store";
+import { useUserChatStore } from "../user_chats/useUserChatStore";
+import { useUserStore } from "./useUserStore";
 import type { IUserProfilePopUp } from "./model";
 
 export default function UserProfilePopUp(props: IUserProfilePopUp) {

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef } from "react";
-import { useUserStore } from "../user_profiles/store";
+import { useUserStore } from "../user_profiles/useUserStore";
 import MessageBubble from "./MessageBubble";
 import type { IGroupMessageList } from "./model";
 

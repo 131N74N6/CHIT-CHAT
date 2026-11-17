@@ -37,7 +37,8 @@ class GroupProfileService {
         const newGroupName = (props.group_name !== undefined && props.group_name !== "") ? 
         this.checkIsInputAString("group name", props.group_name) : group.group_name;
         
-        const newGroupDescription = (props.group_description !== undefined && props.group_description !== "") ?
+        const newGroupDescription = (props.group_description !== undefined && 
+        props.group_description !== "") ?
         this.checkIsInputAString("group description", props.group_description) : group.group_description;
 
         if (props.group_profile) {
@@ -97,7 +98,8 @@ class GroupProfileService {
         const newGroupName = (props.group_name !== undefined && props.group_name !== "") ? 
         this.checkIsInputAString("group name", props.group_name) : `group-${Date.now()}`;
         
-        const newGroupDescription = (props.group_description !== undefined && props.group_description !== "") ?
+        const newGroupDescription = (props.group_description !== undefined && 
+        props.group_description !== "") ? 
         this.checkIsInputAString("group description", props.group_description) : "-";
 
         if (props.group_profile) {

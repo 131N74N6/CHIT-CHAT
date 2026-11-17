@@ -1,19 +1,19 @@
-import { useEffect, useRef } from "react";
-import { useMessageStore } from "../alert/store";
-import { useGroupChatStore } from "../group_chats/store";
-import { useUserStore } from "../user_profiles/store";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect, useRef } from "react";
+import { useMessageStore } from "../alert/useMessageStore";
+import { useGroupChatStore } from "../group_chats/useGroupChatStore";
 import { apiRequest } from "../api";
+import { useUserStore } from "../user_profiles/useUserStore";
 
 function buildWsUrl(backend_url: string, group_id: string, token: string) {
     const wsProtocol = backend_url.startsWith("https") ? "wss:" : "ws:";
     const host = backend_url.replace(/^https?:\/\//, "");
     const encodedToken = encodeURIComponent(token);
-    const wsUrl = `${wsProtocol}//${host}/api/v1/groups/members/ws/${group_id}?token=${encodedToken}`;
+    const wsUrl = `${wsProtocol}//${host}/api/v1/groups/ws/${group_id}?token=${encodedToken}`;
     return wsUrl;
 }
 
-export default function useGroupMemberWebSocket() {
+export default function useGroupProfileWebSocket() {
     const wsRef = useRef<WebSocket | null>(null);
     const reconnectTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const queryClient = useQueryClient();
@@ -31,13 +31,13 @@ export default function useGroupMemberWebSocket() {
         retry: 3,
         retryDelay: 1000,
     });
-
+    
     
     useEffect(() => {
         let isMounted = true;
 
         function connect() {
-            if (!isMounted || !getSessionToken.data || getSessionToken.isLoading || !groupId) return;
+            if (!getSessionToken.data || getSessionToken.isLoading || !isMounted || !groupId) return;
     
             const token = getSessionToken.data;
     
@@ -56,9 +56,9 @@ export default function useGroupMemberWebSocket() {
 
             ws.onopen = () => {
                 const heartbeat = setInterval(() => {
-                    if (ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ type: "ping" }));
+                    if (ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ type : "ping" }));
                 }, 30000);
-                
+
                 (ws as any).heartbeatInterval = heartbeat;
             }
     
@@ -73,16 +73,20 @@ export default function useGroupMemberWebSocket() {
                 }
     
                 if (
-                    data.type === "member:joined" || 
-                    data.type === "member:kicked" || 
-                    data.type === "member:left"
+                    data.type === "group-profile:changed" || 
+                    data.type === "group-profile:deleted" || 
+                    data.type === "group-profile:profile-picture-deleted"
                 ) {
                     queryClient.invalidateQueries({
                         predicate: (query) => {
                             const key = query.queryKey[0];
                             if (typeof key !== "string") return false;
     
-                            return key.startsWith(`group-member-${groupId}`);
+                            return (
+                                key.startsWith("group-profile-") ||
+                                key.startsWith("group-owner-") ||
+                                key.startsWith("available-group-")
+                            );
                         }
                     });
                 }
@@ -95,7 +99,7 @@ export default function useGroupMemberWebSocket() {
                 if (event.code === 4001 || event.code === 4002) return;
 
                 reconnectTimeoutRef.current = setTimeout(() => {
-                    if (isMounted) connect(); 
+                    if (isMounted) connect();
                 }, 3000);
             }
     
@@ -117,11 +121,11 @@ export default function useGroupMemberWebSocket() {
 
             if (wsRef.current) {
                 if ((wsRef.current as any).heartbeatInterval) {
-                    clearInterval((wsRef.current as any).heartbeatInterval);
+                    clearInterval((wsRef.current as any).heartbeatInterval);;
                 }
 
                 if (
-                    wsRef.current.readyState === WebSocket.OPEN || 
+                    wsRef.current.readyState === WebSocket.OPEN ||
                     wsRef.current.readyState === WebSocket.CONNECTING
                 ) {
                     wsRef.current.close(1000, "Unmounted");

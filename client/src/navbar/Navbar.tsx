@@ -1,8 +1,8 @@
 import { useNavigate } from "react-router-dom";
-import useAuthServices from "../auths/service";
+import useAuthServices from "../auths/useAuthService";
 import { Bot, Group, Handshake, Home, Menu, PlusCircle, Power, Settings, UserCircle2 } from "lucide-react";
 import cn from "../utils/cn";
-import { useNavbarStore } from "./store";
+import { useNavbarStore } from "./useNavbarStore";
 
 interface INavbar {
     isProcessing?: boolean;

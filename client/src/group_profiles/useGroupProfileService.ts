@@ -1,13 +1,13 @@
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useMessageStore } from "../alert/store";
+import { useMessageStore } from "../alert/useMessageStore";
 import { useNavigate } from "react-router-dom";
-import { useUserStore } from "../user_profiles/store";
-import { useGroupProfileStore } from "./store";
+import { useUserStore } from "../user_profiles/useUserStore";
+import { useGroupProfileStore } from "./useGroupProfileStore";
 import { useRef } from "react";
-import { useGroupChatStore } from "../group_chats/store";
+import { useGroupChatStore } from "../group_chats/useGroupChatStore";
 import { apiRequest, apiUpload } from "../api";
 import type { IGroupProfileDetail, IGroups } from "./model";
-import useGroupProfileWebSocket from "./websocket";
+import useGroupProfileWebSocket from "./useGroupProfileWebSocket";
 
 export default function useGroupProfileService() {
     const navigate = useNavigate();

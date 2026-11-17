@@ -30,7 +30,6 @@ export interface IUserChatFiles {
         file_type: string;
         public_id: string;
         resource_type: string;
-        size: number;
         url: string;
     }[];
     isLoading: boolean;
@@ -42,7 +41,6 @@ export interface IUserChatFile {
         file_type: string;
         public_id: string;
         resource_type: string;
-        size: number;
         url: string;
     };
     isLoading: boolean;
@@ -138,7 +136,6 @@ export interface IUserChatFilesPopUp {
         file_type: string;
         public_id: string;
         resource_type: string;
-        size: number;
         url: string;
     }[];
     isProcessing: boolean;

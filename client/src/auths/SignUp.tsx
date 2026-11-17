@@ -1,10 +1,10 @@
 import cn from "../utils/cn";
-import useAuthService from "./service";
+import useAuthService from "./useAuthService";
 import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeClosed, MessageCircle } from "lucide-react";
 import { useEffect } from "react";
-import { useMessageStore } from "../alert/store";
-import { useAuthStore } from "./store";
+import { useMessageStore } from "../alert/useMessageStore";
+import { useAuthStore } from "./useAuthStore";
 
 export default function SignUp() {
     const auths = useAuthService();

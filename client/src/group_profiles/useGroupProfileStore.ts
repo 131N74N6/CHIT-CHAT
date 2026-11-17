@@ -29,7 +29,6 @@ export const useGroupProfileStore = create<IGroupProfileState>((set) => ({
             file_type: "",
             public_id: "",
             resource_type: "",
-            size: 0,
             url: "",
         },
         selectedProfileGroup: null,

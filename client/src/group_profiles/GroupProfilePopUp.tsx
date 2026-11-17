@@ -1,10 +1,10 @@
 import cn from "../utils/cn";
 import { Camera, MessageCircle, UserCircle, X } from "lucide-react";
 import Loading from "../loading/Loading";
-import { useGroupChatStore } from "../group_chats/store";
-import { useGroupProfileStore } from "./store";
+import { useGroupChatStore } from "../group_chats/useGroupChatStore";
+import { useGroupProfileStore } from "./useGroupProfileStore";
 import type { IGroupProfileDetailPopUp } from "./model";
-import { useGroupMemberStore } from "../group_member/store";
+import { useGroupMemberStore } from "../group_member/useGroupMemberStore";
 
 export default function GroupDetailPopUp(props: IGroupProfileDetailPopUp) {
     const setShowGroupChatPopUp = useGroupChatStore((state) => state.setShowGroupChatPopUp);

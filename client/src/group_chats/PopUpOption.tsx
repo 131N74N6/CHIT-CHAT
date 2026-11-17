@@ -1,6 +1,6 @@
 import cn from "../utils/cn";
 import type { iPopUpOptionForGroup } from "./model";
-import { useGroupChatStore } from "./store";
+import { useGroupChatStore } from "./useGroupChatStore";
 
 export default function PopUpOption(props: iPopUpOptionForGroup) {
     const resetChosenMessageIdsFromGroup = useGroupChatStore((state) => state.resetChosenMessageIdsFromGroup);

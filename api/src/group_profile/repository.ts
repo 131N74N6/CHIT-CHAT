@@ -9,18 +9,21 @@ class GroupProfileRepository {
     private users = db().collection<Omit<User, "id">>("user");
 
     async changeGroup(props: TGroupProfile["changeGroupResult"]) {
-        const result = await this.group_profiles.findOneAndUpdate({ 
-            _id: new ObjectId(props._id), owner_id: new ObjectId(props.owner_id) 
-        }, {
-            $set: {
-                group_description: props.group_description,
-                group_name: props.group_name,
-                group_profile: props.group_profile,
-                updated_at: new Date()
-            }
-        }, { returnDocument: "after" });
-
-        return result;
+        await Promise.all([
+            this.group_chats.updateMany({ group_id: new ObjectId(props._id) }, {
+                $set: { group_name: props.group_name }
+            }),
+            this.group_profiles.updateOne({ 
+                _id: new ObjectId(props._id), owner_id: new ObjectId(props.owner_id) 
+            }, {
+                $set: {
+                    group_description: props.group_description,
+                    group_name: props.group_name,
+                    group_profile: props.group_profile,
+                    updated_at: new Date()
+                }
+            })
+        ]);
     }
 
     async createGroup(props: TGroupProfile["createGroupResult"]) {

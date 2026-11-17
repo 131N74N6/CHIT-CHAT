@@ -1,20 +1,20 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
-import { useUserChatStore } from "../user_chats/store";
-import { useNavbarStore } from "../navbar/store";
-import { useChatbotStore } from "../chatbot/store";
-import { useMessageStore } from "../alert/store";
+import { useUserChatStore } from "../user_chats/useUserChatStore";
+import { useNavbarStore } from "../navbar/useNavbarStore";
+import { useChatbotStore } from "../chatbot/useChatbotStore";
+import { useMessageStore } from "../alert/useMessageStore";
 import { createAuthClient } from "better-auth/client";
 import type { AuthServiceApi } from "../../../api/src/auth/model";
 import { inferAdditionalFields } from "better-auth/client/plugins";
-import { useAuthStore } from "./store";
+import { useAuthStore } from "./useAuthStore";
 import { useEffect } from "react";
-import { useUserStore } from "../user_profiles/store";
-import { useGroupChatStore } from "../group_chats/store";
-import { useGroupMemberStore } from "../group_member/store";
-import { useGroupProfileStore } from "../group_profiles/store";
+import { useUserStore } from "../user_profiles/useUserStore";
+import { useGroupChatStore } from "../group_chats/useGroupChatStore";
+import { useGroupMemberStore } from "../group_member/useGroupMemberStore";
+import { useGroupProfileStore } from "../group_profiles/useGroupProfileStore";
 import { apiRequest } from "../api";
-import useUserProfileWebSocket from "../user_profiles/websocket";
+import useUserProfileWebSocket from "../user_profiles/useUserProfileWebSocket";
 
 export default function useAuthService() {
     const navigate = useNavigate();
@@ -98,7 +98,10 @@ export default function useAuthService() {
             setCurrentUserId(getCurrentUser.data.user_id);
         }
         
-        if (getCurrentUser.data && getCurrentUser.data.group_ids && getCurrentUser.data.group_ids.length > 0) {
+        if (
+            getCurrentUser.data && getCurrentUser.data.group_ids && 
+            getCurrentUser.data.group_ids.length > 0
+        ) {
             setGroupIds(getCurrentUser.data.group_ids);
         }
     }, [getCurrentUser.data?.user_id, setCurrentUserId]);

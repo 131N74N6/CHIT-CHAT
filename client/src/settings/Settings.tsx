@@ -1,9 +1,9 @@
 import { ImageMinus, UserMinus, UserPen } from "lucide-react";
-import useAuthService from "../auths/service";
+import useAuthService from "../auths/useAuthService";
 import Navbar from "../navbar/Navbar";
-import useUserProfileService from "../user_profiles/service";
+import useUserProfileService from "../user_profiles/useUserProfileService";
 import cn from "../utils/cn";
-import { useUserStore } from "../user_profiles/store";
+import { useUserStore } from "../user_profiles/useUserStore";
 import { useNavigate } from "react-router-dom";
 
 export default function Settings() {

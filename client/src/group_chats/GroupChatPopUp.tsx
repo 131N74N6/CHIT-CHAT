@@ -1,9 +1,9 @@
 import Loading from "../loading/Loading";
 import { ArrowLeft, File, SendIcon, Settings2 } from "lucide-react";
-import { useGroupChatStore } from "./store";
+import { useGroupChatStore } from "./useGroupChatStore";
 import MessageList from "./MessageList";
-import { useGroupProfileStore } from "../group_profiles/store";
-import { useGroupMemberStore } from "../group_member/store";
+import { useGroupProfileStore } from "../group_profiles/useGroupProfileStore";
+import { useGroupMemberStore } from "../group_member/useGroupMemberStore";
 import type { IGroupChatPopUp } from "./model";
 
 export default function GroupChatPopUp(props: IGroupChatPopUp) {

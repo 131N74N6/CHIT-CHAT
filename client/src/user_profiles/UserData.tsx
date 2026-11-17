@@ -2,11 +2,11 @@ import { useNavigate } from "react-router-dom";
 import type { UserData } from "./model";
 import cn from "../utils/cn";
 import { UserMinus2 } from "lucide-react";
-import { useUserChatStore } from "../user_chats/store";
-import { useUserStore } from "./store";
-import { useGroupChatStore } from "../group_chats/store";
-import { useGroupMemberStore } from "../group_member/store";
-import { useGroupProfileStore } from "../group_profiles/store";
+import { useUserChatStore } from "../user_chats/useUserChatStore";
+import { useUserStore } from "./useUserStore";
+import { useGroupChatStore } from "../group_chats/useGroupChatStore";
+import { useGroupMemberStore } from "../group_member/useGroupMemberStore";
+import { useGroupProfileStore } from "../group_profiles/useGroupProfileStore";
 
 export default function UserData(props: UserData) {
     const navigate = useNavigate();

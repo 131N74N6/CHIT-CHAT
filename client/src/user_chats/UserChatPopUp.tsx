@@ -1,8 +1,8 @@
 import ChatList from "./MessageList";
 import Loading from "../loading/Loading";
 import { File, SendIcon, Settings2, X } from "lucide-react";
-import { useUserChatStore } from "./store";
-import { useUserStore } from "../user_profiles/store";
+import { useUserChatStore } from "./useUserChatStore";
+import { useUserStore } from "../user_profiles/useUserStore";
 import type { IUserChatPopUp } from "./model";
 import { useEffect } from "react";
 

@@ -1,10 +1,10 @@
 import { Query, useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useMessageStore } from "../alert/store";
-import { useUserStore } from "../user_profiles/store";
+import { useMessageStore } from "../alert/useMessageStore";
+import { useUserStore } from "../user_profiles/useUserStore";
 import { apiRequest } from "../api";
 import type { Users } from "../user_profiles/model";
-import { useGroupChatStore } from "../group_chats/store";
-import useGroupMemberWebSocket from "./websocket";
+import { useGroupChatStore } from "../group_chats/useGroupChatStore";
+import useGroupMemberWebSocket from "./useGroupMemberWebSocket";
 
 export default function useGroupMemberService() {
     const queryClient = useQueryClient();

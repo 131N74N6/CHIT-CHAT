@@ -1,6 +1,6 @@
 import { Navigate } from "react-router-dom";
 import Loading from "../loading/Loading";
-import useAuthService from "./service";
+import useAuthService from "./useAuthService";
 
 interface ProtectedRouteIntrf {
     children: React.ReactNode;

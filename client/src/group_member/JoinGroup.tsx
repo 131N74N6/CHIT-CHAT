@@ -1,10 +1,10 @@
 import cn from "../utils/cn";
 import Navbar from "../navbar/Navbar";
-import { useMessageStore } from "../alert/store";
+import { useMessageStore } from "../alert/useMessageStore";
 import { useEffect } from "react";
 import Alert from "../alert/Alert";
-import useGroupMemberService from "./service";
-import { useUserStore } from "../user_profiles/store";
+import useGroupMemberService from "./useGroupMemberService";
+import { useUserStore } from "../user_profiles/useUserStore";
 
 export default function JoinGroup() {
     const message = useMessageStore((state) => state.message);

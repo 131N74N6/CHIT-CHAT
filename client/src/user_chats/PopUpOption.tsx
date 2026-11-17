@@ -1,6 +1,6 @@
 import cn from "../utils/cn";
 import type { iPopUpOptionForUser } from "./model";
-import { useUserChatStore } from "./store";
+import { useUserChatStore } from "./useUserChatStore";
 
 export default function PopUpOption(props: iPopUpOptionForUser) {
     const chosenMessageIds = useUserChatStore((state) => state.chosenMessageIds);

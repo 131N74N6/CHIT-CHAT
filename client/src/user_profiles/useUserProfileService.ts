@@ -1,16 +1,16 @@
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
-import { useUserChatStore } from "../user_chats/store";
-import { useUserStore } from "./store";
-import { useNavbarStore } from "../navbar/store";
+import { useUserChatStore } from "../user_chats/useUserChatStore";
+import { useUserStore } from "./useUserStore";
+import { useNavbarStore } from "../navbar/useNavbarStore";
 import { useRef } from "react";
-import { useMessageStore } from "../alert/store";
+import { useMessageStore } from "../alert/useMessageStore";
 import { apiRequest, apiUpload } from "../api";
 import type { UserDetail, Users } from "./model";
-import { useGroupChatStore } from "../group_chats/store";
-import { useGroupMemberStore } from "../group_member/store";
-import { useGroupProfileStore } from "../group_profiles/store";
-import { useChatbotStore } from "../chatbot/store";
+import { useGroupChatStore } from "../group_chats/useGroupChatStore";
+import { useGroupMemberStore } from "../group_member/useGroupMemberStore";
+import { useGroupProfileStore } from "../group_profiles/useGroupProfileStore";
+import { useChatbotStore } from "../chatbot/useChatbotStore";
 
 export default function useUserProfileService() {
     const fileInputRef = useRef<HTMLInputElement>(null);

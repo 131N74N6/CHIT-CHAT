@@ -1,13 +1,13 @@
 import { useEffect } from "react";
-import useUserProfileService from "../user_profiles/service";
-import { useMessageStore } from "../alert/store";
+import useUserProfileService from "../user_profiles/useUserProfileService";
+import { useMessageStore } from "../alert/useMessageStore";
 import Loading from "../loading/Loading";
 import Navbar from "../navbar/Navbar";
 import { ArrowBigLeft, X } from "lucide-react";
 import Alert from "../alert/Alert";
 import cn from "../utils/cn";
-import useAuthService from "./service";
-import { useUserStore } from "../user_profiles/store";
+import useAuthService from "./useAuthService";
+import { useUserStore } from "../user_profiles/useUserStore";
 import { useNavigate } from "react-router-dom";
 
 export default function YourProfile() {
