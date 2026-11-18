@@ -5,11 +5,16 @@ import { apiRequest } from "../api";
 import type { Users } from "../user_profiles/model";
 import { useGroupChatStore } from "../group_chats/useGroupChatStore";
 import useGroupMemberWebSocket from "./useGroupMemberWebSocket";
+import { useGroupMemberStore } from "./useGroupMemberStore";
+import useDebounce from "./useDebounce";
 
 export default function useGroupMemberService() {
     const queryClient = useQueryClient();
     const groupId = useGroupChatStore((state) => state.groupId);
 
+    const searchedGroupMember = useGroupMemberStore((state) => state.searchedGroupMember);
+    const search = useDebounce<string>(500, searchedGroupMember.trim());
+    
     const setMessage = useMessageStore((state) => state.setMessage);
     
     const currentUserId = useUserStore((state) => state.currentUserId);
@@ -39,9 +44,18 @@ export default function useGroupMemberService() {
             setMessage(error.message);
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['current-user'] });
-            queryClient.invalidateQueries({ queryKey: [`available-group-${currentUserId}`] });
-            queryClient.invalidateQueries({ queryKey: [`group-member-${roomCode}`] });
+            queryClient.invalidateQueries({ 
+                predicate: (query) => {
+                    const keys = query.queryKey;
+                    if (Array.isArray(keys) && keys.length > 0 && typeof keys[0] === "string") {
+                        return keys[0].startsWith('current-user') ||
+                        keys[0].startsWith(`available-group-${currentUserId}`) ||
+                        keys[0].startsWith(`group-member-${roomCode}`);
+                    }
+                    return false;
+                }
+            });
+
             setRoomCode("");
         }
     });
@@ -102,11 +116,15 @@ export default function useGroupMemberService() {
         },
         initialPageParam: 1,
         queryFn: async ({ pageParam = 1 }: { pageParam?: number }) => {
-            const endpoint = `/api/v1/groups/members?group_id=${groupId}&page=${pageParam}&limit=${16}`;
+            const endpoint = search ? 
+            `/api/v1/groups/members?group_id=${groupId}&name=${search.trim()}&page=${pageParam}&limit=${16}` : 
+            `/api/v1/groups/members?group_id=${groupId}&page=${pageParam}&limit=${16}`;
+
             const request = await apiRequest<Users[]>(endpoint, { method: "GET" });
             return request.data ?? [];
         },
-        queryKey: [`group-member-${groupId}`]
+        queryKey: search ? [`group-member-${groupId}-${search}`] : 
+        [`group-member-${groupId}`]
     });
 
     const isProcessing = [joinGroupMt, kickMemberMt, leftGroupMt].some(feature => feature.isPending);

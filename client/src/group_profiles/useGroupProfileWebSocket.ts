@@ -16,6 +16,8 @@ function buildWsUrl(backend_url: string, group_id: string, token: string) {
 export default function useGroupProfileWebSocket() {
     const wsRef = useRef<WebSocket | null>(null);
     const reconnectTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const isConncectingRef = useRef<boolean>(false);
+
     const queryClient = useQueryClient();
     const setMessage = useMessageStore((state) => state.setMessage);
     const groupId = useGroupChatStore((state) => state.groupId);
@@ -32,7 +34,6 @@ export default function useGroupProfileWebSocket() {
         retryDelay: 1000,
     });
     
-    
     useEffect(() => {
         let isMounted = true;
 
@@ -46,15 +47,30 @@ export default function useGroupProfileWebSocket() {
                 return;
             }
     
+            isConncectingRef.current = true;
             const wsUrl = buildWsUrl(`${import.meta.env.VITE_BASE_API_URL}`, groupId, token);
 
-            if (wsRef.current?.readyState === WebSocket.OPEN && wsRef.current.url === wsUrl) return;
-            if (wsRef.current) wsRef.current.close(1000, "Reconnecting...");
+            if (wsRef.current?.readyState === WebSocket.OPEN && wsRef.current.url === wsUrl) {
+                isConncectingRef.current = false;
+                return;
+            }
+
+            if (wsRef.current) {
+                if (wsRef.current.readyState === WebSocket.OPEN) {
+                    wsRef.current.close(1000, "Reconnecting...");
+                } else {
+                    wsRef.current = null;
+                }
+            }
 
             const ws = new WebSocket(wsUrl);
             wsRef.current = ws;
 
             ws.onopen = () => {
+                if (!isMounted) return;
+
+                isConncectingRef.current = false;
+
                 const heartbeat = setInterval(() => {
                     if (ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify({ type : "ping" }));
                 }, 30000);
@@ -63,6 +79,8 @@ export default function useGroupProfileWebSocket() {
             }
     
             ws.onmessage = (event) => {
+                if (!isMounted) return;
+
                 const data = JSON.parse(event.data);
     
                 if (data.type === "pong") return;
@@ -95,6 +113,9 @@ export default function useGroupProfileWebSocket() {
             ws.onclose = (event) => {
                 if (!isMounted) return;
                 if (!groupId) return;
+
+                isConncectingRef.current = false;
+
                 if ((ws as any).heartbeatInterval) clearInterval((ws as any).heartbeatInterval);
                 if (event.code === 4001 || event.code === 4002) return;
 
@@ -105,7 +126,6 @@ export default function useGroupProfileWebSocket() {
     
             ws.onerror = () => {
                 if (!isMounted) return;
-                ws.close();
             }
         }
 
@@ -113,6 +133,7 @@ export default function useGroupProfileWebSocket() {
 
         return () => {
             isMounted = false;
+            isConncectingRef.current = false;
 
             if (reconnectTimeoutRef.current) {
                 clearTimeout(reconnectTimeoutRef.current);
@@ -121,18 +142,15 @@ export default function useGroupProfileWebSocket() {
 
             if (wsRef.current) {
                 if ((wsRef.current as any).heartbeatInterval) {
-                    clearInterval((wsRef.current as any).heartbeatInterval);;
+                    clearInterval((wsRef.current as any).heartbeatInterval);
                 }
 
-                if (
-                    wsRef.current.readyState === WebSocket.OPEN ||
-                    wsRef.current.readyState === WebSocket.CONNECTING
-                ) {
+                if (wsRef.current.readyState === WebSocket.OPEN) {
                     wsRef.current.close(1000, "Unmounted");
                 }
-            }
 
-            wsRef.current = null;
+                wsRef.current = null;
+            }
         }
     }, [getSessionToken.data, getSessionToken.isLoading, groupId, queryClient, setMessage]);
 

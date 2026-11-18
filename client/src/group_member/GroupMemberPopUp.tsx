@@ -9,8 +9,12 @@ import type { IGroupMemberPopUp } from "./model";
 export default function GroupMemberPopUp(props: IGroupMemberPopUp) {
     const setShowGroupChatPopUp = useGroupChatStore((state) => state.setShowGroupChatPopUp);
     const setShowGroupChatFilesPopUp = useGroupChatStore((state) => state.setShowGroupChatFilesPopUp);
-
+    
     const setShowGroupChatFilePreviewPopUp = useGroupChatStore((state) => state.setShowGroupChatFilePreviewPopUp);
+
+    const searchedGroupMember = useGroupMemberStore((state) => state.searchedGroupMember);
+    const setSearchedGroupMember = useGroupMemberStore((state) => state.setSearchedGroupMember);
+
     const setShowMemberPopUp = useGroupMemberStore((state) => state.setShowMemberPopUp);
 
     const setShowProfile = useGroupProfileStore((state) => state.setShowProfile);
@@ -36,8 +40,10 @@ export default function GroupMemberPopUp(props: IGroupMemberPopUp) {
                 </button>
                 <input
                     className="outline-none bg-gray-200 text-gray-900 font-medium p-1.5 text-[1rem] w-full"
+                    onChange={(event) => setSearchedGroupMember(event.target.value)}
                     placeholder="find room member..."
                     type="text"
+                    value={searchedGroupMember}
                 />
             </header>
             {props.groupMembers.isLoading ? (

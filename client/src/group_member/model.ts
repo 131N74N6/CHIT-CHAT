@@ -2,6 +2,9 @@ import type { FetchNextPageOptions, InfiniteData, InfiniteQueryObserverResult, U
 import type { Users } from "../user_profiles/model";
 
 export interface IGroupMemberState {
+    searchedGroupMember: string;
+    setSearchedGroupMember: (searchedGroupMember: string) => void
+
     showMemberPopUp: boolean;
     setShowMemberPopUp: (showMemberPopUp: boolean) => void;
     

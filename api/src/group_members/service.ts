@@ -49,11 +49,11 @@ class GroupMemberService {
 
         if (data.name === "" || data.name === undefined) {
             return await groupMemberRepository.showAllMembers({ 
-                group_id: groupId, page: data.page, limit: data.limit, name: data.name 
+                group_id: groupId, page: data.page, limit: data.limit
             });
         } else {
             return await groupMemberRepository.showAllMembers({ 
-                group_id: groupId, page: data.page, limit: data.limit
+                group_id: groupId, page: data.page, limit: data.limit, name: data.name 
             });
         }
     }
