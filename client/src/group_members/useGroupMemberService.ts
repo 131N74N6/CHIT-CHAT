@@ -1,4 +1,4 @@
-import { Query, useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Query, useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useMessageStore } from "../alert/useMessageStore";
 import { useUserStore } from "../user_profiles/useUserStore";
 import { apiRequest } from "../api";
@@ -7,13 +7,24 @@ import { useGroupChatStore } from "../group_chats/useGroupChatStore";
 import useGroupMemberWebSocket from "./useGroupMemberWebSocket";
 import { useGroupMemberStore } from "./useGroupMemberStore";
 import useDebounce from "./useDebounce";
+import { useNavigate } from "react-router-dom";
+import { useGroupProfileStore } from "../group_profiles/useGroupProfileStore";
 
 export default function useGroupMemberService() {
+    const navigate = useNavigate();
     const queryClient = useQueryClient();
+
     const groupId = useGroupChatStore((state) => state.groupId);
+    
+    const setShowGroupChatFilesPopUp = useGroupChatStore((state) => state.setShowGroupChatFilesPopUp);
+    const setShowGroupChatPopUp = useGroupChatStore((state) => state.setShowGroupChatPopUp);
+    const setShowGroupChatFilePreviewPopUp = useGroupChatStore((state) => state.setShowGroupChatFilePreviewPopUp);
 
     const searchedGroupMember = useGroupMemberStore((state) => state.searchedGroupMember);
+    const setShowMemberPopUp = useGroupMemberStore((state) => state.setShowMemberPopUp);
     const search = useDebounce<string>(500, searchedGroupMember.trim());
+    
+    const setShowProfile = useGroupProfileStore((state) => state.setShowProfile);
     
     const setMessage = useMessageStore((state) => state.setMessage);
     
@@ -23,16 +34,6 @@ export default function useGroupMemberService() {
     const setRoomCode = useUserStore((state) => state.setRoomCode);
 
     useGroupMemberWebSocket();
-
-    const isGroupOwner = useQuery({
-        enabled: !!currentUserId && !!groupId,
-        queryFn: async () => {
-            const endpoint = `/api/v1/groups/members/owner?group_id=${groupId}`;
-            const request = await apiRequest<boolean>(endpoint, { method: "GET" });
-            return request.data ?? false;
-        },
-        queryKey: [`group-owner-${currentUserId}-${groupId}`]
-    });
 
     const joinGroupMt = useMutation({
         mutationFn: async () => {
@@ -48,15 +49,16 @@ export default function useGroupMemberService() {
                 predicate: (query) => {
                     const keys = query.queryKey;
                     if (Array.isArray(keys) && keys.length > 0 && typeof keys[0] === "string") {
-                        return keys[0].startsWith('current-user') ||
+                        return keys[0].startsWith("current-user") ||
                         keys[0].startsWith(`available-group-${currentUserId}`) ||
-                        keys[0].startsWith(`group-member-${roomCode}`);
+                        keys[0].startsWith("group-member-");
                     }
                     return false;
                 }
             });
 
             setRoomCode("");
+            navigate("/rooms");
         }
     });
 
@@ -87,7 +89,7 @@ export default function useGroupMemberService() {
     const leftGroupMt = useMutation({
         mutationFn: async () => {
             const endpoint = `/api/v1/groups/members/left?group_id=${groupId}`;
-            const request = await apiRequest(endpoint, { method: "PUT" });
+            const request = await apiRequest(endpoint, { method: "DELETE" });
             return request.data;
         },
         onError: (error) => {
@@ -105,6 +107,14 @@ export default function useGroupMemberService() {
                     return false;
                 }
             });
+
+            setRoomCode("");
+            setShowGroupChatPopUp(false);
+            setShowMemberPopUp(false);
+            setShowProfile(false);
+            setShowGroupChatFilesPopUp(false);
+            setShowGroupChatFilePreviewPopUp(false);
+            navigate("/rooms");
         }
     });
 
@@ -130,7 +140,6 @@ export default function useGroupMemberService() {
     const isProcessing = [joinGroupMt, kickMemberMt, leftGroupMt].some(feature => feature.isPending);
 
     return {
-        isGroupOwner,
         isProcessing,
         joinGroupMt,
         kickMemberMt,

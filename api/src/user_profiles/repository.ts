@@ -1,5 +1,5 @@
 import { ObjectId } from "mongodb";
-import { User } from "../auth/model";
+import { User } from "../auths/model";
 import { db } from "../mongodb/service";
 import { TUserProfile } from "./model";
 

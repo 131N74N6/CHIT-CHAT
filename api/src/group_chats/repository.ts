@@ -1,7 +1,7 @@
 import { ObjectId } from "mongodb";
 import { db } from "../mongodb/service";
 import { TGroupChats } from "./model";
-import { User } from "../auth/model";
+import { User } from "../auths/model";
 
 class GroupChatRepository {
     private group_chats = db().collection("group_chats");

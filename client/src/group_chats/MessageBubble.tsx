@@ -3,7 +3,7 @@ import type { IGroupMessageData } from "./model";
 import cn from "../utils/cn";
 import { useGroupChatStore } from "./useGroupChatStore";
 import { useUserChatStore } from "../user_chats/useUserChatStore";
-import { useGroupMemberStore } from "../group_member/useGroupMemberStore";
+import { useGroupMemberStore } from "../group_members/useGroupMemberStore";
 import { useGroupProfileStore } from "../group_profiles/useGroupProfileStore";
 import { useUserStore } from "../user_profiles/useUserStore";
 import { useEffect } from "react";

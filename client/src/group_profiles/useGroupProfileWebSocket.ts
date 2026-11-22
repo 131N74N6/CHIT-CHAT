@@ -101,9 +101,8 @@ export default function useGroupProfileWebSocket() {
                             if (typeof key !== "string") return false;
     
                             return (
-                                key.startsWith("group-profile-") ||
-                                key.startsWith("group-owner-") ||
-                                key.startsWith("available-group-")
+                                key.startsWith(`group-profile-${groupId}`) ||
+                                key.startsWith(`available-group-${currentUserId}`)
                             );
                         }
                     });

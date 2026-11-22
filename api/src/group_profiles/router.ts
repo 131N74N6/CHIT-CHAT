@@ -1,8 +1,8 @@
 import Elysia, { t } from "elysia";
-import { apiAuthMiddleware } from "../auth/middleware";
+import { apiAuthMiddleware } from "../auths/middleware";
 import groupProfileController from "./controller";
 import { groupProfileSchema, TGroupProfile } from "./model";
-import { validateSession } from "../auth/service";
+import { validateSession } from "../auths/service";
 import { addTunnel, removeTunnel } from "./websocket";
 
 const groupProfileRouters = new Elysia({ prefix: "/api/v1/groups" })

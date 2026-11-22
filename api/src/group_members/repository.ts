@@ -1,21 +1,13 @@
 import { ObjectId } from "mongodb";
 import { db } from "../mongodb/service";
 import { TGroupMember } from "./model";
-import { User } from "../auth/model";
+import { User } from "../auths/model";
 
 class GroupMemberRepository {
     private users = db().collection<Omit<User, "id">>("user");
-    private group_profiles = db().collection("group_profiles");
 
     private escapeRegex(text: string): string {
         return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
-    }
-
-    async isGroupOwner(group_id: string, user_id: string) {
-        let isOwner = false;
-        const group = await this.group_profiles.findOne({ _id: new ObjectId(group_id) });
-        if (group) isOwner = user_id === group.owner_id.toString();
-        return isOwner;
     }
 
     async joinGroup(props: TGroupMember["joinGroup"]) {
@@ -26,13 +18,13 @@ class GroupMemberRepository {
 
     async kickMember(props: TGroupMember["leftGroup"]) {
         return await this.users.updateOne({ _id: new ObjectId(props.user_id) }, {
-            $pull: { group_ids: [props.group_id] }
+            $pull: { group_ids: props.group_id }
         });
     }
 
     async leftGroup(props: TGroupMember["leftGroup"]) {
         return await this.users.updateOne({ _id: new ObjectId(props.user_id) }, {
-            $pull: { group_ids: [props.group_id] }
+            $pull: { group_ids: props.group_id }
         });
     }
 

@@ -8,9 +8,9 @@ import { useMessageStore } from "../alert/useMessageStore";
 import { apiRequest, apiUpload } from "../api";
 import type { UserDetail, Users } from "./model";
 import { useGroupChatStore } from "../group_chats/useGroupChatStore";
-import { useGroupMemberStore } from "../group_member/useGroupMemberStore";
+import { useGroupMemberStore } from "../group_members/useGroupMemberStore";
 import { useGroupProfileStore } from "../group_profiles/useGroupProfileStore";
-import { useChatbotStore } from "../chatbot/useChatbotStore";
+import { useChatbotStore } from "../chatbots/useChatbotStore";
 
 export default function useUserProfileService() {
     const fileInputRef = useRef<HTMLInputElement>(null);

@@ -8,6 +8,7 @@ import { useGroupChatStore } from "../group_chats/useGroupChatStore";
 import { apiRequest, apiUpload } from "../api";
 import type { IGroupProfileDetail, IGroups } from "./model";
 import useGroupProfileWebSocket from "./useGroupProfileWebSocket";
+import { useGroupMemberStore } from "../group_members/useGroupMemberStore";
 
 export default function useGroupProfileService() {
     const navigate = useNavigate();
@@ -18,7 +19,14 @@ export default function useGroupProfileService() {
     const currentUserId = useUserStore((state) => state.currentUserId);
     const groupId = useGroupChatStore((state) => state.groupId);
     
+    const setShowGroupChatFilesPopUp = useGroupChatStore((state) => state.setShowGroupChatFilesPopUp);
+    const setShowGroupChatPopUp = useGroupChatStore((state) => state.setShowGroupChatPopUp);
+    const setShowGroupChatFilePreviewPopUp = useGroupChatStore((state) => state.setShowGroupChatFilePreviewPopUp);
+    
+    const setShowMemberPopUp = useGroupMemberStore((state) => state.setShowMemberPopUp);
+    
     const setEditMode = useGroupProfileStore((state) => state.setEditMode);
+    const setShowProfile = useGroupProfileStore((state) => state.setShowProfile);
 
     const groupDescription = useGroupProfileStore((state) => state.groupDescription);
     const setGroupDescription = useGroupProfileStore((state) => state.setGroupDescription);
@@ -78,7 +86,6 @@ export default function useGroupProfileService() {
             await apiUpload(endpoint, formData, "POST");
         },
         onError: (error) => {
-            console.log(error.message);
             setMessage(error.message);
         },
         onSuccess: () => {
@@ -97,7 +104,7 @@ export default function useGroupProfileService() {
             setSelectedProfileGroupUrl(null);
             setGroupDescription("");
             setGroupName("");
-            navigate(`/rooms`);
+            navigate("/rooms");
         }
     });
 
@@ -122,6 +129,13 @@ export default function useGroupProfileService() {
                     return false;
                 }
             });
+
+            setShowGroupChatPopUp(false);
+            setShowMemberPopUp(false);
+            setShowProfile(false);
+            setShowGroupChatFilesPopUp(false);
+            setShowGroupChatFilePreviewPopUp(false);
+            navigate("/rooms");
         }
     });
 

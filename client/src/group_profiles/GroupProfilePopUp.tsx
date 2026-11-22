@@ -4,7 +4,7 @@ import Loading from "../loading/Loading";
 import { useGroupChatStore } from "../group_chats/useGroupChatStore";
 import { useGroupProfileStore } from "./useGroupProfileStore";
 import type { IGroupProfileDetailPopUp } from "./model";
-import { useGroupMemberStore } from "../group_member/useGroupMemberStore";
+import { useGroupMemberStore } from "../group_members/useGroupMemberStore";
 
 export default function GroupDetailPopUp(props: IGroupProfileDetailPopUp) {
     const setShowGroupChatPopUp = useGroupChatStore((state) => state.setShowGroupChatPopUp);

@@ -5,7 +5,7 @@ import { UserMinus2 } from "lucide-react";
 import { useUserChatStore } from "../user_chats/useUserChatStore";
 import { useUserStore } from "./useUserStore";
 import { useGroupChatStore } from "../group_chats/useGroupChatStore";
-import { useGroupMemberStore } from "../group_member/useGroupMemberStore";
+import { useGroupMemberStore } from "../group_members/useGroupMemberStore";
 import { useGroupProfileStore } from "../group_profiles/useGroupProfileStore";
 
 export default function UserData(props: UserData) {
@@ -87,7 +87,7 @@ export default function UserData(props: UserData) {
                         </div>
                         <div className="text-gray-950 font-medium">{props.user.name}</div>
                     </div>
-                    {props.place.isGroupOwner.data ? null : (
+                    {props.place.isGroupOwner ? null : (
                         <button
                             className={cn(
                                 "font-medium text-gray-700 hover:text-gray-400 transition-colors", 

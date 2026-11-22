@@ -1,4 +1,4 @@
-import type { FetchNextPageOptions, InfiniteData, InfiniteQueryObserverResult, UseMutationResult, UseQueryResult } from "@tanstack/react-query";
+import type { FetchNextPageOptions, InfiniteData, InfiniteQueryObserverResult, UseMutationResult } from "@tanstack/react-query";
 import type { Users } from "../user_profiles/model";
 
 export interface IGroupMemberState {
@@ -12,7 +12,7 @@ export interface IGroupMemberState {
 }
 
 export interface GroupMembersMarks {
-    isGroupOwner: UseQueryResult<boolean, Error>;
+    isGroupOwner: boolean;
     kickMemberMt: UseMutationResult<any, Error, string, unknown>;
     name: "group-member";
 }
@@ -24,7 +24,7 @@ export interface IGroupMemberPopUp {
         fetchNextPage: (options?: FetchNextPageOptions | undefined) => Promise<InfiniteQueryObserverResult<InfiniteData<Users[], unknown>, Error>>
         hasNextPage: boolean;
         isFetchingNextPage: boolean;
-        isGroupOwner: UseQueryResult<boolean, Error>;
+        isGroupOwner: boolean;
         isLoading: boolean;
         kickMemberMt: UseMutationResult<void, Error, string, unknown>;
     }

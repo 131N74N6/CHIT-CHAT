@@ -6,17 +6,17 @@ import Alert from "../alert/Alert";
 import GroupList from "./GroupList";
 import useGroupProfileService from "./useGroupProfileService";
 import useGroupChatService from "../group_chats/useGroupChatService";
-import useGroupMemberService from "../group_member/useGroupMemberService";
+import useGroupMemberService from "../group_members/useGroupMemberService";
 import { useGroupChatStore } from "../group_chats/useGroupChatStore";
 import PopUpOption from "../group_chats/PopUpOption";
 import GroupChatPopUp from "../group_chats/GroupChatPopUp";
-import { useGroupMemberStore } from "../group_member/useGroupMemberStore";
-import GroupMemberPopUp from "../group_member/GroupMemberPopUp";
-import { useUserStore } from "../user_profiles/useUserStore";
+import { useGroupMemberStore } from "../group_members/useGroupMemberStore";
+import GroupMemberPopUp from "../group_members/GroupMemberPopUp";
 import { useGroupProfileStore } from "./useGroupProfileStore";
 import GroupProfilePopUp from "./GroupProfilePopUp";
 import GroupChatFilesPopUp from "../group_chats/GroupChatFilesPopUp";
 import GroupChatFilesPreviewPopUp from "../group_chats/GroupChatFilesPreviewPopUp";
+import { useUserStore } from "../user_profiles/useUserStore";
 
 export default function AvailableGroup() {
     const groupId = useGroupChatStore((state) => state.groupId);
@@ -44,6 +44,7 @@ export default function AvailableGroup() {
     const showMemberPopUp = useGroupMemberStore((state) => state.showMemberPopUp);
 
     const showProfile = useGroupProfileStore((state) => state.showProfile);
+
     const currentUserId = useUserStore((state) => state.currentUserId);
 
     const groupChat = useGroupChatService();
@@ -91,7 +92,8 @@ export default function AvailableGroup() {
         }
     }, [editMode, groupId, groupProfile.showGroupDetail.data]);
 
-    const isGroupOwner = currentUserId === groupProfile.showGroupDetail.data?.owner_id;
+    const isGroupOwner = groupProfile.showGroupDetail.data && 
+    groupProfile.showGroupDetail.data.owner_id === currentUserId ? true : false;
 
     return (
         <section className="flex md:flex-row flex-col gap-2 p-2 h-dvh relative z-10">
@@ -175,12 +177,12 @@ export default function AvailableGroup() {
                             fetchNextPage: groupMember.showGroupMembers.fetchNextPage,
                             hasNextPage: groupMember.showGroupMembers.hasNextPage,
                             isFetchingNextPage: groupMember.showGroupMembers.isFetchingNextPage,
-                            isGroupOwner: groupMember.isGroupOwner,
+                            isGroupOwner: isGroupOwner,
                             isLoading: groupMember.showGroupMembers.isLoading,
                             kickMemberMt: groupMember.kickMemberMt
                         }}
                         
-                        isProcessing={false}
+                        isProcessing={groupChat.isProcessing || groupMember.isProcessing || groupProfile.isProcessing}
                     />
                 ) : groupId && groupId !== "" && showProfile ? (
                     <GroupProfilePopUp 
@@ -233,6 +235,7 @@ export default function AvailableGroup() {
                             isLoading: groupProfile.showGroupDetail.isLoading,
                             isGroupOwner: isGroupOwner
                         }} 
+                        
                         isProcessing={groupChat.isProcessing || groupMember.isProcessing || groupProfile.isProcessing}
                     />
                 ) : groupId && groupId !== "" && showGroupChatFilesPopUp ? (

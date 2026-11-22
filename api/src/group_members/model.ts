@@ -18,15 +18,7 @@ export const groupMemberSchema = {
     wsConfig: t.Object({
         group_id: t.String({ pattern: "^[0-9a-fA-F]{24}$", error: "invalid group" }),
         token: t.String({ minLength: 1, error: "invalid token" })
-    }),
-    wsPayload: t.Object({
-        data: t.Any(),
-        type: t.Union([
-            t.Literal("member:joined"),
-            t.Literal("member:left"),
-            t.Literal("member:kicked")
-        ])
-    }),
+    })
 }
 
 export type TGroupMember = {

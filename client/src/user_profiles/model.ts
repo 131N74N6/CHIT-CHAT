@@ -1,5 +1,5 @@
 import type { FetchNextPageOptions, InfiniteData, InfiniteQueryObserverResult } from "@tanstack/react-query";
-import type { GroupMembersMarks } from "../group_member/model";
+import type { GroupMembersMarks } from "../group_members/model";
 
 export interface UserState {
     address: string;

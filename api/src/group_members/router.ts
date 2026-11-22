@@ -1,11 +1,9 @@
 import Elysia, { t } from "elysia";
-import { apiAuthMiddleware } from "../auth/middleware";
+import { apiAuthMiddleware } from "../auths/middleware";
 import groupMemberController from "./controller";
 import { groupMemberSchema } from "./model";
-import { validateSession } from "../auth/service";
+import { validateSession } from "../auths/service";
 import { addTunnel, removeTunnel, } from "./websocket";
-
-const wsContext = new WeakMap<any, { roomId: string; handler: (data: any) => void }>();
 
 const groupMemberRouters = new Elysia({ prefix: "/api/v1/groups/members" })
 .use(apiAuthMiddleware)
@@ -18,11 +16,6 @@ const groupMemberRouters = new Elysia({ prefix: "/api/v1/groups/members" })
     return await groupMemberController.leftGroup({ ...query, user_id: user.id });
 }, {
     query: t.Pick(groupMemberSchema.leftGroup, ["group_id"])
-})
-.get("/owner", async ({ query, user }) => {
-    return await groupMemberController.isGroupOwner(query.group_id, user.id);
-}, {
-    query: t.Pick(groupMemberSchema.joinGroup, ["group_id"])
 })
 .get("/", async ({ query }) => {
     return await groupMemberController.showAllMembers(query);

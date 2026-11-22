@@ -6,7 +6,7 @@ import { groupMemberBroadcast } from "../group_members/websocket";
 import { userProfileBroadcast } from "./websocket";
 import { TUserProfile } from "./model";
 import { uploadToCloudinary } from "../cloudinary/service";
-import { groupProfileBroadcast } from "../group_profile/websocket";
+import { groupProfileBroadcast } from "../group_profiles/websocket";
 
 class UserProfileService {
     private checkIsIdIsValid(field: string, value: unknown) {

@@ -1,14 +1,14 @@
 import { Elysia } from "elysia";
 import { setupErrorHandler } from "./error/service";
 import cors from "@elysiajs/cors";
-import { authServiceApi } from "./auth/service";
+import { authServiceApi } from "./auths/service";
 import { v2 } from "cloudinary";
 import userChatRouters from "./user_chats/router";
 import groupChatRouters from "./group_chats/router";
 import groupMemberRouters from "./group_members/router";
-import groupProfileRouters from "./group_profile/router";
-import userProfileRouters from "./user_profile/router";
-import chatBotRouters from "./chatbot/router";
+import groupProfileRouters from "./group_profiles/router";
+import userProfileRouters from "./user_profiles/router";
+import chatBotRouters from "./chatbots/router";
 
 const port = import.meta.env.PORT || 3000;
 

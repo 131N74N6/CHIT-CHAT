@@ -1,6 +1,6 @@
 import type { IGroupProfileData } from "./model";
 import { useGroupChatStore } from "../group_chats/useGroupChatStore";
-import { useGroupMemberStore } from "../group_member/useGroupMemberStore";
+import { useGroupMemberStore } from "../group_members/useGroupMemberStore";
 import { useGroupProfileStore } from "./useGroupProfileStore";
 
 export default function GroupData(props: IGroupProfileData) {

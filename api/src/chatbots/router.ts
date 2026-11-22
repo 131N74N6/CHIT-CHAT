@@ -1,5 +1,5 @@
 import Elysia, { t } from "elysia";
-import { apiAuthMiddleware } from "../auth/middleware";
+import { apiAuthMiddleware } from "../auths/middleware";
 import chatBotController from "./controller";
 import { chatBotSchema } from "./model";
 

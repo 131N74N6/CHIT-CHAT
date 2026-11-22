@@ -100,7 +100,11 @@ export default function useGroupMemberWebSocket() {
                             const key = query.queryKey[0];
                             if (typeof key !== "string") return false;
     
-                            return key.startsWith(`group-member-${groupId}`);
+                            return (
+                                key.startsWith(`group-member-${groupId}`) ||
+                                key.startsWith(`group-profile-${groupId}`) ||
+                                key.startsWith(`available-group-${currentUserId}`)
+                            );
                         }
                     });
                 }

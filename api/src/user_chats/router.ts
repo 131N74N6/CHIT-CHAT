@@ -1,9 +1,9 @@
 import Elysia, { t } from "elysia";
-import { apiAuthMiddleware } from "../auth/middleware";
+import { apiAuthMiddleware } from "../auths/middleware";
 import userChatController from "./controller";
 import { userChatSchema } from "./model";
 import { userChatWS } from "./websocket";
-import { validateSession } from "../auth/service";
+import { validateSession } from "../auths/service";
 
 const wsContext = new WeakMap<any, { roomId: string; handler: (data: any) => void }>();
 
