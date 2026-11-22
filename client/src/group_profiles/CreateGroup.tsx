@@ -1,6 +1,6 @@
 import { Camera, X } from "lucide-react";
 import Navbar from "../navbar/Navbar";
-import cn from "../utils/cn";
+import cn from "../cn";
 import { useMessageStore } from "../alert/useMessageStore";
 import { useEffect } from "react";
 import Alert from "../alert/Alert";

@@ -1,6 +1,6 @@
 import { MessageCircle, FilesIcon, SendIcon, X } from "lucide-react";
 import FileViewer from "./FileViewer";
-import cn from "../utils/cn";
+import cn from "../cn";
 import { useUserChatStore } from "./useUserChatStore";
 import type { IUserChatFilesPreviewPopUp } from "./model";
 import { useUserStore } from "../user_profiles/useUserStore";

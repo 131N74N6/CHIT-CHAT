@@ -1,4 +1,4 @@
-import cn from "../utils/cn";
+import cn from "../cn";
 import DOMPurify from "dompurify";
 import { useMemo } from "react";
 import ReactMarkdown from "react-markdown";

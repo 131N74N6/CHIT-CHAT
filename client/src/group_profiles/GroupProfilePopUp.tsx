@@ -1,4 +1,4 @@
-import cn from "../utils/cn";
+import cn from "../cn";
 import { Camera, MessageCircle, UserCircle, X } from "lucide-react";
 import Loading from "../loading/Loading";
 import { useGroupChatStore } from "../group_chats/useGroupChatStore";

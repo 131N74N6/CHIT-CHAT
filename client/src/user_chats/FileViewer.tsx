@@ -1,6 +1,6 @@
 import { AudioLines, File, FileText, FileTypeCorner, FolderArchive, Paperclip, Sheet } from "lucide-react";
 import type { IFilePreview } from "./model";
-import cn from "../utils/cn";
+import cn from "../cn";
 
 export default function FileViewer(props: IFilePreview) {
     return (

@@ -1,5 +1,5 @@
 import { FilesIcon, MessageCircle, SendIcon, X } from "lucide-react";
-import cn from "../utils/cn";
+import cn from "../cn";
 import FileViewer from "../user_chats/FileViewer";
 import { useGroupChatStore } from "./useGroupChatStore";
 import { useGroupMemberStore } from "../group_members/useGroupMemberStore";

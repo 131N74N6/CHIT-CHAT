@@ -2,7 +2,7 @@ import {
     AudioLines, Database, File, Download, FileChartColumn, 
     FileText, FileTypeCorner, FolderArchive, Paperclip, Sheet, Table 
 } from "lucide-react";
-import cn from "../utils/cn";
+import cn from "../cn";
 import type { IUserChatFile, IUserChatFiles } from "./model";
 
 export default function UserChatFileList(props: IUserChatFiles) {

@@ -15,6 +15,7 @@ export default function useGroupMemberService() {
     const queryClient = useQueryClient();
 
     const groupId = useGroupChatStore((state) => state.groupId);
+    const setGroupId = useGroupChatStore((state) => state.setGroupId);
     
     const setShowGroupChatFilesPopUp = useGroupChatStore((state) => state.setShowGroupChatFilesPopUp);
     const setShowGroupChatPopUp = useGroupChatStore((state) => state.setShowGroupChatPopUp);
@@ -58,7 +59,6 @@ export default function useGroupMemberService() {
             });
 
             setRoomCode("");
-            navigate("/rooms");
         }
     });
 
@@ -83,7 +83,10 @@ export default function useGroupMemberService() {
                     return false;
                 }
             });
+
+            setRoomCode("");
         }
+
     });
 
     const leftGroupMt = useMutation({
@@ -109,6 +112,7 @@ export default function useGroupMemberService() {
             });
 
             setRoomCode("");
+            setGroupId("");
             setShowGroupChatPopUp(false);
             setShowMemberPopUp(false);
             setShowProfile(false);
@@ -122,7 +126,7 @@ export default function useGroupMemberService() {
         enabled: !!groupId,
         getNextPageParam: (lastPage, allPages) => {
             if (lastPage.length <= 16 ) return;
-            allPages.length + 1;
+            return allPages.length + 1;
         },
         initialPageParam: 1,
         queryFn: async ({ pageParam = 1 }: { pageParam?: number }) => {

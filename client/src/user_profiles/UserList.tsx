@@ -1,4 +1,4 @@
-import cn from "../utils/cn";
+import cn from "../cn";
 import Loading from "../loading/Loading";
 import UserData from "./UserData";
 import type { UserList } from "./model";

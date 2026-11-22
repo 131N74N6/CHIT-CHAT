@@ -1,6 +1,6 @@
 import { FileIcon } from "lucide-react";
 import type { IGroupMessageData } from "./model";
-import cn from "../utils/cn";
+import cn from "../cn";
 import { useGroupChatStore } from "./useGroupChatStore";
 import { useUserChatStore } from "../user_chats/useUserChatStore";
 import { useGroupMemberStore } from "../group_members/useGroupMemberStore";

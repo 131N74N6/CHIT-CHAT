@@ -1,6 +1,6 @@
 import useUserProfileService from "./useUserProfileService";
 import Loading from "../loading/Loading";
-import cn from "../utils/cn";
+import cn from "../cn";
 import { MessageCircle, X } from "lucide-react";
 import { useUserChatStore } from "../user_chats/useUserChatStore";
 import { useUserStore } from "./useUserStore";

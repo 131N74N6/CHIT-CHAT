@@ -1,4 +1,4 @@
-import cn from "../utils/cn";
+import cn from "../cn";
 import Navbar from "../navbar/Navbar";
 import { useMessageStore } from "../alert/useMessageStore";
 import { useEffect } from "react";

@@ -1,4 +1,4 @@
-import cn from "../utils/cn";
+import cn from "../cn";
 import type { iPopUpOptionForGroup } from "./model";
 import { useGroupChatStore } from "./useGroupChatStore";
 

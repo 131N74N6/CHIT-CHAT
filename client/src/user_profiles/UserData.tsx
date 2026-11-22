@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import type { UserData } from "./model";
-import cn from "../utils/cn";
+import cn from "../cn";
 import { UserMinus2 } from "lucide-react";
 import { useUserChatStore } from "../user_chats/useUserChatStore";
 import { useUserStore } from "./useUserStore";

@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import cn from "../utils/cn";
+import cn from "../cn";
 import { FileIcon } from "lucide-react";
 import type { IUserMessageData } from "./model";
 import { useUserChatStore } from "./useUserChatStore";

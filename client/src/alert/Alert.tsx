@@ -1,4 +1,4 @@
-import cn from "../utils/cn";
+import cn from "../cn";
 import type { AlertIntrf } from "./model";
 
 export default function Alert(props: AlertIntrf) {

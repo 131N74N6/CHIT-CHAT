@@ -18,6 +18,7 @@ export default function useGroupProfileService() {
 
     const currentUserId = useUserStore((state) => state.currentUserId);
     const groupId = useGroupChatStore((state) => state.groupId);
+    const setGroupId = useGroupChatStore((state) => state.setGroupId);
     
     const setShowGroupChatFilesPopUp = useGroupChatStore((state) => state.setShowGroupChatFilesPopUp);
     const setShowGroupChatPopUp = useGroupChatStore((state) => state.setShowGroupChatPopUp);
@@ -135,6 +136,7 @@ export default function useGroupProfileService() {
             setShowProfile(false);
             setShowGroupChatFilesPopUp(false);
             setShowGroupChatFilePreviewPopUp(false);
+            setGroupId("");
             navigate("/rooms");
         }
     });

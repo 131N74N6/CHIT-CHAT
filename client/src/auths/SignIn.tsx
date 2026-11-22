@@ -1,4 +1,4 @@
-import cn from "../utils/cn";
+import cn from "../cn";
 import useAuthService from "./useAuthService";
 import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeClosed, MessageCircle } from "lucide-react";

@@ -5,7 +5,7 @@ import Loading from "../loading/Loading";
 import Navbar from "../navbar/Navbar";
 import { ArrowBigLeft, X } from "lucide-react";
 import Alert from "../alert/Alert";
-import cn from "../utils/cn";
+import cn from "../cn";
 import useAuthService from "./useAuthService";
 import { useUserStore } from "../user_profiles/useUserStore";
 import { useNavigate } from "react-router-dom";
