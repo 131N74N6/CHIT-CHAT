@@ -27,7 +27,7 @@ class GroupChatService {
             _id: id, group_id: groupId, sender_id: senderId, text: text 
         });
 
-        groupChatWebSocket.groupChatBroadcast("group-message:changed");
+        groupChatWebSocket.broadcast("group-message:changed");
     }
     
     private checkIsIdValid(field: string, value: unknown) {
@@ -151,7 +151,7 @@ class GroupChatService {
         const affectedIds = deleteOwnMessagesTemporary.map((message) => message._id.toString());
 
         if (affectedIds.length > 0) {
-            groupChatWebSocket.groupChatBroadcast("group-message:deleted");
+            groupChatWebSocket.broadcast("group-message:deleted");
         }
     }
 
@@ -209,7 +209,7 @@ class GroupChatService {
         const affectedIds = deleteOwnMessagesTemporary.map((message) => message._id.toString());
 
         if (affectedIds.length > 0) {
-            groupChatWebSocket.groupChatBroadcast("group-message:deleted");
+            groupChatWebSocket.broadcast("group-message:deleted");
         }
     }
     
@@ -308,7 +308,7 @@ class GroupChatService {
             text: text
         });
 
-        groupChatWebSocket.groupChatBroadcast("group-message:sent");
+        groupChatWebSocket.broadcast("group-message:sent");
     }
 
     async showAllMessages(props: Omit<TGroupChats["additionalFilter"], "skip">) {

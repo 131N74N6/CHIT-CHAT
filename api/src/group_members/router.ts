@@ -3,7 +3,7 @@ import { apiAuthMiddleware } from "../auths/middleware";
 import groupMemberController from "./controller";
 import { groupMemberSchema } from "./model";
 import { validateSession } from "../auths/service";
-import { addTunnel, removeTunnel, } from "./websocket";
+import groupMemberWebSocket from "./websocket";
 
 const groupMemberRouters = new Elysia({ prefix: "/api/v1/groups/members" })
 .use(apiAuthMiddleware)
@@ -51,7 +51,7 @@ const groupMemberRouters = new Elysia({ prefix: "/api/v1/groups/members" })
                 return;
             }
             
-            addTunnel(groupId, ws);
+            groupMemberWebSocket.addTunnel(groupId, ws);
         } catch (error) {
             ws.send(JSON.stringify({ message: "Connection failed", type: "error" }));
             ws.close(4003, "internal error");
@@ -65,7 +65,7 @@ const groupMemberRouters = new Elysia({ prefix: "/api/v1/groups/members" })
 
     close(ws) {
         const groupId = ws.data.params.group_id;
-        if (groupId) removeTunnel(groupId, ws);
+        if (groupId) groupMemberWebSocket.removeTunnel(groupId, ws);
     }
 });
 

@@ -74,7 +74,6 @@ export default function useGroupMemberWebSocket() {
 
             ws.onopen = () => {
                 if (!isMounted) return;
-
                 isConncectingRef.current = false;
 
                 const heartbeat = setInterval(() => {

@@ -9,7 +9,7 @@ class GroupChatWebSocket {
         this.groupChatTunnel.get(group_id)?.add(ws);
     }
 
-    groupChatBroadcast(event_name: string) {
+    broadcast(event_name: string) {
         const dataToSend = JSON.stringify({ type: event_name });
 
         for (const groupChat of this.groupChatTunnel.values()) {

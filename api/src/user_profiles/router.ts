@@ -3,7 +3,7 @@ import { apiAuthMiddleware } from "../auths/middleware";
 import userProfileController from "./controller";
 import { userProfileSchema } from "./model";
 import { validateSession } from "../auths/service";
-import { addTunnel, removeTunnel } from "./websocket";
+import userProfileWebSocket from "./websocket";
 
 const userProfileRouters = new Elysia({ prefix: "/api/v1/users" })
 .use(apiAuthMiddleware)
@@ -57,7 +57,7 @@ const userProfileRouters = new Elysia({ prefix: "/api/v1/users" })
                 return;
             }
             
-            if (userId) addTunnel(userId, ws);
+            if (userId) userProfileWebSocket.addTunnel(userId, ws);
         } catch (error) {
             ws.send(JSON.stringify({ type: "error", message: "Connection failed" }));
             ws.close(4003, "Internal error");
@@ -71,7 +71,7 @@ const userProfileRouters = new Elysia({ prefix: "/api/v1/users" })
 
     close(ws) {
         const userId = ws.data.user.id;
-        if (userId) removeTunnel(userId, ws);
+        if (userId) userProfileWebSocket.removeTunnel(userId, ws);
     }
 });
 

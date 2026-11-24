@@ -64,7 +64,7 @@ export default function MessageBubble(props: IUserMessageData) {
             <div className="wrap-break-word font-medium text-base">
                 {props.chat.text}
             </div>
-            {props.chat.created_at !== props.chat.updated_at ? (
+            {new Date(props.chat.created_at).getSeconds() !== new Date(props.chat.updated_at).getSeconds() ? (
                 <div className="flex flex-col gap-1">
                     <div className="wrap-break-word font-medium text-[14px]">
                         Sent: {new Date(props.chat.created_at).toLocaleString()}

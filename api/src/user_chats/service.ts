@@ -25,7 +25,7 @@ class UserChatService {
             sender_id: senderId 
         });
 
-        userChatWebSocket.userChatBroadcast("user-message:changed");
+        userChatWebSocket.broadcast("user-message:changed");
     }
 
     private checkIsIdValid(field: string, value: unknown) {
@@ -136,7 +136,7 @@ class UserChatService {
         });
 
         if (chats.length > 0) {
-            userChatWebSocket.userChatBroadcast("user-message:deleted");
+            userChatWebSocket.broadcast("user-message:deleted");
         }
     }
 
@@ -188,7 +188,7 @@ class UserChatService {
         });
 
         if (chats.length > 0) {
-            userChatWebSocket.userChatBroadcast("user-message:deleted");
+            userChatWebSocket.broadcast("user-message:deleted");
         }
     }
     
@@ -278,7 +278,7 @@ class UserChatService {
             sender_id: senderId,
         });
 
-        userChatWebSocket.userChatBroadcast("user-message:sent");
+        userChatWebSocket.broadcast("user-message:sent");
     }
 
     async showAllMessages(props: TUserChat["filter"]) {

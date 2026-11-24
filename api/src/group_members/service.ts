@@ -2,7 +2,7 @@ import { ObjectId } from "mongodb";
 import { TGroupMember } from "./model";
 import { ChitChatApiError } from "../error/service";
 import groupMemberRepository from "./repository";
-import { groupMemberBroadcast } from "./websocket";
+import groupMemberWebSocket from "./websocket";
 
 class GroupMemberService {
     private checkIsIdValid(field: string, value: unknown) {
@@ -18,7 +18,7 @@ class GroupMemberService {
         const userId = this.checkIsIdValid("group", data.user_id);
 
         await groupMemberRepository.joinGroup({ group_id: groupId, user_id: userId });
-        groupMemberBroadcast("member:joined");
+        groupMemberWebSocket.broadcast("member:joined");
     }
 
     async kickMember(data: TGroupMember["leftGroup"]) {
@@ -26,7 +26,7 @@ class GroupMemberService {
         const userId = this.checkIsIdValid("group", data.user_id);
 
         await groupMemberRepository.kickMember({ group_id: groupId, user_id: userId });
-        groupMemberBroadcast("member:kicked");
+        groupMemberWebSocket.broadcast("member:kicked");
     }
 
     async leftGroup(data: TGroupMember["leftGroup"]) {
@@ -34,7 +34,7 @@ class GroupMemberService {
         const userId = this.checkIsIdValid("group", data.user_id);
 
         await groupMemberRepository.leftGroup({ group_id: groupId, user_id: userId });
-        groupMemberBroadcast("member:left");
+        groupMemberWebSocket.broadcast("member:left");
     }
 
     async showAllMembers(data: TGroupMember["filter"]) {

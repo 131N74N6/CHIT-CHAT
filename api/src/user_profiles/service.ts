@@ -2,29 +2,13 @@ import { ObjectId } from "mongodb";
 import { ChitChatApiError } from "../error/service";
 import userProfileRepository from "./repository";
 import { v2 } from "cloudinary";
-import { groupMemberBroadcast } from "../group_members/websocket";
-import { userProfileBroadcast } from "./websocket";
+import groupMemberWebSocket from "../group_members/websocket";
+import userProfileWebSocket from "./websocket";
 import { TUserProfile } from "./model";
 import { uploadToCloudinary } from "../cloudinary/service";
-import { groupProfileBroadcast } from "../group_profiles/websocket";
+import groupProfileWebSocket from "../group_profiles/websocket";
 
 class UserProfileService {
-    private checkIsIdIsValid(field: string, value: unknown) {
-        if (!value || typeof value !== "string" || !ObjectId.isValid(value)) {
-            throw new ChitChatApiError(`invalid ${field}`, 400);
-        }
-
-        return value;
-    }
-    
-    private checkIsInputIsAString(field: string, value: unknown) {
-        if (!value || typeof value !== "string") {
-            throw new ChitChatApiError(`invalid ${field}`, 400);
-        }
-
-        return value;
-    }
-
     async changeUser(props: TUserProfile["changeRaw"]) {
         const currentUserId = this.checkIsIdIsValid("user", props.id);
         const user = await userProfileRepository.findUserById(currentUserId);
@@ -86,7 +70,7 @@ class UserProfileService {
                 name: newUsername
             });
             
-            userProfileBroadcast("user-profile:changed");
+            userProfileWebSocket.broadcast("user-profile:changed");
         } else {
             await userProfileRepository.changeUser({
                 id: props.id,
@@ -101,8 +85,24 @@ class UserProfileService {
                 name: newUsername
             });
 
-            userProfileBroadcast("user-profile:changed");
+            userProfileWebSocket.broadcast("user-profile:changed");
         }
+    }
+
+    private checkIsIdIsValid(field: string, value: unknown) {
+        if (!value || typeof value !== "string" || !ObjectId.isValid(value)) {
+            throw new ChitChatApiError(`invalid ${field}`, 400);
+        }
+
+        return value;
+    }
+    
+    private checkIsInputIsAString(field: string, value: unknown) {
+        if (!value || value === "" || typeof value !== "string") {
+            throw new ChitChatApiError(`invalid ${field}`, 400);
+        }
+
+        return value;
     }
 
     async deleteUser(id: string) {
@@ -157,17 +157,17 @@ class UserProfileService {
             
                 if (yourGroupProfile.owner_id.toString() === userId) {
                     await userProfileRepository.deleteYourGroups(userId);
-                    groupProfileBroadcast("group-profile:deleted");
+                    groupProfileWebSocket.broadcast("group-profile:deleted");
                 } else {
                     await userProfileRepository.leftGroup(groupId);
-                    groupMemberBroadcast("member:left");
+                    groupMemberWebSocket.broadcast("member:left");
                 }
             }
         }
         
         await userProfileRepository.deleteUser(userId);
         
-        userProfileBroadcast("user-profile:deleted");
+        userProfileWebSocket.broadcast("user-profile:deleted");
     }
 
     async deleteUserProfilePicture(id: string) {
@@ -186,7 +186,7 @@ class UserProfileService {
 
         await userProfileRepository.deleteUserProfilePicture(userId);
 
-        userProfileBroadcast("user-profile:profile-picture-deleted");
+        userProfileWebSocket.broadcast("user-profile:profile-picture-deleted");
     }
 
     async showAllUsers(props: TUserProfile["showAllUser"]) {

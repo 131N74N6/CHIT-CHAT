@@ -3,7 +3,7 @@ import { TGroupProfile } from "./model";
 import { ChitChatApiError } from "../error/service";
 import groupProfileRepository from "./repository";
 import { uploadToCloudinary } from "../cloudinary/service";
-import { groupProfileBroadcast } from "./websocket";
+import groupProfileWebSocket from "./websocket";
 import { v2 } from "cloudinary";
 
 class GroupProfileService {
@@ -78,7 +78,7 @@ class GroupProfileService {
                 group_profile: newProfilePicture
             });
 
-            groupProfileBroadcast("group-profile:changed");
+            groupProfileWebSocket.broadcast("group-profile:changed");
         } else {
             await groupProfileRepository.changeGroup({
                 _id: groupId,
@@ -88,7 +88,7 @@ class GroupProfileService {
                 group_profile: group.group_profile || "-"
             });
 
-            groupProfileBroadcast("group-profile:changed");
+            groupProfileWebSocket.broadcast("group-profile:changed");
         }
     }
 
@@ -182,7 +182,7 @@ class GroupProfileService {
 
         await groupProfileRepository.deleteGroup({ group_id: groupId, owner_id: userId });
 
-        groupProfileBroadcast("group-profile:deleted");
+        groupProfileWebSocket.broadcast("group-profile:deleted");
     }
 
     async deleteGroupProfilePicture(props: TGroupProfile["deleteGroup"]) {
@@ -204,7 +204,7 @@ class GroupProfileService {
 
         await groupProfileRepository.deleteGroupProfilePicture(groupId);
 
-        groupProfileBroadcast("group-profile:profile-picture-deleted");
+        groupProfileWebSocket.broadcast("group-profile:profile-picture-deleted");
     }
 
     async showAllGroups(props: TGroupProfile["filter"]) {
