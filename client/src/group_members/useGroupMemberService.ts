@@ -1,4 +1,4 @@
-import { Query, useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useInfiniteQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useMessageStore } from "../alert/useMessageStore";
 import { useUserStore } from "../user_profiles/useUserStore";
 import { apiRequest } from "../api";
@@ -46,17 +46,13 @@ export default function useGroupMemberService() {
             setMessage(error.message);
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ 
-                predicate: (query) => {
-                    const keys = query.queryKey;
-                    if (Array.isArray(keys) && keys.length > 0 && typeof keys[0] === "string") {
-                        return keys[0].startsWith("current-user") ||
-                        keys[0].startsWith(`available-group-${currentUserId}`) ||
-                        keys[0].startsWith("group-member-");
-                    }
-                    return false;
-                }
-            });
+            queryClient.invalidateQueries({ queryKey: [`available-group-${currentUserId}`] });
+            queryClient.invalidateQueries({ queryKey: ["current-user"] });
+            queryClient.invalidateQueries({ queryKey: [`group-member-${roomCode}`] });
+            
+            if (search !== "") {
+                queryClient.invalidateQueries({ queryKey: [`group-member-${roomCode}-${search}`] });
+            }
 
             setRoomCode("");
         }
@@ -72,17 +68,13 @@ export default function useGroupMemberService() {
             setMessage(error.message);
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({
-                predicate: (query:Query<unknown, Error, unknown, readonly unknown[]>) => {
-                    const queryKey = query.queryKey;
-                    if (Array.isArray(queryKey) && queryKey.length > 0 && typeof queryKey[0] === "string") {
-                        return queryKey[0].startsWith(`current-user`) ||
-                        queryKey[0].startsWith(`available-group-${currentUserId}`) ||
-                        queryKey[0].startsWith(`group-member-${groupId}`);
-                    }
-                    return false;
-                }
-            });
+            queryClient.invalidateQueries({ queryKey: [`available-group-${currentUserId}`] });
+            queryClient.invalidateQueries({ queryKey: ["current-user"] });
+            queryClient.invalidateQueries({ queryKey: [`group-member-${groupId}`] });
+            
+            if (search !== "") {
+                queryClient.invalidateQueries({ queryKey: [`group-member-${groupId}-${search}`] });
+            }
 
             setRoomCode("");
         }
@@ -99,17 +91,13 @@ export default function useGroupMemberService() {
             setMessage(error.message);
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({
-                predicate: (query: Query<unknown, Error, unknown, readonly unknown[]>) => {
-                    const queryKey = query.queryKey;
-                    if (Array.isArray(queryKey) && queryKey.length > 0 && typeof queryKey[0] === "string") {
-                        return queryKey[0].startsWith(`current-user`) ||
-                        queryKey[0].startsWith(`available-group-${currentUserId}`) ||
-                        queryKey[0].startsWith(`group-member-${groupId}`);
-                    }
-                    return false;
-                }
-            });
+            queryClient.invalidateQueries({ queryKey: [`available-group-${currentUserId}`] });
+            queryClient.invalidateQueries({ queryKey: ["current-user"] });
+            queryClient.invalidateQueries({ queryKey: [`group-member-${groupId}`] });
+            
+            if (search !== "") {
+                queryClient.invalidateQueries({ queryKey: [`group-member-${groupId}-${search}`] });
+            }
 
             setRoomCode("");
             setGroupId("");

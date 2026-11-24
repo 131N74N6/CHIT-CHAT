@@ -91,7 +91,11 @@ export default function useChatbotService() {
         initialPageParam: 1
     });
 
-    const isProcessing = [sendQuestionMt, deleteAllMessagesMt, deleteChosenMessagesMt].some((f) => f.isPending);
+    const isProcessing = [
+        sendQuestionMt, 
+        deleteAllMessagesMt, 
+        deleteChosenMessagesMt
+    ].some((f) => f.isPending);
 
     return { 
         showAllBotResults, 

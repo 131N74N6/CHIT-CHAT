@@ -66,7 +66,6 @@ export default function useUserProfileWebSocket() {
     
             ws.onopen = () => {
                 if (!isMounted) return;
-                
                 isConncectingRef.current = false;
 
                 const heartbeat = setInterval(() => {

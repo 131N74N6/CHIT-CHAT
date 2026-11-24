@@ -130,6 +130,10 @@ export default function MessageBubble(props: IGroupMessageData) {
                 {props.chat.text}
             </div>
             {props.chat.updated_at === props.chat.created_at ? (
+                <div className="wrap-break-word font-medium text-[14px]">
+                    Sent: {new Date(props.chat.created_at).toLocaleString()}
+                </div>
+            ) : (
                 <div className="flex flex-col gap-1">
                     <div className="wrap-break-word font-medium text-[14px]">
                         Sent: {new Date(props.chat.created_at).toLocaleString()}
@@ -137,10 +141,6 @@ export default function MessageBubble(props: IGroupMessageData) {
                     <div className="wrap-break-word font-medium text-[14px]">
                         Edited: {new Date(props.chat.updated_at).toLocaleString()}
                     </div>
-                </div>
-            ) : (
-                <div className="wrap-break-word font-medium text-[14px]">
-                    Sent: {new Date(props.chat.created_at).toLocaleString()}
                 </div>
             )}
         </div>

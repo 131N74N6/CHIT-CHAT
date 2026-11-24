@@ -1,6 +1,6 @@
 import { TUserChat } from "./model";
 import userChatRepository from "./repository";
-import { userChatWS } from "./websocket";
+import userChatWebSocket from "./websocket";
 import { ChitChatApiError } from "../error/service";
 import { ObjectId } from "mongodb";
 import { v2 } from "cloudinary";
@@ -8,63 +8,6 @@ import { uploadToCloudinary } from "../cloudinary/service";
 import { CloudinaryUploadResult } from "../cloudinary/model";
 
 class UserChatService {
-    private checkIsIdValid(field: string, value: unknown) {
-        if (!value || typeof value !== "string" || !ObjectId.isValid(value)) {
-            throw new ChitChatApiError(`invalid ${field}`, 400);
-        }
-        
-        return value;
-    }
-
-    private checkIsInputAString(field: string, value: unknown) {
-        if (!value || value === "" || typeof value !== "string") {
-            throw new ChitChatApiError(`invalid ${field}`, 400);
-        }
-
-        return value;
-    }
-
-    private async executeDeletion(props: TUserChat["executeDeletion"]) {
-        const operations: Promise<any>[] = [];
-
-        this.executeMediaDeletion({
-            deleteFunctions: (ids) => userChatRepository.deleteAllMessagesPermanently(ids),
-            messages: props.deleteMessagePermanently,
-            operations: operations,
-        });
-
-        this.executeMediaDeletion({
-            deleteFunctions: (ids) => userChatRepository.deleteAllMessagesTemporary(ids),
-            messages: props.deleteMessageTemporary,
-            operations: operations
-        });
-
-        if (props.hideMessages.length > 0) {
-            const ids = props.hideMessages.map(message => message._id);
-            operations.push(userChatRepository.hideChosenMessages({ 
-                user_id: props.sender_id, message_ids: ids 
-            }));
-        }
-
-        if (operations.length > 0) await Promise.all(operations);
-    }
-
-    private executeMediaDeletion(props: TUserChat["executeMediaDeletion"]) {
-        if (props.messages.length === 0) return;
-        const selectedMessageids = props.messages.map(message => message._id);
-        const selectedFiles = props.messages.flatMap(message => message.files || []);
-
-        if (selectedFiles.length > 0) {
-            const removeFromCloudinary = selectedFiles.map(files => {
-                return v2.uploader.destroy(files.public_id, { resource_type: files.resource_type });
-            });
-
-            props.operations.push(...removeFromCloudinary);
-        }
-
-        props.operations.push(props.deleteFunctions(selectedMessageids));
-    }
-    
     async changeChosenMessage(props: TUserChat["changeMessageResult"]) {
         const messageId = this.checkIsIdValid("message chat", props._id);
         const receiverId = this.checkIsIdValid("receiver", props.receiver_id);
@@ -75,15 +18,28 @@ class UserChatService {
         if (!message) throw new ChitChatApiError("message not found", 404);
         if (message.text === newText) return;
 
-        const editedMessage = await userChatRepository.changeMessage({ 
+        await userChatRepository.changeMessage({ 
             _id: messageId, 
             text: newText, 
             receiver_id: receiverId, 
             sender_id: senderId 
         });
 
-        const roomId = this.getRoomId(receiverId, senderId);
-        userChatWS.emit(roomId, { data: editedMessage, type: "user-message:changed" });
+        userChatWebSocket.userChatBroadcast("user-message:changed");
+    }
+
+    private checkIsIdValid(field: string, value: unknown) {
+        if (!value || typeof value !== "string" || !ObjectId.isValid(value)) {
+            throw new ChitChatApiError(`invalid ${field}`, 400);
+        }
+        return value;
+    }
+
+    private checkIsInputAString(field: string, value: unknown) {
+        if (!value || value === "" || typeof value !== "string") {
+            throw new ChitChatApiError(`invalid ${field}`, 400);
+        }
+        return value;
     }
 
     async clearAllMessages(props: Omit<TUserChat["deleteChat"], "message_ids">) {
@@ -179,11 +135,8 @@ class UserChatService {
             sender_id: senderId
         });
 
-        const affectedIds = toDeleteOwnTemporary.map(message => message._id.toString());
-
         if (chats.length > 0) {
-            const roomId = this.getRoomId(senderId, receiverId);
-            userChatWS.emit(roomId, { type: "user-message:deleted", data: affectedIds });
+            userChatWebSocket.userChatBroadcast("user-message:deleted");
         }
     }
 
@@ -234,16 +187,50 @@ class UserChatService {
             sender_id: senderId
         });
 
-        const affectedIds = toDeleteOwnTemporary.map(message => message._id.toString());
-
         if (chats.length > 0) {
-            const roomId = this.getRoomId(senderId, receiverId);
-            userChatWS.emit(roomId, { type: "user-message:deleted", data: affectedIds });
+            userChatWebSocket.userChatBroadcast("user-message:deleted");
         }
     }
+    
+    private async executeDeletion(props: TUserChat["executeDeletion"]) {
+        const operations: Promise<any>[] = [];
 
-    private getRoomId(receiver_id: string, sender_id: string) {
-        return [receiver_id, sender_id].sort().join("_");
+        this.executeMediaDeletion({
+            deleteFunctions: (ids) => userChatRepository.deleteAllMessagesPermanently(ids),
+            messages: props.deleteMessagePermanently,
+            operations: operations,
+        });
+
+        this.executeMediaDeletion({
+            deleteFunctions: (ids) => userChatRepository.deleteAllMessagesTemporary(ids),
+            messages: props.deleteMessageTemporary,
+            operations: operations
+        });
+
+        if (props.hideMessages.length > 0) {
+            const ids = props.hideMessages.map(message => message._id);
+            operations.push(userChatRepository.hideChosenMessages({ 
+                user_id: props.sender_id, message_ids: ids 
+            }));
+        }
+
+        if (operations.length > 0) await Promise.all(operations);
+    }
+
+    private executeMediaDeletion(props: TUserChat["executeMediaDeletion"]) {
+        if (props.messages.length === 0) return;
+        const selectedMessageids = props.messages.map(message => message._id);
+        const selectedFiles = props.messages.flatMap(message => message.files || []);
+
+        if (selectedFiles.length > 0) {
+            const removeFromCloudinary = selectedFiles.map(files => {
+                return v2.uploader.destroy(files.public_id, { resource_type: files.resource_type });
+            });
+
+            props.operations.push(...removeFromCloudinary);
+        }
+
+        props.operations.push(props.deleteFunctions(selectedMessageids));
     }
 
     async sendMessages(props: TUserChat["sendMessageRaw"]) {
@@ -283,7 +270,7 @@ class UserChatService {
             selectedMedia = await Promise.all(uploadPromises);
         }
 
-        const message = await userChatRepository.sendMessages({
+        await userChatRepository.sendMessages({
             files: selectedMedia,
             files_total: selectedMedia.length,
             text: newMessage,
@@ -291,8 +278,7 @@ class UserChatService {
             sender_id: senderId,
         });
 
-        const roomId = this.getRoomId(senderId, receiverId);
-        userChatWS.emit(roomId, { data: message, type: "user-message:sent"});
+        userChatWebSocket.userChatBroadcast("user-message:sent");
     }
 
     async showAllMessages(props: TUserChat["filter"]) {

@@ -3,9 +3,7 @@ import { apiAuthMiddleware } from "../auths/middleware";
 import groupChatController from "./controller";
 import { groupChatSchema } from "./model";
 import { validateSession } from "../auths/service";
-import { groupChatWS } from "./websocket";
-
-const wsContext = new WeakMap<any, { roomId: string; handler: (data: any) => void }>();
+import groupChatWebSocket from "./websocket";
 
 const groupChatRouters = new Elysia({ prefix: "/api/v1/groups/chats" })
 .use(apiAuthMiddleware)
@@ -49,12 +47,13 @@ const groupChatRouters = new Elysia({ prefix: "/api/v1/groups/chats" })
 }, {
     body: t.Omit(groupChatSchema.changeMessage, ["sender_id"])
 })
-.ws("/ws", {
-    query: groupChatSchema.wsConfig,
+.ws("/ws/:group_id", {
+    params: t.Pick(groupChatSchema.wsConfig, ["group_id"]),
+    query: t.Pick(groupChatSchema.wsConfig, ["token"]),
 
     async open(ws) {
         try {
-            const groupId = ws.data.query.group_id;
+            const groupId = ws.data.params.group_id;
             const token = ws.data.query.token;
             const session = await validateSession(token);
 
@@ -64,30 +63,29 @@ const groupChatRouters = new Elysia({ prefix: "/api/v1/groups/chats" })
                 return;
             }
 
-            const senderId = session.user.id;
+            const userId = session.user.id;
 
-            if (!groupId || !senderId || typeof senderId !== "string" || typeof groupId !== "string") {
+            if (!groupId || !userId || typeof userId !== "string" || typeof groupId !== "string") {
                 ws.send(JSON.stringify({ message: "Invalid group or user", type: "error" }));
                 ws.close(4002, "Invalid group or user");
                 return;
             }
 
-            const handler = (data: any) => ws.send(JSON.stringify(data));
-
-            groupChatWS.on(groupId, handler );
-            wsContext.set(ws, { roomId: groupId, handler });
+            groupChatWebSocket.addTunnel(groupId, ws);
         } catch (error) {
             ws.send(JSON.stringify({ message: "Connection failed", type: "error" }));
             ws.close(4003, "Internal error");
         }
     },
 
+    message(ws, message) {
+        const dataToSend = JSON.parse(message as string);
+        if (dataToSend.type === "ping") ws.send(JSON.stringify({ type: "pong" }));
+    },
+
     close(ws) {
-        const ctx = wsContext.get(ws);
-        if (ctx) {
-            groupChatWS.off(ctx.roomId, ctx.handler);
-            wsContext.delete(ws);
-        }
+        const groupId = ws.data.params.group_id;
+        if (groupId) groupChatWebSocket.removeTunnel(groupId, ws);
     }
 });
 

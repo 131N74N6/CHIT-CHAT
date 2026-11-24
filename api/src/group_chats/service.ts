@@ -1,6 +1,6 @@
 import { TGroupChats } from "./model";
 import groupChatRepository from "./repository";
-import { groupChatWS } from "./websocket";
+import groupChatWebSocket from "./websocket";
 import { ObjectId } from "mongodb";
 import { ChitChatApiError } from "../error/service";
 import { v2 } from "cloudinary";
@@ -8,6 +8,28 @@ import { uploadToCloudinary } from "../cloudinary/service";
 import { CloudinaryUploadResult } from "../cloudinary/model";
 
 class GroupChatService {
+    async changeChosenMessage(props: TGroupChats["changeMessage"]) {
+        const id = this.checkIsIdValid("message chat", props._id);
+        const groupId = this.checkIsIdValid("group", props.group_id);
+        const senderId = this.checkIsIdValid("sender", props.sender_id);
+
+        const message = await groupChatRepository.findOneMessageById(id);
+        if (!message) throw new ChitChatApiError("message not found", 404);
+
+        if (message.sender_id.toString() !== senderId) {
+            throw new ChitChatApiError("you are not allowed to change this message", 403);
+        }
+
+        const text = (props.text !== "" || props.text !== undefined) ?
+        this.checkIsInputAString("message", props.text) : message.text;
+
+        await groupChatRepository.changeChosenMessage({ 
+            _id: id, group_id: groupId, sender_id: senderId, text: text 
+        });
+
+        groupChatWebSocket.groupChatBroadcast("group-message:changed");
+    }
+    
     private checkIsIdValid(field: string, value: unknown) {
         if (!value || typeof value !== "string" || !ObjectId.isValid(value)) {
             throw new ChitChatApiError(`invalid ${field}`, 400);
@@ -22,6 +44,187 @@ class GroupChatService {
         }
 
         return value;
+    }
+
+    async clearAllMessages(props: Omit<TGroupChats["deleteMessage"], "message_ids">) {
+        const groupId = this.checkIsIdValid("group", props.group_id);
+        const senderId = this.checkIsIdValid("sender", props.sender_id);
+
+        const members = await groupChatRepository.findAllMembers(groupId);
+        const isMember = members.some(member => member._id.toString() === senderId);
+
+        if (!isMember) throw new ChitChatApiError("you are not a member of this group", 403);
+
+        const totalMembers = members.length;
+        const chats = await groupChatRepository.findAllMessages(groupId);
+
+        if (chats.length === 0) return;
+
+        const toDeletePermanently = chats.filter((chat) => chat.hidden_for.length + 1 >= totalMembers);
+
+        const toHide = chats.filter((chat) => chat.hidden_for.length + 1 < totalMembers);
+
+        await this.executeDeletion({
+            deleteMessagesPermanently: toDeletePermanently,
+            deleteMessagesTemporary: [],
+            hideMessages: toHide,
+            sender_id: senderId
+        });
+    }
+
+    async clearChosenMessages(props: TGroupChats["deleteMessage"]) {
+        const ids = props.message_ids.map((id) => this.checkIsIdValid("message chat", id));
+        const groupId = this.checkIsIdValid("group", props.group_id);
+        const senderId = this.checkIsIdValid("sender", props.sender_id);
+
+        const chats = await groupChatRepository.findChosenMessagesById(ids);
+        if (chats.length === 0) return;
+
+        const members = await groupChatRepository.findAllMembers(groupId);
+        const isMember = members.some(member => member._id.toString() === senderId);
+        if (!isMember) throw new ChitChatApiError("you are not a member of this group", 403);
+        
+        const totalMembers = members.length;
+
+        const toDeletePermanently = chats.filter((chat) => {
+            const hiddenCount = chat.hidden_for ? chat.hidden_for.length : 0;
+            return hiddenCount + 1 >= totalMembers;
+        });
+
+        const toHide = chats.filter((chat) => {
+            const hiddenCount = chat.hidden_for ? chat.hidden_for.length : 0;
+            return hiddenCount + 1 < totalMembers;
+        });
+
+        await this.executeDeletion({
+            deleteMessagesPermanently: toDeletePermanently,
+            deleteMessagesTemporary: [],
+            hideMessages: toHide,
+            sender_id: senderId
+        });
+    }
+
+    async deleteAllMessages(props: Omit<TGroupChats["deleteMessage"], "message_ids">) {
+        const groupId = this.checkIsIdValid("group", props.group_id);
+        const senderId = this.checkIsIdValid("sender", props.sender_id);
+
+        const members = await groupChatRepository.findAllMembers(groupId);
+        const isMember = members.some(member => member._id.toString() === senderId);
+        if (!isMember) throw new ChitChatApiError("you are not a member of this group", 403);
+
+        const totalMembers = members.length;
+        const chats = await groupChatRepository.findAllMessages(groupId);
+        
+        if (chats.length === 0) return;
+
+        const deleteOwnMessagesPermanently = chats.filter((chat) => {
+            const hiddenCount = chat.hidden_for ? chat.hidden_for.length : 0;
+            return hiddenCount + 1 >= totalMembers && chat.sender_id.toString() === senderId;
+        });
+
+        const deleteOwnMessagesTemporary = chats.filter((chat) => {
+            const hiddenCount = chat.hidden_for ? chat.hidden_for.length : 0;
+            return hiddenCount + 1 < totalMembers && chat.sender_id.toString() === senderId;
+        });
+
+        const deleteOtherMessagesPermanently = chats.filter((chat) => {
+            const hiddenCount = chat.hidden_for ? chat.hidden_for.length : 0;
+            return hiddenCount + 1 >= totalMembers && chat.sender_id.toString() !== senderId;
+        });
+
+        const deleteOtherMessagesTemporary = chats.filter((chat) => {
+            const hiddenCount = chat.hidden_for ? chat.hidden_for.length : 0;
+            return hiddenCount + 1 < totalMembers && chat.sender_id.toString() !== senderId;
+        });
+
+        const hideDeletedMessages = chats.filter((chat) => {
+            const hiddenCount = chat.hidden_for ? chat.hidden_for.length : 0;
+            return chat.text === "This message has been deleted" && hiddenCount + 1 < totalMembers;
+        });
+
+        const removeDeletedMessgesPermanently = chats.filter((chat) => {
+            const hiddenCount = chat.hidden_for ? chat.hidden_for.length : 0;
+            return chat.text === "This message has been deleted" && hiddenCount + 1 >= totalMembers;
+        });
+
+        await this.executeDeletion({
+            deleteMessagesPermanently: [
+                ...deleteOwnMessagesPermanently, 
+                ...deleteOtherMessagesPermanently,
+                ...removeDeletedMessgesPermanently
+            ],
+            deleteMessagesTemporary: deleteOwnMessagesTemporary,
+            hideMessages: [...deleteOtherMessagesTemporary, ...hideDeletedMessages],
+            sender_id: senderId
+        });
+
+        const affectedIds = deleteOwnMessagesTemporary.map((message) => message._id.toString());
+
+        if (affectedIds.length > 0) {
+            groupChatWebSocket.groupChatBroadcast("group-message:deleted");
+        }
+    }
+
+    async deleteChosenMessages(props: TGroupChats["deleteMessage"]) {
+        const ids = props.message_ids.map((id) => this.checkIsIdValid("message chat", id));
+        const groupId = this.checkIsIdValid("group", props.group_id);
+        const senderId = this.checkIsIdValid("sender", props.sender_id);
+
+        const chats = await groupChatRepository.findChosenMessagesById(ids);
+        if (chats.length === 0) return;
+
+        const members = await groupChatRepository.findAllMembers(groupId);
+        const isMember = members.some(member => member._id.toString() === senderId);
+        if (!isMember) throw new ChitChatApiError("you are not a member of this group", 403);
+
+        const totalMembers = members.length;
+
+        const deleteOwnMessagesPermanently = chats.filter((chat) => {
+            const hiddenCount = chat.hidden_for ? chat.hidden_for.length : 0;
+            return hiddenCount + 1 >= totalMembers && chat.sender_id.toString() === senderId;
+        });
+
+        const deleteOwnMessagesTemporary = chats.filter((chat) => {
+            const hiddenCount = chat.hidden_for ? chat.hidden_for.length : 0;
+            return hiddenCount + 1 < totalMembers && chat.sender_id.toString() === senderId;
+        });
+
+        const deleteOtherMessagesPermanently = chats.filter((chat) => {
+            const hiddenCount = chat.hidden_for ? chat.hidden_for.length : 0;
+            return hiddenCount + 1 >= totalMembers && chat.sender_id.toString() !== senderId;
+        });
+
+        const deleteOtherMessagesTemporary = chats.filter((chat) => {
+            const hiddenCount = chat.hidden_for ? chat.hidden_for.length : 0;
+            return hiddenCount + 1 < totalMembers && chat.sender_id.toString() !== senderId;
+        });
+
+        const hideDeletedMessages = chats.filter((chat) => {
+            const hiddenCount = chat.hidden_for ? chat.hidden_for.length : 0;
+            return chat.text === "This message has been deleted" && hiddenCount + 1 < totalMembers;
+        });
+
+        const removeDeletedMessgesPermanently = chats.filter((chat) => {
+            const hiddenCount = chat.hidden_for ? chat.hidden_for.length : 0;
+            return chat.text === "This message has been deleted" && hiddenCount + 1 >= totalMembers;
+        });
+
+        await this.executeDeletion({
+            deleteMessagesPermanently: [
+                ...deleteOtherMessagesPermanently,
+                ...deleteOwnMessagesPermanently,
+                ...removeDeletedMessgesPermanently
+            ],
+            deleteMessagesTemporary: deleteOwnMessagesTemporary,
+            hideMessages: [...deleteOtherMessagesTemporary, ...hideDeletedMessages],
+            sender_id: senderId
+        });
+
+        const affectedIds = deleteOwnMessagesTemporary.map((message) => message._id.toString());
+
+        if (affectedIds.length > 0) {
+            groupChatWebSocket.groupChatBroadcast("group-message:deleted");
+        }
     }
     
     private async executeDeletion(props: TGroupChats["executeDeletion"]) {
@@ -64,217 +267,6 @@ class GroupChatService {
         }
 
         props.operations.push(props.deleteFunction(ids));
-    }
-    
-    async changeChosenMessage(props: TGroupChats["changeMessage"]) {
-        const id = this.checkIsIdValid("message chat", props._id);
-        const groupId = this.checkIsIdValid("group", props.group_id);
-        const senderId = this.checkIsIdValid("sender", props.sender_id);
-
-        const message = await groupChatRepository.findOneMessageById(id);
-        if (!message) throw new ChitChatApiError("message not found", 404);
-
-        if (message.sender_id.toString() !== senderId) {
-            throw new ChitChatApiError("you are not allowed to change this message", 403);
-        }
-
-        let text = "";
-        
-        if (message.text !== text) text = this.checkIsInputAString("message", props.text);
-
-        const edited = await groupChatRepository.changeChosenMessage({ 
-            _id: id, group_id: groupId, sender_id: senderId, text: text 
-        });
-
-        groupChatWS.emit(groupId, { data: edited, type: "group-message:changed" });
-    }
-    
-    async clearAllMessages(props: Omit<TGroupChats["deleteMessage"], "message_ids">) {
-        const groupId = this.checkIsIdValid("group", props.group_id);
-        const senderId = this.checkIsIdValid("sender", props.sender_id);
-
-        const members = await groupChatRepository.findAllMembers(groupId);
-        const isMember = members.some(member => String(member._id) === String(senderId));
-
-        if (!isMember) throw new ChitChatApiError("you are not a member of this group", 403);
-
-        const totalMembers = members.length;
-        const chats = await groupChatRepository.findAllMessages(groupId);
-
-        if (chats.length === 0) return;
-
-        const toDeletePermanently = chats.filter((chat) => {
-            // ✅ PERBAIKAN: Gunakan optional chaining (?.) untuk mencegah crash 500
-            const hiddenCount = chat.hidden_for ? chat.hidden_for.length : 0;
-            return hiddenCount + 1 >= totalMembers;
-        });
-
-        const toHide = chats.filter((chat) => {
-            const hiddenCount = chat.hidden_for ? chat.hidden_for.length : 0;
-            return hiddenCount + 1 < totalMembers;
-        });
-
-        await this.executeDeletion({
-            deleteMessagesPermanently: toDeletePermanently,
-            deleteMessagesTemporary: [],
-            hideMessages: toHide,
-            sender_id: senderId
-        });
-    }
-
-    async clearChosenMessages(props: TGroupChats["deleteMessage"]) {
-        const ids = props.message_ids.map((id) => this.checkIsIdValid("message chat", id));
-        const groupId = this.checkIsIdValid("group", props.group_id);
-        const senderId = this.checkIsIdValid("sender", props.sender_id);
-
-        const chats = await groupChatRepository.findChosenMessagesById(ids);
-        if (chats.length === 0) return;
-
-        const members = await groupChatRepository.findAllMembers(groupId);
-        const isMember = members.some(member => String(member._id) === String(senderId));
-        if (!isMember) throw new ChitChatApiError("you are not a member of this group", 403);
-        
-        const totalMembers = members.length;
-
-        const toDeletePermanently = chats.filter((chat) => {
-            const hiddenCount = chat.hidden_for ? chat.hidden_for.length : 0;
-            return hiddenCount + 1 >= totalMembers;
-        });
-
-        const toHide = chats.filter((chat) => {
-            const hiddenCount = chat.hidden_for ? chat.hidden_for.length : 0;
-            return hiddenCount + 1 < totalMembers;
-        });
-
-        await this.executeDeletion({
-            deleteMessagesPermanently: toDeletePermanently,
-            deleteMessagesTemporary: [],
-            hideMessages: toHide,
-            sender_id: senderId
-        });
-    }
-
-    async deleteAllMessages(props: Omit<TGroupChats["deleteMessage"], "message_ids">) {
-        const groupId = this.checkIsIdValid("group", props.group_id);
-        const senderId = this.checkIsIdValid("sender", props.sender_id);
-
-        const members = await groupChatRepository.findAllMembers(groupId);
-        const isMember = members.some(member => String(member._id) === String(senderId));
-        if (!isMember) throw new ChitChatApiError("you are not a member of this group", 403);
-
-        const totalMembers = members.length;
-        const chats = await groupChatRepository.findAllMessages(groupId);
-        
-        if (chats.length === 0) return;
-
-        const deleteOwnMessagesPermanently = chats.filter((chat) => {
-            const hiddenCount = chat.hidden_for ? chat.hidden_for.length : 0;
-            return hiddenCount + 1 >= totalMembers && String(chat.sender_id) === String(senderId);
-        });
-
-        const deleteOwnMessagesTemporary = chats.filter((chat) => {
-            const hiddenCount = chat.hidden_for ? chat.hidden_for.length : 0;
-            return hiddenCount + 1 < totalMembers && String(chat.sender_id) === String(senderId);
-        });
-
-        const deleteOtherMessagesPermanently = chats.filter((chat) => {
-            const hiddenCount = chat.hidden_for ? chat.hidden_for.length : 0;
-            return hiddenCount + 1 >= totalMembers && String(chat.sender_id) !== String(senderId);
-        });
-
-        const deleteOtherMessagesTemporary = chats.filter((chat) => {
-            const hiddenCount = chat.hidden_for ? chat.hidden_for.length : 0;
-            return hiddenCount + 1 < totalMembers && String(chat.sender_id) !== String(senderId);
-        });
-
-        const hideDeletedMessages = chats.filter((chat) => {
-            const hiddenCount = chat.hidden_for ? chat.hidden_for.length : 0;
-            return chat.text === "This message has been deleted" && hiddenCount + 1 < totalMembers;
-        });
-
-        const removeDeletedMessgesPermanently = chats.filter((chat) => {
-            const hiddenCount = chat.hidden_for ? chat.hidden_for.length : 0;
-            return chat.text === "This message has been deleted" && hiddenCount + 1 >= totalMembers;
-        });
-
-        await this.executeDeletion({
-            deleteMessagesPermanently: [
-                ...deleteOwnMessagesPermanently, 
-                ...deleteOtherMessagesPermanently,
-                ...removeDeletedMessgesPermanently
-            ],
-            deleteMessagesTemporary: deleteOwnMessagesTemporary,
-            hideMessages: [...deleteOtherMessagesTemporary, ...hideDeletedMessages],
-            sender_id: senderId
-        });
-
-        const affectedIds = deleteOwnMessagesTemporary.map((message) => message._id.toString());
-
-        if (affectedIds.length > 0) {
-            groupChatWS.emit(groupId, { data: affectedIds, type: "group-message:deleted" });
-        }
-    }
-
-    async deleteChosenMessages(props: TGroupChats["deleteMessage"]) {
-        const ids = props.message_ids.map((id) => this.checkIsIdValid("message chat", id));
-        const groupId = this.checkIsIdValid("group", props.group_id);
-        const senderId = this.checkIsIdValid("sender", props.sender_id);
-
-        const chats = await groupChatRepository.findChosenMessagesById(ids);
-        if (chats.length === 0) return;
-
-        const members = await groupChatRepository.findAllMembers(groupId);
-        const isMember = members.some(member => String(member._id) === String(senderId));
-        if (!isMember) throw new ChitChatApiError("you are not a member of this group", 403);
-
-        const totalMembers = members.length;
-
-        const deleteOwnMessagesPermanently = chats.filter((chat) => {
-            const hiddenCount = chat.hidden_for ? chat.hidden_for.length : 0;
-            return hiddenCount + 1 >= totalMembers && String(chat.sender_id) === String(senderId);
-        });
-
-        const deleteOwnMessagesTemporary = chats.filter((chat) => {
-            const hiddenCount = chat.hidden_for ? chat.hidden_for.length : 0;
-            return hiddenCount + 1 < totalMembers && String(chat.sender_id) === String(senderId);
-        });
-
-        const deleteOtherMessagesPermanently = chats.filter((chat) => {
-            const hiddenCount = chat.hidden_for ? chat.hidden_for.length : 0;
-            return hiddenCount + 1 >= totalMembers && String(chat.sender_id) !== String(senderId);
-        });
-
-        const deleteOtherMessagesTemporary = chats.filter((chat) => {
-            const hiddenCount = chat.hidden_for ? chat.hidden_for.length : 0;
-            return hiddenCount + 1 < totalMembers && String(chat.sender_id) !== String(senderId);
-        });
-
-        const hideDeletedMessages = chats.filter((chat) => {
-            const hiddenCount = chat.hidden_for ? chat.hidden_for.length : 0;
-            return chat.text === "This message has been deleted" && hiddenCount + 1 < totalMembers;
-        });
-
-        const removeDeletedMessgesPermanently = chats.filter((chat) => {
-            const hiddenCount = chat.hidden_for ? chat.hidden_for.length : 0;
-            return chat.text === "This message has been deleted" && hiddenCount + 1 >= totalMembers;
-        });
-
-        await this.executeDeletion({
-            deleteMessagesPermanently: [
-                ...deleteOtherMessagesPermanently,
-                ...deleteOwnMessagesPermanently,
-                ...removeDeletedMessgesPermanently
-            ],
-            deleteMessagesTemporary: deleteOwnMessagesTemporary,
-            hideMessages: [...deleteOtherMessagesTemporary, ...hideDeletedMessages],
-            sender_id: senderId
-        });
-
-        const affectedIds = deleteOwnMessagesTemporary.map((message) => message._id.toString());
-
-        if (affectedIds.length > 0) {
-            groupChatWS.emit(groupId, { data: affectedIds, type: "group-message:deleted" });
-        }
     }
 
     async sendMessage(props: TGroupChats["sendMessageRaw"]) {
@@ -327,7 +319,7 @@ class GroupChatService {
             text: text
         });
 
-        groupChatWS.emit(groupId, { data: message, type: "group-message:sent" });
+        groupChatWebSocket.groupChatBroadcast("group-message:sent");
     }
 
     async showAllMessages(props: Omit<TGroupChats["additionalFilter"], "skip">) {

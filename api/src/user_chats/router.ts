@@ -2,10 +2,8 @@ import Elysia, { t } from "elysia";
 import { apiAuthMiddleware } from "../auths/middleware";
 import userChatController from "./controller";
 import { userChatSchema } from "./model";
-import { userChatWS } from "./websocket";
+import userChatWebSocket from "./websocket";
 import { validateSession } from "../auths/service";
-
-const wsContext = new WeakMap<any, { roomId: string; handler: (data: any) => void }>();
 
 const userChatRouters = new Elysia({ prefix: "/api/v1/user-chats" })
 .use(apiAuthMiddleware)
@@ -73,24 +71,26 @@ const userChatRouters = new Elysia({ prefix: "/api/v1/user-chats" })
                 return;
             }
 
-            const roomId = [senderId, receiverId].sort().join("_");
-            const handler = (data: any) => ws.send(JSON.stringify(data));
-
-            userChatWS.on(roomId, handler);
-            wsContext.set(ws, { roomId, handler });
-            
-            ws.send(JSON.stringify({ type: "connected", message: "You're connected" }));
+            const userChatId = [senderId, receiverId].sort().join("_");
+            userChatWebSocket.addTunnel(userChatId, ws);
         } catch (error) {
             ws.send(JSON.stringify({ type: "error", message: "Connection failed" }));
             ws.close(4003, "Internal error");
         }
     },
 
+    message(ws, message) {
+        const dataToSend = JSON.parse(message as string);
+        if (dataToSend.type === "ping") ws.send(JSON.stringify({ type: "pong" }));
+    },
+
     close(ws) {
-        const ctx = wsContext.get(ws);
-        if (ctx) {
-            userChatWS.off(ctx.roomId, ctx.handler);
-            wsContext.delete(ws);
+        const receiverId = ws.data.params.receiver_id;
+        const senderId = ws.data.user.id;
+
+        if (senderId && receiverId) {
+            const userChatId = [senderId, receiverId].sort().join("_");
+            userChatWebSocket.removeTunnel(userChatId, ws);
         }
     }
 });

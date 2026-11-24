@@ -3,28 +3,28 @@ export type GroupMemberWSData = {
     readyState: number;
 }
 
-export const groupMemberContext = new Map<string, Set<GroupMemberWSData>>();
+export const groupMemberTunnel = new Map<string, Set<GroupMemberWSData>>();
 
 export function addTunnel(group_id: string, ws: GroupMemberWSData) {
-    if (!groupMemberContext.has(group_id)) groupMemberContext.set(group_id, new Set());
-    groupMemberContext.get(group_id)?.add(ws);
+    if (!groupMemberTunnel.has(group_id)) groupMemberTunnel.set(group_id, new Set());
+    groupMemberTunnel.get(group_id)?.add(ws);
 }
 
 export function groupMemberBroadcast(event_name: string) {
-    const payload = JSON.stringify({ type: event_name });
+    const dataToSend = JSON.stringify({ type: event_name });
 
-    for (const groupMember of groupMemberContext.values()) {
+    for (const groupMember of groupMemberTunnel.values()) {
         for (const ws of groupMember) {
-            if (ws.readyState === 1) ws.send(payload);
+            if (ws.readyState === 1) ws.send(dataToSend);
         }
     }
 }
 
 export function removeTunnel(group_id: string, ws: GroupMemberWSData) {
-    const tunnel = groupMemberContext.get(group_id);
+    const tunnel = groupMemberTunnel.get(group_id);
 
     if (tunnel) {
         tunnel.delete(ws);
-        if (tunnel.size === 0) groupMemberContext.delete(group_id);
+        if (tunnel.size === 0) groupMemberTunnel.delete(group_id);
     }
 }
