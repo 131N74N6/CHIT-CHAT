@@ -86,15 +86,9 @@ class GroupChatService {
         
         const totalMembers = members.length;
 
-        const toDeletePermanently = chats.filter((chat) => {
-            const hiddenCount = chat.hidden_for ? chat.hidden_for.length : 0;
-            return hiddenCount + 1 >= totalMembers;
-        });
+        const toDeletePermanently = chats.filter((chat) => chat.hidden_for.length + 1 >= totalMembers);
 
-        const toHide = chats.filter((chat) => {
-            const hiddenCount = chat.hidden_for ? chat.hidden_for.length : 0;
-            return hiddenCount + 1 < totalMembers;
-        });
+        const toHide = chats.filter((chat) => chat.hidden_for.length + 1 < totalMembers);
 
         await this.executeDeletion({
             deleteMessagesPermanently: toDeletePermanently,
@@ -118,33 +112,29 @@ class GroupChatService {
         if (chats.length === 0) return;
 
         const deleteOwnMessagesPermanently = chats.filter((chat) => {
-            const hiddenCount = chat.hidden_for ? chat.hidden_for.length : 0;
-            return hiddenCount + 1 >= totalMembers && chat.sender_id.toString() === senderId;
+            return chat.hidden_for.length + 1 >= totalMembers && chat.sender_id.toString() === senderId;
         });
 
         const deleteOwnMessagesTemporary = chats.filter((chat) => {
-            const hiddenCount = chat.hidden_for ? chat.hidden_for.length : 0;
-            return hiddenCount + 1 < totalMembers && chat.sender_id.toString() === senderId;
+            return chat.hidden_for.length + 1 < totalMembers && chat.sender_id.toString() === senderId;
         });
 
         const deleteOtherMessagesPermanently = chats.filter((chat) => {
-            const hiddenCount = chat.hidden_for ? chat.hidden_for.length : 0;
-            return hiddenCount + 1 >= totalMembers && chat.sender_id.toString() !== senderId;
+            return chat.hidden_for.length + 1 >= totalMembers && chat.sender_id.toString() !== senderId;
         });
 
         const deleteOtherMessagesTemporary = chats.filter((chat) => {
-            const hiddenCount = chat.hidden_for ? chat.hidden_for.length : 0;
-            return hiddenCount + 1 < totalMembers && chat.sender_id.toString() !== senderId;
+            return chat.hidden_for.length + 1 < totalMembers && chat.sender_id.toString() !== senderId;
         });
 
         const hideDeletedMessages = chats.filter((chat) => {
-            const hiddenCount = chat.hidden_for ? chat.hidden_for.length : 0;
-            return chat.text === "This message has been deleted" && hiddenCount + 1 < totalMembers;
+            return chat.text === "This message has been deleted" && 
+            chat.hidden_for.length + 1 < totalMembers;
         });
 
         const removeDeletedMessgesPermanently = chats.filter((chat) => {
-            const hiddenCount = chat.hidden_for ? chat.hidden_for.length : 0;
-            return chat.text === "This message has been deleted" && hiddenCount + 1 >= totalMembers;
+            return chat.text === "This message has been deleted" && 
+            chat.hidden_for.length + 1 >= totalMembers;
         });
 
         await this.executeDeletion({
@@ -180,33 +170,29 @@ class GroupChatService {
         const totalMembers = members.length;
 
         const deleteOwnMessagesPermanently = chats.filter((chat) => {
-            const hiddenCount = chat.hidden_for ? chat.hidden_for.length : 0;
-            return hiddenCount + 1 >= totalMembers && chat.sender_id.toString() === senderId;
+            return chat.hidden_for.length + 1 >= totalMembers && chat.sender_id.toString() === senderId;
         });
 
         const deleteOwnMessagesTemporary = chats.filter((chat) => {
-            const hiddenCount = chat.hidden_for ? chat.hidden_for.length : 0;
-            return hiddenCount + 1 < totalMembers && chat.sender_id.toString() === senderId;
+            return chat.hidden_for.length + 1 < totalMembers && chat.sender_id.toString() === senderId;
         });
 
         const deleteOtherMessagesPermanently = chats.filter((chat) => {
-            const hiddenCount = chat.hidden_for ? chat.hidden_for.length : 0;
-            return hiddenCount + 1 >= totalMembers && chat.sender_id.toString() !== senderId;
+            return chat.hidden_for.length + 1 >= totalMembers && chat.sender_id.toString() !== senderId;
         });
 
         const deleteOtherMessagesTemporary = chats.filter((chat) => {
-            const hiddenCount = chat.hidden_for ? chat.hidden_for.length : 0;
-            return hiddenCount + 1 < totalMembers && chat.sender_id.toString() !== senderId;
+            return chat.hidden_for.length + 1 < totalMembers && chat.sender_id.toString() !== senderId;
         });
 
         const hideDeletedMessages = chats.filter((chat) => {
-            const hiddenCount = chat.hidden_for ? chat.hidden_for.length : 0;
-            return chat.text === "This message has been deleted" && hiddenCount + 1 < totalMembers;
+            return chat.text === "This message has been deleted" && 
+            chat.hidden_for.length + 1 < totalMembers;
         });
 
         const removeDeletedMessgesPermanently = chats.filter((chat) => {
-            const hiddenCount = chat.hidden_for ? chat.hidden_for.length : 0;
-            return chat.text === "This message has been deleted" && hiddenCount + 1 >= totalMembers;
+            return chat.text === "This message has been deleted" && 
+            chat.hidden_for.length + 1 >= totalMembers;
         });
 
         await this.executeDeletion({
@@ -244,7 +230,10 @@ class GroupChatService {
 
         if (props.hideMessages.length > 0) {
             const ids = props.hideMessages.map((message) => message._id);
-            operations.push(groupChatRepository.hideMessages({ message_ids: ids, sender_id: props.sender_id }));
+            
+            operations.push(groupChatRepository.hideMessages({ 
+                message_ids: ids, sender_id: props.sender_id 
+            }));
         }
 
         if (operations.length > 0) await Promise.all(operations);
@@ -311,7 +300,7 @@ class GroupChatService {
             selectedFiles = await Promise.all(result);
         }
 
-        const message = await groupChatRepository.sendMessages({
+        await groupChatRepository.sendMessages({
             files: selectedFiles,
             files_total: filesTotal,
             group_id: groupId,
