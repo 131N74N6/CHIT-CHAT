@@ -38,7 +38,13 @@ export default function useGroupChatWebSocket() {
         let isMounted = true;
 
         function connect() {
-            if (!isMounted || !groupId || getSessionToken.isLoading || !getSessionToken.data) return;
+            if (
+                !groupId || groupId == "" || 
+                !getSessionToken.data || getSessionToken.isLoading || 
+                !isMounted
+            ) {
+                return;
+            }
 
             const token = getSessionToken.data;
 

@@ -5,8 +5,10 @@ import { useGroupChatStore } from "../group_chats/useGroupChatStore";
 import { useGroupProfileStore } from "./useGroupProfileStore";
 import type { IGroupProfileDetailPopUp } from "./model";
 import { useGroupMemberStore } from "../group_members/useGroupMemberStore";
+import { useEffect } from "react";
 
 export default function GroupDetailPopUp(props: IGroupProfileDetailPopUp) {
+    const groupId = useGroupChatStore((state) => state.groupId);
     const setShowGroupChatPopUp = useGroupChatStore((state) => state.setShowGroupChatPopUp);
     const setShowGroupChatFilesPopUp = useGroupChatStore((state) => state.setShowGroupChatFilesPopUp);
     const setShowGroupChatFilePreviewPopUp = useGroupChatStore((state) => state.setShowGroupChatFilePreviewPopUp);
@@ -22,6 +24,8 @@ export default function GroupDetailPopUp(props: IGroupProfileDetailPopUp) {
     const groupName = useGroupProfileStore((state) => state.groupName);
     const setGroupName = useGroupProfileStore((state) => state.setGroupName);
 
+    const setOldGroupProfilePicture = useGroupProfileStore((state) => state.setOldGroupProfilePicture);
+
     const selectedProfileGroup = useGroupProfileStore((state) => state.selectedProfileGroup);
     const setSelectedProfileGroup = useGroupProfileStore((state) => state.setSelectedProfileGroup);
 
@@ -31,6 +35,34 @@ export default function GroupDetailPopUp(props: IGroupProfileDetailPopUp) {
     const oldGroupProfilePicture = useGroupProfileStore((state) => state.oldGroupProfilePicture);
 
     const setShowProfile = useGroupProfileStore((state) => state.setShowProfile);
+    
+    useEffect(() => {
+        if (editMode) {
+            setGroupName(props.groupProfile.group_name);
+            setGroupDescription(props.groupProfile.description);
+
+            props.groupProfile && props.groupProfile.picture.public_id !== "-" ? 
+            setOldGroupProfilePicture(props.groupProfile.picture) : setOldGroupProfilePicture({
+                file_name: "",
+                file_type: "",
+                public_id: "",
+                resource_type: "",
+                url: "",
+            });
+        } else {
+            setGroupDescription("-");
+            setGroupName("-");
+            setSelectedProfileGroup(null);
+            setOldGroupProfilePicture({
+                file_name: "",
+                file_type: "",
+                public_id: "",
+                resource_type: "",
+                url: "",
+            });
+            setSelectedProfileGroupUrl("");
+        }
+    }, [editMode, groupId, props.groupProfile]);
 
     const seeGroupChat = () => {
         setShowGroupChatPopUp(true);
@@ -49,7 +81,7 @@ export default function GroupDetailPopUp(props: IGroupProfileDetailPopUp) {
     }
 
     return (
-        <section className="h-full overflow-y-auto flex flex-col w-full border border-gray-400">
+        <section className="h-full overflow-y-auto flex flex-col w-full">
             {props.groupProfile.isLoading ? (
                 <div className="flex justify-center items-center h-full">
                     <Loading/>
@@ -101,7 +133,7 @@ export default function GroupDetailPopUp(props: IGroupProfileDetailPopUp) {
                                         <X size={1}/>
                                     </button>
                                 </div>
-                            ) : oldGroupProfilePicture.public_id !== "-" ? (
+                            ) : oldGroupProfilePicture.public_id && oldGroupProfilePicture.public_id !== "-" ? (
                                 <div className="w-full h-full relative group">
                                     <img
                                         alt={oldGroupProfilePicture.public_id}
@@ -118,14 +150,14 @@ export default function GroupDetailPopUp(props: IGroupProfileDetailPopUp) {
                                         onClick={() => props.groupProfile.deleteGroupProfilePictureMt.mutate()}
                                         type="button"
                                     >
-                                        <X size={1}/>
+                                        <X size={20}/>
                                     </button>
                                 </div>
                             ) : (
                                 <div 
                                     className={cn(
-                                        "border-dashed border-gray-500 flex justify-center items-center bg-white",
-                                        "w-full h-full rounded-full cursor-pointer font-medium text-gray-500"
+                                        "flex justify-center items-center text-gray-900 bg-gray-200",
+                                        "w-full h-full rounded-full cursor-pointer font-medium "
                                     )}
                                     onClick={() => props.groupProfile.fileInputRef.current?.click()}
                                 >
@@ -147,155 +179,154 @@ export default function GroupDetailPopUp(props: IGroupProfileDetailPopUp) {
                     </div>
                     <div className="flex flex-col gap-1.5">
                         <label htmlFor="room_description" className="text-gray-900 font-medium text-[1rem]">Description</label>
-                        <input
+                        <textarea
                             className={cn(
-                                "outline-0 bg-gray-200 text-gray-900 font-medium text-[1rem]", 
-                                "p-1.5 w-full max-h-80 overflow-y-auto"
+                                "outline-0 bg-blue-200 text-gray-900 font-medium", 
+                                "p-1.5 text-[1rem] w-full h-[25dvh] resize-none"
                             )}
                             id="room_description"
                             name="room_description"
-                            onChange={(event: React.ChangeEvent<HTMLInputElement, HTMLInputElement>) => setGroupDescription(event.target.value)}
-                            type="text"
+                            onChange={(event) => setGroupDescription(event.target.value)}
                             value={groupDescription}
                         />
                     </div>
-                    <button
-                        className={cn(
-                            "bg-blue-600 text-white font-medium cursor-pointer p-1.5 text-[1rem]",
-                            "hover:bg-blue-800 transition-colors disabled:cursor-not-allowed"
-                        )}
-                        disabled={props.isProcessing}
-                        type="submit"
-                    >
-                        {props.isProcessing ? "Saving..." : "Save"}
-                    </button>
-                    <button
-                        className={cn(
-                            "bg-blue-600 text-white font-medium cursor-pointer p-1.5 text-[1rem]",
-                            "hover:bg-blue-800 transition-colors disabled:cursor-not-allowed"
-                        )}
-                        disabled={props.isProcessing}
-                        onClick={() => setEditMode(false)}
-                        type="button"
-                    >
-                        <X size={23}/>
-                    </button>
+                    <div className="grid grid-cols-2 gap-2">
+                        <button
+                            className={cn(
+                                "bg-blue-600 text-white font-medium cursor-pointer p-1.5 text-[1rem]",
+                                "hover:bg-blue-800 transition-colors disabled:cursor-not-allowed"
+                            )}
+                            disabled={props.isProcessing}
+                            type="submit"
+                        >
+                            {props.isProcessing ? "Saving..." : "Save"}
+                        </button>
+                        <button
+                            className={cn(
+                                "bg-blue-600 text-white font-medium cursor-pointer p-1.5 text-[1rem]",
+                                "hover:bg-blue-800 transition-colors disabled:cursor-not-allowed"
+                            )}
+                            disabled={props.isProcessing}
+                            onClick={() => setEditMode(false)}
+                            type="button"
+                        >
+                            Cancel
+                        </button>
+                    </div>
                 </form>
             ) : (
-                <main className="flex flex-col h-full gap-2 w-full">
-                    <div className="bg-white flex flex-col p-2.5 gap-2.5">
-                        <div className="flex gap-2">
-                            <button
-                                className={cn(
-                                    "bg-gray-200 cursor-pointer disabled:cursor-not-allowed text-olive-600", 
-                                    "text-[0.8rem] hover:bg-gray-500 hover:text-white transition-colors font-medium p-1.5"
-                                )}
-                                disabled={props.isProcessing}
-                                type="button"
-                                onClick={seeGroupMember}
-                            >
-                                <UserCircle size={16}/>
-                            </button>
-                            <button
-                                className={cn(
-                                    "bg-gray-200 cursor-pointer disabled:cursor-not-allowed text-olive-600", 
-                                    "text-[0.8rem] hover:bg-gray-500 hover:text-white transition-colors font-medium p-1.5"
-                                )}
-                                disabled={props.isProcessing}
-                                type="button"
-                                onClick={seeGroupChat}
-                            >
-                                <MessageCircle size={16}/>
-                            </button>
-                        </div>
-                        <div className="flex justify-center">
-                            <div className="w-20 h-20 rounded-full">
-                                {props.groupProfile && 
-                                props.groupProfile.picture.public_id !== "-" ? (
-                                    <div className="w-full h-full rounded-full">
-                                        <img
-                                            alt={props.groupProfile.picture.public_id}
-                                            className="w-full h-full object-cover rounded-full"
-                                            src={props.groupProfile.picture.url}
-                                        />
-                                    </div>
-                                ) : (
-                                    <div className={cn(
-                                        "bg-blue-600 text-white font-medium text-2xl",
-                                        "flex justify-center items-center w-full h-full rounded-full"
-                                    )}>
-                                        {props.groupProfile?.group_name[0]}
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                        <div className="flex flex-col gap-3">
-                            <div className="flex flex-col gap-1.5">
-                                <div className="text-[1rem] font-medium text-gray-800">Created At</div>
-                                <div className="text-[1rem] font-medium text-gray-800">
-                                    {new Date(props.groupProfile.created_at).toLocaleString()}
-                                </div>
-                            </div>
-                            <div className="flex flex-col gap-1.5">
-                                <div className="text-[1rem] font-medium text-gray-800">Group ID</div>
-                                <div className="text-[1rem] font-medium text-gray-800">
-                                    {props.groupProfile._id}
-                                </div>
-                            </div>
-                            <div className="flex flex-col gap-1.5">
-                                <div className="text-[1rem] font-medium text-gray-800">Group Name</div>
-                                <div className="text-[1rem] font-medium text-gray-800">
-                                    {props.groupProfile.group_name}
-                                </div>
-                            </div>
-                            <div className="flex flex-col gap-1.5">
-                                <div className="text-[1rem] font-medium text-gray-800">Description</div>
-                                <div className="text-[1rem] font-medium text-gray-800">
-                                    {props.groupProfile.description}
-                                </div>
-                            </div>
-                        </div>
-                        <div className="flex flex-col">
-                            {props.groupProfile.isGroupOwner ? (
-                                <div className="grid grid-cols-2 gap-2">
-                                    <button
-                                        className={cn(
-                                            "bg-gray-200 cursor-pointer disabled:cursor-not-allowed text-amber-600", 
-                                            "text-[0.8rem] hover:bg-gray-500 hover:text-white transition-colors font-medium p-1.5"
-                                        )}
-                                        disabled={props.isProcessing}
-                                        onClick={() => props.groupProfile.deleteGroupMt.mutate()}
-                                        type="button"
-                                    >
-                                        Delete room
-                                    </button>
-                                    <button
-                                        className={cn(
-                                            "bg-gray-200 cursor-pointer disabled:cursor-not-allowed text-amber-600", 
-                                            "text-[0.8rem] hover:bg-gray-500 hover:text-white transition-colors font-medium p-1.5"
-                                        )}
-                                        disabled={props.isProcessing}
-                                        onClick={() => setEditMode(true)}
-                                        type="button"
-                                    >
-                                        Edit group profile
-                                    </button>
+                <section className="flex flex-col p-2.5 gap-2.5 w-full">
+                    <div className="flex gap-2">
+                        <button
+                            className={cn(
+                                "bg-gray-200 cursor-pointer disabled:cursor-not-allowed text-olive-600", 
+                                "text-[0.8rem] hover:bg-gray-500 hover:text-white transition-colors font-medium p-1.5"
+                            )}
+                            disabled={props.isProcessing}
+                            type="button"
+                            onClick={seeGroupMember}
+                        >
+                            <UserCircle size={16}/>
+                        </button>
+                        <button
+                            className={cn(
+                                "bg-gray-200 cursor-pointer disabled:cursor-not-allowed text-olive-600", 
+                                "text-[0.8rem] hover:bg-gray-500 hover:text-white transition-colors font-medium p-1.5"
+                            )}
+                            disabled={props.isProcessing}
+                            type="button"
+                            onClick={seeGroupChat}
+                        >
+                            <MessageCircle size={16}/>
+                        </button>
+                    </div>
+                    <div className="flex justify-center">
+                        <div className="w-20 h-20 rounded-full">
+                            {props.groupProfile && 
+                            props.groupProfile.picture.public_id !== "-" ? (
+                                <div className="w-full h-full rounded-full">
+                                    <img
+                                        alt={props.groupProfile.picture.public_id}
+                                        className="w-full h-full object-cover rounded-full"
+                                        src={props.groupProfile.picture.url}
+                                    />
                                 </div>
                             ) : (
-                                <button
-                                    className={cn(
-                                        "bg-gray-200 cursor-pointer disabled:cursor-not-allowed text-red-600", 
-                                        "text-[0.8rem] hover:bg-gray-500 hover:text-white transition-colors font-medium p-1.5"
-                                    )}
-                                    disabled={props.isProcessing}
-                                    onClick={() => props.groupMember.leftGroupMt.mutate()}
-                                >
-                                    Left group
-                                </button>
+                                <div className={cn(
+                                    "bg-blue-600 text-white font-medium text-2xl",
+                                    "flex justify-center items-center w-full h-full rounded-full"
+                                )}>
+                                    {props.groupProfile?.group_name[0]}
+                                </div>
                             )}
                         </div>
                     </div>
-                </main>
+                    <div className="flex flex-col gap-3">
+                        <div className="flex flex-col gap-1.5">
+                            <div className="text-[1rem] font-medium text-gray-800">Created At</div>
+                            <div className="text-[1rem] font-medium text-gray-800">
+                                {new Date(props.groupProfile.created_at).toLocaleString()}
+                            </div>
+                        </div>
+                        <div className="flex flex-col gap-1.5">
+                            <div className="text-[1rem] font-medium text-gray-800">Group ID</div>
+                            <div className="text-[1rem] font-medium text-gray-800">
+                                {props.groupProfile._id}
+                            </div>
+                        </div>
+                        <div className="flex flex-col gap-1.5">
+                            <div className="text-[1rem] font-medium text-gray-800">Group Name</div>
+                            <div className="text-[1rem] font-medium text-gray-800">
+                                {props.groupProfile.group_name}
+                            </div>
+                        </div>
+                        <div className="flex flex-col gap-1.5">
+                            <div className="text-[1rem] font-medium text-gray-800">Description</div>
+                            <div className="text-[1rem] font-medium text-gray-800">
+                                {props.groupProfile.description}
+                            </div>
+                        </div>
+                    </div>
+                    <div className="flex flex-col">
+                        {props.groupProfile.isGroupOwner ? (
+                            <div className="grid grid-cols-2 gap-2">
+                                <button
+                                    className={cn(
+                                        "bg-gray-200 cursor-pointer disabled:cursor-not-allowed text-amber-600", 
+                                        "text-[0.8rem] hover:bg-gray-500 hover:text-white transition-colors font-medium p-1.5"
+                                    )}
+                                    disabled={props.isProcessing}
+                                    onClick={() => props.groupProfile.deleteGroupMt.mutate()}
+                                    type="button"
+                                >
+                                    Delete room
+                                </button>
+                                <button
+                                    className={cn(
+                                        "bg-gray-200 cursor-pointer disabled:cursor-not-allowed text-amber-600", 
+                                        "text-[0.8rem] hover:bg-gray-500 hover:text-white transition-colors font-medium p-1.5"
+                                    )}
+                                    disabled={props.isProcessing}
+                                    onClick={() => setEditMode(true)}
+                                    type="button"
+                                >
+                                    Edit group profile
+                                </button>
+                            </div>
+                        ) : (
+                            <button
+                                className={cn(
+                                    "bg-gray-200 cursor-pointer disabled:cursor-not-allowed text-red-600", 
+                                    "text-[0.8rem] hover:bg-gray-500 hover:text-white transition-colors font-medium p-1.5"
+                                )}
+                                disabled={props.isProcessing}
+                                onClick={() => props.groupMember.leftGroupMt.mutate()}
+                            >
+                                Left group
+                            </button>
+                        )}
+                    </div>
+                </section>
             )}
         </section>
     );

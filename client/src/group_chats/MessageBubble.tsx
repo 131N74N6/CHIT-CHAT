@@ -6,7 +6,6 @@ import { useUserChatStore } from "../user_chats/useUserChatStore";
 import { useGroupMemberStore } from "../group_members/useGroupMemberStore";
 import { useGroupProfileStore } from "../group_profiles/useGroupProfileStore";
 import { useUserStore } from "../user_profiles/useUserStore";
-import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function MessageBubble(props: IGroupMessageData) {
@@ -18,13 +17,11 @@ export default function MessageBubble(props: IGroupMessageData) {
     const chosenMessageIdsFromGroup = useGroupChatStore((state) => state.chosenMessageIdsFromGroup);
     const setChosenMessageIdsFromGroup = useGroupChatStore((state) => state.setChosenMessageIdsFromGroup);
 
-    const setGroupMessage = useGroupChatStore((state) => state.setGroupMessage);
     const setGroupMessageId = useGroupChatStore((state) => state.setGroupMessageId);
     const setShowGroupChatPopUp = useGroupChatStore((state) => state.setShowGroupChatPopUp);
 
     const selectMode = useGroupChatStore((state) => state.selectMode);
 
-    const chosenMessageFromGroup = useGroupChatStore((state) => state.chosenMessageFromGroup);
     const setChosenMessageFromGroup = useGroupChatStore((state) => state.setChosenMessageFromGroup);
 
     const setReceiverId = useUserChatStore((state) => state.setReceiverId);
@@ -39,19 +36,6 @@ export default function MessageBubble(props: IGroupMessageData) {
     
     const setShowUserProfilePopUp = useUserStore((state) => state.setShowUserProfilePopUp);
 
-    useEffect(() => {
-        const canEdit = selectMode && 
-        chosenMessageFromGroup && 
-        chosenMessageIdsFromGroup.length === 1 &&
-        chosenMessageFromGroup.text !== "This message has been deleted";
-
-        if (canEdit) {
-            setGroupMessage(props.chat.text);
-        } else {
-            setGroupMessage("");
-        }
-    }, [selectMode, chosenMessageIdsFromGroup, chosenMessageFromGroup, setGroupMessage]);
-
     const isSelected = chosenMessageIdsFromGroup.includes(props.chat._id);
 
     const closeUserChatPopUp = () => {
@@ -62,7 +46,7 @@ export default function MessageBubble(props: IGroupMessageData) {
     }
 
     const seeGroupChatFiles = () => {
-        setGroupMessageId(props.chat.sender_id);
+        setGroupMessageId(props.chat._id);
         setShowGroupChatPopUp(false);
         setShowMemberPopUp(false);
         setShowProfile(false);
@@ -129,7 +113,7 @@ export default function MessageBubble(props: IGroupMessageData) {
             <div className="wrap-break-word font-medium text-base">
                 {props.chat.text}
             </div>
-            {props.chat.updated_at === props.chat.created_at ? (
+            {props.chat.created_at === props.chat.updated_at ? (
                 <div className="wrap-break-word font-medium text-[14px]">
                     Sent: {new Date(props.chat.created_at).toLocaleString()}
                 </div>

@@ -1,4 +1,3 @@
-import { useNavigate } from "react-router-dom";
 import cn from "../cn";
 import { FileIcon } from "lucide-react";
 import type { IUserMessageData } from "./model";
@@ -6,7 +5,6 @@ import { useUserChatStore } from "./useUserChatStore";
 import { useUserStore } from "../user_profiles/useUserStore";
 
 export default function MessageBubble(props: IUserMessageData) {
-    const navigate = useNavigate();
     const setShowUserMedia = useUserChatStore((state) => state.setShowUserMedia);
 
     const setChosenMessage = useUserChatStore((state) => state.setChosenMessage);
@@ -29,11 +27,6 @@ export default function MessageBubble(props: IUserMessageData) {
         setShowUserChatPopUp(false);
         setShowUserChatFilesPopUp(true);
         setShowUserProfilePopUp(false);
-    }
-
-    const seeUserChatFilesPage = () => {
-        setChosenMessageId(props.chat._id);
-        navigate(`/user/media/detail/${props.chat._id}`);
     }
 
     const selectMessage = () => {
@@ -60,15 +53,8 @@ export default function MessageBubble(props: IUserMessageData) {
             {props.chat.files_total > 0 ? (
                 <div className={`cursor-pointer ${props.own ? "bg-blue-600" : "bg-gray-200"} p-2 rounded-md`}>
                     <div 
-                        className="items-center gap-2.5 md:flex hidden" 
+                        className="items-center gap-2.5 flex cursor-pointer" 
                         onClick={seeUserChatFiles}
-                    >
-                        <FileIcon size={16}/>
-                        <div>{props.chat.files_total} files</div>
-                    </div>
-                    <div 
-                        className="items-center gap-2.5 cursor-pointer md:hidden flex" 
-                        onClick={seeUserChatFilesPage}
                     >
                         <FileIcon size={16}/>
                         <div>{props.chat.files_total} files</div>
@@ -78,7 +64,7 @@ export default function MessageBubble(props: IUserMessageData) {
             <div className="wrap-break-word font-medium text-base">
                 {props.chat.text}
             </div>
-            {props.chat.updated_at !== props.chat.created_at ? (
+            {props.chat.created_at !== props.chat.updated_at ? (
                 <div className="flex flex-col gap-1">
                     <div className="wrap-break-word font-medium text-[14px]">
                         Sent: {new Date(props.chat.created_at).toLocaleString()}

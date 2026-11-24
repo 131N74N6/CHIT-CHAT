@@ -29,12 +29,12 @@ export default function UserChatPopUp(props: IUserChatPopUp) {
     const setShowUserProfilePopUp = useUserStore((state) => state.setShowUserProfilePopUp);
     
     useEffect(() => {
-        const canEdit = selectMode && 
-        chosenMessageIds.length === 1 && 
-        chosenMessage && 
-        chosenMessage.text !== "This message has been deleted";
-        
-        if (canEdit) {
+        if (
+            selectMode && 
+            chosenMessageIds.length === 1 && 
+            chosenMessage && 
+            chosenMessage.text !== "This message has been deleted"
+        ) {
             setText(chosenMessage.text);
         } else {
             setText("");

@@ -5,6 +5,7 @@ import MessageList from "./MessageList";
 import { useGroupProfileStore } from "../group_profiles/useGroupProfileStore";
 import { useGroupMemberStore } from "../group_members/useGroupMemberStore";
 import type { IGroupChatPopUp } from "./model";
+import { useEffect } from "react";
 
 export default function GroupChatPopUp(props: IGroupChatPopUp) {
     const setOpenPopUpOption = useGroupChatStore((state) => state.setOpenPopUpOption);
@@ -18,14 +19,30 @@ export default function GroupChatPopUp(props: IGroupChatPopUp) {
     
     const chosenMessageFromGroup = useGroupChatStore((state) => state.chosenMessageFromGroup);
     const setChosenMessageFromGroup = useGroupChatStore((state) => state.setChosenMessageFromGroup);
+
+    const chosenMessageIdsFromGroup = useGroupChatStore((state) => state.chosenMessageIdsFromGroup);
     
     const selectMode = useGroupChatStore((state) => state.selectMode);
     const setSelectMode = useGroupChatStore((state) => state.setSelectMode);
+
     const resetChosenMessageIdsFromGroup = useGroupChatStore((state) => state.resetChosenMessageIdsFromGroup);
     
     const setShowMemberPopUp = useGroupMemberStore((state) => state.setShowMemberPopUp);
 
     const setShowProfile = useGroupProfileStore((state) => state.setShowProfile);
+
+    useEffect(() => {
+        if (
+            selectMode && 
+            chosenMessageFromGroup && 
+            chosenMessageIdsFromGroup.length === 1 &&
+            chosenMessageFromGroup.text !== "This message has been deleted"
+        ) {
+            setGroupMessage(chosenMessageFromGroup.text);
+        } else {
+            setGroupMessage("");
+        }
+    }, [selectMode, chosenMessageIdsFromGroup, chosenMessageFromGroup, setGroupMessage]);
 
     const sendMessageToGroup = (event: React.SubmitEvent<HTMLFormElement>) => {
         event.preventDefault();

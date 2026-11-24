@@ -192,13 +192,12 @@ export default function useGroupChatService() {
             if (lastPage.length < 52) return;
             return allPages.length + 1;
         },
+        initialPageParam: 1,
         queryFn: async ({pageParam = 1}: { pageParam?: number }) => {
             const endpoint = `/api/v1/groups/chats?group_id=${groupId}&page=${pageParam}&limit=${52}`;
-
             const request = await apiRequest<IGroupMessage[]>(endpoint, { method: "GET" });
             return request.data ?? [];
         },
-        initialPageParam: 1,
         queryKey: [`group-chat-${groupId}`]
     });
 

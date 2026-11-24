@@ -28,15 +28,6 @@ export default function AvailableGroup() {
     const chosenMessageIdsFromGroup = useGroupChatStore((state) => state.chosenMessageIdsFromGroup);
 
     const showGroupChatPopUp = useGroupChatStore((state) => state.showGroupChatPopUp);
-    
-    const editMode = useGroupProfileStore((state) => state.editMode);
-    const setGroupDescription = useGroupProfileStore((state) => state.setGroupDescription);
-
-    const setGroupName = useGroupProfileStore((state) => state.setGroupName);
-    const setOldGroupProfilePicture = useGroupProfileStore((state) => state.setOldGroupProfilePicture);
-    
-    const setSelectedProfileGroup = useGroupProfileStore((state) => state.setSelectedProfileGroup);
-    const setSelectedProfileGroupUrl = useGroupProfileStore((state) => state.setSelectedProfileGroupUrl);
 
     const showGroupChatFilesPopUp = useGroupChatStore((state) => state.showGroupChatFilesPopUp);
     const showGroupChatFilePreviewPopUp = useGroupChatStore((state) => state.showGroupChatFilePreviewPopUp);
@@ -57,40 +48,6 @@ export default function AvailableGroup() {
             return () => clearTimeout(timer);
         }
     }, [message, setMessage]);
-
-    useEffect(() => {
-        if (editMode) {
-            groupProfile.showGroupDetail.data && groupProfile.showGroupDetail.data.group_name ?
-            setGroupName(groupProfile.showGroupDetail.data.group_name) :
-            setGroupName("-");
-
-            groupProfile.showGroupDetail.data && groupProfile.showGroupDetail.data.group_description ? 
-            setGroupDescription(groupProfile.showGroupDetail.data.group_description) :
-            setGroupDescription("-");
-
-            groupProfile.showGroupDetail.data && groupProfile.showGroupDetail.data.group_profile.public_id !== "" ? 
-            setOldGroupProfilePicture(groupProfile.showGroupDetail.data.group_profile) :
-            setOldGroupProfilePicture({
-                file_name: "",
-                file_type: "",
-                public_id: "",
-                resource_type: "",
-                url: "",
-            });
-        } else {
-            setGroupDescription("-");
-            setGroupName("-");
-            setSelectedProfileGroup(null);
-            setOldGroupProfilePicture({
-                file_name: "",
-                file_type: "",
-                public_id: "",
-                resource_type: "",
-                url: "",
-            });
-            setSelectedProfileGroupUrl("");
-        }
-    }, [editMode, groupId, groupProfile.showGroupDetail.data]);
 
     const isGroupOwner = groupProfile.showGroupDetail.data && 
     groupProfile.showGroupDetail.data.owner_id === currentUserId ? true : false;

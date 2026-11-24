@@ -38,7 +38,13 @@ export default function useGroupProfileWebSocket() {
         let isMounted = true;
 
         function connect() {
-            if (!getSessionToken.data || getSessionToken.isLoading || !isMounted || !groupId) return;
+            if (
+                !groupId || groupId == "" || 
+                !getSessionToken.data || getSessionToken.isLoading || 
+                !isMounted
+            ) {
+                return;
+            }
     
             const token = getSessionToken.data;
     
@@ -111,7 +117,7 @@ export default function useGroupProfileWebSocket() {
     
             ws.onclose = (event) => {
                 if (!isMounted) return;
-                if (!groupId) return;
+                if (!groupId || groupId == "") return;
 
                 isConncectingRef.current = false;
 
