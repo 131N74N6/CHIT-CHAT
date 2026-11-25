@@ -7,22 +7,6 @@ import groupProfileWebSocket from "./websocket";
 import { v2 } from "cloudinary";
 
 class GroupProfileService {
-    private checkIsIdValid(field: string, value: unknown) {
-        if (!value || typeof value !== "string" || !ObjectId.isValid(value)) {
-            throw new ChitChatApiError(`invalid ${field}`, 400);
-        }
-        
-        return value;
-    }
-
-    private checkIsInputAString(field: string, value: unknown) {
-        if (!value || typeof value !== "string" || value === "") {
-            throw new ChitChatApiError(`invalid ${field}`, 400);
-        }
-        
-        return value;
-    }
-
     async changeGroup(props: TGroupProfile["changeGroupRaw"]) {
         const groupId = this.checkIsIdValid("group", props._id);
         const userId = this.checkIsIdValid("group owner", props.owner_id);
@@ -90,6 +74,20 @@ class GroupProfileService {
 
             groupProfileWebSocket.broadcast("group-profile:changed");
         }
+    }
+    
+    private checkIsIdValid(field: string, value: unknown) {
+        if (!value || typeof value !== "string" || !ObjectId.isValid(value)) {
+            throw new ChitChatApiError(`invalid ${field}`, 400);
+        }
+        return value;
+    }
+
+    private checkIsInputAString(field: string, value: unknown) {
+        if (!value || typeof value !== "string" || value === "") {
+            throw new ChitChatApiError(`invalid ${field}`, 400);
+        }
+        return value;
     }
 
     async createGroup(props: TGroupProfile["createGroupRaw"]) {

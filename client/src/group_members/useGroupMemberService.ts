@@ -46,13 +46,18 @@ export default function useGroupMemberService() {
             setMessage(error.message);
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: [`available-group-${currentUserId}`] });
-            queryClient.invalidateQueries({ queryKey: ["current-user"] });
-            queryClient.invalidateQueries({ queryKey: [`group-member-${roomCode}`] });
-            
-            if (search !== "") {
-                queryClient.invalidateQueries({ queryKey: [`group-member-${roomCode}-${search}`] });
-            }
+            queryClient.invalidateQueries({
+                predicate: (query) => {
+                    const key = query.queryKey[0];
+                    if (typeof key !== "string") return false;
+
+                    return (
+                        key.startsWith("group-member-") ||
+                        key.startsWith("current-user") ||
+                        key.startsWith("available-group-")
+                    );
+                }
+            });
 
             setRoomCode("");
         }
@@ -113,7 +118,7 @@ export default function useGroupMemberService() {
     const showGroupMembers = useInfiniteQuery({
         enabled: !!groupId,
         getNextPageParam: (lastPage, allPages) => {
-            if (lastPage.length <= 16 ) return;
+            if (lastPage.length < 16 ) return;
             return allPages.length + 1;
         },
         initialPageParam: 1,

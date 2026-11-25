@@ -9,7 +9,6 @@ class GroupMemberService {
         if (!value || typeof value !== "string" || !ObjectId.isValid(value)) {
             throw new ChitChatApiError(`invalid ${field}`, 400);
         }
-
         return value;
     }
 

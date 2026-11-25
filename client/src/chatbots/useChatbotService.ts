@@ -82,13 +82,13 @@ export default function useChatbotService() {
             if (lastPage.length < 14) return;
             return allPages.length + 1;
         },
-        queryKey: [`all-results-${currentUserId}`],
+        initialPageParam: 1,
         queryFn: async ({ pageParam = 1}: { pageParam?: number }) => {
             const endpoint = `/api/v1/chatbots?page=${pageParam}&limit=${28}`;
             const request = await apiRequest<IMessageBot[]>(endpoint, { method: "GET" });
             return request.data ?? [];
         },
-        initialPageParam: 1
+        queryKey: [`all-results-${currentUserId}`]
     });
 
     const isProcessing = [
