@@ -29,8 +29,6 @@ export default function useGroupMemberService() {
     
     const setMessage = useMessageStore((state) => state.setMessage);
     
-    const currentUserId = useUserStore((state) => state.currentUserId);
-    
     const roomCode = useUserStore((state) => state.roomCode);
     const setRoomCode = useUserStore((state) => state.setRoomCode);
 
@@ -60,6 +58,7 @@ export default function useGroupMemberService() {
             });
 
             setRoomCode("");
+            setGroupId(roomCode);
         }
     });
 
@@ -73,13 +72,18 @@ export default function useGroupMemberService() {
             setMessage(error.message);
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: [`available-group-${currentUserId}`] });
-            queryClient.invalidateQueries({ queryKey: ["current-user"] });
-            queryClient.invalidateQueries({ queryKey: [`group-member-${groupId}`] });
-            
-            if (search !== "") {
-                queryClient.invalidateQueries({ queryKey: [`group-member-${groupId}-${search}`] });
-            }
+            queryClient.invalidateQueries({
+                predicate: (query) => {
+                    const key = query.queryKey[0];
+                    if (typeof key !== "string") return false;
+
+                    return (
+                        key.startsWith("group-member-") ||
+                        key.startsWith("current-user") ||
+                        key.startsWith("available-group-")
+                    );
+                }
+            });
 
             setRoomCode("");
         }
@@ -96,13 +100,18 @@ export default function useGroupMemberService() {
             setMessage(error.message);
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: [`available-group-${currentUserId}`] });
-            queryClient.invalidateQueries({ queryKey: ["current-user"] });
-            queryClient.invalidateQueries({ queryKey: [`group-member-${groupId}`] });
-            
-            if (search !== "") {
-                queryClient.invalidateQueries({ queryKey: [`group-member-${groupId}-${search}`] });
-            }
+            queryClient.invalidateQueries({
+                predicate: (query) => {
+                    const key = query.queryKey[0];
+                    if (typeof key !== "string") return false;
+
+                    return (
+                        key.startsWith("group-member-") ||
+                        key.startsWith("current-user") ||
+                        key.startsWith("available-group-")
+                    );
+                }
+            });
 
             setRoomCode("");
             setGroupId("");
