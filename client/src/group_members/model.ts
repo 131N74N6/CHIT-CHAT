@@ -12,7 +12,7 @@ export interface IGroupMemberState {
 }
 
 export interface GroupMembersMarks {
-    isGroupOwner: boolean;
+    groupOwnerId: string;
     kickMemberMt: UseMutationResult<any, Error, string, unknown>;
     name: "group-member";
 }
@@ -24,7 +24,7 @@ export interface IGroupMemberPopUp {
         fetchNextPage: (options?: FetchNextPageOptions | undefined) => Promise<InfiniteQueryObserverResult<InfiniteData<Users[], unknown>, Error>>
         hasNextPage: boolean;
         isFetchingNextPage: boolean;
-        isGroupOwner: boolean;
+        groupOwnerId: string;
         isLoading: boolean;
         kickMemberMt: UseMutationResult<void, Error, string, unknown>;
     }

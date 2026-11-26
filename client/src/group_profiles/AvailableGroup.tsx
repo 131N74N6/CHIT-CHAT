@@ -16,7 +16,6 @@ import { useGroupProfileStore } from "./useGroupProfileStore";
 import GroupProfilePopUp from "./GroupProfilePopUp";
 import GroupChatFilesPopUp from "../group_chats/GroupChatFilesPopUp";
 import GroupChatFilesPreviewPopUp from "../group_chats/GroupChatFilesPreviewPopUp";
-import { useUserStore } from "../user_profiles/useUserStore";
 
 export default function AvailableGroup() {
     const groupId = useGroupChatStore((state) => state.groupId);
@@ -36,8 +35,6 @@ export default function AvailableGroup() {
 
     const showProfile = useGroupProfileStore((state) => state.showProfile);
 
-    const currentUserId = useUserStore((state) => state.currentUserId);
-
     const groupChat = useGroupChatService();
     const groupProfile = useGroupProfileService();
     const groupMember = useGroupMemberService();
@@ -49,8 +46,8 @@ export default function AvailableGroup() {
         }
     }, [message, setMessage]);
 
-    const isGroupOwner = groupProfile.showGroupDetail.data && 
-    groupProfile.showGroupDetail.data.owner_id === currentUserId ? true : false;
+    const groupOwnerId = groupProfile.showGroupDetail.data ? 
+    groupProfile.showGroupDetail.data.owner_id : "";
 
     return (
         <section className="flex md:flex-row flex-col gap-2 p-2 h-dvh relative z-10">
@@ -134,7 +131,7 @@ export default function AvailableGroup() {
                             fetchNextPage: groupMember.showGroupMembers.fetchNextPage,
                             hasNextPage: groupMember.showGroupMembers.hasNextPage,
                             isFetchingNextPage: groupMember.showGroupMembers.isFetchingNextPage,
-                            isGroupOwner: isGroupOwner,
+                            groupOwnerId: groupOwnerId,
                             isLoading: groupMember.showGroupMembers.isLoading,
                             kickMemberMt: groupMember.kickMemberMt
                         }}
@@ -190,7 +187,7 @@ export default function AvailableGroup() {
                             groupProfile.showGroupDetail.data.group_name : "-",
 
                             isLoading: groupProfile.showGroupDetail.isLoading,
-                            isGroupOwner: isGroupOwner
+                            groupOwnerId: groupOwnerId
                         }} 
                         
                         isProcessing={groupChat.isProcessing || groupMember.isProcessing || groupProfile.isProcessing}

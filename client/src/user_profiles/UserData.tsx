@@ -87,7 +87,7 @@ export default function UserData(props: UserData) {
                         </div>
                         <div className="text-gray-950 font-medium">{props.user.name}</div>
                     </div>
-                    {props.place.isGroupOwner ? null : (
+                    {props.place.groupOwnerId === props.user._id ? null : (
                         <button
                             className={cn(
                                 "font-medium text-gray-700 hover:text-gray-400 transition-colors", 

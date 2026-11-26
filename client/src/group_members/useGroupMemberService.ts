@@ -57,8 +57,8 @@ export default function useGroupMemberService() {
                 }
             });
 
-            setRoomCode("");
             setGroupId(roomCode);
+            setRoomCode("");
         }
     });
 

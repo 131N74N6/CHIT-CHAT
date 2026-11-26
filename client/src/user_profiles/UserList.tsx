@@ -32,7 +32,7 @@ export default function UserList(props: UserList) {
                     );
                 })}
             </div>
-            {props.users.length <= 14 ? null : (                
+            {props.users.length <= 14 ? null : (
                 <div className="flex justify-center">
                     {props.isFetchingNextPage ? (
                         <Loading/>
@@ -49,7 +49,9 @@ export default function UserList(props: UserList) {
                             Load more
                         </button>
                     ) : (
-                        <div className="text-center text-[0.8rem] text-gray-950 font-medium">No more user to show</div>
+                        <div className="text-center text-[0.8rem] text-gray-950 font-medium">
+                            No more user to show
+                        </div>
                     )}
                 </div>
             )}

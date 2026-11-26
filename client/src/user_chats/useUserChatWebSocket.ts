@@ -147,7 +147,6 @@ export default function useUserChatWebSocket() {
                 wsRef.current = null;
             }
         }
-
     }, [getSessionToken.data, getSessionToken.isLoading, receiverId, queryClient, setMessage]);
 
     return wsRef.current;

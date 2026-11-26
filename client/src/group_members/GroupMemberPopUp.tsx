@@ -28,8 +28,8 @@ export default function GroupMemberPopUp(props: IGroupMemberPopUp) {
     }
 
     return (
-        <section className="flex flex-col h-full w-full p-2 border border-gray-400 overflow-y-auto">
-            <header className="flex gap-2">
+        <section className="flex flex-col h-full w-full border border-gray-400">
+            <header className="flex gap-2 px-2 pt-2">
                 <button 
                     className="text-base font-medium cursor-pointer disabled:cursor-not-allowed text-gray-900"
                     disabled={props.isProcessing}
@@ -62,7 +62,7 @@ export default function GroupMemberPopUp(props: IGroupMemberPopUp) {
                     hasNextPage={props.groupMembers.hasNextPage}
                     place={{ 
                         name: "group-member", 
-                        isGroupOwner: props.groupMembers.isGroupOwner, 
+                        groupOwnerId: props.groupMembers.groupOwnerId, 
                         kickMemberMt: props.groupMembers.kickMemberMt 
                     }}
                     isFetchingNextPage={props.groupMembers.isFetchingNextPage}

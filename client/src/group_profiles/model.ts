@@ -99,8 +99,8 @@ export interface IGroupProfileDetailPopUp {
             url: string;
         };
         group_name: string;
+        groupOwnerId: string;
         isLoading: boolean;
-        isGroupOwner: boolean;
     }
     isProcessing: boolean;
 }
